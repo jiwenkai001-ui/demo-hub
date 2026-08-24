@@ -24,7 +24,7 @@ if (fs.existsSync(demosDir)) {
     if (!entry.isDirectory()) continue;
     
     const demoPath = path.join(demosDir, entry.name);
-    const outputPath = path.join(siteDir, entry.name);
+    const outputPath = path.join(siteDir, 'demos', entry.name);
     
     console.log('Processing demo:', entry.name);
     
