@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LADY FASHION 门店管理系统 Demo</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="ambient-shell"></div>
+
+  <section class="login-shell" id="loginShell">
+    <div class="login-frame">
+      <div class="login-topbar">
+        <div class="brand-block">
+          <div class="brand-mark">LF</div>
+          <div>
+            <div class="brand-title">LADY FASHION</div>
+            <div class="brand-subtitle">STORE MANAGER DEMO</div>
+          </div>
+        </div>
+
+        <div class="lang-switch" aria-label="Language switch">
+          <button class="lang-button active" type="button" data-lang="zh">中文</button>
+          <button class="lang-button" type="button" data-lang="en">EN</button>
+        </div>
+      </div>
+
+      <div class="login-layout">
+        <section class="login-intro">
+          <div class="login-hero-copy">
+            <div class="metric-tag" id="loginEyebrow">客户演示登录入口</div>
+            <h1 id="loginTitle">女装店铺管理系统</h1>
+            <div class="login-title-note" id="loginTitleNote">双店铺销售、库存与调拨演示后台</div>
+          </div>
+
+          <div class="login-points compact">
+            <div class="login-point">
+              <strong id="loginPoint1Title">默认中文，支持中英文切换</strong>
+            </div>
+            <div class="login-point">
+              <strong id="loginPoint2Title">演示账号可直接登录</strong>
+            </div>
+            <div class="login-point">
+              <strong id="loginPoint3Title">纯静态部署</strong>
+            </div>
+          </div>
+
+          <div class="login-showcase">
+            <div class="login-showcase-label" id="loginShowcaseLabel">本次演示范围</div>
+            <div class="login-showcase-grid">
+              <div class="login-showcase-item" id="loginShowcaseItem1">店铺A 销售分析</div>
+              <div class="login-showcase-item" id="loginShowcaseItem2">店铺B 库存预警</div>
+              <div class="login-showcase-item" id="loginShowcaseItem3">双店铺调拨流程</div>
+              <div class="login-showcase-item" id="loginShowcaseItem4">管理后台双语言切换</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="login-panel">
+          <div class="panel-header">
+            <div>
+              <h2 id="loginFormTitle">账号登录</h2>
+              <p id="loginFormDesc">输入演示账号和密码进入系统。</p>
+            </div>
+          </div>
+
+          <form id="loginForm" class="login-form">
+            <label for="usernameInput" class="login-label" id="usernameLabel">账号</label>
+            <input id="usernameInput" name="username" type="text" autocomplete="username">
+
+            <label for="passwordInput" class="login-label" id="passwordLabel">密码</label>
+            <input id="passwordInput" name="password" type="password" autocomplete="current-password">
+
+            <div class="login-error" id="loginError" hidden></div>
+            <button class="login-submit" type="submit" id="loginSubmit">登录进入系统</button>
+          </form>
+
+          <div class="demo-account-box">
+            <div class="demo-account-title" id="demoAccountTitle">演示账号</div>
+            <div class="demo-account-list" id="demoAccountList"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div class="app-frame" id="appShell" hidden>
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">LF</div>
+        <div>
+          <div class="brand-title">LADY FASHION</div>
+          <div class="brand-subtitle">STORE MANAGER DEMO</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu" aria-label="主导航">
+        <button class="nav-item active" type="button" data-page="overview">
+          <span class="nav-icon">⌘</span>
+          <span>概览</span>
+        </button>
+        <button class="nav-item" type="button" data-page="sales">
+          <span class="nav-icon">◔</span>
+          <span>销售分析</span>
+        </button>
+        <button class="nav-item" type="button" data-page="inventory">
+          <span class="nav-icon">▣</span>
+          <span>出入库</span>
+        </button>
+        <button class="nav-item" type="button" data-page="stores">
+          <span class="nav-icon">◎</span>
+          <span>店铺管理</span>
+        </button>
+      </nav>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-main">
+          <div class="topbar-label">店铺选择</div>
+          <div class="store-select-wrap">
+            <select id="storeSelect" class="store-select" aria-label="店铺选择">
+              <option value="all">所有店铺</option>
+              <option value="storeA">店铺A · 淮海路形象店</option>
+              <option value="storeB">店铺B · 万象城轻奢店</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="lang-switch" aria-label="Language switch">
+            <button class="lang-button active" type="button" data-lang="zh">中文</button>
+            <button class="lang-button" type="button" data-lang="en">EN</button>
+          </div>
+          <div class="header-chip" id="currentScopeChip">当前视图：所有店铺</div>
+          <div class="header-chip" id="adminChip">管理员</div>
+          <div class="header-chip" id="dateChip">2026-04-14</div>
+          <button class="header-chip logout-chip" id="logoutButton" type="button">退出登录</button>
+          <button class="icon-button" type="button" aria-label="通知">⌁</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="page active" data-page-panel="overview">
+          <div class="section-heading">
+            <div>
+              <h1>销售分析概览</h1>
+              <p>围绕两家女装店铺的销售、订单、会员与库存节奏进行展示，方便客户快速理解系统能力。</p>
+            </div>
+            <div class="scope-badge" id="overviewScopeBadge">当前：所有店铺</div>
+          </div>
+
+          <div class="hero-layout">
+            <article class="hero-card">
+              <div class="hero-card-label">总销售额</div>
+              <div class="hero-card-value" id="heroSalesValue">¥0</div>
+              <div class="hero-card-meta">
+                <span class="hero-trend up" id="heroYoyValue">同比 +0.0%</span>
+                <span class="hero-note">本月累计</span>
+              </div>
+              <div class="hero-accent"></div>
+            </article>
+
+            <article class="mini-kpi">
+              <div class="mini-kpi-title">订单数</div>
+              <div class="mini-kpi-value" id="ordersValue">0</div>
+              <div class="mini-kpi-trend up" id="ordersTrend">环比 +0.0%</div>
+            </article>
+
+            <article class="mini-kpi">
+              <div class="mini-kpi-title">客单价</div>
+              <div class="mini-kpi-value" id="ticketValue">¥0</div>
+              <div class="mini-kpi-trend up" id="ticketTrend">同比 +0.0%</div>
+            </article>
+
+            <article class="mini-kpi warning">
+              <div class="mini-kpi-title">新增会员</div>
+              <div class="mini-kpi-value" id="memberValue">0</div>
+              <div class="mini-kpi-trend down" id="memberTrend">环比 +0.0%</div>
+            </article>
+          </div>
+
+          <div class="panel-grid two-up">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>销售趋势：本月 vs 上月 vs 去年同期</h2>
+                  <p>适合给客户展示同比、环比和趋势判断能力。</p>
+                </div>
+              </div>
+              <div class="chart-host" id="trendChart"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>店铺A vs 店铺B 销售对比</h2>
+                  <p>按周展示两家门店的销售差异和节奏变化。</p>
+                </div>
+              </div>
+              <div class="chart-host compact" id="compareChart"></div>
+            </article>
+          </div>
+
+          <div class="panel-grid asymmetric">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>本月畅销女装 TOP 5</h2>
+                  <p>结合样图形式展示排名、SKU、销量和销售额。</p>
+                </div>
+              </div>
+              <div class="ranking-list" id="topProductsList"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>经营分析摘要</h2>
+                  <p>演示系统对门店表现的归纳能力。</p>
+                </div>
+              </div>
+              <div class="insight-list" id="overviewInsights"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page-panel="sales">
+          <div class="section-heading">
+            <div>
+              <h1 id="salesPageTitle">销售详细分析</h1>
+              <p>按照门店维度查看每月销售额、同比、环比和重点商品表现。</p>
+            </div>
+          </div>
+
+          <div class="sales-entry-strip">
+            <div class="sales-entry-copy">
+              <span class="metric-tag" id="salesEntryBadge">演示交互</span>
+              <h2 id="salesEntryPanelTitle">新增销售录入</h2>
+              <p id="salesEntryPanelDesc">给当前门店补录销售额、订单数和新增会员后，页面会立即刷新同比、环比和概览指标。</p>
+            </div>
+            <div class="sales-entry-meta">
+              <div class="sales-entry-chip">
+                <span id="salesEntryScopeLabel">当前录入门店</span>
+                <strong id="salesEntryScopeValue">所有店铺</strong>
+              </div>
+              <button class="sales-entry-button" type="button" id="openSalesEntryButton">新增销售录入</button>
+            </div>
+          </div>
+
+          <div class="banner-row">
+            <article class="growth-banner">
+              <div class="growth-title">同比增长（YoY）</div>
+              <div class="growth-value" id="salesYoyBanner">+0.0%</div>
+              <div class="growth-arrow up">↑</div>
+            </article>
+            <article class="growth-banner green">
+              <div class="growth-title">环比增长（MoM）</div>
+              <div class="growth-value" id="salesMomBanner">+0.0%</div>
+              <div class="growth-arrow down">↓</div>
+            </article>
+          </div>
+
+          <div class="panel-grid asymmetric">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>月度销售明细</h2>
+                  <p>展示今日销售额、上月同期、去年同期，以及环比和同比结果。</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>日期</th>
+                      <th>本月销售额</th>
+                      <th>上月同期</th>
+                      <th>去年同期</th>
+                      <th>环比增长</th>
+                      <th>同比增长</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesDetailTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>重点商品分析</h2>
+                  <p>适合演示商品结构、热卖单品和导购建议。</p>
+                </div>
+              </div>
+              <div class="product-summary-list" id="salesProductSummary"></div>
+              <div class="sales-log-block">
+                <div class="sales-log-header">
+                  <h3 id="salesEntryListTitle">最近销售录入</h3>
+                  <p id="salesEntryListDesc">用户新增后会立即出现在这里，方便现场演示。</p>
+                </div>
+                <div class="sales-entry-list" id="salesEntryList"></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page-panel="inventory">
+          <div class="section-heading">
+            <div>
+              <h1>出入库管理中心</h1>
+              <p>包含库存查询、低库存预警、出入库记录和店铺调拨申请，贴近你给的样图结构。</p>
+            </div>
+          </div>
+
+          <div class="inventory-layout">
+            <article class="panel action-panel">
+              <div class="panel-header tight">
+                <div>
+                  <h2>入库 / 出库单据管理</h2>
+                  <p>演示新增单据、查看最近操作和库存流转。</p>
+                </div>
+              </div>
+              <div class="action-buttons">
+                <button type="button" id="openInboundButton" data-doc-action="inbound">新增入库单</button>
+                <button type="button" id="openOutboundButton" data-doc-action="outbound">新增出库单</button>
+              </div>
+              <div class="table-wrap small">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>单据编号</th>
+                      <th>类型</th>
+                      <th>日期</th>
+                      <th>关联店铺</th>
+                      <th>状态</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recordDocTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel inventory-panel">
+              <div class="panel-header tight inventory-head">
+                <div>
+                  <h2>库存查询</h2>
+                  <p>支持分类筛选和关键字搜索。</p>
+                </div>
+                <div class="filter-box">
+                  <input id="inventorySearch" type="search" placeholder="搜索商品或 SKU">
+                  <select id="inventoryCategory">
+                    <option value="all">全部分类</option>
+                    <option value="sleepwear">睡衣</option>
+                    <option value="underwear">内衣</option>
+                    <option value="sleep-pants">睡裤</option>
+                    <option value="briefs">内裤</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>商品图片</th>
+                      <th>商品名称</th>
+                      <th>SKU</th>
+                      <th>当前库存（店铺A）</th>
+                      <th>当前库存（店铺B）</th>
+                      <th>总库存</th>
+                      <th>安全股数</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel warning-panel">
+              <div class="panel-header tight">
+                <div>
+                  <h2>库存预警</h2>
+                  <p>低库存商品和安全库存提醒。</p>
+                </div>
+              </div>
+              <div class="warning-list" id="warningList"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header tight">
+                <div>
+                  <h2>最新出入库记录</h2>
+                  <p>按时间倒序展示最近单据动作。</p>
+                </div>
+              </div>
+              <div class="table-wrap small">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>时间</th>
+                      <th>类型</th>
+                      <th>商品</th>
+                      <th>门店</th>
+                      <th>数量</th>
+                      <th>操作员</th>
+                    </tr>
+                  </thead>
+                  <tbody id="movementTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header tight">
+                <div>
+                  <h2>店铺调拨申请</h2>
+                  <p>演示两店之间的库存调拨流程。</p>
+                </div>
+              </div>
+              <div class="transfer-list" id="transferList"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page-panel="stores">
+          <div class="section-heading">
+            <div>
+              <h1>店铺管理</h1>
+              <p>展示两家店铺的基础信息、运营节奏和管理建议，方便客户理解系统能管什么。</p>
+            </div>
+          </div>
+
+          <div class="store-card-grid" id="storeCards"></div>
+
+          <div class="panel-grid two-up">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>双店铺关键指标对比</h2>
+                  <p>从销售额、坪效、连带率和库存周转天数四个维度做展示。</p>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>店铺</th>
+                      <th>本月销售额</th>
+                      <th>坪效</th>
+                      <th>连带率</th>
+                      <th>库存周转天数</th>
+                    </tr>
+                  </thead>
+                  <tbody id="storeCompareTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2>本周营运建议</h2>
+                  <p>用于演示系统从数据出发给管理层的提醒内容。</p>
+                </div>
+              </div>
+              <div class="insight-list" id="storeAdviceList"></div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-shell" id="docModal" hidden>
+    <div class="modal-backdrop" id="docModalBackdrop"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="docModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="docModalTitle">新增入库单</h2>
+          <p id="docModalDesc">填写商品、门店和数量后，系统会同步刷新库存和记录。</p>
+        </div>
+        <button class="modal-close" type="button" id="closeDocModal" aria-label="关闭">×</button>
+      </div>
+
+      <form class="modal-form" id="docForm">
+        <div class="modal-grid">
+          <label class="modal-field">
+            <span id="docTypeLabel">单据类型</span>
+            <input id="docTypeDisplay" type="text" readonly>
+          </label>
+
+          <label class="modal-field">
+            <span id="docStoreLabel">门店</span>
+            <select id="docStoreSelect"></select>
+          </label>
+
+          <label class="modal-field">
+            <span id="docProductLabel">商品</span>
+            <select id="docProductSelect"></select>
+          </label>
+
+          <label class="modal-field">
+            <span id="docQtyLabel">数量</span>
+            <input id="docQtyInput" type="number" min="1" step="1" value="12">
+          </label>
+        </div>
+
+        <label class="modal-field">
+          <span id="docRemarkLabel">备注</span>
+          <textarea id="docRemarkInput" rows="3"></textarea>
+        </label>
+
+        <div class="modal-hint" id="docModalHint">提交后将立即更新库存、最新记录和单据列表。</div>
+        <div class="login-error" id="docModalError" hidden></div>
+
+        <div class="modal-actions">
+          <button class="modal-secondary" type="button" id="cancelDocModal">取消</button>
+          <button class="login-submit modal-submit" type="submit" id="submitDocModal">确认新增</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-shell" id="salesModal" hidden>
+    <div class="modal-backdrop" id="salesModalBackdrop"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="salesModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="salesModalTitle">新增销售录入</h2>
+          <p id="salesModalDesc">录入后会即时刷新当前门店的销售分析、概览指标与最近录入记录。</p>
+        </div>
+        <button class="modal-close" type="button" id="closeSalesModal" aria-label="关闭">×</button>
+      </div>
+
+      <form class="modal-form" id="salesForm">
+        <div class="modal-grid">
+          <label class="modal-field">
+            <span id="salesMonthLabel">录入月份</span>
+            <input id="salesMonthDisplay" type="text" readonly>
+          </label>
+
+          <label class="modal-field">
+            <span id="salesStoreLabel">门店</span>
+            <select id="salesStoreSelect"></select>
+          </label>
+
+          <label class="modal-field">
+            <span id="salesAmountLabel">销售额</span>
+            <input id="salesAmountInput" type="number" min="100" step="100" value="6800">
+          </label>
+
+          <label class="modal-field">
+            <span id="salesOrdersLabel">订单数</span>
+            <input id="salesOrdersInput" type="number" min="1" step="1" value="28">
+          </label>
+        </div>
+
+        <div class="modal-grid sales-modal-grid">
+          <label class="modal-field">
+            <span id="salesMembersLabel">新增会员</span>
+            <input id="salesMembersInput" type="number" min="0" step="1" value="3">
+          </label>
+
+          <label class="modal-field">
+            <span id="salesNoteLabel">录入说明</span>
+            <input id="salesNoteInput" type="text" value="示例：午间直播成交补录">
+          </label>
+        </div>
+
+        <div class="modal-hint" id="salesModalHint">提交后将同步更新本月销售额、订单数、新增会员和最近录入记录。</div>
+        <div class="login-error" id="salesModalError" hidden></div>
+
+        <div class="modal-actions">
+          <button class="modal-secondary" type="button" id="cancelSalesModal">取消</button>
+          <button class="login-submit modal-submit" type="submit" id="submitSalesModal">确认录入</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
