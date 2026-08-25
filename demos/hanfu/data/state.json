@@ -1,0 +1,10 @@
+{
+  "tickets": [],
+  "currentCall": null,
+  "counters": {
+    "dateKey": "",
+    "general": 0
+  },
+  "updatedAt": "2026-04-28T14:38:08.928387",
+  "lastCreatedTicketId": ""
+}
