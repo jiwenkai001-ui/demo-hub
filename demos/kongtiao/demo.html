@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>正兴实业 · 中央空调智能管理系统</title>
+<style>
+:root {
+  --teal-900:#134E4A;--teal-800:#115E59;--teal-700:#0F766E;--teal-600:#0D9488;
+  --teal-500:#14B8A6;--teal-400:#2DD4BF;--teal-100:#CCFBF1;--teal-50:#F0FDFA;
+  --amber-500:#F59E0B;--amber-400:#FBBF24;--amber-100:#FEF3C7;
+  --slate-900:#0F172A;--slate-800:#1E293B;--slate-700:#334155;--slate-600:#475569;
+  --slate-500:#64748B;--slate-400:#94A3B8;--slate-300:#CBD5E1;--slate-200:#E2E8F0;
+  --slate-100:#F1F5F9;--slate-50:#F8FAFC;
+  --red-500:#EF4444;--red-100:#FEE2E2;--green-500:#22C55E;--green-100:#DCFCE7;
+  --blue-500:#3B82F6;--blue-100:#DBEAFE;--purple-500:#8B5CF6;--purple-100:#EDE9FE;
+  --sidebar-w:220px;--radius:14px;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-md:0 4px 6px -1px rgba(15,23,42,.08),0 2px 4px -2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 15px -3px rgba(15,23,42,.08),0 4px 6px -4px rgba(15,23,42,.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:var(--slate-100);color:var(--slate-800);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ====== TOPBAR ====== */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:linear-gradient(135deg,var(--teal-800),var(--teal-700));box-shadow:0 2px 12px rgba(15,118,110,.3);height:56px;display:flex;align-items:center;padding:0 20px;gap:16px}
+.brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:15px;white-space:nowrap}
+.brand-icon{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-sub{font-size:10px;font-weight:400;opacity:.8}
+
+.role-tabs{display:flex;gap:2px;margin-left:auto;margin-right:12px;background:rgba(255,255,255,.1);border-radius:10px;padding:3px}
+.role-tab{padding:6px 14px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,.7);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.role-tab:hover{color:#fff;background:rgba(255,255,255,.1)}
+.role-tab.active{background:#fff;color:var(--teal-700)}
+
+.device-toggle{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:10px;padding:3px 6px 3px 8px}
+.device-toggle>span{color:rgba(255,255,255,.8);font-size:11px;font-weight:500}
+.device-btn{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,.6);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.device-btn.active{background:#fff;color:var(--teal-700)}
+.device-btn svg{width:15px;height:15px}
+
+/* ====== SIDEBAR ====== */
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:var(--sidebar-w);background:#fff;box-shadow:2px 0 8px rgba(15,23,42,.06);z-index:50;overflow-y:auto;padding:12px 0}
+.sidebar::-webkit-scrollbar{width:0}
+.sidebar-group-label{font-size:10px;color:var(--slate-400);font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:16px 20px 6px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:var(--slate-600);cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-weight:500}
+.sidebar-item:hover{background:var(--slate-50);color:var(--teal-700)}
+.sidebar-item.active{background:var(--teal-50);color:var(--teal-700);border-left-color:var(--teal-500);font-weight:700}
+.sidebar-item .icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-item .icon svg{width:18px;height:18px}
+.sidebar-item .badge{margin-left:auto;font-size:10px;background:var(--amber-500);color:#fff;padding:1px 7px;border-radius:10px;font-weight:700}
+
+/* ====== MAIN ====== */
+.main-wrap{margin-left:var(--sidebar-w);padding-top:56px;min-height:100vh}
+.content-area{padding:24px;max-width:1300px;margin:0 auto;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Mobile frame */
+.mobile-viewport{display:none;justify-content:center;padding:30px 0}
+.mobile-frame{width:390px;height:780px;border-radius:44px;background:#1a1a2e;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.25),0 8px 24px rgba(0,0,0,.15);position:relative}
+.mobile-frame::before{content:'';position:absolute;top:12px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#1a1a2e;border-radius:0 0 18px 18px;z-index:10}
+.mobile-screen{width:100%;height:100%;border-radius:32px;overflow-y:auto;overflow-x:hidden;background:var(--slate-100)}
+.mobile-screen::-webkit-scrollbar{width:0}
+.mobile-content{padding:44px 0 20px}
+.mobile-content .content-area{padding:0 16px}
+
+/* ====== SHARED ====== */
+.page-title{font-size:20px;font-weight:700;color:var(--slate-900);margin-bottom:2px}
+.page-sub{font-size:12px;color:var(--slate-500);margin-bottom:20px}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.kpi-card.accent-teal::before{background:var(--teal-500)}
+.kpi-card.accent-amber::before{background:var(--amber-500)}
+.kpi-card.accent-blue::before{background:var(--blue-500)}
+.kpi-card.accent-purple::before{background:var(--purple-500)}
+.kpi-card.accent-green::before{background:var(--green-500)}
+.kpi-card.accent-red::before{background:var(--red-500)}
+.kpi-label{font-size:11px;color:var(--slate-500);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-label svg{width:13px;height:13px;opacity:.6}
+.kpi-value{font-size:26px;font-weight:700;color:var(--slate-900);line-height:1.2}
+.kpi-value .unit{font-size:13px;color:var(--slate-400)}
+.kpi-trend{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:3px}
+.kpi-trend.up{color:var(--green-500)}
+.kpi-trend.down{color:var(--red-500)}
+.kpi-trend.neutral{color:var(--slate-400)}
+
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700;color:var(--slate-800);display:flex;align-items:center;gap:7px}
+.card-title svg{width:17px;height:17px;color:var(--teal-600)}
+.card-action{font-size:12px;color:var(--teal-600);cursor:pointer;font-weight:600}
+.card-body{padding:18px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;font-size:11px;color:var(--slate-500);font-weight:600;padding:9px 14px;border-bottom:2px solid var(--slate-200);white-space:nowrap}
+.data-table td{padding:11px 14px;font-size:12px;border-bottom:1px solid var(--slate-100);color:var(--slate-700)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover{background:var(--slate-50)}
+
+.tag{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;gap:3px}
+.tag-teal{background:var(--teal-100);color:var(--teal-700)}
+.tag-amber{background:var(--amber-100);color:#92400E}
+.tag-blue{background:var(--blue-100);color:#1E40AF}
+.tag-purple{background:var(--purple-100);color:#5B21B6}
+.tag-green{background:var(--green-100);color:#166534}
+.tag-red{background:var(--red-100);color:#991B1B}
+.tag-slate{background:var(--slate-200);color:var(--slate-600)}
+
+/* Steps */
+.steps-row{display:flex;align-items:center;gap:0;margin:8px 0;flex-wrap:wrap}
+.step-item{display:flex;align-items:center;gap:3px}
+.step-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--slate-300);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--slate-400)}
+.step-dot.done{background:var(--teal-500);border-color:var(--teal-500);color:#fff}
+.step-dot.current{background:var(--amber-500);border-color:var(--amber-500);color:#fff}
+.step-line{width:20px;height:2px;background:var(--slate-200)}
+.step-line.done{background:var(--teal-500)}
+
+/* Bar chart */
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{width:70px;font-size:11px;color:var(--slate-600);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--slate-100);border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;font-weight:600;color:#fff;transition:width .8s ease}
+.bar-fill.teal{background:linear-gradient(90deg,var(--teal-600),var(--teal-500))}
+.bar-fill.amber{background:linear-gradient(90deg,var(--amber-500),var(--amber-400))}
+.bar-fill.blue{background:linear-gradient(90deg,#2563EB,#3B82F6)}
+.bar-fill.purple{background:linear-gradient(90deg,#7C3AED,#8B5CF6)}
+.bar-fill.green{background:linear-gradient(90deg,#16A34A,#22C55E)}
+.bar-fill.red{background:linear-gradient(90deg,#DC2626,#EF4444)}
+.bar-fill.slate{background:linear-gradient(90deg,#64748B,#94A3B8)}
+
+/* Funnel */
+.funnel{display:flex;flex-direction:column;align-items:center;gap:0}
+.funnel-step{height:40px;display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-weight:600;font-size:12px}
+.funnel-step:nth-child(1){width:100%;background:var(--teal-700);border-radius:8px 8px 0 0}
+.funnel-step:nth-child(3){width:78%;background:var(--teal-600)}
+.funnel-step:nth-child(5){width:56%;background:var(--teal-500)}
+.funnel-step:nth-child(7){width:34%;background:var(--amber-500);border-radius:0 0 8px 8px}
+.funnel-arrow{color:var(--slate-400);font-size:12px;padding:1px 0}
+.funnel-count{font-size:10px;opacity:.8}
+
+/* Photo grid */
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.photo-item{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;background:linear-gradient(135deg,var(--teal-50),var(--slate-100));display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.photo-item:hover{transform:scale(1.03)}
+.photo-item::after{content:attr(data-label);position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:9px;padding:12px 6px 5px;text-align:center}
+.photo-icon{font-size:24px;opacity:.4}
+
+/* Timeline */
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--slate-200)}
+.timeline-item{position:relative;margin-bottom:14px}
+.timeline-item:last-child{margin-bottom:0}
+.timeline-item::before{content:'';position:absolute;left:-19px;top:5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--teal-500);background:#fff}
+.timeline-item.done::before{background:var(--teal-500)}
+.timeline-time{font-size:10px;color:var(--slate-400)}
+.timeline-title{font-size:12px;font-weight:600;color:var(--slate-800);margin:1px 0}
+.timeline-desc{font-size:11px;color:var(--slate-500)}
+
+.section-h{font-size:13px;font-weight:700;color:var(--slate-800);margin:16px 0 10px;display:flex;align-items:center;gap:7px}
+.section-h .bar{width:3px;height:14px;background:var(--teal-500);border-radius:2px}
+
+/* Mini stats */
+.mini-stat{background:var(--slate-50);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.mini-stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.mini-stat-label{font-size:10px;color:var(--slate-500)}
+.mini-stat-value{font-size:15px;font-weight:700;color:var(--slate-900)}
+
+/* SOP */
+.sop-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--slate-100)}
+.sop-item:last-child{border-bottom:none}
+.sop-num{width:22px;height:22px;border-radius:6px;background:var(--teal-100);color:var(--teal-700);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sop-text{font-size:12px;color:var(--slate-700);line-height:1.5}
+
+/* Warranty */
+.warranty-card{border:1px solid var(--slate-200);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.warranty-card.active{border-color:var(--green-500);background:var(--green-100)}
+.warranty-card.expiring{border-color:var(--amber-500);background:var(--amber-100)}
+.warranty-card.expired{border-color:var(--red-500);background:var(--red-100)}
+.warranty-info{display:flex;flex-direction:column;gap:1px}
+.warranty-name{font-size:12px;font-weight:600;color:var(--slate-800)}
+.warranty-date{font-size:10px;color:var(--slate-500)}
+
+/* Table scroll */
+.table-wrap{overflow-x:auto}
+.table-wrap::-webkit-scrollbar{height:5px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:3px}
+
+/* Role indicator */
+.role-indicator{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--teal-50);color:var(--teal-700);margin-bottom:16px;border:1px solid var(--teal-100)}
+
+/* Progress bar */
+.progress-bar{background:var(--slate-100);border-radius:6px;height:8px;width:100%;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:6px}
+
+/* Payment type indicator */
+.pay-type{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px}
+.pay-type.deposit{background:var(--amber-100);color:#92400E}
+.pay-type.full{background:var(--green-100);color:#166534}
+.pay-type.warranty{background:var(--purple-100);color:#5B21B6}
+.pay-type.balance{background:var(--blue-100);color:#1E40AF}
+
+/* Boss hero */
+.boss-hero{background:linear-gradient(135deg,var(--teal-800),var(--teal-600));border-radius:var(--radius);padding:24px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.boss-hero h2{font-size:18px;font-weight:700;margin-bottom:3px}
+.boss-hero p{font-size:12px;opacity:.8}
+.boss-hero-stat{text-align:right}
+.boss-hero-stat .num{font-size:28px;font-weight:800}
+.boss-hero-stat .lbl{font-size:11px;opacity:.8}
+
+/* Role-aware notice */
+.role-notice{padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Mobile sidebar */
+.mobile-nav{display:none}
+.mobile-bottom-nav{display:none}
+
+/* Responsive */
+@media(max-width:768px){
+  :root{--sidebar-w:0px}
+  .sidebar{display:none}
+  .main-wrap{margin-left:0}
+  .role-tabs{display:none}
+  .mobile-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--slate-200);padding:6px 0;z-index:100;justify-content:space-around;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+  .mobile-bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;font-size:9px;color:var(--slate-400);cursor:pointer;border:none;background:none}
+  .mobile-bottom-nav-item.active{color:var(--teal-600)}
+  .mobile-bottom-nav-item svg{width:20px;height:20px}
+  .mobile-role-bar{display:flex;padding:6px 12px;gap:5px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--slate-200);position:sticky;top:0;z-index:5}
+  .mobile-role-bar::-webkit-scrollbar{display:none}
+  .mobile-role-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--slate-100);color:var(--slate-600);border:none;cursor:pointer;white-space:nowrap}
+  .mobile-role-chip.active{background:var(--teal-600);color:#fff}
+}
+</style>
+</head>
+<body>
+
+<!-- ====== TOPBAR ====== -->
+<nav class="topbar">
+  <div class="brand">
+    <div class="brand-icon">❄</div>
+    <div>
+      <div>正兴实业</div>
+      <div class="brand-sub">中央空调智能管理系统</div>
+    </div>
+  </div>
+
+  <div class="role-tabs" id="roleTabs">
+    <button class="role-tab active" data-role="sales">销售总</button>
+    <button class="role-tab" data-role="install">安装总</button>
+    <button class="role-tab" data-role="service">售后总</button>
+    <button class="role-tab" data-role="boss">老板</button>
+  </div>
+
+  <div class="device-toggle">
+    <span>视图</span>
+    <button class="device-btn active" id="desktopBtn" title="电脑端">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+    </button>
+    <button class="device-btn" id="mobileBtn" title="手机端">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-group-label">业务管理</div>
+  <div class="sidebar-item active" data-module="customer">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span>客户管理</span>
+    <span class="badge">56</span>
+  </div>
+  <div class="sidebar-item" data-module="contract">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6M9 17h4"/></svg></span>
+    <span>合同管理</span>
+  </div>
+  <div class="sidebar-item" data-module="payment">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></span>
+    <span>收款管理</span>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-item" data-module="install">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+    <span>现场安装管理</span>
+    <span class="badge">14</span>
+  </div>
+  <div class="sidebar-item" data-module="service">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg></span>
+    <span>售后维保派单</span>
+    <span class="badge">12</span>
+  </div>
+  <div class="sidebar-group-label">数据分析</div>
+  <div class="sidebar-item" data-module="report">
+    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg></span>
+    <span>报表管理</span>
+  </div>
+</aside>
+
+<!-- ====== MAIN ====== -->
+<div class="main-wrap">
+  <div id="desktopView">
+    <div class="content-area" id="mainContent"></div>
+  </div>
+
+  <div id="mobileView" class="mobile-viewport">
+    <div class="mobile-frame">
+      <div class="mobile-screen">
+        <div class="mobile-content">
+          <div class="mobile-role-bar" id="mobileRoleBar"></div>
+          <div class="content-area" id="mobileContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile bottom nav -->
+<div class="mobile-bottom-nav" id="mobileBottomNav"></div>
+
+<script>
+(function(){
+  const ROLE_NAMES = {
+    sales: '销售总',
+    install: '安装总',
+    service: '售后总',
+    boss: '老板'
+  };
+  const ROLE_DESC = {
+    sales: '关注客户跟进、合同签订与收款进度',
+    install: '关注安装派单、施工进度与质控',
+    service: '关注维保工单、质保管理与维修记录',
+    boss: '全局经营视角，关注核心指标与趋势'
+  };
+  const MODULES = [
+    {id:'customer',label:'客户管理'},
+    {id:'contract',label:'合同管理'},
+    {id:'payment',label:'收款管理'},
+    {id:'install',label:'现场安装管理'},
+    {id:'service',label:'售后维保派单'},
+    {id:'report',label:'报表管理'},
+  ];
+
+  let currentRole = 'sales';
+  let currentModule = 'customer';
+  let currentDevice = 'desktop';
+
+  // ====== Icon SVGs ======
+  const ICONS = {
+    customers:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+    funnel:'<polygon points="22 3 2 3 6 12 2 21 22 21 18 12 22 3"/>',
+    chart:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+    target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    money:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    tool:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    shield:'<path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>',
+    search:'<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>',
+    list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    trend:'<path d="M23 6l-9 9-5-5L1 18"/><polyline points="17 6 23 6 23 12"/>',
+    alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    handover:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/>',
+  };
+
+  function svg(name){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+(ICONS[name]||'')+'</svg>';}
+
+  // ====== MODULE RENDERERS ======
+
+  function renderCustomer(){
+    const role = currentRole;
+    const kpis = {
+      sales:[
+        {cls:'accent-teal',icon:'customers',label:'本月新增客户',value:'38<span class="unit">人</span>',trend:'up',trendText:'↑ 12% 环比'},
+        {cls:'accent-amber',icon:'list',label:'跟进中客户',value:'56<span class="unit">人</span>',trend:'neutral',trendText:'待量房23人'},
+        {cls:'accent-green',icon:'check',label:'本月成交',value:'21<span class="unit">单</span>',trend:'up',trendText:'↑ 8% 环比'},
+        {cls:'accent-purple',icon:'trend',label:'转化率',value:'55.3<span class="unit">%</span>',trend:'up',trendText:'↑ 3.2%'},
+      ],
+      install:[
+        {cls:'accent-teal',icon:'customers',label:'已签待安装',value:'14<span class="unit">户</span>',trend:'up',trendText:'↑ 本周+4'},
+        {cls:'accent-amber',icon:'tool',label:'安装中',value:'14<span class="unit">户</span>',trend:'neutral',trendText:'6户本周完工'},
+        {cls:'accent-green',icon:'check',label:'本月完工',value:'18<span class="unit">户</span>',trend:'up',trendText:'↑ +3'},
+        {cls:'accent-purple',icon:'shield',label:'质保内客户',value:'186<span class="unit">户</span>',trend:'up',trendText:'↑ +8'},
+      ],
+      service:[
+        {cls:'accent-teal',icon:'customers',label:'质保内客户',value:'186<span class="unit">户</span>',trend:'up',trendText:'↑ +8'},
+        {cls:'accent-amber',icon:'alert',label:'质保外客户',value:'34<span class="unit">户</span>',trend:'neutral',trendText:'有维修收入'},
+        {cls:'accent-purple',icon:'doc',label:'本月工单',value:'12<span class="unit">单</span>',trend:'up',trendText:'↓ -2'},
+        {cls:'accent-green',icon:'clock',label:'平均响应',value:'2.3<span class="unit">h</span>',trend:'up',trendText:'↓ -0.5h'},
+      ],
+      boss:[
+        {cls:'accent-teal',icon:'customers',label:'累计客户',value:'220<span class="unit">户</span>',trend:'up',trendText:'↑ 年增38户'},
+        {cls:'accent-amber',icon:'list',label:'活跃客户',value:'56<span class="unit">户</span>',trend:'neutral',trendText:'跟进中'},
+        {cls:'accent-green',icon:'check',label:'本年成交',value:'168<span class="unit">单</span>',trend:'up',trendText:'↑ 18.2%'},
+        {cls:'accent-purple',icon:'trend',label:'年转化率',value:'52.5<span class="unit">%</span>',trend:'up',trendText:'↑ 4.1%'},
+      ],
+    };
+    const k = kpis[role] || kpis.boss;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
+      <div class="page-title">客户管理</div>
+      <div class="page-sub">客户档案 · 来源渠道 · 跟进记录 · 成交流程</div>
+      <div class="kpi-grid">
+        ${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}
+      </div>`;
+
+    // Sales funnel + channel conversion
+    if(role==='sales'||role==='boss'){
+      html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('funnel')}销售漏斗</div><span class="tag tag-teal">初步接触 → 成交</span></div>
+          <div class="card-body">
+            <div class="funnel">
+              <div class="funnel-step">初步接触<span class="funnel-count">38人</span></div>
+              <div class="funnel-arrow">↓</div>
+              <div class="funnel-step">需求沟通<span class="funnel-count">29人</span></div>
+              <div class="funnel-arrow">↓</div>
+              <div class="funnel-step">上门量房<span class="funnel-count">21人</span></div>
+              <div class="funnel-arrow">↓</div>
+              <div class="funnel-step">成交<span class="funnel-count">21人</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('chart')}渠道转化分析</div><span class="card-action">查看详情</span></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">自然到店</span><div class="bar-track"><div class="bar-fill teal" style="width:82%">82%</div></div></div>
+              <div class="bar-row"><span class="bar-label">活动获客</span><div class="bar-track"><div class="bar-fill teal" style="width:68%">68%</div></div></div>
+              <div class="bar-row"><span class="bar-label">异业联盟</span><div class="bar-track"><div class="bar-fill amber" style="width:55%">55%</div></div></div>
+              <div class="bar-row"><span class="bar-label">设计师合作</span><div class="bar-track"><div class="bar-fill amber" style="width:72%">72%</div></div></div>
+              <div class="bar-row"><span class="bar-label">装修公司</span><div class="bar-track"><div class="bar-fill blue" style="width:45%">45%</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // Customer list
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('customers')}客户档案列表</div><span class="card-action">+ 新增客户</span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>客户姓名</th><th>来源渠道</th><th>户型/面积</th><th>意向机型</th><th>当前阶段</th><th>最新跟进</th><th>负责人</th></tr></thead>
+            <tbody>
+              <tr><td>张明远</td><td><span class="tag tag-teal">设计师合作</span></td><td>三室两厅/128㎡</td><td>大金VRV-X</td><td><span class="tag tag-green">成交</span></td><td>9/14 已签单</td><td>李晓</td></tr>
+              <tr><td>王思琪</td><td><span class="tag tag-amber">活动获客</span></td><td>两室一厅/89㎡</td><td>格力雅居</td><td><span class="tag tag-amber">上门量房</span></td><td>9/15 安排量房</td><td>赵敏</td></tr>
+              <tr><td>刘建国</td><td><span class="tag tag-blue">自然到店</span></td><td>四室两厅/165㎡</td><td>三菱重工KXZ</td><td><span class="tag tag-purple">需求沟通</span></td><td>9/13 电话沟通</td><td>李晓</td></tr>
+              <tr><td>陈雅芳</td><td><span class="tag tag-purple">异业联盟</span></td><td>三室两厅/110㎡</td><td>美的理想家</td><td><span class="tag tag-teal">初步接触</span></td><td>9/15 初次到店</td><td>王强</td></tr>
+              <tr><td>周浩宇</td><td><span class="tag tag-teal">设计师合作</span></td><td>复式/220㎡</td><td>大金VRV-S</td><td><span class="tag tag-amber">上门量房</span></td><td>9/12 已量房</td><td>赵敏</td></tr>
+              <tr><td>孙丽娜</td><td><span class="tag tag-amber">活动获客</span></td><td>两室两厅/95㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交</span></td><td>9/10 已签单</td><td>李晓</td></tr>
+              <tr><td>吴小莉</td><td><span class="tag tag-blue">自然到店</span></td><td>三室一厅/105㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交</span></td><td>9/08 已签单</td><td>王强</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    // SOP + target
+    if(role==='sales'||role==='boss'){
+      html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('check')}销售SOP标准流程</div></div>
+          <div class="card-body">
+            <div class="sop-item"><div class="sop-num">1</div><div class="sop-text"><b>初步接触</b> — 记录客户来源（到店/活动/异业/设计师/装修公司），填写基本信息与初步需求</div></div>
+            <div class="sop-item"><div class="sop-num">2</div><div class="sop-text"><b>需求沟通</b> — 电话/微信/见面，了解户型面积、预算、偏好品牌，记录跟进日志</div></div>
+            <div class="sop-item"><div class="sop-num">3</div><div class="sop-text"><b>上门量房</b> — 预约上门测量，出具方案与报价，确认机型配置</div></div>
+            <div class="sop-item"><div class="sop-num">4</div><div class="sop-text"><b>成交签单</b> — 签订合同，收取定金，流转至安装环节</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('target')}业绩目标</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+              <svg width="72" height="72" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#E2E8F0" stroke-width="7"/>
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#0D9488" stroke-width="7" stroke-dasharray="213.6" stroke-dashoffset="74.8" transform="rotate(-90 40 40)" stroke-linecap="round"/>
+                <text x="40" y="46" text-anchor="middle" font-size="15" font-weight="700" fill="#0F172A">65%</text>
+              </svg>
+              <div>
+                <div style="font-size:11px;color:var(--slate-500)">年度目标进度</div>
+                <div style="font-size:17px;font-weight:700;color:var(--slate-900)">1,300万 / 2,000万</div>
+                <div style="font-size:10px;color:var(--green-500)">剩余700万 · 距年底108天</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--teal-100)">📋</div><div><div class="mini-stat-label">Q3目标</div><div class="mini-stat-value">500万</div></div></div>
+              <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--amber-100)">✅</div><div><div class="mini-stat-label">Q3已完成</div><div class="mini-stat-value">325万</div></div></div>
+              <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--blue-100)">👥</div><div><div class="mini-stat-label">销售人数</div><div class="mini-stat-value">5人</div></div></div>
+              <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--purple-100)">📈</div><div><div class="mini-stat-label">人均产出</div><div class="mini-stat-value">26万/人</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+    return html;
+  }
+
+  function renderContract(){
+    const role = currentRole;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
+      <div class="page-title">合同管理</div>
+      <div class="page-sub">合同签订 · 执行跟踪 · 变更管理 · 到期提醒</div>`;
+
+    const kpis = {
+      sales:[
+        {cls:'accent-teal',icon:'doc',label:'本月新签合同',value:'21<span class="unit">份</span>',trend:'up',trendText:'↑ 8% 环比'},
+        {cls:'accent-amber',icon:'money',label:'合同总金额',value:'168<span class="unit">万</span>',trend:'up',trendText:'↑ 15% 环比'},
+        {cls:'accent-green',icon:'check',label:'已执行',value:'14<span class="unit">份</span>',trend:'neutral',trendText:'流转安装中'},
+        {cls:'accent-purple',icon:'alert',label:'待签合同',value:'5<span class="unit">份</span>',trend:'neutral',trendText:'客户确认中'},
+      ],
+      install:[
+        {cls:'accent-teal',icon:'doc',label:'安装合同',value:'14<span class="unit">份</span>',trend:'up',trendText:'↑ 本周+4'},
+        {cls:'accent-amber',icon:'clock',label:'待排期',value:'3<span class="unit">份</span>',trend:'neutral',trendText:'需排工长'},
+        {cls:'accent-green',icon:'check',label:'本月完工',value:'18<span class="unit">份</span>',trend:'up',trendText:'↑ +3'},
+        {cls:'accent-purple',icon:'alert',label:'延期风险',value:'1<span class="unit">份</span>',trend:'down',trendText:'需关注'},
+      ],
+      service:[
+        {cls:'accent-teal',icon:'doc',label:'质保合同',value:'220<span class="unit">份</span>',trend:'up',trendText:'↑ +8'},
+        {cls:'accent-amber',icon:'alert',label:'即将到期',value:'7<span class="unit">份</span>',trend:'neutral',trendText:'30天内'},
+        {cls:'accent-purple',icon:'shield',label:'质保外',value:'34<span class="unit">份</span>',trend:'neutral',trendText:'有维修收入'},
+        {cls:'accent-green',icon:'money',label:'维修收入',value:'2.64<span class="unit">万</span>',trend:'up',trendText:'↑ 本年累计'},
+      ],
+      boss:[
+        {cls:'accent-teal',icon:'doc',label:'本年合同',value:'168<span class="unit">份</span>',trend:'up',trendText:'↑ 18.2%'},
+        {cls:'accent-amber',icon:'money',label:'合同总额',value:'1,300<span class="unit">万</span>',trend:'up',trendText:'↑ 18.2%'},
+        {cls:'accent-green',icon:'check',label:'已完工',value:'146<span class="unit">份</span>',trend:'up',trendText:'完成率87%'},
+        {cls:'accent-purple',icon:'alert',label:'待收尾款',value:'22<span class="unit">份</span>',trend:'neutral',trendText:'¥86万'},
+      ],
+    };
+    const k = kpis[role] || kpis.boss;
+    html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
+
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('doc')}合同列表</div><span class="card-action">+ 新建合同</span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>合同编号</th><th>客户姓名</th><th>机型</th><th>合同金额</th><th>签订日期</th><th>执行状态</th><th>收款进度</th><th>负责人</th></tr></thead>
+            <tbody>
+              <tr><td>HT-2026-0921</td><td>张明远</td><td>大金VRV-X</td><td>¥68,000</td><td>2026-09-14</td><td><span class="tag tag-teal">安装中</span></td><td><span class="tag tag-green">全款已收</span></td><td>李晓</td></tr>
+              <tr><td>HT-2026-0920</td><td>孙丽娜</td><td>格力雅居</td><td>¥32,000</td><td>2026-09-10</td><td><span class="tag tag-green">已完工</span></td><td><span class="tag tag-green">全款已收</span></td><td>李晓</td></tr>
+              <tr><td>HT-2026-0919</td><td>周浩宇</td><td>大金VRV-S</td><td>¥120,000</td><td>2026-09-08</td><td><span class="tag tag-slate">刚开工</span></td><td><span class="tag tag-amber">定金+50%</span></td><td>赵敏</td></tr>
+              <tr><td>HT-2026-0918</td><td>吴小莉</td><td>格力雅居</td><td>¥28,500</td><td>2026-09-08</td><td><span class="tag tag-green">已完工</span></td><td><span class="tag tag-green">全款已收</span></td><td>王强</td></tr>
+              <tr><td>HT-2026-0917</td><td>刘建国</td><td>三菱重工KXZ</td><td>¥95,000</td><td>2026-09-05</td><td><span class="tag tag-amber">施工中</span></td><td><span class="tag tag-amber">定金+50%</span></td><td>李晓</td></tr>
+              <tr><td>HT-2026-0916</td><td>陈刚</td><td>格力雅居</td><td>¥30,000</td><td>2026-09-02</td><td><span class="tag tag-green">已完工</span></td><td><span class="tag tag-green">全款已收</span></td><td>王强</td></tr>
+              <tr><td>HT-2026-0915</td><td>王思琪</td><td>格力雅居</td><td>¥29,800</td><td>待签订</td><td><span class="tag tag-purple">待签</span></td><td><span class="tag tag-slate">未收款</span></td><td>赵敏</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    if(role==='sales'||role==='boss'){
+      html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('trend')}合同金额趋势</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">1月</span><div class="bar-track"><div class="bar-fill teal" style="width:65%">95万</div></div></div>
+              <div class="bar-row"><span class="bar-label">3月</span><div class="bar-track"><div class="bar-fill teal" style="width:85%">130万</div></div></div>
+              <div class="bar-row"><span class="bar-label">5月</span><div class="bar-track"><div class="bar-fill teal" style="width:78%">125万</div></div></div>
+              <div class="bar-row"><span class="bar-label">7月</span><div class="bar-track"><div class="bar-fill amber" style="width:95%">155万</div></div></div>
+              <div class="bar-row"><span class="bar-label">9月</span><div class="bar-track"><div class="bar-fill amber" style="width:58%">95万</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('chart')}合同类型分布</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">零售合同</span><div class="bar-track"><div class="bar-fill teal" style="width:90%">152份</div></div></div>
+              <div class="bar-row"><span class="bar-label">工程合同</span><div class="bar-track"><div class="bar-fill amber" style="width:8%">14份</div></div></div>
+              <div class="bar-row"><span class="bar-label">维保合同</span><div class="bar-track"><div class="bar-fill purple" style="width:20%">34份</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+    return html;
+  }
+
+  function renderPayment(){
+    const role = currentRole;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
+      <div class="page-title">收款管理</div>
+      <div class="page-sub">定金 · 全款 · 维保款 · 尾款 · 应收账款</div>`;
+
+    const kpis = {
+      sales:[
+        {cls:'accent-teal',icon:'money',label:'本月收款',value:'95<span class="unit">万</span>',trend:'up',trendText:'↑ 15% 环比'},
+        {cls:'accent-amber',icon:'alert',label:'待收尾款',value:'86<span class="unit">万</span>',trend:'neutral',trendText:'22笔待收'},
+        {cls:'accent-green',icon:'check',label:'收款率',value:'87.5<span class="unit">%</span>',trend:'up',trendText:'↑ 2.3%'},
+        {cls:'accent-purple',icon:'alert',label:'逾期未收',value:'3<span class="unit">笔</span>',trend:'down',trendText:'¥12.5万需催收'},
+      ],
+      boss:[
+        {cls:'accent-teal',icon:'money',label:'年度收款',value:'1,300<span class="unit">万</span>',trend:'up',trendText:'↑ 18.2%'},
+        {cls:'accent-amber',icon:'alert',label:'应收账款',value:'86<span class="unit">万</span>',trend:'neutral',trendText:'22笔'},
+        {cls:'accent-green',icon:'check',label:'年度收款率',value:'87.5<span class="unit">%</span>',trend:'up',trendText:'↑ 2.3%'},
+        {cls:'accent-purple',icon:'money',label:'维修收入',value:'2.64<span class="unit">万</span>',trend:'up',trendText:'质保外收入'},
+      ],
+      install:[
+        {cls:'accent-teal',icon:'money',label:'安装尾款',value:'38<span class="unit">万</span>',trend:'neutral',trendText:'待安装完工后收'},
+        {cls:'accent-amber',icon:'alert',label:'待验收尾款',value:'12<span class="unit">万</span>',trend:'neutral',trendText:'3户待验收'},
+        {cls:'accent-green',icon:'check',label:'已收尾款',value:'26<span class="unit">万</span>',trend:'up',trendText:'↑ 本月+5'},
+        {cls:'accent-purple',icon:'clock',label:'平均回款',value:'7.2<span class="unit">天</span>',trend:'up',trendText:'↓ -1.5天'},
+      ],
+      service:[
+        {cls:'accent-teal',icon:'money',label:'维修收入',value:'2.64<span class="unit">万</span>',trend:'up',trendText:'↑ 质保外'},
+        {cls:'accent-amber',icon:'doc',label:'待开票',value:'4<span class="unit">笔</span>',trend:'neutral',trendText:'¥0.82万'},
+        {cls:'accent-green',icon:'check',label:'已回款',value:'1.82<span class="unit">万</span>',trend:'up',trendText:'↑ 回款率69%'},
+        {cls:'accent-purple',icon:'alert',label:'配件成本',value:'0.95<span class="unit">万</span>',trend:'neutral',trendText:'毛利率64%'},
+      ],
+    };
+    const k = kpis[role] || kpis.boss;
+    html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
+
+    // Payment records table
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('money')}收款记录</div><span class="card-action">+ 登记收款</span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>客户</th><th>合同编号</th><th>收款类型</th><th>应收金额</th><th>已收金额</th><th>收款日期</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>张明远</td><td>HT-2026-0921</td><td><span class="pay-type deposit">定金</span></td><td>¥20,000</td><td>¥20,000</td><td>9/14</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>张明远</td><td>HT-2026-0921</td><td><span class="pay-type full">全款</span></td><td>¥48,000</td><td>¥48,000</td><td>9/14</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>孙丽娜</td><td>HT-2026-0920</td><td><span class="pay-type full">全款</span></td><td>¥32,000</td><td>¥32,000</td><td>9/10</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>周浩宇</td><td>HT-2026-0919</td><td><span class="pay-type deposit">定金</span></td><td>¥36,000</td><td>¥36,000</td><td>9/08</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>周浩宇</td><td>HT-2026-0919</td><td><span class="pay-type balance">进度款</span></td><td>¥60,000</td><td>¥24,000</td><td>9/12</td><td><span class="tag tag-amber">部分收款</span></td></tr>
+              <tr><td>刘建国</td><td>HT-2026-0917</td><td><span class="pay-type deposit">定金</span></td><td>¥28,500</td><td>¥28,500</td><td>9/05</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>刘建国</td><td>HT-2026-0917</td><td><span class="pay-type balance">进度款</span></td><td>¥47,500</td><td>¥19,000</td><td>9/12</td><td><span class="tag tag-amber">部分收款</span></td></tr>
+              <tr><td>李伟</td><td>HT-2025-0312</td><td><span class="pay-type warranty">维保款</span></td><td>¥380</td><td>¥380</td><td>9/11</td><td><span class="tag tag-green">已收</span></td></tr>
+              <tr><td>赵芳</td><td>HT-2024-1105</td><td><span class="pay-type warranty">维保款</span></td><td>¥520</td><td>—</td><td>待收</td><td><span class="tag tag-red">待收款</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    // Payment progress + aging
+    html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('chart')}收款类型分布</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">定金</span><div class="bar-track"><div class="bar-fill amber" style="width:30%">¥39万 (30%)</div></div></div>
+              <div class="bar-row"><span class="bar-label">全款</span><div class="bar-track"><div class="bar-fill green" style="width:48%">¥62.5万 (48%)</div></div></div>
+              <div class="bar-row"><span class="bar-label">进度款</span><div class="bar-track"><div class="bar-fill blue" style="width:18%">¥23.5万 (18%)</div></div></div>
+              <div class="bar-row"><span class="bar-label">维保款</span><div class="bar-track"><div class="bar-fill purple" style="width:4%">¥0.9万 (4%)</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('alert')}应收账款账龄</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">0-30天</span><div class="bar-track"><div class="bar-fill green" style="width:45%">¥38.7万</div></div></div>
+              <div class="bar-row"><span class="bar-label">31-60天</span><div class="bar-track"><div class="bar-fill amber" style="width:30%">¥25.8万</div></div></div>
+              <div class="bar-row"><span class="bar-label">61-90天</span><div class="bar-track"><div class="bar-fill red" style="width:15%">¥12.5万</div></div></div>
+              <div class="bar-row"><span class="bar-label">90天+</span><div class="bar-track"><div class="bar-fill slate" style="width:10%">¥9.0万</div></div></div>
+            </div>
+            <div class="role-notice" style="background:var(--red-100);color:#991B1B;margin-top:14px;margin-bottom:0">
+              <b>⚠ 催收提醒：</b>3笔逾期未收款共¥12.5万，需立即跟进
+            </div>
+          </div>
+        </div>
+      </div>`;
+    return html;
+  }
+
+  function renderInstall(){
+    const role = currentRole;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
+      <div class="page-title">现场安装管理</div>
+      <div class="page-sub">派单 · 施工进度 · 现场记录 · 复检质控</div>`;
+
+    const kpis = {
+      sales:[
+        {cls:'accent-teal',icon:'handover',label:'已签待装',value:'14<span class="unit">户</span>',trend:'up',trendText:'↑ 本周+4'},
+        {cls:'accent-amber',icon:'clock',label:'排期中',value:'3<span class="unit">户</span>',trend:'neutral',trendText:'待安排工长'},
+        {cls:'accent-green',icon:'check',label:'已完工',value:'146<span class="unit">户</span>',trend:'up',trendText:'↑ 本年累计'},
+        {cls:'accent-purple',icon:'alert',label:'客户催装',value:'2<span class="unit">户</span>',trend:'down',trendText:'需协调'},
+      ],
+      install:[
+        {cls:'accent-teal',icon:'tool',label:'在装项目',value:'14<span class="unit">个</span>',trend:'up',trendText:'↑ +4'},
+        {cls:'accent-amber',icon:'list',label:'待派单',value:'3<span class="unit">个</span>',trend:'neutral',trendText:'需分配工长'},
+        {cls:'accent-green',icon:'check',label:'本月完工',value:'18<span class="unit">个</span>',trend:'up',trendText:'↑ +3'},
+        {cls:'accent-purple',icon:'shield',label:'复检通过率',value:'94.6<span class="unit">%</span>',trend:'up',trendText:'↑ 1.8%'},
+      ],
+      service:[
+        {cls:'accent-teal',icon:'handover',label:'安装移交',value:'18<span class="unit">户</span>',trend:'up',trendText:'本月需录入质保'},
+        {cls:'accent-amber',icon:'alert',label:'安装缺陷',value:'1<span class="unit">户</span>',trend:'down',trendText:'需返工'},
+        {cls:'accent-green',icon:'check',label:'已入质保',value:'186<span class="unit">户</span>',trend:'up',trendText:'↑ +8'},
+        {cls:'accent-purple',icon:'shield',label:'质保建档率',value:'100<span class="unit">%</span>',trend:'up',trendText:'全部已建档'},
+      ],
+      boss:[
+        {cls:'accent-teal',icon:'tool',label:'在装项目',value:'14<span class="unit">个</span>',trend:'up',trendText:'↑ +4'},
+        {cls:'accent-amber',icon:'check',label:'本月完工',value:'18<span class="unit">个</span>',trend:'up',trendText:'↑ +3'},
+        {cls:'accent-green',icon:'shield',label:'复检通过率',value:'94.6<span class="unit">%</span>',trend:'up',trendText:'↑ 1.8%'},
+        {cls:'accent-purple',icon:'clock',label:'平均工期',value:'4.5<span class="unit">天</span>',trend:'up',trendText:'↓ -0.5天'},
+      ],
+    };
+    const k = kpis[role] || kpis.boss;
+    html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
+
+    // Work order list
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('list')}安装工单列表</div><span class="card-action">+ 新建工单</span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>客户</th><th>机型</th><th>项目经理</th><th>工长</th><th>当前节点</th><th>进度</th><th>状态</th><th>预计完工</th></tr></thead>
+            <tbody>
+              <tr><td>张明远</td><td>大金VRV-X</td><td>陈工</td><td>王师傅</td><td>吊顶修复(6/10)</td><td><span class="tag tag-amber">60%</span></td><td><span class="tag tag-teal">施工中</span></td><td>9/18</td></tr>
+              <tr><td>孙丽娜</td><td>格力雅居</td><td>陈工</td><td>李师傅</td><td>安装室外机(9/10)</td><td><span class="tag tag-green">90%</span></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
+              <tr><td>周浩宇</td><td>大金VRV-S</td><td>赵工</td><td>张师傅</td><td>铺设保护膜(2/10)</td><td><span class="tag tag-slate">20%</span></td><td><span class="tag tag-blue">刚开工</span></td><td>9/22</td></tr>
+              <tr><td>陈雅芳</td><td>美的理想家</td><td>陈工</td><td>—</td><td>待派单</td><td><span class="tag tag-slate">0%</span></td><td><span class="tag tag-amber">待分配</span></td><td>—</td></tr>
+              <tr><td>刘建国</td><td>三菱重工KXZ</td><td>赵工</td><td>王师傅</td><td>排水试验(7/10)</td><td><span class="tag tag-amber">75%</span></td><td><span class="tag tag-teal">施工中</span></td><td>9/17</td></tr>
+              <tr><td>吴小莉</td><td>格力雅居</td><td>陈工</td><td>李师傅</td><td>抽真空检漏(9/10)</td><td><span class="tag tag-green">85%</span></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    // 10-step progress + photos
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('tool')}安装全流程节点 — 张明远/大金VRV-X</div><span class="tag tag-amber">施工中·第6步</span></div>
+        <div class="card-body">
+          <div class="steps-row" style="flex-wrap:wrap;justify-content:center;gap:1px;margin-bottom:18px">
+            ${['现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复','排水试验','盖管保护','抽真空检漏','安装室外机'].map((s,i)=>{
+              const n=i+1;
+              const done = n<=5 ? 'done' : '';
+              const current = n===6 ? 'current' : '';
+              const cls = done ? 'done' : (current ? 'current' : '');
+              const content = done ? '✓' : (current ? '6' : n);
+              const lineCls = n<=5 ? 'done' : '';
+              const label = n<=5 ? `style="font-size:10px;color:var(--teal-600)"` : (n===6 ? `style="font-size:10px;color:var(--amber-500);font-weight:700"` : `style="font-size:10px;color:var(--slate-400)"`);
+              return `<div class="step-item"><div class="step-dot ${cls}">${content}</div><span ${label}>${s}</span></div>${n<10?`<div class="step-line ${lineCls}"></div>`:''}`;
+            }).join('')}
+          </div>
+          <div class="section-h"><div class="bar"></div>现场施工照片</div>
+          <div class="photo-grid">
+            <div class="photo-item" data-label="现场定位 · 9/12"><span class="photo-icon">📐</span></div>
+            <div class="photo-item" data-label="铺设保护膜 · 9/12"><span class="photo-icon">📦</span></div>
+            <div class="photo-item" data-label="安装室内机 · 9/13"><span class="photo-icon">🏠</span></div>
+            <div class="photo-item" data-label="防尘保护 · 9/13"><span class="photo-icon">🛡️</span></div>
+            <div class="photo-item" data-label="管路安装 · 9/14"><span class="photo-icon">🔩</span></div>
+            <div class="photo-item" data-label="吊顶修复 · 9/15"><span class="photo-icon">🔨</span></div>
+            <div class="photo-item" data-label="待上传" style="opacity:.4"><span class="photo-icon">📷</span></div>
+            <div class="photo-item" data-label="待上传" style="opacity:.4"><span class="photo-icon">📷</span></div>
+          </div>
+        </div>
+      </div>`;
+
+    // SOP timeline + QC
+    html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('list')}安装SOP标准流程（10步）</div></div>
+          <div class="card-body">
+            <div class="timeline">
+              ${['现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复完成空调安装','排水试验','盖管保护','抽真空和检漏','安装室外机'].map((s,i)=>{
+                const desc=['确认室内外机位置、管路走向、排水方案','对地面、家具、门窗进行专业防护','固定内机支架，安装室内机主体','对内机及周围区域进行防尘包裹','冷媒铜管、排水管、信号线敷设连接','配合装修方修复吊顶，完善内机安装','检查排水通畅性，确保无渗漏','管路保温棉包裹、盖槽固定','系统抽真空至-0.1MPa，保压检漏','固定外机支架，连接内外机管路，通电调试'];
+                const done = i<5 ? 'done' : '';
+                const status = i<5 ? '已完成' : (i===5 ? '当前进行' : '待执行');
+                return `<div class="timeline-item ${done}"><div class="timeline-time">第${i+1}步 · ${status}</div><div class="timeline-title">${s}</div><div class="timeline-desc">${desc[i]}</div></div>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('shield')}复检质控管理</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">本月复检</span><div class="bar-track"><div class="bar-fill teal" style="width:100%">28次</div></div></div>
+              <div class="bar-row"><span class="bar-label">一次通过</span><div class="bar-track"><div class="bar-fill green" style="width:94.6%">26次(94.6%)</div></div></div>
+              <div class="bar-row"><span class="bar-label">需返工</span><div class="bar-track"><div class="bar-fill red" style="width:5.4%">2次(5.4%)</div></div></div>
+              <div class="bar-row"><span class="bar-label">返工通过</span><div class="bar-track"><div class="bar-fill teal" style="width:100%">2次</div></div></div>
+            </div>
+            <div class="role-notice" style="background:var(--red-100);color:#991B1B;margin-top:14px;margin-bottom:0">
+              <b>⚠ 待处理：</b>周浩宇/大金VRV-S · 防尘保护不达标 · 已退回返工 · 截止9/17
+            </div>
+          </div>
+        </div>
+      </div>`;
+    return html;
+  }
+
+  function renderService(){
+    const role = currentRole;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
+      <div class="page-title">售后维保派单管理</div>
+      <div class="page-sub">质保管理 · 派单流转 · 维修记录 · 客户档案</div>`;
+
+    const kpis = {
+      sales:[
+        {cls:'accent-teal',icon:'customers',label:'客户报修',value:'5<span class="unit">单</span>',trend:'neutral',trendText:'已转售后'},
+        {cls:'accent-amber',icon:'handover',label:'待转售后',value:'1<span class="unit">单</span>',trend:'neutral',trendText:'待派单'},
+        {cls:'accent-green',icon:'check',label:'已解决',value:'4<span class="unit">单</span>',trend:'up',trendText:'客户满意'},
+        {cls:'accent-purple',icon:'customers',label:'满意度',value:'96<span class="unit">%</span>',trend:'up',trendText:'↑ 2%'},
+      ],
+      install:[
+        {cls:'accent-teal',icon:'handover',label:'安装移交',value:'18<span class="unit">户</span>',trend:'up',trendText:'待入质保'},
+        {cls:'accent-amber',icon:'alert',label:'安装缺陷',value:'1<span class="unit">户</span>',trend:'down',trendText:'返工中'},
+        {cls:'accent-green',icon:'shield',label:'已入质保',value:'186<span class="unit">户</span>',trend:'up',trendText:'↑ +8'},
+        {cls:'accent-purple',icon:'check',label:'移交完成率',value:'100<span class="unit">%</span>',trend:'up',trendText:'全部移交'},
+      ],
+      service:[
+        {cls:'accent-teal',icon:'shield',label:'质保内客户',value:'186<span class="unit">户</span>',trend:'up',trendText:'↑ +8'},
+        {cls:'accent-amber',icon:'alert',label:'质保外客户',value:'34<span class="unit">户</span>',trend:'neutral',trendText:'有维修收入'},
+        {cls:'accent-purple',icon:'doc',label:'本月工单',value:'12<span class="unit">单</span>',trend:'up',trendText:'↓ -2'},
+        {cls:'accent-green',icon:'clock',label:'平均响应',value:'2.3<span class="unit">h</span>',trend:'up',trendText:'↓ -0.5h'},
+      ],
+      boss:[
+        {cls:'accent-teal',icon:'shield',label:'质保内',value:'186<span class="unit">户</span>',trend:'up',trendText:'84.5%'},
+        {cls:'accent-amber',icon:'alert',label:'质保外',value:'34<span class="unit">户</span>',trend:'neutral',trendText:'15.5%'},
+        {cls:'accent-purple',icon:'doc',label:'本年工单',value:'68<span class="unit">单</span>',trend:'up',trendText:'↓ -12%'},
+        {cls:'accent-green',icon:'money',label:'维修收入',value:'2.64<span class="unit">万</span>',trend:'up',trendText:'质保外'},
+      ],
+    };
+    const k = kpis[role] || kpis.boss;
+    html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
+
+    // Dispatch flow + warranty
+    html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('handover')}维保派单流转</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center">
+              <div style="padding:8px 14px;background:var(--teal-100);border-radius:8px;font-size:11px;color:var(--teal-700);font-weight:600">客户反馈</div>
+              <span style="color:var(--slate-400)">→</span>
+              <div style="padding:8px 14px;background:var(--amber-100);border-radius:8px;font-size:11px;color:#92400E;font-weight:600">销售接收</div>
+              <span style="color:var(--slate-400)">→</span>
+              <div style="padding:8px 14px;background:var(--purple-100);border-radius:8px;font-size:11px;color:#5B21B6;font-weight:600">售后派单</div>
+              <span style="color:var(--slate-400)">→</span>
+              <div style="padding:8px 14px;background:var(--blue-100);border-radius:8px;font-size:11px;color:#1E40AF;font-weight:600">工长上门</div>
+              <span style="color:var(--slate-400)">→</span>
+              <div style="padding:8px 14px;background:var(--green-100);border-radius:8px;font-size:11px;color:#166534;font-weight:600">完工回访</div>
+            </div>
+            <div class="role-notice" style="background:var(--teal-50);color:var(--teal-700);margin-top:14px;margin-bottom:0">
+              <b>✓ 系统化优势：</b>替代微信群管理，消息永久留存不丢失。每条工单可追溯故障类型、维修方案、配件更换记录。
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('shield')}质保状态管理</div></div>
+          <div class="card-body">
+            <div class="warranty-card active"><div class="warranty-info"><div class="warranty-name">张明远 / 大金VRV-X</div><div class="warranty-date">安装：2025-09-15 · 设备至2028 · 安装至2027</div></div><span class="tag tag-green">双质保内</span></div>
+            <div class="warranty-card expiring"><div class="warranty-info"><div class="warranty-name">孙丽娜 / 格力雅居</div><div class="warranty-date">安装：2024-03-10 · 安装质保至2026-03-10</div></div><span class="tag tag-amber">即将到期</span></div>
+            <div class="warranty-card expired"><div class="warranty-info"><div class="warranty-name">李伟 / 美的理想家</div><div class="warranty-date">安装：2023-06-20 · 安装质保已过期</div></div><span class="tag tag-red">已过期</span></div>
+            <div class="warranty-card expired"><div class="warranty-info"><div class="warranty-name">赵芳 / 三菱重工KXZ</div><div class="warranty-date">安装：2022-11-05 · 双质保已过期</div></div><span class="tag tag-red">双质保过期</span></div>
+          </div>
+        </div>
+      </div>`;
+
+    // Work order list
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('doc')}维修工单记录</div><span class="card-action">+ 新建工单</span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>客户</th><th>机型</th><th>故障类型</th><th>质保状态</th><th>工长</th><th>配件更换</th><th>维修收入</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>张明远</td><td>大金VRV-X</td><td>制冷不足</td><td><span class="tag tag-green">质保内</span></td><td>王师傅</td><td>—</td><td><span class="tag tag-slate">免费</span></td><td><span class="tag tag-teal">已派单</span></td></tr>
+              <tr><td>李伟</td><td>美的理想家</td><td>外机异响</td><td><span class="tag tag-red">质保外</span></td><td>李师傅</td><td>压缩机减震垫</td><td>¥380</td><td><span class="tag tag-green">已完工</span></td></tr>
+              <tr><td>赵芳</td><td>三菱重工KXZ</td><td>漏水</td><td><span class="tag tag-red">质保外</span></td><td>王师傅</td><td>排水管更换</td><td>¥520</td><td><span class="tag tag-teal">维修中</span></td></tr>
+              <tr><td>陈刚</td><td>格力雅居</td><td>遥控失灵</td><td><span class="tag tag-green">质保内</span></td><td>张师傅</td><td>遥控器更换</td><td><span class="tag tag-slate">免费</span></td><td><span class="tag tag-green">已完工</span></td></tr>
+              <tr><td>吴小莉</td><td>格力雅居</td><td>不制热</td><td><span class="tag tag-green">质保内</span></td><td>—</td><td>—</td><td>—</td><td><span class="tag tag-amber">待派单</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+
+    // Archive summary
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('search')}历史客户档案调阅</div><span class="card-action">搜索客户</span></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--teal-100)">📁</div><div><div class="mini-stat-label">历史客户</div><div class="mini-stat-value">220户</div></div></div>
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--amber-100)">🔧</div><div><div class="mini-stat-label">总维修工单</div><div class="mini-stat-value">68单</div></div></div>
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--green-100)">💰</div><div><div class="mini-stat-label">质保外收入</div><div class="mini-stat-value">¥26,400</div></div></div>
+          </div>
+          <div style="padding:14px;background:var(--teal-50);border-radius:10px;border:1px solid var(--teal-100)">
+            <div style="font-size:12px;font-weight:700;color:var(--teal-700);margin-bottom:6px">💡 系统价值</div>
+            <div style="font-size:11px;color:var(--slate-600);line-height:1.8">
+              • 历史签约、套餐、服务信息一键调阅，无需翻查微信群<br>
+              • 故障与维修记录永久留存，避免人员变动信息丢失<br>
+              • 质保到期自动提醒，主动联系客户，提升服务体验<br>
+              • 质保外维修配件与收入清晰记录，形成完整业务闭环
+            </div>
+          </div>
+        </div>
+      </div>`;
+    return html;
+  }
+
+  function renderReport(){
+    const role = currentRole;
+    let html = `
+      <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>`;
+
+    if(role==='boss'){
+      html += `
+        <div class="boss-hero">
+          <div><h2>经营总览看板</h2><p>2026年度 · 销售趋势 · 业绩对比 · 安装进度 · 售后概况</p></div>
+          <div class="boss-hero-stat"><div class="num">¥1,300<span style="font-size:14px;font-weight:400;opacity:.8">万</span></div><div class="lbl">年度销售额 · 目标完成65%</div></div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card accent-teal"><div class="kpi-label">${svg('money')}年度销售额</div><div class="kpi-value">1,300<span class="unit">万</span></div><div class="kpi-trend up">↑ 18.2% 同比</div></div>
+          <div class="kpi-card accent-amber"><div class="kpi-label">${svg('target')}目标完成率</div><div class="kpi-value">65<span class="unit">%</span></div><div class="kpi-trend neutral">距目标700万 · 剩108天</div></div>
+          <div class="kpi-card accent-blue"><div class="kpi-label">${svg('tool')}在装项目</div><div class="kpi-value">14<span class="unit">个</span></div><div class="kpi-trend up">↑ +4</div></div>
+          <div class="kpi-card accent-purple"><div class="kpi-label">${svg('shield')}售后工单</div><div class="kpi-value">12<span class="unit">单</span></div><div class="kpi-trend neutral">质保内8 · 质保外4</div></div>
+        </div>`;
+    } else {
+      html += `<div class="page-title">报表管理</div><div class="page-sub">经营数据 · 趋势分析 · 同比环比 · 排名对比</div>`;
+      const rk = {
+        sales:[
+          {cls:'accent-teal',icon:'money',label:'年度销售额',value:'1,300<span class="unit">万</span>',trend:'up',trendText:'↑ 18.2%'},
+          {cls:'accent-amber',icon:'target',label:'目标完成',value:'65<span class="unit">%</span>',trend:'neutral',trendText:'剩700万'},
+          {cls:'accent-green',icon:'check',label:'本年成交',value:'168<span class="unit">单</span>',trend:'up',trendText:'↑ 31单'},
+          {cls:'accent-purple',icon:'trend',label:'年转化率',value:'52.5<span class="unit">%</span>',trend:'up',trendText:'↑ 4.1%'},
+        ],
+        install:[
+          {cls:'accent-teal',icon:'tool',label:'在装项目',value:'14<span class="unit">个</span>',trend:'up',trendText:'↑ +4'},
+          {cls:'accent-amber',icon:'check',label:'本月完工',value:'18<span class="unit">个</span>',trend:'up',trendText:'↑ +3'},
+          {cls:'accent-green',icon:'shield',label:'复检通过',value:'94.6<span class="unit">%</span>',trend:'up',trendText:'↑ 1.8%'},
+          {cls:'accent-purple',icon:'clock',label:'平均工期',value:'4.5<span class="unit">天</span>',trend:'up',trendText:'↓ -0.5天'},
+        ],
+        service:[
+          {cls:'accent-teal',icon:'shield',label:'质保内',value:'186<span class="unit">户</span>',trend:'up',trendText:'84.5%'},
+          {cls:'accent-amber',icon:'alert',label:'质保外',value:'34<span class="unit">户</span>',trend:'neutral',trendText:'15.5%'},
+          {cls:'accent-purple',icon:'doc',label:'本年工单',value:'68<span class="unit">单</span>',trend:'up',trendText:'↓ -12%'},
+          {cls:'accent-green',icon:'money',label:'维修收入',value:'2.64<span class="unit">万</span>',trend:'up',trendText:'质保外'},
+        ],
+      };
+      const k = rk[role] || rk.boss;
+      html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
+    }
+
+    // Sales trend + target
+    html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('trend')}月度销售额趋势（2026）</div><span class="tag tag-teal">万元</span></div>
+          <div class="card-body">
+            <svg viewBox="0 0 400 200" style="width:100%;height:180px">
+              <line x1="40" y1="20" x2="390" y2="20" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="3"/>
+              <line x1="40" y1="60" x2="390" y2="60" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="3"/>
+              <line x1="40" y1="100" x2="390" y2="100" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="3"/>
+              <line x1="40" y1="140" x2="390" y2="140" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="3"/>
+              <line x1="40" y1="180" x2="390" y2="180" stroke="#CBD5E1" stroke-width="1.5"/>
+              <text x="32" y="24" text-anchor="end" font-size="9" fill="#94A3B8">200</text>
+              <text x="32" y="64" text-anchor="end" font-size="9" fill="#94A3B8">150</text>
+              <text x="32" y="104" text-anchor="end" font-size="9" fill="#94A3B8">100</text>
+              <text x="32" y="144" text-anchor="end" font-size="9" fill="#94A3B8">50</text>
+              <text x="32" y="184" text-anchor="end" font-size="9" fill="#94A3B8">0</text>
+              <defs><linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0D9488" stop-opacity="0.3"/><stop offset="100%" stop-color="#0D9488" stop-opacity="0"/></linearGradient></defs>
+              <path d="M60 104 L100 92 L140 76 L180 94 L220 80 L260 68 L300 56 L340 72 L380 104 L380 180 L60 180 Z" fill="url(#ag1)"/>
+              <path d="M60 104 L100 92 L140 76 L180 94 L220 80 L260 68 L300 56 L340 72 L380 104" fill="none" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              ${[[60,104],[100,92],[140,76],[180,94],[220,80],[260,68],[300,56],[340,72]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#0D9488"/>`).join('')}
+              <circle cx="380" cy="104" r="4.5" fill="#F59E0B" stroke="#fff" stroke-width="2"/>
+              ${['1月','2月','3月','4月','5月','6月','7月','8月'].map((m,i)=>`<text x="${60+i*40}" y="195" text-anchor="middle" font-size="9" fill="#94A3B8">${m}</text>`).join('')}
+              <text x="380" y="195" text-anchor="middle" font-size="9" fill="#F59E0B" font-weight="700">9月</text>
+            </svg>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('chart')}销售额 vs 目标对比</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">Q1</span><div class="bar-track"><div class="bar-fill teal" style="width:83%">335/400万</div></div></div>
+              <div class="bar-row"><span class="bar-label">Q2</span><div class="bar-track"><div class="bar-fill teal" style="width:92%">370/400万</div></div></div>
+              <div class="bar-row"><span class="bar-label">Q3</span><div class="bar-track"><div class="bar-fill amber" style="width:65%">325/500万</div></div></div>
+              <div class="bar-row"><span class="bar-label">Q4</span><div class="bar-track"><div class="bar-fill slate" style="width:5%">待执行</div></div></div>
+              <div class="bar-row"><span class="bar-label">全年</span><div class="bar-track"><div class="bar-fill purple" style="width:65%">1300/2000万</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // Top5 + YoY
+    html += `
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('chart')}机型销量排名 TOP5</div></div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">格力雅居</span><div class="bar-track"><div class="bar-fill teal" style="width:100%">56台</div></div></div>
+              <div class="bar-row"><span class="bar-label">大金VRV-X</span><div class="bar-track"><div class="bar-fill teal" style="width:76%">43台</div></div></div>
+              <div class="bar-row"><span class="bar-label">美的理想家</span><div class="bar-track"><div class="bar-fill amber" style="width:54%">30台</div></div></div>
+              <div class="bar-row"><span class="bar-label">三菱KXZ</span><div class="bar-track"><div class="bar-fill amber" style="width:39%">22台</div></div></div>
+              <div class="bar-row"><span class="bar-label">大金VRV-S</span><div class="bar-track"><div class="bar-fill blue" style="width:32%">18台</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">${svg('trend')}同比环比数据</div></div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table class="data-table" style="text-align:center">
+                <thead><tr><th>指标</th><th>本月</th><th>上月</th><th>环比</th><th>去年</th><th>同比</th></tr></thead>
+                <tbody>
+                  <tr><td>销售额</td><td>¥95万</td><td>¥135万</td><td style="color:var(--red-500)">-30%</td><td>¥78万</td><td style="color:var(--green-500)">+22%</td></tr>
+                  <tr><td>成交单</td><td>21</td><td>28</td><td style="color:var(--red-500)">-25%</td><td>16</td><td style="color:var(--green-500)">+31%</td></tr>
+                  <tr><td>新增客户</td><td>38</td><td>34</td><td style="color:var(--green-500)">+12%</td><td>29</td><td style="color:var(--green-500)">+31%</td></tr>
+                  <tr><td>安装完工</td><td>18</td><td>15</td><td style="color:var(--green-500)">+20%</td><td>12</td><td style="color:var(--green-500)">+50%</td></tr>
+                  <tr><td>售后工单</td><td>12</td><td>14</td><td style="color:var(--green-500)">-14%</td><td>10</td><td style="color:var(--red-500)">+20%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // Install progress + service summary
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('tool')}安装进度总览</div><span class="tag tag-teal">在装14个</span></div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>客户</th><th>机型</th><th>施工阶段</th><th style="min-width:180px">进度</th><th>状态</th><th>预计完工</th></tr></thead>
+              <tbody>
+                <tr><td>张明远</td><td>大金VRV-X</td><td>吊顶修复(6/10)</td><td><div class="progress-bar"><div class="progress-bar-fill" style="background:var(--amber-500);width:60%"></div></div></td><td><span class="tag tag-amber">施工中</span></td><td>9/18</td></tr>
+                <tr><td>孙丽娜</td><td>格力雅居</td><td>安装室外机(9/10)</td><td><div class="progress-bar"><div class="progress-bar-fill" style="background:var(--green-500);width:90%"></div></div></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
+                <tr><td>周浩宇</td><td>大金VRV-S</td><td>铺设保护膜(2/10)</td><td><div class="progress-bar"><div class="progress-bar-fill" style="background:var(--slate-400);width:20%"></div></div></td><td><span class="tag tag-slate">刚开工</span></td><td>9/22</td></tr>
+                <tr><td>刘建国</td><td>三菱重工KXZ</td><td>排水试验(7/10)</td><td><div class="progress-bar"><div class="progress-bar-fill" style="background:var(--amber-500);width:70%"></div></div></td><td><span class="tag tag-amber">施工中</span></td><td>9/17</td></tr>
+                <tr><td>吴小莉</td><td>格力雅居</td><td>抽真空检漏(9/10)</td><td><div class="progress-bar"><div class="progress-bar-fill" style="background:var(--green-500);width:85%"></div></div></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('shield')}售后维保概况</div></div>
+        <div class="card-body">
+          <div class="three-col" style="margin-bottom:0">
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--green-100)">✅</div><div><div class="mini-stat-label">质保内客户</div><div class="mini-stat-value">186户 (84.5%)</div></div></div>
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--red-100)">⚠️</div><div><div class="mini-stat-label">质保外客户</div><div class="mini-stat-value">34户 (15.5%)</div></div></div>
+            <div class="mini-stat"><div class="mini-stat-icon" style="background:var(--purple-100)">💰</div><div><div class="mini-stat-label">维修收入</div><div class="mini-stat-value">¥26,400</div></div></div>
+          </div>
+        </div>
+      </div>`;
+    return html;
+  }
+
+  const RENDERERS = {
+    customer: renderCustomer,
+    contract: renderContract,
+    payment: renderPayment,
+    install: renderInstall,
+    service: renderService,
+    report: renderReport,
+  };
+
+  // ====== STATE & RENDER ======
+  function render(){
+    const html = RENDERERS[currentModule] ? RENDERERS[currentModule]() : '<div class="page-title">模块开发中</div>';
+    document.getElementById('mainContent').innerHTML = html;
+    renderMobileContent();
+  }
+
+  function renderMobileContent(){
+    // Build mobile role bar
+    const bar = document.getElementById('mobileRoleBar');
+    bar.innerHTML = Object.entries(ROLE_NAMES).map(([k,v])=>
+      `<button class="mobile-role-chip ${k===currentRole?'active':''}" data-role="${k}">${v}</button>`
+    ).join('');
+    bar.querySelectorAll('.mobile-role-chip').forEach(c=>{
+      c.onclick = ()=>{ switchRole(c.dataset.role); };
+    });
+
+    // Render module content (re-use desktop renderer, CSS adapts)
+    const mc = document.getElementById('mobileContent');
+    mc.innerHTML = RENDERERS[currentModule] ? RENDERERS[currentModule]() : '<div class="page-title">模块开发中</div>';
+  }
+
+  function switchRole(role){
+    currentRole = role;
+    document.querySelectorAll('.role-tab').forEach(t=>t.classList.toggle('active',t.dataset.role===role));
+    render();
+  }
+
+  function switchModule(mod){
+    currentModule = mod;
+    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.toggle('active',i.dataset.module===mod));
+    document.querySelectorAll('.mobile-bottom-nav-item').forEach(i=>i.classList.toggle('active',i.dataset.module===mod));
+    render();
+  }
+
+  function switchDevice(device){
+    currentDevice = device;
+    document.getElementById('desktopBtn').classList.toggle('active',device==='desktop');
+    document.getElementById('mobileBtn').classList.toggle('active',device==='mobile');
+    document.getElementById('desktopView').style.display = device==='desktop'?'block':'none';
+    document.getElementById('mobileView').style.display = device==='mobile'?'flex':'none';
+    if(device==='mobile'){ renderMobileContent(); }
+  }
+
+  // ====== EVENT BINDING ======
+  document.querySelectorAll('.role-tab').forEach(t=>{
+    t.onclick = ()=>switchRole(t.dataset.role);
+  });
+  document.querySelectorAll('.sidebar-item').forEach(i=>{
+    i.onclick = ()=>switchModule(i.dataset.module);
+  });
+  document.getElementById('desktopBtn').onclick = ()=>switchDevice('desktop');
+  document.getElementById('mobileBtn').onclick = ()=>switchDevice('mobile');
+
+  // Build mobile bottom nav (show first 4 modules + report)
+  const navItems = MODULES.slice(0,5).concat(MODULES.slice(5));
+  const navIcons = {
+    customer:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+    contract:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    payment:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+    install:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    service:'<path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>',
+    report:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+  };
+  const mobileNav = document.getElementById('mobileBottomNav');
+  // Show 5 items: customer, contract, install, service, report
+  const mobileNavList = ['customer','contract','install','service','report'];
+  mobileNav.innerHTML = mobileNavList.map(m=>{
+    const label = MODULES.find(x=>x.id===m).label;
+    return `<button class="mobile-bottom-nav-item ${m===currentModule?'active':''}" data-module="${m}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${navIcons[m]}</svg><span>${label.length>4?label.slice(0,4):label}</span></button>`;
+  }).join('');
+  mobileNav.querySelectorAll('.mobile-bottom-nav-item').forEach(i=>{
+    i.onclick = ()=>switchModule(i.dataset.module);
+  });
+
+  // Initial render
+  render();
+})();
+</script>
+</body>
+</html>
