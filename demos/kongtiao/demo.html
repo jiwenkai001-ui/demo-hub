@@ -236,6 +236,132 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
   .mobile-role-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--slate-100);color:var(--slate-600);border:none;cursor:pointer;white-space:nowrap}
   .mobile-role-chip.active{background:var(--teal-600);color:#fff}
 }
+
+/* ====== CUSTOMER DETAIL VIEW ====== */
+.back-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer;color:var(--teal-600);font-size:13px;font-weight:600;padding:8px 0;transition:opacity .2s}
+.back-bar:hover{opacity:.7}
+.back-bar svg{width:18px;height:18px}
+
+.detail-hero{background:linear-gradient(135deg,var(--teal-800),var(--teal-600));border-radius:var(--radius);padding:22px 26px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.detail-hero-info h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.detail-hero-info p{font-size:12px;opacity:.85;line-height:1.8}
+.detail-hero-tag{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.detail-hero-tag .tag{font-size:12px;padding:4px 14px}
+
+/* Follow-up timeline */
+.followup-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--slate-100)}
+.followup-item:last-child{border-bottom:none}
+.followup-type{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.followup-type.wechat{background:var(--green-100)}
+.followup-type.phone{background:var(--blue-100)}
+.followup-type.face{background:var(--amber-100)}
+.followup-type.visit{background:var(--purple-100)}
+.followup-content{flex:1}
+.followup-head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.followup-date{font-size:11px;color:var(--slate-400)}
+.followup-text{font-size:12px;color:var(--slate-700);line-height:1.6}
+.followup-next{font-size:11px;color:var(--teal-600);margin-top:4px;font-weight:600}
+
+/* Installation drill-through */
+.install-step-detail{border:1px solid var(--slate-200);border-radius:10px;padding:14px;margin-bottom:12px}
+.install-step-detail.done{border-left:3px solid var(--green-500)}
+.install-step-detail.current{border-left:3px solid var(--amber-500);background:var(--amber-100)}
+.install-step-detail.pending{border-left:3px solid var(--slate-300);opacity:.65}
+.install-step-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.install-step-title{font-size:13px;font-weight:700;color:var(--slate-800);display:flex;align-items:center;gap:6px}
+.install-step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.install-step-detail.done .install-step-num{background:var(--green-500);color:#fff}
+.install-step-detail.current .install-step-num{background:var(--amber-500);color:#fff}
+.install-step-detail.pending .install-step-num{background:var(--slate-200);color:var(--slate-400)}
+.install-step-report{font-size:12px;color:var(--slate-600);margin:6px 0;line-height:1.6;padding:8px 12px;background:var(--slate-50);border-radius:8px}
+.install-step-photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.install-step-photos .photo-item{border-radius:8px}
+
+/* Maintenance drill-through */
+.maint-section{border-radius:10px;overflow:hidden;margin-bottom:16px}
+.maint-section-head{padding:10px 14px;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.maint-section.before .maint-section-head{background:var(--red-500)}
+.maint-section.during .maint-section-head{background:var(--amber-500)}
+.maint-section.after .maint-section-head{background:var(--green-500)}
+.maint-section-body{padding:14px;background:#fff;border:1px solid var(--slate-200);border-top:none}
+.maint-photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.maint-report{font-size:12px;color:var(--slate-700);line-height:1.6;padding:8px 12px;background:var(--slate-50);border-radius:8px}
+
+/* Sales alert banner */
+.sales-alert{background:linear-gradient(90deg,var(--red-100),var(--amber-100));border:1px solid var(--red-500);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px;color:#991B1B;font-weight:600}
+.sales-alert svg{width:18px;height:18px;color:var(--red-500);flex-shrink:0}
+
+/* Customer info grid */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.info-item{background:var(--slate-50);border-radius:10px;padding:10px 14px}
+.info-label{font-size:10px;color:var(--slate-500);margin-bottom:2px}
+.info-value{font-size:13px;font-weight:600;color:var(--slate-800)}
+
+/* Clickable row */
+.data-table tr[data-cid]{cursor:pointer;transition:background .15s}
+.data-table tr[data-cid]:hover{background:var(--teal-50)}
+.click-hint{font-size:10px;color:var(--teal-500);font-weight:400;margin-left:4px}
+
+/* ====== MODAL & EDIT SYSTEM ====== */
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--slate-100);position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0;z-index:1}
+.modal-title{font-size:15px;font-weight:700;color:var(--slate-800)}
+.modal-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--slate-400);transition:all .15s}
+.modal-close:hover{background:var(--slate-100);color:var(--slate-700)}
+.modal-body{padding:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--slate-100);position:sticky;bottom:0;background:#fff;border-radius:0 0 14px 14px}
+.btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--teal-600);color:#fff}
+.btn-primary:hover{background:var(--teal-700)}
+.btn-cancel{background:var(--slate-100);color:var(--slate-600)}
+.btn-cancel:hover{background:var(--slate-200)}
+.btn-save{background:var(--green-600);color:#fff}
+.btn-save:hover{background:var(--green-700)}
+
+/* Form fields */
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--slate-700);margin-bottom:6px;display:block}
+.form-input,.form-textarea,.form-select{width:100%;padding:10px 12px;border:1px solid var(--slate-200);border-radius:8px;font-size:13px;color:var(--slate-800);font-family:inherit;transition:border .15s;box-sizing:border-box}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--teal-500);outline:none;box-shadow:0 0 0 3px rgba(20,184,166,.1)}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:10px;color:var(--slate-400);margin-top:4px}
+
+/* Photo upload area */
+.photo-upload{border:2px dashed var(--slate-200);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s}
+.photo-upload:hover{border-color:var(--teal-400);background:var(--teal-50)}
+.photo-upload-icon{font-size:28px;margin-bottom:6px}
+.photo-upload-text{font-size:11px;color:var(--slate-400)}
+
+/* Editable step card */
+.editable-step{border:1px solid var(--slate-200);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.editable-step-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;transition:background .15s}
+.editable-step-head:hover{background:var(--slate-50)}
+.editable-step-head.done{background:var(--green-50)}
+.editable-step-head.current{background:var(--amber-50)}
+.editable-step-body{padding:14px;border-top:1px solid var(--slate-100)}
+.editable-step-body textarea{margin-bottom:10px}
+.editable-photo-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.editable-photo{width:72px;height:72px;border-radius:8px;background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;cursor:pointer;transition:transform .15s}
+.editable-photo:hover{transform:scale(1.05)}
+.editable-photo .del-photo{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--red-500);color:#fff;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.editable-photo.add{border:2px dashed var(--slate-200);background:transparent}
+
+/* Filter tabs */
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.filter-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--slate-200);color:var(--slate-500);background:#fff;transition:all .15s}
+.filter-tab:hover{border-color:var(--teal-400)}
+.filter-tab.active{background:var(--teal-600);color:#fff;border-color:var(--teal-600)}
+
+/* Edit toggle button */
+.edit-toggle{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--teal-200);color:var(--teal-600);background:var(--teal-50);transition:all .15s}
+.edit-toggle:hover{background:var(--teal-100)}
+.edit-toggle.active{background:var(--teal-600);color:#fff}
+
+/* Detail view state indicator */
+.detail-view-banner{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--teal-50);border-radius:8px;margin-bottom:14px;font-size:12px;color:var(--teal-700)}
 </style>
 </head>
 <body>
@@ -345,10 +471,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     {id:'service',label:'售后维保派单'},
     {id:'report',label:'报表管理'},
   ];
+  // 角色权限配置：各角色可见的模块
+  const ROLE_MODULES = {
+    sales: ['customer','contract','payment','install','service','report'],
+    boss: ['customer','contract','payment','install','service','report'],
+    install: ['install','service','report'],
+    service: ['service','report'],
+  };
 
   let currentRole = 'sales';
   let currentModule = 'customer';
   let currentDevice = 'desktop';
+  let currentView = 'list';
+  let currentCustomerId = null;
+  let currentInstallId = null;
+  let currentServiceId = null;
+  let installFilter = 'all';
+  let editMode = false;
+  let modalState = null;
 
   // ====== Icon SVGs ======
   const ICONS = {
@@ -372,10 +512,284 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
 
   function svg(name){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+(ICONS[name]||'')+'</svg>';}
 
+  // ====== CUSTOMER DATABASE ======
+  const CUSTOMERS = {
+    'zhangmingyuan':{
+      name:'张明远',source:'设计师合作',layout:'三室两厅',area:'128㎡',machine:'大金VRV-X',stage:'成交-安装中',stageTag:'tag-amber',
+      phone:'138****6688',address:'城东翡翠湾3栋802',sales:'李晓',contractNo:'HT-2026-0921',contractAmt:'¥68,000',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-08-20',text:'设计师王工带客到店，客户对大金VRV-X感兴趣，预算7万左右',next:'后续微信跟进方案'},
+        {type:'wechat',icon:'wechat',date:'2026-08-25',text:'微信发送VRV-X产品资料和3套方案对比，客户回复倾向方案B',next:'预约上门量房'},
+        {type:'phone',icon:'phone',date:'2026-08-28',text:'电话确认量房时间，客户周末方便',next:'9月2日上门量房'},
+        {type:'face',icon:'face',date:'2026-09-02',text:'上门量房完成，确认128㎡三室两厅，3台内机+1台外机方案，报价¥68,000',next:'客户考虑后回复'},
+        {type:'wechat',icon:'wechat',date:'2026-09-10',text:'客户微信确认方案，同意报价，预约签单',next:'9月14日到店签单'},
+        {type:'face',icon:'face',date:'2026-09-14',text:'到店签订合同HT-2026-0921，收取定金¥20,000+全款¥48,000，流转安装',next:'安装排期中'},
+      ],
+      install:{
+        progress:60,currentStep:6,
+        steps:[
+          {n:1,name:'现场定位',status:'done',date:'9/12',report:'确认客厅、主卧、次卧内机位置，管路走梁下，排水走卫生间。外机位已确认在阳台外侧。',
+            photos:['现场定位·全屋俯瞰','客厅内机位','主卧内机位','外机位确认']},
+          {n:2,name:'铺设保护膜',status:'done',date:'9/12',report:'地面、门窗、家具全部铺设防护膜，客户确认满意。',
+            photos:['地面防护','门窗防护','家具包裹']},
+          {n:3,name:'安装室内机',status:'done',date:'9/13',report:'3台大金内机安装完成，双面板设计，位置与方案一致。减震垫已加装。',
+            photos:['客厅内机安装','主卧内机','次卧内机','减震垫特写']},
+          {n:4,name:'防尘保护',status:'done',date:'9/13',report:'内机及管路接口处防尘包裹完成，防止后期装修粉尘进入。',
+            photos:['内机防尘','管路接口防尘']},
+          {n:5,name:'管路安装',status:'done',date:'9/14',report:'冷媒铜管6根敷设完成，排水管3路连接完毕，信号线穿管。铜管保温棉已包裹。',
+            photos:['铜管敷设','排水管连接','保温棉包裹','信号线穿管']},
+          {n:6,name:'吊顶修复',status:'current',date:'9/15进行中',report:'配合装修方修复吊顶开孔，完善内机安装。预计今日完工。',
+            photos:['吊顶开孔修复中','内机与吊顶衔接']},
+          {n:7,name:'排水试验',status:'pending',date:'待执行',report:'',photos:[]},
+          {n:8,name:'盖管保护',status:'pending',date:'待执行',report:'',photos:[]},
+          {n:9,name:'抽真空检漏',status:'pending',date:'待执行',report:'',photos:[]},
+          {n:10,name:'安装室外机',status:'pending',date:'待执行',report:'',photos:[]},
+        ]
+      },
+      warranty:null,
+      maintenance:null,
+    },
+    'sunlina':{
+      name:'孙丽娜',source:'活动获客',layout:'两室两厅',area:'95㎡',machine:'格力雅居',stage:'成交-质保内',stageTag:'tag-green',
+      phone:'139****2266',address:'城南阳光花园5栋601',sales:'李晓',contractNo:'HT-2026-0920',contractAmt:'¥32,000',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-08-15',text:'门店活动到访，了解格力雅居系列，预算3万左右',next:'微信跟进'},
+        {type:'wechat',icon:'wechat',date:'2026-08-18',text:'发送雅居系列产品资料和案例图，客户回复满意外观',next:'预约量房'},
+        {type:'phone',icon:'phone',date:'2026-08-22',text:'电话沟通确认量房时间',next:'8月25日上门量房'},
+        {type:'face',icon:'face',date:'2026-08-25',text:'上门量房，95㎡两室两厅，2台内机+1台外机，报价¥32,000',next:'客户考虑'},
+        {type:'wechat',icon:'wechat',date:'2026-09-05',text:'客户确认方案，预约签单',next:'9月10日签单'},
+        {type:'face',icon:'face',date:'2026-09-10',text:'签订合同HT-2026-0920，收取全款¥32,000，流转安装',next:'安装排期'},
+      ],
+      install:{
+        progress:100,currentStep:10,
+        steps:[
+          {n:1,name:'现场定位',status:'done',date:'9/11',report:'确认2台内机位置，管路走走廊，排水走客卫。',photos:['全屋定位图','客厅内机位','卧室内机位']},
+          {n:2,name:'铺设保护膜',status:'done',date:'9/11',report:'防护到位。',photos:['地面防护','家具包裹']},
+          {n:3,name:'安装室内机',status:'done',date:'9/11',report:'2台内机安装完成。',photos:['客厅内机','卧室内机']},
+          {n:4,name:'防尘保护',status:'done',date:'9/12',report:'防尘包裹完成。',photos:['内机防尘']},
+          {n:5,name:'管路安装',status:'done',date:'9/12',report:'铜管4根，排水管2路，信号线穿管。',photos:['铜管敷设','排水管','保温棉']},
+          {n:6,name:'吊顶修复',status:'done',date:'9/13',report:'吊顶修复完成，内机与吊顶衔接美观。',photos:['吊顶修复完成']},
+          {n:7,name:'排水试验',status:'done',date:'9/13',report:'排水通畅，无渗漏。',photos:['排水试验']},
+          {n:8,name:'盖管保护',status:'done',date:'9/14',report:'管路保温棉包裹，盖槽固定。',photos:['盖管保护']},
+          {n:9,name:'抽真空检漏',status:'done',date:'9/14',report:'系统抽真空至-0.1MPa，保压30分钟无泄漏。',photos:['真空泵运行','压力表读数']},
+          {n:10,name:'安装室外机',status:'done',date:'9/15',report:'外机安装完毕，连接内外机管路，通电调试制冷制热正常。交付客户。',photos:['外机安装','管路连接','调试运行','客户验收签字']},
+        ]
+      },
+      warranty:{
+        installDate:'2026-09-15',deviceWarranty:'2029-09-15',installWarranty:'2028-09-15',status:'质保内',
+        package:'格力雅居全包套餐',serviceItems:['制冷制热故障','内机异响','漏水','遥控器更换','年度保养1次'],
+      },
+      maintenance:{
+        ticketNo:'WX-2026-0915-01',faultType:'制冷不足',reportDate:'2026-09-15',assignDate:'2026-09-15',
+        worker:'王师傅',status:'维修中',warrantyStatus:'质保内-免费维修',
+        before:{photos:['外机工况照片','内机出风温度测量','滤网状况'],report:'客户反馈制冷不足，室温降至26度后不再下降。检测出风温度18度，偏高。滤网有积灰但不严重，初步判断冷媒可能不足。'},
+        during:{photos:['压力表检测','冷媒补充中','检漏泡沫测试'],report:'检测低压压力0.35MPa偏低，确认冷媒微漏。补充R410A冷媒至标准压力0.45MPa。泡沫检漏发现外机阀门处微漏，已紧固处理。'},
+        after:{photos:['维修后出风温度','压力表正常读数','客户确认签字'],report:'补充冷媒后出风温度降至12度，制冷恢复正常。阀门紧固后无泄漏。已向客户说明日常使用注意事项。质保内免费维修。'},
+        salesAlert:true,
+      },
+    },
+    'wangsiqi':{
+      name:'王思琪',source:'活动获客',layout:'两室一厅',area:'89㎡',machine:'格力雅居',stage:'上门量房',stageTag:'tag-amber',
+      phone:'137****4488',address:'城西万科城2栋303',sales:'赵敏',contractNo:'待签订',contractAmt:'待报价',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-09-05',text:'小区活动到访，了解格力雅居系列，预算2.5-3万',next:'微信跟进方案'},
+        {type:'wechat',icon:'wechat',date:'2026-09-08',text:'发送雅居产品资料，客户倾向2台内机方案',next:'预约量房'},
+        {type:'phone',icon:'phone',date:'2026-09-12',text:'电话确认量房时间，客户周末方便',next:'9月15日上门量房'},
+      ],
+      install:null,warranty:null,maintenance:null,
+    },
+    'liujianguo':{
+      name:'刘建国',source:'自然到店',layout:'四室两厅',area:'165㎡',machine:'三菱重工KXZ',stage:'需求沟通',stageTag:'tag-purple',
+      phone:'136****1100',address:'城北碧水湾1栋201',sales:'李晓',contractNo:'待签订',contractAmt:'待报价',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-09-08',text:'自然到店，了解三菱重工KXZ系列，四室两厅165㎡，预算8-10万',next:'微信发送方案'},
+        {type:'wechat',icon:'wechat',date:'2026-09-10',text:'发送KXZ产品资料和多套方案对比，客户回复倾向大功率方案',next:'电话跟进'},
+        {type:'phone',icon:'phone',date:'2026-09-13',text:'电话沟通，客户对价格有顾虑，考虑分期付款方案',next:'准备分期方案再沟通'},
+      ],
+      install:null,warranty:null,maintenance:null,
+    },
+    'chenyafang':{
+      name:'陈雅芳',source:'异业联盟',layout:'三室两厅',area:'110㎡',machine:'美的理想家',stage:'初步接触',stageTag:'tag-teal',
+      phone:'135****7799',address:'城中龙腾府4栋1502',sales:'王强',contractNo:'待签订',contractAmt:'待报价',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-09-15',text:'异业联盟（装修公司）推荐到店，了解美的理想家系列，三室两厅110㎡',next:'后续微信跟进'},
+      ],
+      install:null,warranty:null,maintenance:null,
+    },
+    'zhouhaoyu':{
+      name:'周浩宇',source:'设计师合作',layout:'复式',area:'220㎡',machine:'大金VRV-S',stage:'上门量房',stageTag:'tag-amber',
+      phone:'188****3300',address:'城东翡翠湾8栋复式',sales:'赵敏',contractNo:'待签订',contractAmt:'待报价',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-09-01',text:'设计师推荐到店，复式220㎡，了解大金VRV-S系列，预算12万',next:'发送方案'},
+        {type:'wechat',icon:'wechat',date:'2026-09-05',text:'发送VRV-S产品资料和复式方案，客户回复倾向上下层独立控制方案',next:'预约量房'},
+        {type:'face',icon:'face',date:'2026-09-12',text:'上门量房完成，复式上下层，5台内机+2台外机方案，报价¥120,000',next:'客户考虑中'},
+      ],
+      install:null,warranty:null,maintenance:null,
+    },
+    'wuxiaoli':{
+      name:'吴小莉',source:'自然到店',layout:'三室一厅',area:'105㎡',machine:'格力雅居',stage:'成交-质保内',stageTag:'tag-green',
+      phone:'133****5566',address:'城南阳光花园7栋801',sales:'王强',contractNo:'HT-2026-0918',contractAmt:'¥28,500',
+      followups:[
+        {type:'visit',icon:'face',date:'2026-08-20',text:'自然到店，了解格力雅居，三室一厅105㎡，预算3万',next:'微信跟进'},
+        {type:'wechat',icon:'wechat',date:'2026-08-25',text:'发送方案，客户确认2台内机方案',next:'预约量房'},
+        {type:'face',icon:'face',date:'2026-09-01',text:'上门量房，确认方案，报价¥28,500',next:'客户考虑'},
+        {type:'wechat',icon:'wechat',date:'2026-09-06',text:'客户确认方案和报价',next:'签单'},
+        {type:'face',icon:'face',date:'2026-09-08',text:'签订合同HT-2026-0918，全款¥28,500',next:'安装排期'},
+      ],
+      install:{
+        progress:100,currentStep:10,
+        steps:[
+          {n:1,name:'现场定位',status:'done',date:'9/09',report:'确认3台内机位置。',photos:['全屋定位']},
+          {n:2,name:'铺设保护膜',status:'done',date:'9/09',report:'防护到位。',photos:['地面防护']},
+          {n:3,name:'安装室内机',status:'done',date:'9/10',report:'3台内机安装完成。',photos:['内机安装']},
+          {n:4,name:'防尘保护',status:'done',date:'9/10',report:'防尘完成。',photos:['防尘包裹']},
+          {n:5,name:'管路安装',status:'done',date:'9/11',report:'管路敷设完成。',photos:['管路安装']},
+          {n:6,name:'吊顶修复',status:'done',date:'9/12',report:'吊顶修复完成。',photos:['吊顶修复']},
+          {n:7,name:'排水试验',status:'done',date:'9/12',report:'排水通畅。',photos:['排水试验']},
+          {n:8,name:'盖管保护',status:'done',date:'9/13',report:'盖管完成。',photos:['盖管保护']},
+          {n:9,name:'抽真空检漏',status:'done',date:'9/13',report:'检漏合格。',photos:['真空检漏']},
+          {n:10,name:'安装室外机',status:'done',date:'9/14',report:'完工交付。',photos:['外机安装','客户验收']},
+        ]
+      },
+      warranty:{
+        installDate:'2026-09-14',deviceWarranty:'2029-09-14',installWarranty:'2028-09-14',status:'质保内',
+        package:'格力雅居全包套餐',serviceItems:['制冷制热故障','内机异响','漏水','遥控器更换','年度保养1次'],
+      },
+      maintenance:null,
+    },
+  };
+
   // ====== MODULE RENDERERS ======
+
+  // Install work order data
+  const INSTALL_ORDERS = {
+    'zhangmingyuan':{
+      customer:'张明远',machine:'大金VRV-X',manager:'陈工',worker:'王师傅',
+      currentStep:6,progress:60,status:'施工中',eta:'9/18',area:'128㎡',
+      steps:CUSTOMERS['zhangmingyuan'].install.steps,
+    },
+    'sunlina':{
+      customer:'孙丽娜',machine:'格力雅居',manager:'陈工',worker:'李师傅',
+      currentStep:10,progress:100,status:'已完工',eta:'9/15',area:'95㎡',
+      steps:CUSTOMERS['sunlina'].install.steps,
+    },
+    'zhouhaoyu':{
+      customer:'周浩宇',machine:'大金VRV-S',manager:'赵工',worker:'张师傅',
+      currentStep:2,progress:20,status:'施工中',eta:'9/22',area:'220㎡',
+      steps:[
+        {n:1,name:'现场定位',status:'done',date:'9/15',report:'复式上下层定位完成，5台内机位置确认。',photos:['复式定位图','上层内机位','下层内机位']},
+        {n:2,name:'铺设保护膜',status:'current',date:'9/15进行中',report:'正在铺设地面和楼梯防护膜。',photos:['地面防护中']},
+        {n:3,name:'安装室内机',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:4,name:'防尘保护',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:5,name:'管路安装',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:6,name:'吊顶修复',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:7,name:'排水试验',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:8,name:'盖管保护',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:9,name:'抽真空检漏',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:10,name:'安装室外机',status:'pending',date:'待执行',report:'',photos:[]},
+      ],
+    },
+    'liujianguo':{
+      customer:'刘建国',machine:'三菱重工KXZ',manager:'赵工',worker:'王师傅',
+      currentStep:7,progress:75,status:'施工中',eta:'9/17',area:'165㎡',
+      steps:[
+        {n:1,name:'现场定位',status:'done',date:'9/12',report:'四室两厅定位完成。',photos:['定位图']},
+        {n:2,name:'铺设保护膜',status:'done',date:'9/12',report:'防护到位。',photos:['防护']},
+        {n:3,name:'安装室内机',status:'done',date:'9/13',report:'4台内机安装完成。',photos:['内机']},
+        {n:4,name:'防尘保护',status:'done',date:'9/13',report:'防尘完成。',photos:['防尘']},
+        {n:5,name:'管路安装',status:'done',date:'9/14',report:'管路敷设完成。',photos:['管路']},
+        {n:6,name:'吊顶修复',status:'done',date:'9/14',report:'吊顶修复完成。',photos:['吊顶']},
+        {n:7,name:'排水试验',status:'current',date:'9/15进行中',report:'正在进行排水通畅性试验。',photos:['排水试验中']},
+        {n:8,name:'盖管保护',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:9,name:'抽真空检漏',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:10,name:'安装室外机',status:'pending',date:'待执行',report:'',photos:[]},
+      ],
+    },
+    'wuxiaoli':{
+      customer:'吴小莉',machine:'格力雅居',manager:'陈工',worker:'李师傅',
+      currentStep:10,progress:100,status:'已完工',eta:'9/14',area:'105㎡',
+      steps:CUSTOMERS['wuxiaoli'].install.steps,
+    },
+    'chenyafang':{
+      customer:'陈雅芳',machine:'美的理想家',manager:'陈工',worker:'—',
+      currentStep:0,progress:0,status:'待派单',eta:'—',area:'110㎡',
+      steps:[
+        {n:1,name:'现场定位',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:2,name:'铺设保护膜',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:3,name:'安装室内机',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:4,name:'防尘保护',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:5,name:'管路安装',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:6,name:'吊顶修复',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:7,name:'排水试验',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:8,name:'盖管保护',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:9,name:'抽真空检漏',status:'pending',date:'待执行',report:'',photos:[]},
+        {n:10,name:'安装室外机',status:'pending',date:'待执行',report:'',photos:[]},
+      ],
+    },
+  };
+
+  const INSTALL_STEPS = ['现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复','排水试验','盖管保护','抽真空检漏','安装室外机'];
+
+  // Service/maintenance work order data
+  const SERVICE_ORDERS = {
+    'sunlina':{
+      customer:'孙丽娜',machine:'格力雅居',faultType:'制冷不足',warranty:'质保内',
+      worker:'王师傅',status:'维修中',income:'免费',ticketNo:'WX-2026-0915-01',
+      reportDate:'2026-09-15',assignDate:'2026-09-15',
+      maintenance:CUSTOMERS['sunlina'].maintenance,
+    },
+    'liwei':{
+      customer:'李伟',machine:'美的理想家',faultType:'外机异响',warranty:'质保外',
+      worker:'李师傅',status:'已完工',income:'¥380',ticketNo:'WX-2026-0908-03',
+      reportDate:'2026-09-08',assignDate:'2026-09-08',
+      maintenance:{
+        ticketNo:'WX-2026-0908-03',faultType:'外机异响',reportDate:'2026-09-08',assignDate:'2026-09-08',
+        worker:'李师傅',status:'已完工',warrantyStatus:'质保外-收费维修',
+        before:{photos:['外机全景','异响位置特写','支架状况'],report:'客户反馈外机运行时有金属碰撞声。现场检查发现压缩机减震垫老化变形，导致运行共振异响。'},
+        during:{photos:['拆卸旧减震垫','新减震垫对比','安装新垫中'],report:'更换压缩机减震垫1组（4个）。旧垫已严重老化变形，新垫安装后底座固定牢固。'},
+        after:{photos:['维修后外机工况','减震垫安装特写','客户确认签字'],report:'更换减震垫后异响消除，外机运行平稳。质保外收费维修¥380（含配件+人工），客户已确认付款。'},
+        salesAlert:false,
+      },
+    },
+    'zhaofang':{
+      customer:'赵芳',machine:'三菱重工KXZ',faultType:'漏水',warranty:'质保外',
+      worker:'王师傅',status:'维修中',income:'¥520',ticketNo:'WX-2026-0912-02',
+      reportDate:'2026-09-12',assignDate:'2026-09-12',
+      maintenance:{
+        ticketNo:'WX-2026-0912-02',faultType:'内机漏水',reportDate:'2026-09-12',assignDate:'2026-09-12',
+        worker:'王师傅',status:'维修中',warrantyStatus:'质保外-收费维修',
+        before:{photos:['漏水位置','排水管状况','内机接口'],report:'客厅内机下方漏水。检查发现排水管老化开裂，接口处渗水。'},
+        during:{photos:['拆除旧排水管','新管材对比','安装新管中'],report:'更换客厅内机排水管1路。旧管老化开裂严重，新管连接密封到位。正在做排水试验。'},
+        after:{photos:[],report:''},
+        salesAlert:false,
+      },
+    },
+    'chengang':{
+      customer:'陈刚',machine:'格力雅居',faultType:'遥控失灵',warranty:'质保内',
+      worker:'张师傅',status:'已完工',income:'免费',ticketNo:'WX-2026-0905-01',
+      reportDate:'2026-09-05',assignDate:'2026-09-05',
+      maintenance:{
+        ticketNo:'WX-2026-0905-01',faultType:'遥控失灵',reportDate:'2026-09-05',assignDate:'2026-09-05',
+        worker:'张师傅',status:'已完工',warrantyStatus:'质保内-免费维修',
+        before:{photos:['遥控器正面','电池仓','信号测试'],report:'遥控器按键无反应，更换电池后仍无信号输出。判断遥控器主板故障。'},
+        during:{photos:['更换新遥控器','配对测试'],report:'更换全新格力遥控器1个，与内机配对成功，所有功能键正常响应。'},
+        after:{photos:['新遥控器测试','客户确认'],report:'新遥控器功能全部正常，客户满意。质保内免费更换。'},
+        salesAlert:false,
+      },
+    },
+    'wuxiaoli_svc':{
+      customer:'吴小莉',machine:'格力雅居',faultType:'不制热',warranty:'质保内',
+      worker:'—',status:'待派单',income:'—',ticketNo:'WX-2026-0915-02',
+      reportDate:'2026-09-15',assignDate:'—',
+      maintenance:null,
+    },
+  };
 
   function renderCustomer(){
     const role = currentRole;
+    if(currentView==='detail' && currentCustomerId && CUSTOMERS[currentCustomerId]){
+      return renderCustomerDetail(currentCustomerId);
+    }
     const kpis = {
       sales:[
         {cls:'accent-teal',icon:'customers',label:'本月新增客户',value:'38<span class="unit">人</span>',trend:'up',trendText:'↑ 12% 环比'},
@@ -447,18 +861,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     // Customer list
     html += `
       <div class="card">
-        <div class="card-header"><div class="card-title">${svg('customers')}客户档案列表</div><span class="card-action">+ 新增客户</span></div>
+        <div class="card-header"><div class="card-title">${svg('customers')}客户档案列表<span class="click-hint">点击查看详情 →</span></div><span class="card-action" id="newCustomer">+ 新增客户</span></div>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>客户姓名</th><th>来源渠道</th><th>户型/面积</th><th>意向机型</th><th>当前阶段</th><th>最新跟进</th><th>负责人</th></tr></thead>
             <tbody>
-              <tr><td>张明远</td><td><span class="tag tag-teal">设计师合作</span></td><td>三室两厅/128㎡</td><td>大金VRV-X</td><td><span class="tag tag-green">成交</span></td><td>9/14 已签单</td><td>李晓</td></tr>
-              <tr><td>王思琪</td><td><span class="tag tag-amber">活动获客</span></td><td>两室一厅/89㎡</td><td>格力雅居</td><td><span class="tag tag-amber">上门量房</span></td><td>9/15 安排量房</td><td>赵敏</td></tr>
-              <tr><td>刘建国</td><td><span class="tag tag-blue">自然到店</span></td><td>四室两厅/165㎡</td><td>三菱重工KXZ</td><td><span class="tag tag-purple">需求沟通</span></td><td>9/13 电话沟通</td><td>李晓</td></tr>
-              <tr><td>陈雅芳</td><td><span class="tag tag-purple">异业联盟</span></td><td>三室两厅/110㎡</td><td>美的理想家</td><td><span class="tag tag-teal">初步接触</span></td><td>9/15 初次到店</td><td>王强</td></tr>
-              <tr><td>周浩宇</td><td><span class="tag tag-teal">设计师合作</span></td><td>复式/220㎡</td><td>大金VRV-S</td><td><span class="tag tag-amber">上门量房</span></td><td>9/12 已量房</td><td>赵敏</td></tr>
-              <tr><td>孙丽娜</td><td><span class="tag tag-amber">活动获客</span></td><td>两室两厅/95㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交</span></td><td>9/10 已签单</td><td>李晓</td></tr>
-              <tr><td>吴小莉</td><td><span class="tag tag-blue">自然到店</span></td><td>三室一厅/105㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交</span></td><td>9/08 已签单</td><td>王强</td></tr>
+              <tr data-cid="zhangmingyuan"><td><b>张明远</b></td><td><span class="tag tag-teal">设计师合作</span></td><td>三室两厅/128㎡</td><td>大金VRV-X</td><td><span class="tag tag-amber">成交-安装中</span></td><td>9/14 已签单</td><td>李晓</td></tr>
+              <tr data-cid="wangsiqi"><td><b>王思琪</b></td><td><span class="tag tag-amber">活动获客</span></td><td>两室一厅/89㎡</td><td>格力雅居</td><td><span class="tag tag-amber">上门量房</span></td><td>9/15 安排量房</td><td>赵敏</td></tr>
+              <tr data-cid="liujianguo"><td><b>刘建国</b></td><td><span class="tag tag-blue">自然到店</span></td><td>四室两厅/165㎡</td><td>三菱重工KXZ</td><td><span class="tag tag-purple">需求沟通</span></td><td>9/13 电话沟通</td><td>李晓</td></tr>
+              <tr data-cid="chenyafang"><td><b>陈雅芳</b></td><td><span class="tag tag-purple">异业联盟</span></td><td>三室两厅/110㎡</td><td>美的理想家</td><td><span class="tag tag-teal">初步接触</span></td><td>9/15 初次到店</td><td>王强</td></tr>
+              <tr data-cid="zhouhaoyu"><td><b>周浩宇</b></td><td><span class="tag tag-teal">设计师合作</span></td><td>复式/220㎡</td><td>大金VRV-S</td><td><span class="tag tag-amber">上门量房</span></td><td>9/12 已量房</td><td>赵敏</td></tr>
+              <tr data-cid="sunlina"><td><b>孙丽娜</b></td><td><span class="tag tag-amber">活动获客</span></td><td>两室两厅/95㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交-质保内</span></td><td>9/10 已签单</td><td>李晓</td></tr>
+              <tr data-cid="wuxiaoli"><td><b>吴小莉</b></td><td><span class="tag tag-blue">自然到店</span></td><td>三室一厅/105㎡</td><td>格力雅居</td><td><span class="tag tag-green">成交-质保内</span></td><td>9/08 已签单</td><td>王强</td></tr>
             </tbody>
           </table>
         </div>
@@ -505,6 +919,200 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     return html;
   }
 
+  // ====== CUSTOMER DETAIL VIEW ======
+  function renderCustomerDetail(cid){
+    const c = CUSTOMERS[cid];
+    if(!c) return '<div class="page-title">客户不存在</div>';
+    const role = currentRole;
+    const followupIcons = {wechat:'💬',phone:'📞',face:'👤',visit:'🚪'};
+    const followupLabels = {wechat:'微信沟通',phone:'电话沟通',face:'当面沟通',visit:'上门到访'};
+
+    let html = `
+      <div class="back-bar" id="backToList">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        返回客户列表
+      </div>
+
+      <div class="detail-hero">
+        <div class="detail-hero-info">
+          <h2>${c.name}</h2>
+          <p>📞 ${c.phone} &nbsp;📍 ${c.address}<br>📋 ${c.contractNo} &nbsp;💰 ${c.contractAmt} &nbsp;👤 销售：${c.sales}</p>
+        </div>
+        <div class="detail-hero-tag">
+          <span class="tag ${c.stageTag}">${c.stage}</span>
+          <span class="tag tag-slate">${c.source}</span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">户型</div><div class="info-value">${c.layout}</div></div>
+        <div class="info-item"><div class="info-label">面积</div><div class="info-value">${c.area}</div></div>
+        <div class="info-item"><div class="info-label">意向/签约机型</div><div class="info-value">${c.machine}</div></div>
+      </div>`;
+
+    // Sales alert for maintenance
+    if(c.maintenance && c.maintenance.salesAlert){
+      html += `
+      <div class="sales-alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>⚠ 维保提醒：该客户已发起维保工单（${c.maintenance.ticketNo}），故障类型「${c.maintenance.faultType}」，当前状态「${c.maintenance.status}」。请及时跟进客户满意度！</span>
+      </div>`;
+    }
+
+    // 1. Follow-up records (all customers)
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('list')}客户历史跟进记录</div><span class="tag tag-teal">${c.followups.length}条记录</span></div>
+        <div class="card-body">`;
+
+    c.followups.forEach(f => {
+      html += `
+          <div class="followup-item">
+            <div class="followup-type ${f.icon}">${followupIcons[f.icon]||'📝'}</div>
+            <div class="followup-content">
+              <div class="followup-head">
+                <span class="tag tag-slate">${followupLabels[f.icon]||'其他'}</span>
+                <span class="followup-date">${f.date}</span>
+              </div>
+              <div class="followup-text">${f.text}</div>
+              <div class="followup-next">→ 下一步：${f.next}</div>
+            </div>
+          </div>`;
+    });
+
+    html += `
+        </div>
+      </div>`;
+
+    // 2. Installation drill-through (for closed customers)
+    if(c.install){
+      const inst = c.install;
+      html += `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">${svg('tool')}安装进度穿透 — 当前第${inst.currentStep}步 / 共10步</div>
+          <span class="tag tag-amber">进度${inst.progress}%</span>
+        </div>
+        <div class="card-body">
+          <div class="progress-bar" style="margin-bottom:16px">
+            <div class="progress-bar-fill" style="background:linear-gradient(90deg,var(--teal-600),var(--teal-500));width:${inst.progress}%"></div>
+          </div>`;
+
+      inst.steps.forEach(s => {
+        const statusLabel = s.status==='done'?'已完成':(s.status==='current'?'进行中':'待执行');
+        html += `
+          <div class="install-step-detail ${s.status}">
+            <div class="install-step-head">
+              <div class="install-step-title"><div class="install-step-num">${s.n}</div>${s.name}</div>
+              <span class="tag tag-slate">${s.date} · ${statusLabel}</span>
+            </div>`;
+        if(s.report){
+          html += `<div class="install-step-report">📋 ${s.report}</div>`;
+        }
+        if(s.photos && s.photos.length > 0){
+          html += `<div class="install-step-photos">`;
+          s.photos.forEach(p => {
+            html += `<div class="photo-item" data-label="${p}"><span class="photo-icon">📷</span></div>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+
+      html += `
+        </div>
+      </div>`;
+    }
+
+    // 3. Warranty info (for warranty customers)
+    if(c.warranty){
+      const w = c.warranty;
+      html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('shield')}质保客户档案</div><span class="tag tag-green">${w.status}</span></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><div class="info-label">安装日期</div><div class="info-value">${w.installDate}</div></div>
+            <div class="info-item"><div class="info-label">设备质保至</div><div class="info-value">${w.deviceWarranty}</div></div>
+            <div class="info-item"><div class="info-label">安装质保至</div><div class="info-value">${w.installWarranty}</div></div>
+          </div>
+          <div class="section-h"><div class="bar"></div>服务套餐：${w.package}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+            ${w.serviceItems.map(s=>`<span class="tag tag-teal">${s}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // 4. Maintenance drill-through
+    if(c.maintenance){
+      const m = c.maintenance;
+      html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('doc')}维保工单穿透 — ${m.ticketNo}</div><span class="tag tag-amber">${m.status}</span></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item"><div class="info-label">故障类型</div><div class="info-value">${m.faultType}</div></div>
+            <div class="info-item"><div class="info-label">报修日期</div><div class="info-value">${m.reportDate}</div></div>
+            <div class="info-item"><div class="info-label">维修工长</div><div class="info-value">${m.worker}</div></div>
+          </div>
+          <div style="margin:8px 0 16px"><span class="tag tag-green">${m.warrantyStatus}</span></div>`;
+
+      // Before
+      html += `
+          <div class="maint-section before">
+            <div class="maint-section-head">🔴 维保前 — 故障检测</div>
+            <div class="maint-section-body">
+              <div class="maint-photos">
+                ${m.before.photos.map(p=>`<div class="photo-item" data-label="${p}"><span class="photo-icon">📷</span></div>`).join('')}
+              </div>
+              <div class="maint-report">📋 ${m.before.report}</div>
+            </div>
+          </div>`;
+
+      // During
+      html += `
+          <div class="maint-section during">
+            <div class="maint-section-head">🟡 维保中 — 维修过程</div>
+            <div class="maint-section-body">
+              <div class="maint-photos">
+                ${m.during.photos.map(p=>`<div class="photo-item" data-label="${p}"><span class="photo-icon">🔧</span></div>`).join('')}
+              </div>
+              <div class="maint-report">📋 ${m.during.report}</div>
+            </div>
+          </div>`;
+
+      // After
+      html += `
+          <div class="maint-section after">
+            <div class="maint-section-head">🟢 维保后 — 验收确认</div>
+            <div class="maint-section-body">
+              <div class="maint-photos">
+                ${m.after.photos.map(p=>`<div class="photo-item" data-label="${p}"><span class="photo-icon">✅</span></div>`).join('')}
+              </div>
+              <div class="maint-report">📋 ${m.after.report}</div>
+            </div>
+          </div>`;
+
+      html += `
+        </div>
+      </div>`;
+    }
+
+    // No further data
+    if(!c.install && !c.warranty && !c.maintenance){
+      html += `
+      <div class="card">
+        <div class="card-body" style="text-align:center;padding:30px">
+          <div style="font-size:36px;margin-bottom:8px">📋</div>
+          <div style="font-size:14px;color:var(--slate-500)">该客户尚未成交，暂无安装、质保和维保数据<br>请继续跟进客户，促成成交</div>
+        </div>
+      </div>`;
+    }
+
+    return html;
+  }
+
   function renderContract(){
     const role = currentRole;
     let html = `
@@ -543,7 +1151,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
 
     html += `
       <div class="card">
-        <div class="card-header"><div class="card-title">${svg('doc')}合同列表</div><span class="card-action">+ 新建合同</span></div>
+        <div class="card-header"><div class="card-title">${svg('doc')}合同列表</div><span class="card-action" id="newContract">+ 新建合同</span></div>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>合同编号</th><th>客户姓名</th><th>机型</th><th>合同金额</th><th>签订日期</th><th>执行状态</th><th>收款进度</th><th>负责人</th></tr></thead>
@@ -629,7 +1237,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     // Payment records table
     html += `
       <div class="card">
-        <div class="card-header"><div class="card-title">${svg('money')}收款记录</div><span class="card-action">+ 登记收款</span></div>
+        <div class="card-header"><div class="card-title">${svg('money')}收款记录</div><span class="card-action" id="newPayment">+ 登记收款</span></div>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>客户</th><th>合同编号</th><th>收款类型</th><th>应收金额</th><th>已收金额</th><th>收款日期</th><th>状态</th></tr></thead>
@@ -682,6 +1290,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
 
   function renderInstall(){
     const role = currentRole;
+    if(currentView==='detail' && currentInstallId && INSTALL_ORDERS[currentInstallId]){
+      return renderInstallDetail(currentInstallId);
+    }
     let html = `
       <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
       <div class="page-title">现场安装管理</div>
@@ -716,54 +1327,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     const k = kpis[role] || kpis.boss;
     html += `<div class="kpi-grid">${k.map(c=>`<div class="kpi-card ${c.cls}"><div class="kpi-label">${svg(c.icon)}${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-trend ${c.trend}">${c.trendText}</div></div>`).join('')}</div>`;
 
+    // Filter tabs by process node
+    const filterTabs = ['all','待派单','现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复','排水试验','盖管保护','抽真空检漏','安装室外机','已完工'];
+    html += `<div class="filter-tabs" id="installFilter">`;
+    filterTabs.forEach(t => {
+      const label = t==='all'?'全部':t;
+      html += `<button class="filter-tab ${installFilter===t?'active':''}" data-filter="${t}">${label}</button>`;
+    });
+    html += `</div>`;
+
+    // Filter work orders
+    const filtered = Object.entries(INSTALL_ORDERS).filter(([id,o])=>{
+      if(installFilter==='all') return true;
+      if(installFilter==='待派单') return o.status==='待派单';
+      if(installFilter==='已完工') return o.status==='已完工';
+      const stepName = INSTALL_STEPS[o.currentStep-1] || '';
+      return stepName===installFilter;
+    });
+
     // Work order list
     html += `
       <div class="card">
-        <div class="card-header"><div class="card-title">${svg('list')}安装工单列表</div><span class="card-action">+ 新建工单</span></div>
+        <div class="card-header"><div class="card-title">${svg('list')}安装工单列表<span class="click-hint">点击查看安装详情 →</span></div><span class="card-action" id="newInstallOrder">+ 新建工单</span></div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>客户</th><th>机型</th><th>项目经理</th><th>工长</th><th>当前节点</th><th>进度</th><th>状态</th><th>预计完工</th></tr></thead>
-            <tbody>
-              <tr><td>张明远</td><td>大金VRV-X</td><td>陈工</td><td>王师傅</td><td>吊顶修复(6/10)</td><td><span class="tag tag-amber">60%</span></td><td><span class="tag tag-teal">施工中</span></td><td>9/18</td></tr>
-              <tr><td>孙丽娜</td><td>格力雅居</td><td>陈工</td><td>李师傅</td><td>安装室外机(9/10)</td><td><span class="tag tag-green">90%</span></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
-              <tr><td>周浩宇</td><td>大金VRV-S</td><td>赵工</td><td>张师傅</td><td>铺设保护膜(2/10)</td><td><span class="tag tag-slate">20%</span></td><td><span class="tag tag-blue">刚开工</span></td><td>9/22</td></tr>
-              <tr><td>陈雅芳</td><td>美的理想家</td><td>陈工</td><td>—</td><td>待派单</td><td><span class="tag tag-slate">0%</span></td><td><span class="tag tag-amber">待分配</span></td><td>—</td></tr>
-              <tr><td>刘建国</td><td>三菱重工KXZ</td><td>赵工</td><td>王师傅</td><td>排水试验(7/10)</td><td><span class="tag tag-amber">75%</span></td><td><span class="tag tag-teal">施工中</span></td><td>9/17</td></tr>
-              <tr><td>吴小莉</td><td>格力雅居</td><td>陈工</td><td>李师傅</td><td>抽真空检漏(9/10)</td><td><span class="tag tag-green">85%</span></td><td><span class="tag tag-green">即将完工</span></td><td>9/16</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-
-    // 10-step progress + photos
-    html += `
-      <div class="card">
-        <div class="card-header"><div class="card-title">${svg('tool')}安装全流程节点 — 张明远/大金VRV-X</div><span class="tag tag-amber">施工中·第6步</span></div>
-        <div class="card-body">
-          <div class="steps-row" style="flex-wrap:wrap;justify-content:center;gap:1px;margin-bottom:18px">
-            ${['现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复','排水试验','盖管保护','抽真空检漏','安装室外机'].map((s,i)=>{
-              const n=i+1;
-              const done = n<=5 ? 'done' : '';
-              const current = n===6 ? 'current' : '';
-              const cls = done ? 'done' : (current ? 'current' : '');
-              const content = done ? '✓' : (current ? '6' : n);
-              const lineCls = n<=5 ? 'done' : '';
-              const label = n<=5 ? `style="font-size:10px;color:var(--teal-600)"` : (n===6 ? `style="font-size:10px;color:var(--amber-500);font-weight:700"` : `style="font-size:10px;color:var(--slate-400)"`);
-              return `<div class="step-item"><div class="step-dot ${cls}">${content}</div><span ${label}>${s}</span></div>${n<10?`<div class="step-line ${lineCls}"></div>`:''}`;
-            }).join('')}
-          </div>
-          <div class="section-h"><div class="bar"></div>现场施工照片</div>
-          <div class="photo-grid">
-            <div class="photo-item" data-label="现场定位 · 9/12"><span class="photo-icon">📐</span></div>
-            <div class="photo-item" data-label="铺设保护膜 · 9/12"><span class="photo-icon">📦</span></div>
-            <div class="photo-item" data-label="安装室内机 · 9/13"><span class="photo-icon">🏠</span></div>
-            <div class="photo-item" data-label="防尘保护 · 9/13"><span class="photo-icon">🛡️</span></div>
-            <div class="photo-item" data-label="管路安装 · 9/14"><span class="photo-icon">🔩</span></div>
-            <div class="photo-item" data-label="吊顶修复 · 9/15"><span class="photo-icon">🔨</span></div>
-            <div class="photo-item" data-label="待上传" style="opacity:.4"><span class="photo-icon">📷</span></div>
-            <div class="photo-item" data-label="待上传" style="opacity:.4"><span class="photo-icon">📷</span></div>
-          </div>
-        </div>
+            <thead><tr><th>客户</th><th>机型</th><th>面积</th><th>项目经理</th><th>工长</th><th>当前节点</th><th>进度</th><th>状态</th><th>预计完工</th></tr></thead>
+            <tbody>`;
+    filtered.forEach(([id,o])=>{
+      const stepName = o.currentStep>0 ? `${INSTALL_STEPS[o.currentStep-1]}(${o.currentStep}/10)` : '待派单';
+      const statusTag = o.status==='已完工'?'tag-green':(o.status==='待派单'?'tag-amber':(o.progress>=80?'tag-green':'tag-teal'));
+      const progressTag = o.progress===100?'tag-green':(o.progress>=50?'tag-amber':'tag-slate');
+      html += `<tr data-iid="${id}"><td><b>${o.customer}</b></td><td>${o.machine}</td><td>${o.area}</td><td>${o.manager}</td><td>${o.worker}</td><td>${stepName}</td><td><span class="tag ${progressTag}">${o.progress}%</span></td><td><span class="tag ${statusTag}">${o.status}</span></td><td>${o.eta}</td></tr>`;
+    });
+    html += `</tbody></table></div>
       </div>`;
 
     // SOP timeline + QC
@@ -773,11 +1369,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
           <div class="card-header"><div class="card-title">${svg('list')}安装SOP标准流程（10步）</div></div>
           <div class="card-body">
             <div class="timeline">
-              ${['现场定位','铺设保护膜','安装室内机','防尘保护','管路安装','吊顶修复完成空调安装','排水试验','盖管保护','抽真空和检漏','安装室外机'].map((s,i)=>{
+              ${INSTALL_STEPS.map((s,i)=>{
                 const desc=['确认室内外机位置、管路走向、排水方案','对地面、家具、门窗进行专业防护','固定内机支架，安装室内机主体','对内机及周围区域进行防尘包裹','冷媒铜管、排水管、信号线敷设连接','配合装修方修复吊顶，完善内机安装','检查排水通畅性，确保无渗漏','管路保温棉包裹、盖槽固定','系统抽真空至-0.1MPa，保压检漏','固定外机支架，连接内外机管路，通电调试'];
-                const done = i<5 ? 'done' : '';
-                const status = i<5 ? '已完成' : (i===5 ? '当前进行' : '待执行');
-                return `<div class="timeline-item ${done}"><div class="timeline-time">第${i+1}步 · ${status}</div><div class="timeline-title">${s}</div><div class="timeline-desc">${desc[i]}</div></div>`;
+                return `<div class="timeline-item"><div class="timeline-time">第${i+1}步 · SOP标准</div><div class="timeline-title">${s}</div><div class="timeline-desc">${desc[i]}</div></div>`;
               }).join('')}
             </div>
           </div>
@@ -800,8 +1394,132 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     return html;
   }
 
+  // ====== INSTALL DETAIL VIEW ======
+  function renderInstallDetail(iid){
+    const o = INSTALL_ORDERS[iid];
+    if(!o) return '<div class="page-title">工单不存在</div>';
+    let html = `
+      <div class="back-bar" id="backToInstallList">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        返回安装工单列表
+      </div>
+      <div class="detail-hero">
+        <div class="detail-hero-info">
+          <h2>${o.customer} — 安装工单</h2>
+          <p>📋 机型：${o.machine} &nbsp;📐 面积：${o.area}<br>👤 项目经理：${o.manager} &nbsp;🔧 工长：${o.worker}<br>📅 预计完工：${o.eta}</p>
+        </div>
+        <div class="detail-hero-tag">
+          <span class="tag ${o.progress===100?'tag-green':'tag-amber'}">${o.status}</span>
+          <span class="tag tag-slate">进度${o.progress}%</span>
+        </div>
+      </div>
+
+      <div class="detail-view-banner">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>当前为${editMode?'编辑模式':'查看模式'} — 可${editMode?'编辑现场照片和施工汇报':'点击右上角"编辑"切换到编辑模式'}</span>
+        <span class="edit-toggle ${editMode?'active':''}" id="editToggle" style="margin-left:auto">${editMode?'✏ 编辑中':'✏ 编辑'}</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">${svg('tool')}安装全流程节点 — ${o.customer}/${o.machine}</div>
+          <span class="tag ${o.progress===100?'tag-green':'tag-amber'}">${o.status}·第${o.currentStep}步/共10步</span>
+        </div>
+        <div class="card-body">
+          <div class="progress-bar" style="margin-bottom:16px">
+            <div class="progress-bar-fill" style="background:linear-gradient(90deg,var(--teal-600),var(--teal-500));width:${o.progress}%"></div>
+          </div>`;
+
+    o.steps.forEach(s => {
+      const statusLabel = s.status==='done'?'已完成':(s.status==='current'?'进行中':'待执行');
+      const stepIcon = s.status==='done'?'✅':(s.status==='current'?'🟡':'⚪');
+      html += `
+        <div class="install-step-detail ${s.status}">
+          <div class="install-step-head">
+            <div class="install-step-title"><div class="install-step-num">${s.n}</div>${s.name}</div>
+            <span class="tag tag-slate">${s.date} · ${statusLabel}</span>
+          </div>`;
+
+      if(editMode){
+        // Editable mode
+        html += `<div class="install-step-body">
+          <div class="form-group">
+            <label class="form-label">📋 施工汇报文字</label>
+            <textarea class="form-textarea" id="stepReport_${s.n}" placeholder="请输入施工汇报...">${s.report||''}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📷 现场照片（点击添加/删除）</label>
+            <div class="editable-photo-row" id="stepPhotos_${s.n}">`;
+        (s.photos||[]).forEach((p,i) => {
+          html += `<div class="editable-photo"><span>📷</span><span class="del-photo" data-step="${s.n}" data-idx="${i}">✕</span></div>`;
+        });
+        html += `<div class="editable-photo add" data-step="${s.n}" id="addPhoto_${s.n}"><span>＋</span></div>`;
+        html += `</div>
+            <div class="form-hint">照片${(s.photos||[]).length}张 · 点击＋添加，点击✕删除</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">施工日期</label>
+              <input class="form-input" type="text" value="${s.date||''}" id="stepDate_${s.n}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">节点状态</label>
+              <select class="form-select" id="stepStatus_${s.n}">
+                <option value="pending" ${s.status==='pending'?'selected':''}>待执行</option>
+                <option value="current" ${s.status==='current'?'selected':''}>进行中</option>
+                <option value="done" ${s.status==='done'?'selected':''}>已完成</option>
+              </select>
+            </div>
+          </div>
+        </div>`;
+      } else {
+        // View mode
+        if(s.report){
+          html += `<div class="install-step-report">📋 ${s.report}</div>`;
+        }
+        if(s.photos && s.photos.length > 0){
+          html += `<div class="install-step-photos">`;
+          s.photos.forEach(p => {
+            html += `<div class="photo-item" data-label="${p}"><span class="photo-icon">📷</span></div>`;
+          });
+          html += `</div>`;
+        }
+        if(!s.report && (!s.photos || s.photos.length === 0)){
+          html += `<div style="font-size:11px;color:var(--slate-400);padding:8px 12px">该节点暂无汇报信息，切换编辑模式可录入</div>`;
+        }
+      }
+      html += `</div>`;
+    });
+
+    html += `</div></div>`;
+
+    // QC section
+    html += `
+      <div class="card">
+        <div class="card-header"><div class="card-title">${svg('shield')}复检质控</div></div>
+        <div class="card-body">
+          <div class="bar-chart">
+            <div class="bar-row"><span class="bar-label">安装质量评分</span><div class="bar-track"><div class="bar-fill teal" style="width:${o.progress===100?95:80}%">${o.progress===100?'95分':'待评'}</div></div></div>
+          </div>
+          ${o.progress===100?'<div class="role-notice" style="background:var(--green-100);color:#166534;margin-top:14px;margin-bottom:0"><b>✓ 已完工交付：</b>客户已验收签字，质保期自安装完成日起算。</div>':'<div class="role-notice" style="background:var(--amber-100);color:#92400E;margin-top:14px;margin-bottom:0"><b>⏳ 施工中：</b>完成后将自动转入质保管理。</div>'}
+        </div>
+      </div>`;
+
+    if(editMode){
+      html += `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-cancel" id="cancelEdit">取消</button>
+        <button class="btn btn-save" id="saveInstall">💾 保存所有修改</button>
+      </div>`;
+    }
+
+    return html;
+  }
+
   function renderService(){
     const role = currentRole;
+    if(currentView==='detail' && currentServiceId && SERVICE_ORDERS[currentServiceId]){
+      return renderServiceDetail(currentServiceId);
+    }
     let html = `
       <div class="role-indicator"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg> 当前视角：${ROLE_NAMES[role]} · ${ROLE_DESC[role]}</div>
       <div class="page-title">售后维保派单管理</div>
@@ -869,22 +1587,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
         </div>
       </div>`;
 
-    // Work order list
+    // Work order list (clickable)
     html += `
       <div class="card">
-        <div class="card-header"><div class="card-title">${svg('doc')}维修工单记录</div><span class="card-action">+ 新建工单</span></div>
+        <div class="card-header"><div class="card-title">${svg('doc')}维修工单记录<span class="click-hint">点击查看维保详情 →</span></div><span class="card-action" id="newServiceOrder">+ 新建工单</span></div>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>客户</th><th>机型</th><th>故障类型</th><th>质保状态</th><th>工长</th><th>配件更换</th><th>维修收入</th><th>状态</th></tr></thead>
-            <tbody>
-              <tr><td>张明远</td><td>大金VRV-X</td><td>制冷不足</td><td><span class="tag tag-green">质保内</span></td><td>王师傅</td><td>—</td><td><span class="tag tag-slate">免费</span></td><td><span class="tag tag-teal">已派单</span></td></tr>
-              <tr><td>李伟</td><td>美的理想家</td><td>外机异响</td><td><span class="tag tag-red">质保外</span></td><td>李师傅</td><td>压缩机减震垫</td><td>¥380</td><td><span class="tag tag-green">已完工</span></td></tr>
-              <tr><td>赵芳</td><td>三菱重工KXZ</td><td>漏水</td><td><span class="tag tag-red">质保外</span></td><td>王师傅</td><td>排水管更换</td><td>¥520</td><td><span class="tag tag-teal">维修中</span></td></tr>
-              <tr><td>陈刚</td><td>格力雅居</td><td>遥控失灵</td><td><span class="tag tag-green">质保内</span></td><td>张师傅</td><td>遥控器更换</td><td><span class="tag tag-slate">免费</span></td><td><span class="tag tag-green">已完工</span></td></tr>
-              <tr><td>吴小莉</td><td>格力雅居</td><td>不制热</td><td><span class="tag tag-green">质保内</span></td><td>—</td><td>—</td><td>—</td><td><span class="tag tag-amber">待派单</span></td></tr>
-            </tbody>
-          </table>
-        </div>
+            <tbody>`;
+    Object.entries(SERVICE_ORDERS).forEach(([id,o])=>{
+      const wTag = o.warranty==='质保内'?'tag-green':'tag-red';
+      const sTag = o.status==='已完工'?'tag-green':(o.status==='待派单'?'tag-amber':'tag-teal');
+      const parts = o.maintenance ? (o.maintenance.during && o.maintenance.during.report ? '详见工单' : '—') : '—';
+      html += `<tr data-sid="${id}"><td><b>${o.customer}</b></td><td>${o.machine}</td><td>${o.faultType}</td><td><span class="tag ${wTag}">${o.warranty}</span></td><td>${o.worker}</td><td>${parts}</td><td>${o.income}</td><td><span class="tag ${sTag}">${o.status}</span></td></tr>`;
+    });
+    html += `</tbody></table></div>
       </div>`;
 
     // Archive summary
@@ -908,6 +1625,122 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
           </div>
         </div>
       </div>`;
+    return html;
+  }
+
+  // ====== SERVICE DETAIL VIEW ======
+  function renderServiceDetail(sid){
+    const o = SERVICE_ORDERS[sid];
+    if(!o) return '<div class="page-title">工单不存在</div>';
+    let html = `
+      <div class="back-bar" id="backToServiceList">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        返回维修工单列表
+      </div>
+      <div class="detail-hero">
+        <div class="detail-hero-info">
+          <h2>${o.customer} — 维保工单 ${o.ticketNo}</h2>
+          <p>📋 机型：${o.machine} &nbsp;🔧 故障：${o.faultType}<br>👤 工长：${o.worker} &nbsp;📅 报修：${o.reportDate}<br>💰 费用：${o.income} &nbsp;🛡 质保状态：${o.warranty}</p>
+        </div>
+        <div class="detail-hero-tag">
+          <span class="tag ${o.status==='已完工'?'tag-green':'tag-amber'}">${o.status}</span>
+          <span class="tag ${o.warranty==='质保内'?'tag-green':'tag-red'}">${o.warranty}</span>
+        </div>
+      </div>`;
+
+    if(!o.maintenance){
+      html += `
+        <div class="detail-view-banner">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>该工单尚未派单，暂无维保记录。点击右侧编辑按钮可录入维保信息。</span>
+          <span class="edit-toggle ${editMode?'active':''}" id="editToggle" style="margin-left:auto">${editMode?'✏ 编辑中':'✏ 编辑'}</span>
+        </div>
+        <div class="card">
+          <div class="card-body" style="text-align:center;padding:30px">
+            <div style="font-size:36px;margin-bottom:8px">🔧</div>
+            <div style="font-size:14px;color:var(--slate-500)">该工单待派单处理，切换编辑模式可录入维保前/中/后照片和文字信息</div>
+          </div>
+        </div>`;
+      if(editMode){
+        html += `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+          <button class="btn btn-cancel" id="cancelEdit">取消</button>
+          <button class="btn btn-save" id="saveService">💾 保存</button>
+        </div>`;
+      }
+      return html;
+    }
+
+    const m = o.maintenance;
+    html += `
+      <div class="detail-view-banner">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span>当前为${editMode?'编辑模式':'查看模式'} — 可${editMode?'编辑维保照片和文字汇报':'点击右上角"编辑"切换到编辑模式'}</span>
+        <span class="edit-toggle ${editMode?'active':''}" id="editToggle" style="margin-left:auto">${editMode?'✏ 编辑中':'✏ 编辑'}</span>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">工单编号</div><div class="info-value">${m.ticketNo}</div></div>
+        <div class="info-item"><div class="info-label">派单日期</div><div class="info-value">${m.assignDate}</div></div>
+        <div class="info-item"><div class="info-label">维修工长</div><div class="info-value">${m.worker}</div></div>
+      </div>
+      <div style="margin:0 0 16px"><span class="tag ${o.warranty==='质保内'?'tag-green':'tag-red'}">${m.warrantyStatus}</span></div>`;
+
+    // Three sections: before, during, after
+    const sections = [
+      {key:'before',label:'维保前 — 故障检测',icon:'🔴',cls:'before'},
+      {key:'during',label:'维保中 — 维修过程',icon:'🟡',cls:'during'},
+      {key:'after',label:'维保后 — 验收确认',icon:'🟢',cls:'after'},
+    ];
+
+    sections.forEach(sec => {
+      const data = m[sec.key] || {photos:[],report:''};
+      html += `
+        <div class="maint-section ${sec.cls}">
+          <div class="maint-section-head">${sec.icon} ${sec.label}</div>
+          <div class="maint-section-body">`;
+
+      if(editMode){
+        html += `
+          <div class="form-group">
+            <label class="form-label">📋 ${sec.label}文字汇报</label>
+            <textarea class="form-textarea" id="maintReport_${sec.key}" placeholder="请输入${sec.label}汇报...">${data.report||''}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📷 现场照片（点击添加/删除）</label>
+            <div class="editable-photo-row" id="maintPhotos_${sec.key}">`;
+        (data.photos||[]).forEach((p,i)=>{
+          html += `<div class="editable-photo"><span>${sec.icon}</span><span class="del-photo" data-section="${sec.key}" data-idx="${i}">✕</span></div>`;
+        });
+        html += `<div class="editable-photo add" data-section="${sec.key}" id="addMaintPhoto_${sec.key}"><span>＋</span></div>`;
+        html += `</div>
+            <div class="form-hint">照片${(data.photos||[]).length}张</div>
+          </div>`;
+      } else {
+        if(data.photos && data.photos.length > 0){
+          html += `<div class="maint-photos">`;
+          data.photos.forEach(p => {
+            html += `<div class="photo-item" data-label="${p}"><span class="photo-icon">${sec.icon}</span></div>`;
+          });
+          html += `</div>`;
+        }
+        if(data.report){
+          html += `<div class="maint-report">📋 ${data.report}</div>`;
+        }
+        if((!data.photos || data.photos.length === 0) && !data.report){
+          html += `<div style="font-size:11px;color:var(--slate-400);padding:8px 12px">暂无${sec.label}信息，切换编辑模式可录入</div>`;
+        }
+      }
+
+      html += `</div></div>`;
+    });
+
+    if(editMode){
+      html += `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-cancel" id="cancelEdit">取消</button>
+        <button class="btn btn-save" id="saveService">💾 保存所有修改</button>
+      </div>`;
+    }
+
     return html;
   }
 
@@ -1070,11 +1903,259 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     report: renderReport,
   };
 
+  // 根据角色更新侧边栏可见性
+  function updateSidebarVisibility(){
+    const allowed = ROLE_MODULES[currentRole] || [];
+    document.querySelectorAll('.sidebar-item').forEach(i=>{
+      const visible = allowed.includes(i.dataset.module);
+      i.style.display = visible ? 'flex' : 'none';
+    });
+    // 隐藏分组标签如果没有可见项
+    const groups = document.querySelectorAll('.sidebar-group-label');
+    let prevLabel = null;
+    document.querySelector('#sidebar').querySelectorAll('.sidebar-group-label, .sidebar-item').forEach(el=>{
+      if(el.classList.contains('sidebar-group-label')){
+        if(prevLabel) prevLabel.style.display = 'none'; // 先隐藏，后面有项目再显示
+        prevLabel = el;
+        el.style.display = 'none';
+      } else if(el.style.display !== 'none' && prevLabel){
+        prevLabel.style.display = 'block';
+        prevLabel = null;
+      }
+    });
+  }
+
+  // 构建移动端底部导航（根据角色权限）
+  function buildMobileNav(){
+    const allowed = ROLE_MODULES[currentRole] || [];
+    const navIcons = {
+      customer:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+      contract:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+      payment:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+      install:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+      service:'<path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>',
+      report:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
+    };
+    const mobileNav = document.getElementById('mobileBottomNav');
+    const visibleModules = MODULES.filter(m=>allowed.includes(m.id));
+    mobileNav.innerHTML = visibleModules.map(m=>{
+      const label = m.label;
+      const shortLabel = label.length>4 ? label.slice(0,4) : label;
+      return `<button class="mobile-bottom-nav-item ${m.id===currentModule?'active':''}" data-module="${m.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${navIcons[m.id]||''}</svg><span>${shortLabel}</span></button>`;
+    }).join('');
+    mobileNav.querySelectorAll('.mobile-bottom-nav-item').forEach(i=>{
+      i.onclick = ()=>switchModule(i.dataset.module);
+    });
+  }
+
+  // ====== NAVIGATION ======
+  function openCustomerDetail(cid){
+    currentView = 'detail';
+    currentCustomerId = cid;
+    render();
+  }
+  function closeCustomerDetail(){
+    currentView = 'list';
+    currentCustomerId = null;
+    render();
+  }
+  function openInstallDetail(iid){
+    currentView = 'detail';
+    currentInstallId = iid;
+    currentServiceId = null;
+    currentCustomerId = null;
+    render();
+  }
+  function closeInstallDetail(){
+    currentView = 'list';
+    currentInstallId = null;
+    editMode = false;
+    render();
+  }
+  function openServiceDetail(sid){
+    currentView = 'detail';
+    currentServiceId = sid;
+    currentInstallId = null;
+    currentCustomerId = null;
+    render();
+  }
+  function closeServiceDetail(){
+    currentView = 'list';
+    currentServiceId = null;
+    editMode = false;
+    render();
+  }
+  function toggleEditMode(){
+    editMode = !editMode;
+    render();
+  }
+  function setInstallFilter(filter){
+    installFilter = filter;
+    render();
+  }
+
+  // ====== MODAL SYSTEM ======
+  function showModal(title, bodyHtml){
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'modalOverlay';
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-head">
+          <div class="modal-title">${title}</div>
+          <div class="modal-close" id="modalCloseBtn">✕</div>
+        </div>
+        <div class="modal-body">${bodyHtml}</div>
+        <div class="modal-footer">
+          <button class="btn btn-cancel" id="modalCancelBtn">取消</button>
+          <button class="btn btn-primary" id="modalSaveBtn">💾 保存</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById('modalCloseBtn').onclick = closeModal;
+    document.getElementById('modalCancelBtn').onclick = closeModal;
+    document.getElementById('modalSaveBtn').onclick = ()=>{ closeModal(); };
+    overlay.onclick = (e)=>{ if(e.target===overlay) closeModal(); };
+  }
+  function closeModal(){
+    const m = document.getElementById('modalOverlay');
+    if(m) m.remove();
+  }
+  function showNewCustomerModal(){
+    showModal('新增客户', `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="请输入姓名"></div>
+        <div class="form-group"><label class="form-label">联系电话 *</label><input class="form-input" placeholder="请输入电话"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">来源渠道</label><select class="form-select"><option>自然到店</option><option>活动获客</option><option>设计师合作</option><option>异业联盟</option></select></div>
+        <div class="form-group"><label class="form-label">户型</label><input class="form-input" placeholder="如：三室两厅"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">面积</label><input class="form-input" placeholder="如：128㎡"></div>
+        <div class="form-group"><label class="form-label">意向机型</label><input class="form-input" placeholder="如：大金VRV-X"></div>
+      </div>
+      <div class="form-group"><label class="form-label">地址</label><input class="form-input" placeholder="请输入地址"></div>
+      <div class="form-group"><label class="form-label">备注</label><textarea class="form-textarea" placeholder="客户需求备注..."></textarea></div>
+    `);
+  }
+  function showNewInstallModal(){
+    showModal('新建安装工单', `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div>
+        <div class="form-group"><label class="form-label">机型 *</label><input class="form-input" placeholder="如：大金VRV-X"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">项目经理</label><input class="form-input" placeholder="如：陈工"></div>
+        <div class="form-group"><label class="form-label">工长</label><input class="form-input" placeholder="如：王师傅"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">面积</label><input class="form-input" placeholder="如：128㎡"></div>
+        <div class="form-group"><label class="form-label">预计完工</label><input class="form-input" type="date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">备注</label><textarea class="form-textarea" placeholder="工单备注..."></textarea></div>
+    `);
+  }
+  function showNewServiceModal(){
+    showModal('新建维保工单', `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div>
+        <div class="form-group"><label class="form-label">机型</label><input class="form-input" placeholder="如：格力雅居"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">故障类型 *</label><select class="form-select"><option>制冷不足</option><option>不制热</option><option>漏水</option><option>异响</option><option>遥控失灵</option><option>其他</option></select></div>
+        <div class="form-group"><label class="form-label">质保状态</label><select class="form-select"><option>质保内</option><option>质保外</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">故障描述</label><textarea class="form-textarea" placeholder="请描述客户反馈的故障情况..."></textarea></div>
+    `);
+  }
+
+  // Wire up dynamic click events after render
+  function wireUpEvents(){
+    // Customer rows
+    document.querySelectorAll('tr[data-cid]').forEach(tr=>{
+      tr.onclick = ()=>openCustomerDetail(tr.dataset.cid);
+    });
+    const backCust = document.getElementById('backToList');
+    if(backCust) backCust.onclick = ()=>closeCustomerDetail();
+
+    // Install rows
+    document.querySelectorAll('tr[data-iid]').forEach(tr=>{
+      tr.onclick = ()=>openInstallDetail(tr.dataset.iid);
+    });
+    const backInst = document.getElementById('backToInstallList');
+    if(backInst) backInst.onclick = ()=>closeInstallDetail();
+
+    // Service rows
+    document.querySelectorAll('tr[data-sid]').forEach(tr=>{
+      tr.onclick = ()=>openServiceDetail(tr.dataset.sid);
+    });
+    const backSvc = document.getElementById('backToServiceList');
+    if(backSvc) backSvc.onclick = ()=>closeServiceDetail();
+
+    // Install filter tabs
+    document.querySelectorAll('.filter-tab[data-filter]').forEach(t=>{
+      t.onclick = ()=>setInstallFilter(t.dataset.filter);
+    });
+
+    // Edit toggle
+    const editBtn = document.getElementById('editToggle');
+    if(editBtn) editBtn.onclick = ()=>toggleEditMode();
+
+    // Cancel edit
+    const cancelBtn = document.getElementById('cancelEdit');
+    if(cancelBtn) cancelBtn.onclick = ()=>{ editMode=false; render(); };
+
+    // Save buttons
+    const saveInst = document.getElementById('saveInstall');
+    if(saveInst) saveInst.onclick = ()=>{ editMode=false; render(); };
+    const saveSvc = document.getElementById('saveService');
+    if(saveSvc) saveSvc.onclick = ()=>{ editMode=false; render(); };
+
+    // New order buttons
+    const newCust = document.getElementById('newCustomer');
+    if(newCust) newCust.onclick = (e)=>{ e.stopPropagation(); showNewCustomerModal(); };
+    const newInst = document.getElementById('newInstallOrder');
+    if(newInst) newInst.onclick = (e)=>{ e.stopPropagation(); showNewInstallModal(); };
+    const newSvc = document.getElementById('newServiceOrder');
+    if(newSvc) newSvc.onclick = (e)=>{ e.stopPropagation(); showNewServiceModal(); };
+    const newCon = document.getElementById('newContract');
+    if(newCon) newCon.onclick = (e)=>{ e.stopPropagation(); showModal('新建合同', `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">合同编号 *</label><input class="form-input" placeholder="如：HT-2026-0925"></div>
+        <div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">机型</label><input class="form-input" placeholder="如：大金VRV-X"></div>
+        <div class="form-group"><label class="form-label">合同金额 *</label><input class="form-input" placeholder="如：¥68,000"></div>
+      </div>
+      <div class="form-group"><label class="form-label">备注</label><textarea class="form-textarea" placeholder="合同备注..."></textarea></div>
+    `); };
+    const newPay = document.getElementById('newPayment');
+    if(newPay) newPay.onclick = (e)=>{ e.stopPropagation(); showModal('登记收款', `
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div>
+        <div class="form-group"><label class="form-label">合同编号</label><input class="form-input" placeholder="如：HT-2026-0921"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">收款类型 *</label><select class="form-select"><option>定金</option><option>全款</option><option>进度款</option><option>维保款</option></select></div>
+        <div class="form-group"><label class="form-label">收款金额 *</label><input class="form-input" placeholder="如：¥20,000"></div>
+      </div>
+      <div class="form-group"><label class="form-label">备注</label><textarea class="form-textarea" placeholder="收款备注..."></textarea></div>
+    `); };
+
+    // Modal close on Escape
+    document.onkeydown = (e)=>{ if(e.key==='Escape') closeModal(); };
+  }
+
   // ====== STATE & RENDER ======
   function render(){
     const html = RENDERERS[currentModule] ? RENDERERS[currentModule]() : '<div class="page-title">模块开发中</div>';
     document.getElementById('mainContent').innerHTML = html;
+    updateSidebarVisibility();
+    buildMobileNav();
     renderMobileContent();
+    wireUpEvents();
   }
 
   function renderMobileContent(){
@@ -1090,16 +2171,76 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
     // Render module content (re-use desktop renderer, CSS adapts)
     const mc = document.getElementById('mobileContent');
     mc.innerHTML = RENDERERS[currentModule] ? RENDERERS[currentModule]() : '<div class="page-title">模块开发中</div>';
+    // Wire up events in mobile content too
+    mc.querySelectorAll('tr[data-cid]').forEach(tr=>{
+      tr.onclick = ()=>openCustomerDetail(tr.dataset.cid);
+    });
+    mc.querySelectorAll('tr[data-iid]').forEach(tr=>{
+      tr.onclick = ()=>openInstallDetail(tr.dataset.iid);
+    });
+    mc.querySelectorAll('tr[data-sid]').forEach(tr=>{
+      tr.onclick = ()=>openServiceDetail(tr.dataset.sid);
+    });
+    mc.querySelectorAll('.filter-tab[data-filter]').forEach(t=>{
+      t.onclick = ()=>setInstallFilter(t.dataset.filter);
+    });
+    const mcBackCust = mc.querySelector('#backToList');
+    if(mcBackCust) mcBackCust.onclick = ()=>closeCustomerDetail();
+    const mcBackInst = mc.querySelector('#backToInstallList');
+    if(mcBackInst) mcBackInst.onclick = ()=>closeInstallDetail();
+    const mcBackSvc = mc.querySelector('#backToServiceList');
+    if(mcBackSvc) mcBackSvc.onclick = ()=>closeServiceDetail();
+    const mcEdit = mc.querySelector('#editToggle');
+    if(mcEdit) mcEdit.onclick = ()=>toggleEditMode();
+    const mcCancel = mc.querySelector('#cancelEdit');
+    if(mcCancel) mcCancel.onclick = ()=>{ editMode=false; render(); };
+    const mcSaveI = mc.querySelector('#saveInstall');
+    if(mcSaveI) mcSaveI.onclick = ()=>{ editMode=false; render(); };
+    const mcSaveS = mc.querySelector('#saveService');
+    if(mcSaveS) mcSaveS.onclick = ()=>{ editMode=false; render(); };
+    const mcNewI = mc.querySelector('#newInstallOrder');
+    if(mcNewI) mcNewI.onclick = (e)=>{ e.stopPropagation(); showNewInstallModal(); };
+    const mcNewS = mc.querySelector('#newServiceOrder');
+    if(mcNewS) mcNewS.onclick = (e)=>{ e.stopPropagation(); showNewServiceModal(); };
+    const mcNewC = mc.querySelector('#newCustomer');
+    if(mcNewC) mcNewC.onclick = (e)=>{ e.stopPropagation(); showNewCustomerModal(); };
+    const mcNewCon = mc.querySelector('#newContract');
+    if(mcNewCon) mcNewCon.onclick = (e)=>{ e.stopPropagation(); showModal('新建合同', '<div class="form-group"><label class="form-label">合同编号 *</label><input class="form-input" placeholder="如：HT-2026-0925"></div><div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div><div class="form-group"><label class="form-label">合同金额 *</label><input class="form-input" placeholder="如：¥68,000"></div>'); };
+    const mcNewPay = mc.querySelector('#newPayment');
+    if(mcNewPay) mcNewPay.onclick = (e)=>{ e.stopPropagation(); showModal('登记收款', '<div class="form-group"><label class="form-label">客户姓名 *</label><input class="form-input" placeholder="选择客户"></div><div class="form-group"><label class="form-label">收款类型 *</label><select class="form-select"><option>定金</option><option>全款</option><option>进度款</option><option>维保款</option></select></div><div class="form-group"><label class="form-label">收款金额 *</label><input class="form-input" placeholder="如：¥20,000"></div>'); };
   }
 
   function switchRole(role){
     currentRole = role;
     document.querySelectorAll('.role-tab').forEach(t=>t.classList.toggle('active',t.dataset.role===role));
+    // 检查当前模块是否有权限，没有则跳到第一个有权限的模块
+    const allowed = ROLE_MODULES[role] || [];
+    if(!allowed.includes(currentModule) && allowed.length > 0){
+      currentModule = allowed[0];
+      document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.toggle('active',i.dataset.module===currentModule));
+    }
+    // 角色切换时重置详情视图
+    currentView = 'list';
+    currentCustomerId = null;
+    currentInstallId = null;
+    currentServiceId = null;
+    editMode = false;
+    installFilter = 'all';
     render();
   }
 
   function switchModule(mod){
+    // 权限检查
+    const allowed = ROLE_MODULES[currentRole] || [];
+    if(!allowed.includes(mod)) return;
     currentModule = mod;
+    // 切换模块时重置详情视图
+    currentView = 'list';
+    currentCustomerId = null;
+    currentInstallId = null;
+    currentServiceId = null;
+    editMode = false;
+    installFilter = 'all';
     document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.toggle('active',i.dataset.module===mod));
     document.querySelectorAll('.mobile-bottom-nav-item').forEach(i=>i.classList.toggle('active',i.dataset.module===mod));
     render();
@@ -1123,27 +2264,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
   });
   document.getElementById('desktopBtn').onclick = ()=>switchDevice('desktop');
   document.getElementById('mobileBtn').onclick = ()=>switchDevice('mobile');
-
-  // Build mobile bottom nav (show first 4 modules + report)
-  const navItems = MODULES.slice(0,5).concat(MODULES.slice(5));
-  const navIcons = {
-    customer:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
-    contract:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
-    payment:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
-    install:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
-    service:'<path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>',
-    report:'<path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/>',
-  };
-  const mobileNav = document.getElementById('mobileBottomNav');
-  // Show 5 items: customer, contract, install, service, report
-  const mobileNavList = ['customer','contract','install','service','report'];
-  mobileNav.innerHTML = mobileNavList.map(m=>{
-    const label = MODULES.find(x=>x.id===m).label;
-    return `<button class="mobile-bottom-nav-item ${m===currentModule?'active':''}" data-module="${m}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${navIcons[m]}</svg><span>${label.length>4?label.slice(0,4):label}</span></button>`;
-  }).join('');
-  mobileNav.querySelectorAll('.mobile-bottom-nav-item').forEach(i=>{
-    i.onclick = ()=>switchModule(i.dataset.module);
-  });
 
   // Initial render
   render();
