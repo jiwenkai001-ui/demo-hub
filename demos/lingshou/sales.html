@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>销售开单 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .sales-header {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      background: #fff; padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow-light); margin-bottom: 16px;
+    }
+    .sales-header .form-item { margin-bottom: 0; }
+    .credit-info { padding: 12px 16px; background: #ecf5ff; border-radius: 4px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .credit-info .danger { color: var(--danger); font-weight: 600; }
+    .sales-footer { background: #fff; padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow-light); }
+    .sales-footer .summary { display: flex; justify-content: flex-end; gap: 32px; flex-wrap: wrap; }
+    .sales-footer .summary .item .label { color: var(--text-3); font-size: 13px; margin-bottom: 4px; }
+    .sales-footer .summary .item .value { font-size: 18px; font-weight: 600; }
+    .sales-footer .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .qty-input { width: 80px; }
+    .price-input { width: 90px; }
+    @media (max-width: 768px) {
+      .sales-header { grid-template-columns: 1fr 1fr; }
+      .sales-header .form-item:nth-child(3) { grid-column: 1 / 3; }
+    }
+  </style>
+</head>
+<body>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/scan.js"></script>
+  <script>
+    const user = window.Auth.requireAuth()
+    if (user) {
+      window.renderLayout({ active: 'sales', title: '销售开单' })
+      const c = document.getElementById('pageContent')
+
+      // 开单状态
+      const state = {
+        orderNo: window.DB.genSalesOrderNo(),
+        customerId: '',
+        date: window.UI.formatDate(new Date()),
+        items: [], // {id, productId, name, spec, unit, qty, price, isGift, batchNo}
+      }
+
+      function recalc(idx) {
+        const it = state.items[idx]
+        it.amount = it.isGift ? 0 : Number((it.qty * it.price).toFixed(2))
+        renderTable()
+      }
+
+      function renderCreditInfo() {
+        if (!state.customerId) return '<div class="credit-info"><span>请先选择客户</span></div>'
+        const c = window.DB.customers.find(x => x.id === Number(state.customerId))
+        if (!c) return ''
+        const used = c.balance + state.items.filter(i => !i.isGift).reduce((s,i) => s + i.amount, 0)
+        const ratio = c.creditLimit > 0 ? used / c.creditLimit : 0
+        const remain = c.creditLimit - used
+        const cls = ratio >= 1 ? 'danger' : ratio >= 0.8 ? 'warning' : ''
+        return `<div class="credit-info ${cls}">
+          <span>客户:<b>${window.UI.escapeHtml(c.name)}</b> (${c.gradeLabel}) · 信用额度 ${window.UI.money(c.creditLimit)}</span>
+          <span>已用欠款 ${window.UI.money(c.balance)} + 本单 ${window.UI.money(state.items.filter(i => !i.isGift).reduce((s,i) => s + i.amount, 0))}</span>
+          <span class="${ratio >= 1 ? 'danger' : ''}">${ratio >= 1 ? '⛔ 已超信用额度,无法继续赊销!' : `剩余可用 ${window.UI.money(remain)}`}</span>
+        </div>`
+      }
+
+      function renderTable() {
+        const rowsHTML = state.items.length === 0
+          ? '<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:30px">暂无商品,请点击上方"📷 扫码"或"➕ 手选商品"添加</td></tr>'
+          : state.items.map((it, idx) => `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${window.UI.escapeHtml(it.name)}</td>
+              <td>${it.spec}</td>
+              <td>${it.unit}</td>
+              <td><input type="number" class="input qty-input" min="1" value="${it.qty}" onchange="onQtyChange(${idx}, this.value)"></td>
+              <td><input type="number" class="input price-input" min="0" step="0.01" value="${it.price}" ${it.isGift ? 'disabled' : ''} onchange="onPriceChange(${idx}, this.value)"></td>
+              <td class="text-right">${window.UI.money(it.amount, false)}</td>
+              <td class="text-center">
+                <input type="checkbox" ${it.isGift ? 'checked' : ''} onchange="onGiftChange(${idx}, this.checked)">
+                ${it.batchNo ? `<br><span class="tag info" style="margin-top:4px">${it.batchNo}</span>` : ''}
+              </td>
+              <td class="text-center"><button class="btn-text danger" onclick="onRemove(${idx})">删除</button></td>
+            </tr>`).join('')
+
+        const totalAmount = state.items.reduce((s,i) => s + i.amount, 0)
+        const giftAmount = state.items.filter(i => i.isGift).reduce((s,i) => s + i.qty * i.price, 0)
+        const roundDown = Math.floor(totalAmount)
+        const change = Number((totalAmount - roundDown).toFixed(2))
+        const finalAmount = roundDown
+
+        document.getElementById('salesBody').innerHTML = rowsHTML
+        document.getElementById('totalAmount').textContent = window.UI.money(totalAmount)
+        document.getElementById('giftAmount').textContent = `赠品原价 ${window.UI.money(giftAmount)}`
+        document.getElementById('eraseChange').textContent = `抹零 ${window.UI.money(change)}`
+        document.getElementById('finalAmount').textContent = window.UI.money(finalAmount)
+        document.getElementById('creditBox').innerHTML = renderCreditInfo()
+      }
+
+      function renderPage() {
+        c.innerHTML = `
+          <div class="sales-header">
+            <div class="form-item">
+              <label>单号</label>
+              <input class="input" value="${state.orderNo}" readonly>
+            </div>
+            <div class="form-item">
+              <label>客户</label>
+              <select class="select" id="customerSelect" onchange="onCustomerChange(this.value)">
+                <option value="">请选择客户</option>
+                ${window.DB.customers.map(c => `<option value="${c.id}">${window.UI.escapeHtml(c.name)} (${c.gradeLabel},信用 ${window.UI.money(c.creditLimit)})</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-item">
+              <label>开单日期</label>
+              <input class="input" type="date" value="${state.date}">
+            </div>
+            <div class="form-item">
+              <label>业务员</label>
+              <input class="input" value="${window.Auth.getCurrentUser().name}" readonly>
+            </div>
+          </div>
+          <div class="card">
+            <div class="toolbar">
+              <div class="left">
+                <button class="btn btn-sm" onclick="scanAdd()">📷 扫码添加</button>
+                <select class="select" style="width:280px" id="productSelect" onchange="onProductChange(this.value)">
+                  <option value="">➕ 手选商品...</option>
+                  ${window.DB.products.map(p => `<option value="${p.id}">${window.UI.escapeHtml(p.name)} - ${window.UI.money(p.retailPrice)}/${p.mainUnit}</option>`).join('')}
+                </select>
+              </div>
+              <div class="right">
+                <button class="btn btn-default btn-sm" onclick="onReset()">↻ 重置</button>
+              </div>
+            </div>
+            <div id="creditBox"></div>
+            <table class="table">
+              <thead><tr><th>#</th><th>商品名称</th><th>规格</th><th>单位</th><th>数量</th><th class="text-right">单价</th><th class="text-right">金额</th><th class="text-center">赠品 / 批次</th><th class="text-center">操作</th></tr></thead>
+              <tbody id="salesBody"></tbody>
+            </table>
+          </div>
+          <div class="sales-footer">
+            <div class="summary">
+              <div class="item"><div class="label">合计金额</div><div class="value text-primary" id="totalAmount">${window.UI.money(0)}</div></div>
+              <div class="item"><div class="label" id="giftAmount">赠品原价 ${window.UI.money(0)}</div><div class="value">-</div></div>
+              <div class="item"><div class="label" id="eraseChange">抹零 ${window.UI.money(0)}</div><div class="value">-</div></div>
+              <div class="item"><div class="label">应收金额</div><div class="value text-danger" id="finalAmount">${window.UI.money(0)}</div></div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-default" onclick="onReset()">重置单据</button>
+              <button class="btn btn-warning" onclick="onSave('draft')">💾 暂存草稿</button>
+              <button class="btn" onclick="onSave('confirm')">✓ 保存并预览</button>
+            </div>
+          </div>`
+        renderTable()
+      }
+
+      function onCustomerChange(v) {
+        state.customerId = v
+        renderTable()
+      }
+
+      function onProductChange(v) {
+        if (!v) return
+        if (!state.customerId) { toast('请先选择客户', 'warning'); document.getElementById('productSelect').value = ''; return }
+        addProduct(Number(v))
+        document.getElementById('productSelect').value = ''
+      }
+
+      function addProduct(productId, scanned = false) {
+        const p = window.DB.products.find(x => x.id === productId)
+        if (!p) { toast('未找到商品', 'danger'); return }
+        if (p.status === 3) { toast(`${p.name} 已停售,不可销售`, 'danger'); return }
+        const c = window.DB.customers.find(x => x.id === Number(state.customerId))
+        if (!c) { toast('请先选择客户', 'warning'); return }
+        const price = window.DB.getGradePrice(p.retailPrice, c.grade)
+        const fifoBatches = window.DB.pickBatchByFIFO(p.id, 1)
+        const batchNo = fifoBatches[0]?.batchNo || ''
+        const existing = state.items.findIndex(i => i.productId === productId && !i.isGift)
+        if (existing >= 0) {
+          state.items[existing].qty += 1
+          state.items[existing].amount = Number((state.items[existing].qty * state.items[existing].price).toFixed(2))
+          toast(`已添加:${p.name}(数量+1)`, 'success')
+        } else {
+          state.items.push({
+            id: Date.now() + Math.random(),
+            productId,
+            name: p.name,
+            spec: p.spec,
+            unit: p.mainUnit,
+            qty: 1,
+            price,
+            amount: price,
+            isGift: false,
+            batchNo,
+          })
+          toast(`已添加:${p.name} ${scanned ? '(扫码)' : ''}`, 'success')
+        }
+        renderTable()
+      }
+
+      function scanAdd() {
+        window.startScan(code => {
+          const p = window.DB.products.find(x => x.barcode === code)
+          if (p) addProduct(p.id, true)
+          else toast(`条码 ${code} 未匹配商品,请手选`, 'warning')
+        })
+      }
+
+      function onQtyChange(idx, v) {
+        const q = Math.max(1, Number(v) || 1)
+        state.items[idx].qty = q
+        // 重新匹配 FIFO 批次
+        const p = window.DB.products.find(x => x.id === state.items[idx].productId)
+        if (p) {
+          const fb = window.DB.pickBatchByFIFO(p.id, q)
+          state.items[idx].batchNo = fb.map(b => `${b.batchNo}×${b.qty}`).join(', ')
+        }
+        recalc(idx)
+      }
+
+      function onPriceChange(idx, v) {
+        state.items[idx].price = Math.max(0, Number(v) || 0)
+        recalc(idx)
+      }
+
+      function onGiftChange(idx, v) {
+        state.items[idx].isGift = v
+        if (v) {
+          state.items[idx].amount = 0
+          toast('已标记为赠品,不计金额,扣库存', 'info')
+        } else {
+          state.items[idx].amount = Number((state.items[idx].qty * state.items[idx].price).toFixed(2))
+        }
+        renderTable()
+      }
+
+      function onRemove(idx) {
+        state.items.splice(idx, 1)
+        renderTable()
+      }
+
+      function onReset() {
+        state.items = []
+        state.customerId = ''
+        state.orderNo = window.DB.genSalesOrderNo()
+        renderPage()
+        toast('单据已重置', 'info')
+      }
+
+      function onSave(type) {
+        if (!state.customerId) { toast('请先选择客户', 'warning'); return }
+        if (state.items.length === 0) { toast('请至少添加 1 个商品', 'warning'); return }
+        // 信用额度校验
+        const c = window.DB.customers.find(x => x.id === Number(state.customerId))
+        const totalAmount = state.items.reduce((s,i) => s + i.amount, 0)
+        const used = c.balance + totalAmount
+        if (used > c.creditLimit) {
+          window.UI.confirmDialog(
+            `客户「${c.name}」信用额度 ${window.UI.money(c.creditLimit)},已用欠款 ${window.UI.money(c.balance)} + 本单 ${window.UI.money(totalAmount)} = ${window.UI.money(used)} 超额。是否申请老板审批放行?`,
+            '⚠️ 信用额度超额'
+          ).then(ok => {
+            if (ok) toast('已提交审批,DEMO 不模拟审批流', 'info')
+          })
+          return
+        }
+        if (type === 'draft') {
+          toast('草稿已暂存(DEMO 不持久化)', 'success')
+          return
+        }
+        // 显示销货单预览
+        const cName = c.name
+        const rowsHTML = state.items.map((it, i) => `
+          <tr>
+            <td>${i+1}</td>
+            <td>${window.UI.escapeHtml(it.name)}</td>
+            <td>${it.spec}</td>
+            <td>${it.unit}</td>
+            <td class="text-right">${it.qty}</td>
+            <td class="text-right">${window.UI.money(it.price, false)}</td>
+            <td class="text-right">${window.UI.money(it.amount, false)}</td>
+            <td>${it.isGift ? '✓ 赠品' : it.batchNo || '-'}</td>
+          </tr>`).join('')
+        const total = state.items.reduce((s,i) => s + i.amount, 0)
+        const erase = Number((total - Math.floor(total)).toFixed(2))
+        const final = Math.floor(total)
+        window.UI.openModal(
+          `🧾 销货单预览 - ${state.orderNo}`,
+          `<div style="margin-bottom:12px;padding:10px;background:#f5f7fa;border-radius:4px;font-size:13px;line-height:1.8">
+            <div><b>客户:</b>${window.UI.escapeHtml(cName)}  <b>日期:</b>${state.date}  <b>业务员:</b>${user.name}</div>
+            <div><b>单号:</b>${state.orderNo}</div>
+          </div>
+          <table class="table table-compact">
+            <thead><tr><th>#</th><th>商品</th><th>规格</th><th>单位</th><th class="text-right">数量</th><th class="text-right">单价</th><th class="text-right">金额</th><th>批次/赠品</th></tr></thead>
+            <tbody>${rowsHTML}</tbody>
+            <tfoot><tr><td colspan="6" class="text-right"><b>合计 / 抹零 / 应收</b></td><td class="text-right"><b>${window.UI.money(total)}</b> / ${window.UI.money(erase)} / <b class="text-danger">${window.UI.money(final)}</b></td><td></td></tr></tfoot>
+          </table>
+          <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:12px;color:var(--text-3)">
+            <span>签字栏:业务员 _______ 客户 _______ 库管 _______</span>
+            <span>打印:针式三联 / 热敏</span>
+          </div>`,
+          `<button class="btn btn-default btn-sm" onclick="window.UI.closeModal(document.querySelector('.modal-mask'))">关闭</button>
+           <button class="btn btn-default btn-sm" onclick="window.print()">🖨 打印</button>
+           <button class="btn btn-sm" onclick="confirmSave()">✓ 确认保存</button>`
+        )
+      }
+
+      function confirmSave() {
+        document.querySelector('.modal-mask')?.remove()
+        toast(`销货单 ${state.orderNo} 已保存 ✓`, 'success')
+        onReset()
+      }
+
+      // 暴露给 onclick
+      window.onCustomerChange = onCustomerChange
+      window.onProductChange = onProductChange
+      window.scanAdd = scanAdd
+      window.onQtyChange = onQtyChange
+      window.onPriceChange = onPriceChange
+      window.onGiftChange = onGiftChange
+      window.onRemove = onRemove
+      window.onReset = onReset
+      window.onSave = onSave
+      window.confirmSave = confirmSave
+
+      renderPage()
+    }
+  </script>
+</body>
+</html>

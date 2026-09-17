@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>库存查询 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const user = window.Auth.requireAuth()
+    if (user) {
+      window.renderLayout({ active: 'stock', title: '库存查询' })
+      const c = document.getElementById('pageContent')
+
+      let view = 'summary' // summary | batch
+      let keyword = ''
+      let warehouseId = ''
+
+      function render() {
+        const isSummary = view === 'summary'
+        if (isSummary) renderSummary(); else renderBatch()
+      }
+
+      function renderSummary() {
+        const k = keyword.trim().toLowerCase()
+        const wId = warehouseId ? Number(warehouseId) : null
+        const list = window.DB.products.map(p => {
+          const stock1 = window.DB.batches.filter(b => b.productId === p.id && b.status === 1 && b.warehouseId === 1).reduce((s,b) => s + b.remainingQty, 0)
+          const stock2 = window.DB.batches.filter(b => b.productId === p.id && b.status === 1 && b.warehouseId === 2).reduce((s,b) => s + b.remainingQty, 0)
+          const total = stock1 + stock2
+          const amount = total * p.costPrice
+          // 临期判断
+          const batches = window.DB.batches.filter(b => b.productId === p.id)
+          const minExpiry = batches.length ? batches.reduce((min,b) => new Date(b.expiryDate) < new Date(min) ? b.expiryDate : min, batches[0].expiryDate) : null
+          const expStatus = minExpiry ? window.DB.getExpiryStatus(minExpiry) : null
+          return { p, stock1, stock2, total, amount, expStatus }
+        }).filter(item => !k || item.p.name.toLowerCase().includes(k) || item.p.code.includes(k))
+          .filter(item => !wId || (wId === 1 ? item.stock1 > 0 : item.stock2 > 0))
+
+        const rowsHTML = list.map(item => {
+          const expTag = item.expStatus
+            ? `<span class="tag ${item.expStatus.type === 'expired' ? 'danger' : item.expStatus.type === 'danger' ? 'danger' : item.expStatus.type === 'warning' ? 'warning' : 'success'}">${item.expStatus.label}</span>`
+            : '<span class="tag info">无批次</span>'
+          return `
+            <tr>
+              <td>${item.p.code}</td>
+              <td>${window.UI.escapeHtml(item.p.name)}</td>
+              <td>${item.p.spec}</td>
+              <td class="text-right">${item.stock1}</td>
+              <td class="text-right">${item.stock2}</td>
+              <td class="text-right text-bold">${item.total}</td>
+              <td class="text-right">${window.UI.money(item.amount, false)}</td>
+              <td>${expTag}</td>
+            </tr>`
+        }).join('')
+        const totalAmount = list.reduce((s,i) => s + i.amount, 0)
+
+        c.innerHTML = `
+          <div class="card">
+            <div class="toolbar">
+              <div class="left">
+                <div class="radio-group">
+                  <button class="${view === 'summary' ? 'active' : ''}" onclick="onView('summary')">汇总视图</button>
+                  <button class="${view === 'batch' ? 'active' : ''}" onclick="onView('batch')">批次视图</button>
+                </div>
+              </div>
+              <div class="right">
+                <input class="input" placeholder="搜索商品名称/编码" value="${window.UI.escapeHtml(keyword)}" oninput="onKeyword(this.value)" style="max-width:240px">
+                <select class="select" style="width:160px" onchange="onWarehouse(this.value)">
+                  <option value="">全部仓库</option>
+                  ${window.DB.warehouses.map(w => `<option value="${w.id}" ${warehouseId == w.id ? 'selected' : ''}>${w.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>编码</th><th>商品名称</th><th>规格</th>
+                  <th class="text-right">档口仓库</th><th class="text-right">后备库房</th>
+                  <th class="text-right">合计</th><th class="text-right">库存金额</th><th>最近到期</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHTML || '<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:30px">无匹配商品</td></tr>'}</tbody>
+              <tfoot>
+                <tr style="background:#fafafa;font-weight:600">
+                  <td colspan="6" class="text-right">合计库存金额</td>
+                  <td class="text-right text-primary">${window.UI.money(totalAmount)}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>`
+      }
+
+      function renderBatch() {
+        const k = keyword.trim().toLowerCase()
+        const wId = warehouseId ? Number(warehouseId) : null
+        const list = window.DB.batches
+          .filter(b => !wId || b.warehouseId === wId)
+          .map(b => {
+            const p = window.DB.products.find(x => x.id === b.productId)
+            const s = window.DB.getExpiryStatus(b.expiryDate)
+            const w = window.DB.warehouses.find(x => x.id === b.warehouseId)
+            return { b, p, s, w }
+          })
+          .filter(item => !k || item.p.name.toLowerCase().includes(k) || item.p.code.includes(k) || item.b.batchNo.toLowerCase().includes(k))
+
+        // 同商品内按生产日期升序,标注 FIFO 优先级
+        const groups = {}
+        list.forEach(item => {
+          const key = item.b.productId
+          if (!groups[key]) groups[key] = []
+          groups[key].push(item)
+        })
+        Object.values(groups).forEach(g => g.sort((a,b) => new Date(a.b.productionDate) - new Date(b.b.productionDate)).forEach((it, i) => { it.fifoPriority = i + 1 }))
+
+        const rowsHTML = list.map(item => {
+          const tagClass = item.s.type === 'expired' ? 'danger' : item.s.type === 'danger' ? 'danger' : item.s.type === 'warning' ? 'warning' : 'success'
+          const statusTag = item.b.status === 3
+            ? '<span class="tag danger">已过期</span>'
+            : `<span class="tag ${tagClass}">${item.s.label}</span>`
+          const fifoBadge = item.fifoPriority === 1
+            ? '<span class="tag success">⭐ 优先出库(最早批次)</span>'
+            : `<span class="tag info">FIFO 第${item.fifoPriority}顺位</span>`
+          return `
+            <tr>
+              <td>${item.p.code}</td>
+              <td>${window.UI.escapeHtml(item.p.name)}</td>
+              <td>${item.b.batchNo}</td>
+              <td>${item.b.productionDate}</td>
+              <td>${item.b.expiryDate}</td>
+              <td class="text-right">${item.b.remainingQty} ${item.p.mainUnit}</td>
+              <td>${item.w?.name || '-'}</td>
+              <td>${statusTag}</td>
+              <td>${fifoBadge}</td>
+            </tr>`
+        }).join('')
+
+        c.innerHTML = `
+          <div class="card">
+            <div class="toolbar">
+              <div class="left">
+                <div class="radio-group">
+                  <button class="${view === 'summary' ? 'active' : ''}" onclick="onView('summary')">汇总视图</button>
+                  <button class="${view === 'batch' ? 'active' : ''}" onclick="onView('batch')">批次视图</button>
+                </div>
+              </div>
+              <div class="right">
+                <input class="input" placeholder="搜索商品/批次号" value="${window.UI.escapeHtml(keyword)}" oninput="onKeyword(this.value)" style="max-width:240px">
+                <select class="select" style="width:160px" onchange="onWarehouse(this.value)">
+                  <option value="">全部仓库</option>
+                  ${window.DB.warehouses.map(w => `<option value="${w.id}" ${warehouseId == w.id ? 'selected' : ''}>${w.name}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div style="padding:10px 12px;background:#fdf6ec;border-radius:4px;margin-bottom:12px;font-size:12px;color:var(--warning)">
+              📌 先进先出(FIFO)建议:同商品按生产日期升序,标"⭐ 优先出库"的批次应优先发出
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>编码</th><th>商品名称</th><th>批次号</th>
+                  <th>生产日期</th><th>到期日期</th><th class="text-right">剩余库存</th>
+                  <th>所在仓库</th><th>临期状态</th><th>FIFO 建议</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHTML || '<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:30px">无匹配批次</td></tr>'}</tbody>
+            </table>
+          </div>`
+      }
+
+      function onView(v) { view = v; render() }
+      function onKeyword(v) { keyword = v; render() }
+      function onWarehouse(v) { warehouseId = v; render() }
+
+      window.onView = onView
+      window.onKeyword = onKeyword
+      window.onWarehouse = onWarehouse
+
+      render()
+    }
+  </script>
+</body>
+</html>

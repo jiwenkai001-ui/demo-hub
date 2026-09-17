@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>预包装食品批发管理系统 DEMO</title>
+  <script>
+    // 入口跳转:已登录直接进 dashboard,未登录进 login
+    try {
+      const u = localStorage.getItem('food_demo_user')
+      const exp = Number(localStorage.getItem('food_demo_user_expire') || 0)
+      if (u && exp && Date.now() < exp) {
+        location.replace('dashboard.html')
+      } else {
+        localStorage.removeItem('food_demo_user')
+        localStorage.removeItem('food_demo_user_expire')
+        location.replace('login.html')
+      }
+    } catch (e) { location.replace('login.html') }
+  </script>
+  <meta http-equiv="refresh" content="0; url=login.html">
+</head>
+<body>跳转中…如果没有自动跳转,<a href="login.html">请点击这里</a></body>
+</html>

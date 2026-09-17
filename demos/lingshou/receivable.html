@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>往来对账 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    .aging-bar { display: inline-flex; align-items: center; height: 16px; border-radius: 3px; overflow: hidden; min-width: 100px; }
+    .aging-bar span { display: inline-block; height: 100%; }
+    .aging-legend { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-3); }
+    .aging-legend .item { display: inline-flex; align-items: center; gap: 4px; }
+    .aging-legend .item .dot { width: 10px; height: 10px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    const user = window.Auth.requireAuth()
+    if (user) {
+      window.renderLayout({ active: 'receivable', title: '往来对账' })
+      const c = document.getElementById('pageContent')
+
+      // 颜色
+      const colors = ['#67c23a', '#409eff', '#e6a23c', '#f56c6c', '#909399']
+
+      function render() {
+        const list = window.DB.receivables
+        const totalBalance = list.reduce((s,r) => s + r.balance, 0)
+        const totalAging = window.DB.agingBuckets.map((_, i) => list.reduce((s,r) => s + r.aging[i], 0))
+
+        const rowsHTML = list.map(r => {
+          const used = r.balance
+          const ratio = r.creditLimit > 0 ? used / r.creditLimit : 0
+          const cls = ratio >= 1 ? 'danger' : ratio >= 0.8 ? 'warning' : ''
+          // 账龄条
+          const maxAging = Math.max(...r.aging, 1)
+          const barHTML = r.aging.map((v, i) => v > 0 ? `<span style="width:${(v/maxAging*100)}%;background:${colors[i]}" title="${window.DB.agingBuckets[i]}: ${window.UI.money(v)}"></span>` : '').join('')
+          const overdue = r.accountPeriod > 0 && ratio > 0.8
+          return `
+            <tr>
+              <td><b>${window.UI.escapeHtml(r.customerName)}</b><br><span class="text-sm text-gray">${r.accountPeriod === 0 ? '现结' : `账期 ${r.accountPeriod} 天`}</span></td>
+              <td class="text-right">${window.UI.money(r.creditLimit)}</td>
+              <td>
+                <div class="text-right text-bold">${window.UI.money(r.balance)}</div>
+                <div class="credit-bar"><div class="fill ${cls}" style="width:${Math.min(ratio*100,100)}%"></div></div>
+                <div class="text-sm text-gray">${(ratio*100).toFixed(0)}% 已用</div>
+              </td>
+              <td>
+                <div class="aging-bar">${barHTML || '<span style="width:100%;background:#ebeef5"></span>'}</div>
+                <div class="text-sm text-gray" style="margin-top:4px">
+                  ${r.aging.map((v,i) => v > 0 ? `${window.DB.agingBuckets[i]}:${window.UI.money(v)} ` : '').join('· ') || '无欠款'}
+                </div>
+              </td>
+              <td class="nowrap text-center">
+                <button class="btn-text" onclick="showReconciliation(${r.customerId})">📄 对账</button>
+                <button class="btn-text success" onclick="showReceipt(${r.customerId})">💵 收款</button>
+              </td>
+            </tr>`
+        }).join('')
+
+        // 账龄汇总图
+        const chartLegend = window.DB.agingBuckets.map((b,i) => `<span class="item"><span class="dot" style="background:${colors[i]}"></span>${b}</span>`).join('')
+
+        c.innerHTML = `
+          <div class="kpi-grid" style="grid-template-columns: repeat(3,1fr)">
+            <div class="kpi-card warning">
+              <div class="label">应收总额</div>
+              <div class="value">${window.UI.money(totalBalance)}</div>
+              <div class="delta">${list.length} 家客户</div>
+            </div>
+            <div class="kpi-card danger">
+              <div class="label">逾期(账期外)客户</div>
+              <div class="value">${list.filter(r => r.accountPeriod > 0 && r.balance/r.creditLimit > 0.8).length}</div>
+              <div class="delta">超 80% 信用额度</div>
+            </div>
+            <div class="kpi-card">
+              <div class="label">180 天以上账龄</div>
+              <div class="value">${window.UI.money(totalAging[4])}</div>
+              <div class="delta">需计提坏账准备</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📊 账龄分布</span>
+              <div class="aging-legend">${chartLegend}</div>
+            </div>
+            <div id="chartAging" class="chart" style="height:240px"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📋 应收账款台账</span>
+              <span class="text-sm text-gray">合计 ${window.UI.money(totalBalance)}</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>客户</th><th class="text-right">信用额度</th><th class="text-right">应收余额</th>
+                  <th>账龄分桶</th><th class="text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHTML}</tbody>
+            </table>
+          </div>`
+
+        // 账龄堆叠条形图
+        setTimeout(() => {
+          if (typeof echarts === 'undefined') return
+          const chart = echarts.init(document.getElementById('chartAging'))
+          chart.setOption({
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+            legend: { data: window.DB.agingBuckets, bottom: 0 },
+            grid: { left: 100, right: 30, top: 10, bottom: 40 },
+            xAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+            yAxis: { type: 'category', data: list.map(r => r.customerName), axisLine: { lineStyle: { color: '#dcdfe6' } } },
+            series: window.DB.agingBuckets.map((b, i) => ({
+              name: b, type: 'bar', stack: 'total', data: list.map(r => r.aging[i]),
+              itemStyle: { color: colors[i] }, barWidth: 18,
+            }))
+          })
+          window.addEventListener('resize', () => chart.resize())
+        }, 100)
+      }
+
+      function showReconciliation(customerId) {
+        const r = window.DB.receivables.find(x => x.customerId === customerId)
+        if (!r) return
+        const orders = window.DB.salesOrders.filter(o => o.customerId === customerId)
+        const rowsHTML = orders.map(o => `
+          <tr>
+            <td>${o.date}</td>
+            <td>${o.no}</td>
+            <td>${o.type === '销售' ? '销售单' : '收款单'}</td>
+            <td class="text-right">${o.type === '销售' ? window.UI.money(o.amount) : '-'}</td>
+            <td class="text-right">${o.type === '收款' ? window.UI.money(o.paid) : '-'}</td>
+          </tr>`).join('')
+        const salesSum = orders.filter(o => o.type === '销售').reduce((s,o) => s + o.amount, 0)
+        const paidSum = orders.filter(o => o.type === '收款').reduce((s,o) => s + o.paid, 0)
+        window.UI.openModal(
+          `📄 对账单 - ${window.UI.escapeHtml(r.customerName)}`,
+          `<div style="margin-bottom:12px;padding:10px;background:#f5f7fa;border-radius:4px;font-size:13px;line-height:1.8">
+            <div><b>客户:</b>${window.UI.escapeHtml(r.customerName)} <b>账期:</b>${r.accountPeriod === 0 ? '现结' : r.accountPeriod + ' 天'}</div>
+            <div><b>对账期间:</b>2026-09-01 至 2026-09-17</div>
+          </div>
+          <table class="table table-compact">
+            <thead><tr><th>日期</th><th>单号</th><th>类型</th><th class="text-right">销售金额</th><th class="text-right">收款金额</th></tr></thead>
+            <tbody>${rowsHTML || '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-3)">该期间无单据</td></tr>'}</tbody>
+            <tfoot>
+              <tr style="background:#fafafa;font-weight:600">
+                <td colspan="3" class="text-right">合计 销售应收 / 已收款 / 期末余额</td>
+                <td class="text-right">${window.UI.money(salesSum)}</td>
+                <td class="text-right">${window.UI.money(paidSum)}</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div style="margin-top:12px;padding:10px;background:#ecf5ff;border-radius:4px;display:flex;justify-content:space-between;align-items:center">
+            <span>期末应收余额(对账确认): <b class="text-danger">${window.UI.money(r.balance)}</b></span>
+            <span class="text-sm text-gray">客户扫码电子签收 → 定案</span>
+          </div>`
+        )
+      }
+
+      function showReceipt(customerId) {
+        const r = window.DB.receivables.find(x => x.customerId === customerId)
+        if (!r) return
+        const mask = window.UI.openModal(
+          `💵 收款单 - ${window.UI.escapeHtml(r.customerName)}`,
+          `<div style="margin-bottom:12px;padding:10px;background:#f5f7fa;border-radius:4px;font-size:13px;line-height:1.8">
+            <div><b>客户:</b>${window.UI.escapeHtml(r.customerName)}</div>
+            <div><b>当前应收余额:</b><span class="text-danger text-bold">${window.UI.money(r.balance)}</span></div>
+          </div>
+          <div class="form-item">
+            <label>本次收款金额</label>
+            <input id="receiptAmount" class="input" type="number" min="0" step="0.01" value="${r.balance}" oninput="onReceiptAmount(this.value)">
+          </div>
+          <div class="form-item">
+            <label>收款方式</label>
+            <select id="receiptMethod" class="select">
+              <option value="cash">现金</option>
+              <option value="bank">银行转账</option>
+              <option value="wechat">微信</option>
+              <option value="alipay">支付宝</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>备注</label>
+            <textarea id="receiptRemark" class="input textarea" rows="2" placeholder="可填写付款流水号或备注"></textarea>
+          </div>`,
+          `<button class="btn btn-default btn-sm" onclick="document.querySelector('.modal-mask').remove()">取消</button>
+           <button class="btn btn-success btn-sm" onclick="confirmReceipt()">✓ 确认收款</button>`
+        )
+        window.currentReceipt = { customerId, balance: r.balance }
+      }
+
+      function onReceiptAmount(v) {
+        const r = window.DB.receivables.find(x => x.customerId === window.currentReceipt.customerId)
+        const remain = r.balance - (Number(v) || 0)
+        const tip = document.getElementById('receiptTip')
+        if (tip) tip.textContent = `收款后剩余应收:${window.UI.money(remain)}`
+      }
+
+      function confirmReceipt() {
+        const amount = Number(document.getElementById('receiptAmount').value) || 0
+        const method = document.getElementById('receiptMethod').value
+        if (amount <= 0) { toast('请输入有效金额', 'warning'); return }
+        const r = window.DB.receivables.find(x => x.customerId === window.currentReceipt.customerId)
+        document.querySelector('.modal-mask')?.remove()
+        toast(`已收款 ${window.UI.money(amount)}(${method})`, 'success')
+        r.balance -= amount
+        render()
+      }
+
+      window.showReconciliation = showReconciliation
+      window.showReceipt = showReceipt
+      window.onReceiptAmount = onReceiptAmount
+      window.confirmReceipt = confirmReceipt
+
+      render()
+    }
+  </script>
+</body>
+</html>

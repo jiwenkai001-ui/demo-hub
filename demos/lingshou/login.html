@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .login-bg {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #409eff 0%, #1f6fb5 100%);
+      padding: 16px;
+    }
+    .login-card {
+      width: 100%; max-width: 400px; background: #fff;
+      border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,.15);
+      padding: 40px 32px;
+    }
+    .login-card h1 {
+      font-size: 20px; text-align: center; color: var(--text-1); margin-bottom: 6px;
+    }
+    .login-card .subtitle {
+      font-size: 13px; color: var(--text-3); text-align: center; margin-bottom: 28px;
+    }
+    .login-card .features {
+      margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--text-3); line-height: 1.8;
+    }
+    .login-card .features li { padding-left: 16px; position: relative; }
+    .login-card .features li::before { content: '✓'; position: absolute; left: 0; color: var(--success); }
+    .login-btn { width: 100%; height: 44px; font-size: 16px; margin-top: 8px; }
+    .demo-tip {
+      margin-top: 16px; padding: 10px 12px; background: #ecf5ff;
+      border-radius: 4px; font-size: 12px; color: var(--primary); text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-bg">
+    <div class="login-card">
+      <h1>🏪 预包装食品批发管理系统</h1>
+      <div class="subtitle">DEMO · 业财一体 · 食品合规内置</div>
+      <form id="loginForm" onsubmit="return doLogin(event)">
+        <div class="form-item">
+          <label>账号</label>
+          <input id="username" class="input" type="text" value="admin" placeholder="请输入账号" autocomplete="username">
+        </div>
+        <div class="form-item">
+          <label>密码</label>
+          <input id="password" class="input" type="password" value="123456" placeholder="请输入密码(至少 6 位)" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-block login-btn">登 录</button>
+        <div class="demo-tip">DEMO 模式:任意账号 + 密码 6 位以上即可登录</div>
+        <ul class="features">
+          <li>响应式网页 + PWA,桌面/手机/PDA 浏览器统一入口</li>
+          <li>食品合规内置:批次溯源、索证索票、临期预警、先进先出</li>
+          <li>业财一体:业务单据自动驱动资金台账</li>
+          <li>扫码开单 · 离线可用 · 站内消息推送</li>
+        </ul>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // 已登录用户直接跳转到 dashboard
+    if (window.Auth.getCurrentUser()) location.href = 'dashboard.html'
+
+    function doLogin(e) {
+      e.preventDefault()
+      const u = document.getElementById('username').value.trim()
+      const p = document.getElementById('password').value
+      try {
+        window.Auth.login(u, p)
+        toast('登录成功,正在进入系统...', 'success')
+        setTimeout(() => location.href = 'dashboard.html', 600)
+      } catch (err) {
+        toast(err.message, 'danger')
+      }
+      return false
+    }
+  </script>
+</body>
+</html>

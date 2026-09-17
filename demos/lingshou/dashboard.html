@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>老板看板 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+</head>
+<body>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script>
+    // 鉴权 + 渲染布局
+    const user = window.Auth.requireAuth()
+    if (user) {
+      window.renderLayout({ active: 'dashboard', title: '老板看板' })
+      const c = document.getElementById('pageContent')
+
+      const kpi = window.DB.kpiSummary
+
+      // KPI 卡片
+      const kpiHTML = `
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="label">今日销售额</div>
+            <div class="value">${window.UI.money(kpi.todaySales)}</div>
+            <div class="delta down">较昨日 -15.3%</div>
+          </div>
+          <div class="kpi-card warning">
+            <div class="label">应收总额</div>
+            <div class="value">${window.UI.money(kpi.receivableTotal)}</div>
+            <div class="delta">5 家客户,欣旺达二批逾期</div>
+          </div>
+          <div class="kpi-card danger">
+            <div class="label">临期 / 过期商品</div>
+            <div class="value">${kpi.expiringCount} <span style="font-size:14px;color:var(--text-3)">/</span> ${kpi.expiredCount}</div>
+            <div class="delta">需立即处理,见下方列表</div>
+          </div>
+          <div class="kpi-card success">
+            <div class="label">库存总金额</div>
+            <div class="value">${window.UI.money(kpi.stockAmount)}</div>
+            <div class="delta">2 个仓库,11 个 SKU</div>
+          </div>
+        </div>`
+
+      // 临期预警表
+      const expiringList = window.DB.batches
+        .map(b => ({ ...b, product: window.DB.products.find(p => p.id === b.productId), status: window.DB.getExpiryStatus(b.expiryDate) }))
+        .filter(b => b.status.type === 'danger' || b.status.type === 'expired' || b.status.type === 'warning')
+        .sort((a,b) => a.status.days - b.status.days)
+
+      const expiringHTML = expiringList.map(b => `
+        <tr>
+          <td>${window.UI.escapeHtml(b.product?.name || '')}</td>
+          <td>${b.batchNo}</td>
+          <td>${b.productionDate}</td>
+          <td>${b.expiryDate}</td>
+          <td>${b.remainingQty} ${b.product?.mainUnit || ''}</td>
+          <td><span class="tag ${b.status.type === 'expired' ? 'danger' : b.status.type === 'danger' ? 'danger' : 'warning'}">${b.status.label}</span></td>
+        </tr>`).join('')
+
+      c.innerHTML = kpiHTML + `
+        <div class="chart-grid">
+          <div class="chart-box">
+            <div class="title">📈 近 7 日销售额趋势</div>
+            <div class="chart" id="chartTrend"></div>
+          </div>
+          <div class="chart-box">
+            <div class="title">🏆 Top 10 商品销售额</div>
+            <div class="chart" id="chartTop10"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚠️ 临期 / 过期商品预警</span>
+            <a href="stock.html" class="btn-text">查看库存 →</a>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>商品名称</th><th>批次号</th><th>生产日期</th><th>到期日期</th><th>剩余库存</th><th>临期状态</th></tr>
+            </thead>
+            <tbody>${expiringHTML || '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:20px">暂无临期商品</td></tr>'}</tbody>
+          </table>
+        </div>`
+
+      // 渲染图表(ECharts)
+      setTimeout(() => {
+        // 7 日趋势折线图
+        const chart1 = echarts.init(document.getElementById('chartTrend'))
+        chart1.setOption({
+          tooltip: { trigger: 'axis' },
+          grid: { left: 40, right: 20, top: 20, bottom: 30 },
+          xAxis: { type: 'category', data: window.DB.salesTrend7d.map(d => d.date), axisLine: { lineStyle: { color: '#dcdfe6' } } },
+          yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+          series: [{
+            name: '销售额', type: 'line', smooth: true, data: window.DB.salesTrend7d.map(d => d.amount),
+            itemStyle: { color: '#409eff' }, areaStyle: { color: 'rgba(64,158,255,0.15)' }, lineStyle: { width: 3 }
+          }]
+        })
+
+        // Top 10 商品条形图
+        const chart2 = echarts.init(document.getElementById('chartTop10'))
+        chart2.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          grid: { left: 100, right: 20, top: 10, bottom: 20 },
+          xAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+          yAxis: { type: 'category', data: window.DB.top10Products.map(d => d.name).reverse(), axisLine: { lineStyle: { color: '#dcdfe6' } } },
+          series: [{
+            name: '销售额', type: 'bar', data: window.DB.top10Products.map(d => d.amount).reverse(),
+            itemStyle: { color: '#67c23a', borderRadius: [0, 4, 4, 0] }, barWidth: 14
+          }]
+        })
+
+        window.addEventListener('resize', () => { chart1.resize(); chart2.resize() })
+      }, 100)
+    }
+  </script>
+</body>
+</html>

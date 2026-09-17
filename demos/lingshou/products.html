@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品档案 - 预包装食品批发管理系统</title>
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/scan.js"></script>
+  <script>
+    const user = window.Auth.requireAuth()
+    if (user) {
+      window.renderLayout({ active: 'products', title: '商品档案' })
+      const c = document.getElementById('pageContent')
+
+      let pageSize = 5, currentPage = 1, keyword = ''
+
+      function filterProducts() {
+        const k = keyword.trim().toLowerCase()
+        return window.DB.products.filter(p =>
+          !k || p.name.toLowerCase().includes(k) || p.code.toLowerCase().includes(k) || p.barcode.includes(k)
+        )
+      }
+
+      function renderList() {
+        const list = filterProducts()
+        const total = list.length
+        const totalPage = Math.max(1, Math.ceil(total / pageSize))
+        if (currentPage > totalPage) currentPage = totalPage
+        const start = (currentPage - 1) * pageSize
+        const pageList = list.slice(start, start + pageSize)
+
+        const rowsHTML = pageList.map(p => {
+          const stock = window.DB.getProductStock(p.id)
+          const batchCount = window.DB.batches.filter(b => b.productId === p.id).length
+          return `
+            <tr>
+              <td>${p.code}</td>
+              <td class="hidden-mobile">${p.barcode}</td>
+              <td>${window.UI.escapeHtml(p.name)}</td>
+              <td>${p.spec}</td>
+              <td><span class="tag info">${p.categoryName}</span></td>
+              <td>${p.mainUnit}</td>
+              <td>${p.shelfLifeDays} 天</td>
+              <td class="text-right">${window.UI.money(p.costPrice, false)}</td>
+              <td class="text-right">${window.UI.money(p.retailPrice, false)}</td>
+              <td><span class="tag ${stock > 0 ? 'success' : 'danger'}">${stock} ${p.mainUnit}</span></td>
+              <td>${batchCount}</td>
+              <td class="nowrap text-center">
+                <button class="btn-text" onclick="showBatches(${p.id})">查看批次</button>
+              </td>
+            </tr>`
+        }).join('')
+
+        // 分页
+        const pages = window.UI.pageNumbers(currentPage, totalPage)
+        const pageBtns = pages.map(p =>
+          p === '...' ? '<button class="page-btn" disabled>...</button>' : `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`
+        ).join('')
+
+        c.innerHTML = `
+          <div class="card">
+            <div class="toolbar">
+              <div class="left">
+                <input id="searchInput" class="input" placeholder="搜索商品名称 / 编码 / 条码" value="${window.UI.escapeHtml(keyword)}" oninput="onSearch(this.value)" style="max-width:300px">
+                <button class="btn btn-default btn-sm" onclick="onSearch(document.getElementById('searchInput').value)">🔍 搜索</button>
+              </div>
+              <div class="right">
+                <button class="btn btn-default btn-sm" onclick="scanCreate()">📷 扫码建档</button>
+                <button class="btn btn-sm" onclick="toast('DEMO 不提供实际新增,可查看现有 11 个商品','info')">+ 新增商品</button>
+              </div>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>编码</th><th class="hidden-mobile">条码</th><th>商品名称</th><th>规格</th><th>分类</th>
+                  <th>单位</th><th>保质期</th><th class="text-right">成本价</th><th class="text-right">零售价</th>
+                  <th>在库</th><th>批次数</th><th class="text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHTML || `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:30px">无匹配商品</td></tr>`}</tbody>
+            </table>
+            <div class="pagination">
+              <span class="total">共 ${total} 条</span>
+              <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">上一页</button>
+              ${pageBtns}
+              <button class="page-btn" ${currentPage === totalPage ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">下一页</button>
+              <span style="margin-left:12px">第 ${currentPage} / ${totalPage} 页</span>
+            </div>
+          </div>`
+      }
+
+      function onSearch(v) { keyword = v; currentPage = 1; renderList() }
+      function goPage(p) { currentPage = p; renderList() }
+      function scanCreate() {
+        window.startScan(code => {
+          const p = window.DB.products.find(p => p.barcode === code)
+          if (p) toast(`已存在商品:${p.name}`,'warning')
+          else toast(`已扫码条码 ${code},DEMO 暂不提供新建,可前往销售开单使用`,'info')
+        })
+      }
+
+      function showBatches(productId) {
+        const p = window.DB.products.find(x => x.id === productId)
+        const list = window.DB.batches.filter(b => b.productId === productId)
+        const rowsHTML = list.map(b => {
+          const s = window.DB.getExpiryStatus(b.expiryDate)
+          const w = window.DB.warehouses.find(x => x.id === b.warehouseId)
+          const tagClass = s.type === 'expired' ? 'danger' : s.type === 'danger' ? 'danger' : s.type === 'warning' ? 'warning' : 'success'
+          const statusTag = b.status === 3 ? '<span class="tag danger">已过期</span>' : `<span class="tag ${tagClass}">${s.label}</span>`
+          return `
+            <tr>
+              <td>${b.batchNo}</td>
+              <td>${b.productionDate}</td>
+              <td>${b.expiryDate}</td>
+              <td>${b.initialQty}</td>
+              <td>${b.remainingQty}</td>
+              <td>${w?.name || '-'}</td>
+              <td>${statusTag}</td>
+            </tr>`
+        }).join('')
+        window.UI.openModal(
+          `📦 批次档案 - ${window.UI.escapeHtml(p.name)}`,
+          `<table class="table table-compact">
+            <thead><tr><th>批次号</th><th>生产日期</th><th>到期日期</th><th>初始入库</th><th>剩余库存</th><th>所在仓库</th><th>临期状态</th></tr></thead>
+            <tbody>${rowsHTML || '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-3)">该商品暂无批次</td></tr>'}</tbody>
+          </table>
+          <div style="margin-top:12px;padding:10px;background:#f5f7fa;border-radius:4px;font-size:12px;color:var(--text-2)">
+            📌 食品行业合规要点:批次号 + 生产日期 + 到期日期 必填,出库按先进先出(早入库、早生产优先)
+          </div>`
+        )
+      }
+
+      window.onSearch = onSearch
+      window.goPage = goPage
+      window.scanCreate = scanCreate
+      window.showBatches = showBatches
+
+      renderList()
+    }
+  </script>
+</body>
+</html>
