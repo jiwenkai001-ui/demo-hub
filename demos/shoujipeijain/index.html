@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>手机配件进销存系统</title>
+<style>
+:root{
+  --primary:#6366f1;--primary-dark:#4f46e5;--primary-light:#e0e7ff;
+  --primary-grad:linear-gradient(135deg,#6366f1,#8b5cf6);
+  --bg:#f8fafc;--card:#fff;--text:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
+  --border:#e2e8f0;--border-2:#f1f5f9;
+  --success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#06b6d4;
+  --sidebar-w:220px;--header-h:56px;--radius:12px;--shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 25px rgba(15,23,42,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ LOGIN ============ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#312e81 0%,#6366f1 50%,#8b5cf6 100%);padding:20px}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:0 25px 60px rgba(30,27,75,.35)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .icon{width:56px;height:56px;background:var(--primary-grad);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:28px;margin-bottom:12px;box-shadow:0 8px 20px rgba(99,102,241,.4)}
+.login-logo h1{font-size:20px;font-weight:700}
+.login-logo p{color:var(--text-2);font-size:13px;margin-top:4px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:500;color:var(--text-2)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);outline:none;transition:border .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:14px;font-weight:500;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--primary-grad);color:#fff;box-shadow:0 2px 8px rgba(99,102,241,.3)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-block{width:100%}
+.btn-ghost{color:var(--text-2)}
+.btn-ghost:hover{background:var(--border-2)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-outline{border:1px solid var(--border);color:var(--text);background:#fff}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.login-tip{margin-top:16px;text-align:center;font-size:12px;color:var(--text-3)}
+
+/* ============ APP LAYOUT ============ */
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,#0f172a 0%,#1e1b4b 100%);color:#cbd5e1;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;flex-shrink:0;z-index:100}
+.sidebar .brand{display:flex;align-items:center;gap:10px;padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar .brand .icon{width:34px;height:34px;background:var(--primary-grad);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(99,102,241,.4)}
+.sidebar .brand h1{font-size:15px;color:#fff;font-weight:600}
+.sidebar .brand p{font-size:11px;color:#64748b}
+.nav-group{padding:8px 0}
+.nav-group-title{padding:8px 20px 4px;font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:.5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:#cbd5e1;cursor:pointer;transition:all .15s;border-left:3px solid transparent;font-size:13.5px}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(99,102,241,.2);color:#fff;border-left-color:var(--primary)}
+.nav-item .ico{width:18px;text-align:center}
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-width:0}
+.header{height:var(--header-h);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:12px}
+.menu-toggle{display:none;font-size:20px;cursor:pointer}
+.header h2{font-size:16px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:16px}
+.user-info{display:flex;align-items:center;gap:8px;cursor:pointer}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(99,102,241,.3)}
+.content{padding:20px;flex:1}
+
+/* ============ MOBILE BOTTOM NAV ============ */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:100;height:56px}
+.mobile-nav .nav-m{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text-3);font-size:11px;cursor:pointer}
+.mobile-nav .nav-m.active{color:var(--primary)}
+.mobile-nav .nav-m .ico{font-size:18px}
+.mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* ============ CARDS & TABLES ============ */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border-2);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:15px;font-weight:600}
+.card-body{padding:16px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
+.stat-card .s-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+.stat-card .s-label{font-size:12px;color:var(--text-2)}
+.stat-card .s-value{font-size:22px;font-weight:700;margin-top:2px}
+.stat-card .s-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.toolbar .search{flex:1;min-width:200px;max-width:360px;position:relative}
+.toolbar .search input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:var(--radius);outline:none}
+.toolbar .search .s-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3)}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border-2);white-space:nowrap}
+th{background:#f8fafc;font-weight:600;color:var(--text-2);position:sticky;top:0}
+tr:hover td{background:#f8fafc}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:500}
+.tag-success{background:#dcfce7;color:#166534}
+.tag-warning{background:#fef3c7;color:#92400e}
+.tag-danger{background:#fee2e2;color:#991b1b}
+.tag-info{background:#cffafe;color:#155e75}
+.tag-muted{background:#f1f5f9;color:#475569}
+.action-btns{display:flex;gap:6px}
+.action-btns a{color:var(--primary);cursor:pointer;font-size:13px}
+.action-btns a.danger{color:var(--danger)}
+.action-btns a:hover{text-decoration:underline}
+.empty{text-align:center;padding:40px;color:var(--text-3)}
+
+/* ============ MODAL ============ */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:10px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-lg{max-width:720px}
+.modal-sm{max-width:420px}
+.modal-header{padding:14px 18px;border-bottom:1px solid var(--border-2);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:16px;font-weight:600}
+.modal-close{font-size:22px;color:var(--text-3);cursor:pointer;line-height:1}
+.modal-body{padding:18px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border-2);display:flex;justify-content:flex-end;gap:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-row-full{grid-column:1/-1}
+
+/* ============ DASHBOARD CHARTS ============ */
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px 0}
+.bar-chart .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-chart .bar .fill{width:100%;max-width:36px;background:var(--primary-grad);border-radius:6px 6px 0 0;transition:height .3s}
+.bar-chart .bar .lbl{font-size:11px;color:var(--text-3)}
+.bar-chart .bar .val{font-size:11px;font-weight:600}
+.legend-list .legend-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-2)}
+.legend-list .legend-item:last-child{border-bottom:none}
+.legend-list .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-toggle{display:block}
+  .mobile-nav{display:flex}
+  .content{padding:12px;padding-bottom:70px}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .chart-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat-card{padding:12px}
+  .stat-card .s-icon{width:38px;height:38px;font-size:16px}
+  .stat-card .s-value{font-size:18px}
+  .header h2{font-size:14px}
+  .card-header h3{font-size:14px}
+  table{font-size:12.5px}
+  th,td{padding:8px 10px}
+}
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:1fr}
+}
+
+/* utils */
+.flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.text-right{text-align:right}.text-center{text-align:center}.text-muted{color:var(--text-2)}.text-danger{color:var(--danger)}.text-success{color:var(--success)}
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}
+.font-bold{font-weight:600}.text-sm{font-size:12.5px}.text-xs{font-size:11px}
+.w-full{width:100%}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ==================== DATA LAYER ==================== */
+const LS_KEY = 'phone_erp_data_v2';
+const now = () => new Date().toISOString().slice(0,19).replace('T',' ');
+const today = () => new Date().toISOString().slice(0,10);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const fmt = n => (Number(n)||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money = n => '¥' + fmt(n);
+
+const DEFAULT_DATA = {
+  _version:2,
+  users:[
+    {id:'u1',username:'admin',password:'123456',name:'管理员',role:'admin',phone:'13800000001'},
+    {id:'u2',username:'sales',password:'123456',name:'张三',role:'sales',phone:'13800000002'},
+    {id:'u3',username:'buyer',password:'123456',name:'李四',role:'buyer',phone:'13800000003'},
+  ],
+  warehouses:[
+    {id:'w1',name:'主仓库',address:'深圳市福田区华强北',manager:'仓管A'},
+    {id:'w2',name:'分店仓',address:'深圳市南山区科技园',manager:'仓管B'},
+  ],
+  categories:[
+    {id:'c1',name:'手机壳',sort:1},
+    {id:'c2',name:'钢化膜',sort:2},
+    {id:'c3',name:'充电器',sort:3},
+    {id:'c4',name:'数据线',sort:4},
+    {id:'c5',name:'耳机音频',sort:5},
+    {id:'c6',name:'移动电源',sort:6},
+    {id:'c7',name:'车载配件',sort:7},
+    {id:'c8',name:'手机支架',sort:8},
+  ],
+  products:[
+    {id:'p1',name:'液态硅胶手机壳',categoryId:'c1',brand:'图拉斯',models:['iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max'],barcode:'',needSerial:false,skuList:[
+      {id:'s1',spec:'黑色-6.1寸',barcode:'690001',cost:12,price:29,stock:120,minStock:20},
+      {id:'s2',spec:'白色-6.1寸',barcode:'690002',cost:12,price:29,stock:80,minStock:20},
+      {id:'s3',spec:'黑色-6.7寸',barcode:'690003',cost:13,price:32,stock:15,minStock:20},
+    ]},
+    {id:'p2',name:'高清钢化膜',categoryId:'c2',brand:'闪魔',models:['iPhone 15','iPhone 15 Pro'],barcode:'',needSerial:false,skuList:[
+      {id:'s4',spec:'高清-6.1寸',barcode:'690004',cost:3,price:15,stock:200,minStock:50},
+      {id:'s5',spec:'防窥-6.1寸',barcode:'690005',cost:6,price:25,stock:60,minStock:30},
+    ]},
+    {id:'p3',name:'氮化镓充电器 30W',categoryId:'c3',brand:'安克',models:['通用'],barcode:'690006',needSerial:true,skuList:[
+      {id:'s6',spec:'白色',barcode:'690006',cost:65,price:129,stock:45,minStock:10},
+    ]},
+    {id:'p4',name:'Type-C 数据线 1米',categoryId:'c4',brand:'绿联',models:['通用'],barcode:'690007',needSerial:false,skuList:[
+      {id:'s7',spec:'编织-黑色',barcode:'690007',cost:8,price:25,stock:150,minStock:30},
+    ]},
+    {id:'p5',name:'蓝牙耳机 TWS',categoryId:'c5',brand:'QCY',models:['通用'],barcode:'690008',needSerial:true,skuList:[
+      {id:'s8',spec:'白色',barcode:'690008',cost:80,price:169,stock:30,minStock:10},
+    ]},
+    {id:'p6',name:'充电宝 20000mAh',categoryId:'c6',brand:'小米',models:['通用'],barcode:'690009',needSerial:true,skuList:[
+      {id:'s9',spec:'黑色',barcode:'690009',cost:75,price:149,stock:8,minStock:10},
+    ]},
+  ],
+  customers:[
+    {id:'cu1',name:'王老板（零售店）',phone:'13900000001',type:'零售',level:'普通',receivable:0,remark:''},
+    {id:'cu2',name:'李总（批发）',phone:'13900000002',type:'批发',level:'VIP',receivable:3500,remark:'月结30天'},
+    {id:'cu3',name:'张先生',phone:'13900000003',type:'零售',level:'普通',receivable:0,remark:''},
+  ],
+  suppliers:[
+    {id:'su1',name:'深圳华强北配件批发',phone:'0755-12345678',contact:'陈经理',payable:0,remark:''},
+    {id:'su2',name:'广州数码配件厂',phone:'020-87654321',contact:'刘总',payable:0,remark:''},
+  ],
+  purchases:[],
+  sales:[],
+  payments:[],
+  receipts:[],
+  stocks:[],     // {id, skuId, warehouseId, qty}
+  serials:[],    // {id, skuId, serialNo, warehouseId, status:'在库'|'已售出', purchaseNo, saleNo, createdAt}
+  checks:[],
+  transfers:[],  // {id, no, date, fromWarehouseId, toWarehouseId, items:[{skuId,qty,serials[]}], status, createdAt}
+};
+
+function loadData(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(raw){
+    try{
+      const d = JSON.parse(raw);
+      // migrate: ensure new fields exist
+      if(!d._version || d._version<2 || !d.warehouses || !d.stocks){
+        // old data, reset
+      } else {
+        d.warehouses = d.warehouses && d.warehouses.length ? d.warehouses : DEFAULT_DATA.warehouses;
+        d.stocks = d.stocks || [];
+        d.serials = d.serials || [];
+        d.transfers = d.transfers || [];
+        d.products.forEach(p=>{ if(p.needSerial===undefined) p.needSerial=false; });
+        return d;
+      }
+    }catch(e){}
+  }
+  const d = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  seedStocks(d);
+  seedTransactions(d);
+  saveData(d);
+  return d;
+}
+function saveData(d){ localStorage.setItem(LS_KEY, JSON.stringify(d)); }
+function resetData(){ localStorage.removeItem(LS_KEY); location.reload(); }
+
+let DB = loadData();
+const currentUser = () => JSON.parse(sessionStorage.getItem('erp_user')||'null');
+function setUser(u){ sessionStorage.setItem('erp_user', JSON.stringify(u)); }
+function logout(){ sessionStorage.removeItem('erp_user'); render(); }
+
+// helpers
+const getCategory = id => DB.categories.find(c=>c.id===id);
+const getProduct = id => DB.products.find(p=>p.id===id);
+const getSku = id => { for(const p of DB.products){ const s=p.skuList.find(s=>s.id===id); if(s) return {product:p,sku:s}; } return null; };
+const getCustomer = id => DB.customers.find(c=>c.id===id);
+const getSupplier = id => DB.suppliers.find(s=>s.id===id);
+const getWarehouse = id => DB.warehouses.find(w=>w.id===id);
+const skuName = id => { const r=getSku(id); return r? r.product.name+' - '+r.sku.spec : '-'; };
+const skuNeedSerial = id => { const r=getSku(id); return r? !!r.product.needSerial : false; };
+
+// per-warehouse stock operations (source of truth); sku.stock kept as cached total
+function getStockRecord(skuId, warehouseId){
+  return DB.stocks.find(s=>s.skuId===skuId && s.warehouseId===warehouseId);
+}
+function getSkuWarehouseStock(skuId, warehouseId){
+  const r = getStockRecord(skuId, warehouseId);
+  return r? r.qty : 0;
+}
+function getSkuTotalStock(skuId){
+  return DB.stocks.filter(s=>s.skuId===skuId).reduce((a,s)=>a+s.qty,0);
+}
+function setSkuWarehouseStock(skuId, warehouseId, qty){
+  let r = getStockRecord(skuId, warehouseId);
+  if(!r){ r = {id:uid(), skuId, warehouseId, qty:0}; DB.stocks.push(r); }
+  r.qty = qty;
+  // sync cached total on sku
+  const sk = getSku(skuId);
+  if(sk) sk.sku.stock = getSkuTotalStock(skuId);
+}
+function addStock(skuId, warehouseId, qty){
+  const cur = getSkuWarehouseStock(skuId, warehouseId);
+  setSkuWarehouseStock(skuId, warehouseId, cur + qty);
+}
+function subStock(skuId, warehouseId, qty){
+  const cur = getSkuWarehouseStock(skuId, warehouseId);
+  setSkuWarehouseStock(skuId, warehouseId, Math.max(0, cur - qty));
+}
+const totalStock = () => DB.stocks.reduce((s,x)=>s+x.qty,0);
+const stockValue = () => DB.products.reduce((s,p)=>s+p.skuList.reduce((a,sk)=>a+getSkuTotalStock(sk.id)*sk.cost,0),0);
+const lowStockList = () => { const r=[]; DB.products.forEach(p=>p.skuList.forEach(sk=>{ if(getSkuTotalStock(sk.id)<=sk.minStock) r.push({product:p,sku:sk}); })); return r; };
+
+// serials
+function getAvailableSerials(skuId, warehouseId){
+  return DB.serials.filter(s=>s.skuId===skuId && s.warehouseId===warehouseId && s.status==='在库');
+}
+function getAllSerials(skuId){
+  return DB.serials.filter(s=>s.skuId===skuId);
+}
+
+function seedStocks(d){
+  // distribute sku.stock into stocks table across warehouses
+  d.warehouses.forEach(w=>{
+    d.products.forEach(p=>p.skuList.forEach(sk=>{
+      // put ~70% in main warehouse, rest in branch
+      const ratio = w.id==='w1'? 0.7 : 0.3;
+      const qty = Math.floor(sk.stock * ratio);
+      if(qty>0) d.stocks.push({id:uid(), skuId:sk.id, warehouseId:w.id, qty});
+    }));
+  });
+}
+
+function seedTransactions(d){
+  const nowDate = new Date();
+  for(let i=0;i<14;i++){
+    const dt = new Date(nowDate.getTime()-i*86400000);
+    const date = dt.toISOString().slice(0,10);
+    const amount = Math.floor(Math.random()*3000)+500;
+    d.sales.push({id:uid(),no:'XS'+date.replace(/-/g,'')+String(100+i),date,customerId:i%3===0?'cu2':(i%2?'cu1':'cu3'),warehouseId:'w1',items:[{skuId:'s1',qty:Math.floor(Math.random()*5)+1,price:29,serials:[]}],amount,status:'已完成',createdAt:date+' 10:00'});
+    d.purchases.push({id:uid(),no:'CG'+date.replace(/-/g,'')+String(100+i),date,supplierId:i%2?'su1':'su2',warehouseId:'w1',items:[{skuId:'s1',qty:Math.floor(Math.random()*20)+5,price:12,serials:[]}],amount:Math.floor(Math.random()*1500)+300,status:'已入库',createdAt:date+' 09:00'});
+  }
+  // seed a few serials for serial-managed products in main warehouse
+  const serialSeed = [
+    {skuId:'s6',prefix:'ANK',count:5},
+    {skuId:'s8',prefix:'QCY',count:5},
+    {skuId:'s9',prefix:'MI',count:3},
+  ];
+  serialSeed.forEach(sd=>{
+    for(let i=0;i<sd.count;i++){
+      d.serials.push({id:uid(),skuId:sd.skuId,serialNo:sd.prefix+String(1000+i),warehouseId:'w1',status:'在库',purchaseNo:'-',saleNo:'',createdAt:today()+' 08:00'});
+    }
+  });
+}
+
+/* ==================== ROUTER ==================== */
+const routes = {
+  dashboard:{title:'工作台',render:renderDashboard,icon:'📊',mnav:true},
+  products:{title:'商品管理',render:renderProducts,icon:'📦',mnav:true},
+  customers:{title:'客户管理',render:renderCustomers,icon:'👥',mnav:false},
+  suppliers:{title:'供应商',render:renderSuppliers,icon:'🏭',mnav:false},
+  purchase:{title:'采购管理',render:renderPurchase,icon:'🛒',mnav:false},
+  sales:{title:'销售管理',render:renderSales,icon:'💰',mnav:true},
+  stock:{title:'库存管理',render:renderStock,icon:'📋',mnav:true},
+  finance:{title:'财务管理',render:renderFinance,icon:'💳',mnav:false},
+  report:{title:'报表中心',render:renderReport,icon:'📈',mnav:false},
+  settings:{title:'系统设置',render:renderSettings,icon:'⚙️',mnav:false},
+};
+
+function getRoute(){ const h = location.hash.slice(1)||'dashboard'; return routes[h]? h : 'dashboard'; }
+function navigate(h){ location.hash = h; }
+window.addEventListener('hashchange', render);
+
+/* ==================== RENDER ==================== */
+function render(){
+  const app = document.getElementById('app');
+  const u = currentUser();
+  if(!u){ app.innerHTML = renderLogin(); bindLogin(); return; }
+  const route = getRoute();
+  const r = routes[route];
+  app.innerHTML = renderLayout(r);
+  bindLayout(route);
+  document.getElementById('page-content').innerHTML = r.render();
+  if(r.bind) r.bind();
+}
+
+/* ---------- LOGIN ---------- */
+function renderLogin(){
+  return `<div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">
+        <div class="icon">📱</div>
+        <h1>手机配件进销存</h1>
+        <p>Mobile Accessories ERP</p>
+      </div>
+      <div class="form-group"><label>账号</label><input id="lg-user" value="admin" placeholder="请输入账号"></div>
+      <div class="form-group"><label>密码</label><input id="lg-pass" type="password" value="123456" placeholder="请输入密码"></div>
+      <button class="btn btn-primary btn-block" id="lg-btn">登 录</button>
+      <div class="login-tip">演示账号：admin / 123456（管理员）<br>sales / 123456（销售） · buyer / 123456（采购）</div>
+    </div>
+  </div>`;
+}
+function bindLogin(){
+  document.getElementById('lg-btn').onclick = ()=>{
+    const u = document.getElementById('lg-user').value.trim();
+    const p = document.getElementById('lg-pass').value;
+    const user = DB.users.find(x=>x.username===u && x.password===p);
+    if(!user){ alert('账号或密码错误'); return; }
+    setUser({id:user.id,name:user.name,role:user.role});
+    render();
+  };
+  document.getElementById('lg-pass').onkeydown = e=>{ if(e.key==='Enter') document.getElementById('lg-btn').click(); };
+}
+
+/* ---------- LAYOUT ---------- */
+function renderLayout(r){
+  const u = currentUser();
+  const navHtml = Object.entries(routes).map(([k,v])=>`
+    <div class="nav-item ${k===getRoute()?'active':''}" onclick="navigate('${k}')">
+      <span class="ico">${v.icon}</span><span>${v.title}</span>
+    </div>`).join('');
+  const mNavHtml = Object.entries(routes).filter(([k,v])=>v.mnav).map(([k,v])=>`
+    <div class="nav-m ${k===getRoute()?'active':''}" onclick="navigate('${k}')">
+      <span class="ico">${v.icon}</span><span>${v.title}</span>
+    </div>`).join('');
+  return `
+  <div class="app">
+    <div class="sidebar" id="sidebar">
+      <div class="brand"><div class="icon">📱</div><div><h1>配件进销存</h1><p>Mobile ERP</p></div></div>
+      <div class="nav-group">${navHtml}</div>
+    </div>
+    <div class="mobile-overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="main">
+      <div class="header">
+        <div class="header-left">
+          <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
+          <h2>${r.title}</h2>
+        </div>
+        <div class="header-right">
+          <div class="user-info" onclick="logout()">
+            <div class="avatar">${u.name.slice(0,1)}</div>
+            <span class="text-sm">${u.name}</span>
+            <span class="text-xs text-muted">退出</span>
+          </div>
+        </div>
+      </div>
+      <div class="content" id="page-content"></div>
+    </div>
+    <div class="mobile-nav">${mNavHtml}</div>
+  </div>`;
+}
+function bindLayout(){ }
+function toggleSidebar(){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('open');
+  ov.style.display = sb.classList.contains('open')?'block':'none';
+}
+
+/* ==================== DASHBOARD ==================== */
+function renderDashboard(){
+  const salesTotal = DB.sales.reduce((s,x)=>s+x.amount,0);
+  const purchaseTotal = DB.purchases.reduce((s,x)=>s+x.amount,0);
+  const receivable = DB.customers.reduce((s,c)=>s+c.receivable,0);
+  const low = lowStockList();
+  // last 7 days sales
+  const days = [];
+  for(let i=6;i>=0;i--){ const d=new Date(Date.now()-i*86400000).toISOString().slice(0,10); days.push({d,label:d.slice(5)}); }
+  const salesByDay = days.map(d=>({...d,val:DB.sales.filter(s=>s.date===d.d).reduce((a,s)=>a+s.amount,0)}));
+  const maxDay = Math.max(...salesByDay.map(d=>d.val),1);
+  // top products
+  const skuSales = {};
+  DB.sales.forEach(s=>s.items.forEach(it=>{ skuSales[it.skuId]=(skuSales[it.skuId]||0)+it.qty; }));
+  const top = Object.entries(skuSales).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,qty])=>({name:skuName(id),qty}));
+  const colors=['#2563eb','#16a34a','#d97706','#dc2626','#0891b2'];
+
+  return `
+  <div class="stats-grid">
+    <div class="stat-card"><div class="s-icon" style="background:#2563eb">💰</div><div><div class="s-label">累计销售额</div><div class="s-value">${money(salesTotal)}</div><div class="s-sub">全部订单</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#16a34a">📦</div><div><div class="s-label">库存总量</div><div class="s-value">${totalStock()}</div><div class="s-sub">库存价值 ${money(stockValue())}</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#d97706">⚠️</div><div><div class="s-label">库存预警</div><div class="s-value">${low.length}</div><div class="s-sub">低于最低库存</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#dc2626">📥</div><div><div class="s-label">应收账款</div><div class="s-value">${money(receivable)}</div><div class="s-sub">客户欠款</div></div></div>
+  </div>
+  <div class="chart-grid">
+    <div class="card"><div class="card-header"><h3>近7日销售趋势</h3></div><div class="card-body">
+      <div class="bar-chart">${salesByDay.map(d=>`<div class="bar"><span class="val">${d.val>0?'¥'+(d.val/1000).toFixed(1)+'k':''}</span><div class="fill" style="height:${(d.val/maxDay*140)}px"></div><span class="lbl">${d.label}</span></div>`).join('')}</div>
+    </div></div>
+    <div class="card"><div class="card-header"><h3>热销商品 TOP5</h3></div><div class="card-body">
+      <div class="legend-list">${top.length?top.map((t,i)=>`<div class="legend-item"><span><span class="dot" style="background:${colors[i]}"></span>${t.name}</span><span class="font-bold">${t.qty}件</span></div>`).join(''):'<div class="empty">暂无数据</div>'}</div>
+    </div></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>库存预警列表</h3><a class="btn btn-outline btn-sm" onclick="navigate('stock')">查看全部</a></div><div class="card-body">
+    ${low.length?`<div class="table-wrap"><table><thead><tr><th>商品</th><th>规格</th><th>当前库存</th><th>最低库存</th><th>状态</th></tr></thead><tbody>
+    ${low.slice(0,8).map(l=>`<tr><td>${l.product.name}</td><td>${l.sku.spec}</td><td class="text-danger font-bold">${getSkuTotalStock(l.sku.id)}</td><td>${l.sku.minStock}</td><td><span class="tag tag-danger">库存不足</span></td></tr>`).join('')}
+    </tbody></table></div>`:'<div class="empty">✅ 库存正常，无预警</div>'}
+  </div></div>
+  <div class="card"><div class="card-header"><h3>最近销售单</h3><a class="btn btn-outline btn-sm" onclick="navigate('sales')">更多</a></div><div class="card-body">
+    <div class="table-wrap"><table><thead><tr><th>单号</th><th>日期</th><th>客户</th><th>金额</th><th>状态</th></tr></thead><tbody>
+    ${DB.sales.slice(-5).reverse().map(s=>`<tr><td>${s.no}</td><td>${s.date}</td><td>${getCustomer(s.customerId)?.name||'-'}</td><td class="font-bold">${money(s.amount)}</td><td><span class="tag tag-success">${s.status}</span></td></tr>`).join('')}
+    </tbody></table></div>
+  </div></div>`;
+}
+
+/* ==================== MODAL UTIL ==================== */
+function showModal(bodyHtml, onOk, size){
+  const sizeCls = size==='modal-lg'?'modal-lg':(size==='modal-sm'?'modal-sm':'');
+  const footer = onOk ? `<div class="modal-footer"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" id="modal-ok">确定</button></div>` : '';
+  const mask = document.createElement('div');
+  mask.className = 'modal-mask';
+  mask.id = 'modal-mask';
+  mask.innerHTML = `<div class="modal ${sizeCls}" onclick="event.stopPropagation()">
+    <div class="modal-header"><h3 id="modal-title">${(bodyHtml.match(/<h3>(.*?)<\/h3>/)||['',''])[1]||''}</h3><span class="modal-close" onclick="closeModal()">×</span></div>
+    <div class="modal-body" id="modal-body">${bodyHtml.replace(/<h3>.*?<\/h3>/,'')}</div>
+    ${footer}
+  </div>`;
+  mask.onclick = closeModal;
+  document.body.appendChild(mask);
+  if(onOk) mask.querySelector('#modal-ok').onclick = onOk;
+}
+function closeModal(){ const masks=document.querySelectorAll('.modal-mask'); if(masks.length) masks[masks.length-1].remove(); }
+
+/* ==================== PLACEHOLDERS (to be filled) ==================== */
+/* ==================== PRODUCTS ==================== */
+let _prodCatFilter = '';
+function renderProducts(){
+  const cats = DB.categories.slice().sort((a,b)=>a.sort-b.sort);
+  const list = DB.products.filter(p=>!_prodCatFilter||p.categoryId===_prodCatFilter);
+  return `
+  <div class="card">
+    <div class="card-body">
+      <div class="toolbar">
+        <div class="flex gap-2" style="flex-wrap:wrap">
+          <button class="btn btn-sm ${!_prodCatFilter?'btn-primary':'btn-outline'}" onclick="_prodCatFilter='';render()">全部</button>
+          ${cats.map(c=>`<button class="btn btn-sm ${_prodCatFilter===c.id?'btn-primary':'btn-outline'}" onclick="_prodCatFilter='${c.id}';render()">${c.name}</button>`).join('')}
+        </div>
+        <div class="search"><span class="s-ico">🔍</span><input id="prod-search" placeholder="搜索商品名称/品牌/条码"></div>
+        <button class="btn btn-outline btn-sm" onclick="showCategoryModal()">分类管理</button>
+        <button class="btn btn-primary btn-sm" onclick="showProductModal()">+ 新增商品</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>商品名称</th><th>分类</th><th>品牌</th><th>适配机型</th><th>序列号</th><th>SKU数</th><th>总库存</th><th>操作</th></tr></thead>
+          <tbody id="prod-tbody">
+            ${list.map(p=>`<tr>
+              <td class="font-bold">${p.name}</td>
+              <td>${getCategory(p.categoryId)?.name||'-'}</td>
+              <td>${p.brand||'-'}</td>
+              <td><span class="text-xs text-muted">${(p.models||[]).join(' / ')||'-'}</span></td>
+              <td>${p.needSerial?'<span class="tag tag-info">序列号</span>':'<span class="text-muted text-xs">-</span>'}</td>
+              <td>${p.skuList.length}</td>
+              <td class="font-bold">${p.skuList.reduce((s,sk)=>s+getSkuTotalStock(sk.id),0)}</td>
+              <td><div class="action-btns">
+                <a onclick="showProductModal('${p.id}')">编辑</a>
+                <a onclick="showSkuModal('${p.id}')">SKU</a>
+                <a class="danger" onclick="delProduct('${p.id}')">删除</a>
+              </div></td>
+            </tr>`).join('') || `<tr><td colspan="8" class="empty">暂无商品</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+routes.products.bind = function(){
+  const inp = document.getElementById('prod-search');
+  if(inp){ inp.oninput = ()=>{
+    const kw = inp.value.toLowerCase();
+    document.querySelectorAll('#prod-tbody tr').forEach(tr=>{
+      tr.style.display = tr.textContent.toLowerCase().includes(kw)?'':'none';
+    });
+  };}
+};
+function showProductModal(id){
+  const p = id? getProduct(id) : {name:'',categoryId:DB.categories[0]?.id||'',brand:'',models:[],needSerial:false,skuList:[{spec:'',barcode:'',cost:0,price:0,stock:0,minStock:0}]};
+  const catOpts = DB.categories.map(c=>`<option value="${c.id}" ${c.id===p.categoryId?'selected':''}>${c.name}</option>`).join('');
+  const modelsAll = ['iPhone 15','iPhone 15 Pro','iPhone 15 Pro Max','iPhone 14','iPhone 14 Pro','iPhone 14 Pro Max','华为 Mate 60','华为 P60','小米 14','OPPO Find X7','vivo X100','通用'];
+  window._editProduct = JSON.parse(JSON.stringify(p));
+  window._editProduct.id = id || null;
+  const skuRows = p.skuList.map((sk,i)=>skuRowHtml(sk,i)).join('');
+  showModal(`
+    <h3>${id?'编辑':'新增'}商品</h3>
+    <div class="form-row">
+      <div class="form-group"><label>商品名称 *</label><input id="pm-name" value="${p.name}"></div>
+      <div class="form-group"><label>分类 *</label><select id="pm-cat">${catOpts}</select></div>
+      <div class="form-group"><label>品牌</label><input id="pm-brand" value="${p.brand||''}"></div>
+      <div class="form-group items-center" style="display:flex;align-items:flex-end;gap:8px">
+        <input id="pm-serial" type="checkbox" ${p.needSerial?'checked':''} style="width:auto">
+        <label for="pm-serial" style="margin:0;cursor:pointer">启用序列号管理（逐个登记，如耳机/充电器）</label>
+      </div>
+      <div class="form-group form-row-full"><label>适配机型（按住Ctrl多选）</label>
+        <select id="pm-models" multiple size="4" style="height:auto">${modelsAll.map(m=>`<option value="${m}" ${(p.models||[]).includes(m)?'selected':''}>${m}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="form-group"><label>规格 SKU 列表</label>
+      <div class="table-wrap"><table><thead><tr><th>规格名称</th><th>条码</th><th>成本价</th><th>销售价</th><th>库存</th><th>最低库存</th><th></th></tr></thead>
+      <tbody id="pm-sku-body">${skuRows}</tbody></table></div>
+      <button class="btn btn-outline btn-sm mt-2" onclick="addSkuRow()">+ 添加规格</button>
+    </div>
+  `, ()=>saveProduct(), 'modal-lg');
+}
+function skuRowHtml(sk,i){
+  return `<tr>
+    <td><input class="w-full" value="${sk.spec||''}" data-k="spec"></td>
+    <td><input class="w-full" value="${sk.barcode||''}" data-k="barcode"></td>
+    <td><input class="w-full" type="number" value="${sk.cost}" data-k="cost"></td>
+    <td><input class="w-full" type="number" value="${sk.price}" data-k="price"></td>
+    <td><input class="w-full" type="number" value="${sk.stock}" data-k="stock"></td>
+    <td><input class="w-full" type="number" value="${sk.minStock}" data-k="minStock"></td>
+    <td><a class="danger" onclick="this.closest('tr').remove()">✕</a></td>
+  </tr>`;
+}
+function addSkuRow(){
+  const tb = document.getElementById('pm-sku-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = skuRowHtml({spec:'',barcode:'',cost:0,price:0,stock:0,minStock:0},0);
+  tb.appendChild(tr);
+}
+function saveProduct(){
+  const p = window._editProduct;
+  p.name = document.getElementById('pm-name').value.trim();
+  p.categoryId = document.getElementById('pm-cat').value;
+  p.brand = document.getElementById('pm-brand').value.trim();
+  p.needSerial = document.getElementById('pm-serial').checked;
+  p.models = Array.from(document.getElementById('pm-models').selectedOptions).map(o=>o.value);
+  if(!p.name){ alert('请输入商品名称'); return false; }
+  const rows = document.querySelectorAll('#pm-sku-body tr');
+  p.skuList = [];
+  rows.forEach(tr=>{
+    const sk = {};
+    tr.querySelectorAll('input').forEach(inp=>{ sk[inp.dataset.k] = inp.type==='number'?Number(inp.value):inp.value; });
+    if(sk.spec) p.skuList.push({...sk,id:sk.id||uid()});
+  });
+  if(!p.skuList.length){ alert('至少添加一个规格'); return false; }
+  if(p.id){
+    const idx = DB.products.findIndex(x=>x.id===p.id);
+    DB.products[idx] = p;
+  } else {
+    p.id = uid();
+    DB.products.push(p);
+  }
+  saveData(DB); closeModal(); render();
+  return true;
+}
+function delProduct(id){
+  if(!confirm('确定删除该商品？所有 SKU 将一并删除。')) return;
+  DB.products = DB.products.filter(p=>p.id!==id);
+  saveData(DB); render();
+}
+function showSkuModal(pid){
+  const p = getProduct(pid);
+  if(!p) return;
+  const whCols = DB.warehouses.map(w=>`<th>${w.name}</th>`).join('');
+  showModal(`<h3>${p.name} - SKU 列表</h3>
+    <div class="table-wrap"><table><thead><tr><th>规格</th><th>条码</th><th>成本价</th><th>销售价</th><th>最低库存</th>${whCols}<th>总库存</th><th>序列号</th></tr></thead><tbody>
+    ${p.skuList.map(sk=>`<tr>
+      <td>${sk.spec}</td><td>${sk.barcode}</td><td>${fmt(sk.cost)}</td><td>${fmt(sk.price)}</td><td>${sk.minStock}</td>
+      ${DB.warehouses.map(w=>`<td class="${getSkuWarehouseStock(sk.id,w.id)<=sk.minStock?'text-danger font-bold':''}">${getSkuWarehouseStock(sk.id,w.id)}</td>`).join('')}
+      <td class="font-bold">${getSkuTotalStock(sk.id)}</td>
+      <td>${p.needSerial?`<a onclick="showSerialsModal('${sk.id}')">${getAllSerials(sk.id).length}条</a>`:'<span class="text-muted">-</span>'}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`, null, 'modal-lg');
+}
+function showSerialsModal(skuId){
+  const r = getSku(skuId);
+  if(!r) return;
+  const serials = getAllSerials(skuId);
+  showModal(`<h3>${r.product.name} - ${r.sku.spec} 序列号列表</h3>
+    <div class="table-wrap"><table><thead><tr><th>序列号</th><th>仓库</th><th>状态</th><th>来源单号</th><th>销售单号</th></tr></thead><tbody>
+    ${serials.map(s=>`<tr>
+      <td class="font-bold">${s.serialNo}</td>
+      <td>${getWarehouse(s.warehouseId)?.name||'-'}</td>
+      <td><span class="tag ${s.status==='在库'?'tag-success':'tag-muted'}">${s.status}</span></td>
+      <td class="text-xs text-muted">${s.purchaseNo||'-'}</td>
+      <td class="text-xs text-muted">${s.saleNo||'-'}</td>
+    </tr>`).join('') || `<tr><td colspan="5" class="empty">暂无序列号</td></tr>`}
+    </tbody></table></div>`, null, 'modal-lg');
+}
+function showCategoryModal(){
+  showModal(`<h3>商品分类管理</h3>
+    <div class="form-group"><div class="flex gap-2"><input id="cat-new" placeholder="新分类名称"><button class="btn btn-primary btn-sm" onclick="addCategory()">添加</button></div></div>
+    <table><thead><tr><th>分类名称</th><th>排序</th><th>操作</th></tr></thead><tbody id="cat-body">
+    ${DB.categories.slice().sort((a,b)=>a.sort-b.sort).map(c=>`<tr><td>${c.name}</td><td>${c.sort}</td><td><a class="danger" onclick="delCategory('${c.id}')">删除</a></td></tr>`).join('')}
+    </tbody></table>`, null, 'modal-sm');
+}
+function addCategory(){
+  const name = document.getElementById('cat-new').value.trim();
+  if(!name) return;
+  DB.categories.push({id:uid(),name,sort:DB.categories.length+1});
+  saveData(DB); showCategoryModal();
+}
+function delCategory(id){
+  if(DB.products.some(p=>p.categoryId===id)){ alert('该分类下有商品，无法删除'); return; }
+  DB.categories = DB.categories.filter(c=>c.id!==id);
+  saveData(DB); showCategoryModal();
+}
+
+/* ==================== CUSTOMERS ==================== */
+function renderCustomers(){
+  return `<div class="card"><div class="card-body">
+    <div class="toolbar">
+      <div class="search"><span class="s-ico">🔍</span><input id="cu-search" placeholder="搜索客户名称/电话"></div>
+      <button class="btn btn-primary btn-sm" onclick="showCustomerModal()">+ 新增客户</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>客户名称</th><th>电话</th><th>类型</th><th>等级</th><th>应收余额</th><th>备注</th><th>操作</th></tr></thead>
+      <tbody id="cu-tbody">
+        ${DB.customers.map(c=>`<tr>
+          <td class="font-bold">${c.name}</td><td>${c.phone}</td>
+          <td><span class="tag ${c.type==='批发'?'tag-info':'tag-muted'}">${c.type}</span></td>
+          <td><span class="tag ${c.level==='VIP'?'tag-warning':'tag-muted'}">${c.level}</span></td>
+          <td class="${c.receivable>0?'text-danger font-bold':''}">${money(c.receivable)}</td>
+          <td class="text-xs text-muted">${c.remark||'-'}</td>
+          <td><div class="action-btns"><a onclick="showCustomerModal('${c.id}')">编辑</a><a class="danger" onclick="delCustomer('${c.id}')">删除</a></div></td>
+        </tr>`).join('') || `<tr><td colspan="7" class="empty">暂无客户</td></tr>`}
+      </tbody>
+    </table></div>
+  </div></div>`;
+}
+routes.customers.bind = function(){
+  const inp = document.getElementById('cu-search');
+  if(inp) inp.oninput = ()=>{ document.querySelectorAll('#cu-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(inp.value.toLowerCase())?'':'none'); };
+};
+function showCustomerModal(id){
+  const c = id? getCustomer(id) : {name:'',phone:'',type:'零售',level:'普通',remark:''};
+  showModal(`<h3>${id?'编辑':'新增'}客户</h3>
+    <div class="form-row">
+      <div class="form-group form-row-full"><label>客户名称 *</label><input id="cu-name" value="${c.name}"></div>
+      <div class="form-group"><label>电话</label><input id="cu-phone" value="${c.phone}"></div>
+      <div class="form-group"><label>类型</label><select id="cu-type"><option ${c.type==='零售'?'selected':''}>零售</option><option ${c.type==='批发'?'selected':''}>批发</option></select></div>
+      <div class="form-group"><label>等级</label><select id="cu-level"><option ${c.level==='普通'?'selected':''}>普通</option><option ${c.level==='VIP'?'selected':''}>VIP</option></select></div>
+      <div class="form-group form-row-full"><label>备注</label><textarea id="cu-remark" rows="2">${c.remark||''}</textarea></div>
+    </div>`, ()=>{
+    const name = document.getElementById('cu-name').value.trim();
+    if(!name){ alert('请输入客户名称'); return false; }
+    const data = {name, phone:document.getElementById('cu-phone').value.trim(), type:document.getElementById('cu-type').value, level:document.getElementById('cu-level').value, remark:document.getElementById('cu-remark').value.trim()};
+    if(id){ Object.assign(getCustomer(id), data); } else { DB.customers.push({id:uid(),receivable:0,...data}); }
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function delCustomer(id){ if(!confirm('确定删除该客户？')) return; DB.customers=DB.customers.filter(c=>c.id!==id); saveData(DB); render(); }
+
+/* ==================== SUPPLIERS ==================== */
+function renderSuppliers(){
+  return `<div class="card"><div class="card-body">
+    <div class="toolbar">
+      <div class="search"><span class="s-ico">🔍</span><input id="su-search" placeholder="搜索供应商名称/电话"></div>
+      <button class="btn btn-primary btn-sm" onclick="showSupplierModal()">+ 新增供应商</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>供应商名称</th><th>电话</th><th>联系人</th><th>应付余额</th><th>备注</th><th>操作</th></tr></thead>
+      <tbody id="su-tbody">
+        ${DB.suppliers.map(s=>`<tr>
+          <td class="font-bold">${s.name}</td><td>${s.phone}</td><td>${s.contact||'-'}</td>
+          <td class="${s.payable>0?'text-danger font-bold':''}">${money(s.payable)}</td>
+          <td class="text-xs text-muted">${s.remark||'-'}</td>
+          <td><div class="action-btns"><a onclick="showSupplierModal('${s.id}')">编辑</a><a class="danger" onclick="delSupplier('${s.id}')">删除</a></div></td>
+        </tr>`).join('') || `<tr><td colspan="6" class="empty">暂无供应商</td></tr>`}
+      </tbody>
+    </table></div>
+  </div></div>`;
+}
+routes.suppliers.bind = function(){
+  const inp = document.getElementById('su-search');
+  if(inp) inp.oninput = ()=>{ document.querySelectorAll('#su-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(inp.value.toLowerCase())?'':'none'); };
+};
+function showSupplierModal(id){
+  const s = id? getSupplier(id) : {name:'',phone:'',contact:'',remark:''};
+  showModal(`<h3>${id?'编辑':'新增'}供应商</h3>
+    <div class="form-row">
+      <div class="form-group form-row-full"><label>供应商名称 *</label><input id="su-name" value="${s.name}"></div>
+      <div class="form-group"><label>电话</label><input id="su-phone" value="${s.phone}"></div>
+      <div class="form-group"><label>联系人</label><input id="su-contact" value="${s.contact||''}"></div>
+      <div class="form-group form-row-full"><label>备注</label><textarea id="su-remark" rows="2">${s.remark||''}</textarea></div>
+    </div>`, ()=>{
+    const name = document.getElementById('su-name').value.trim();
+    if(!name){ alert('请输入供应商名称'); return false; }
+    const data = {name, phone:document.getElementById('su-phone').value.trim(), contact:document.getElementById('su-contact').value.trim(), remark:document.getElementById('su-remark').value.trim()};
+    if(id){ Object.assign(getSupplier(id), data); } else { DB.suppliers.push({id:uid(),payable:0,...data}); }
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function delSupplier(id){ if(!confirm('确定删除该供应商？')) return; DB.suppliers=DB.suppliers.filter(s=>s.id!==id); saveData(DB); render(); }
+
+/* ==================== PURCHASE ==================== */
+function renderPurchase(){
+  const list = DB.purchases.slice().reverse();
+  return `<div class="card"><div class="card-body">
+    <div class="toolbar">
+      <div class="search"><span class="s-ico">🔍</span><input id="pg-search" placeholder="搜索单号/供应商"></div>
+      <button class="btn btn-primary btn-sm" onclick="showPurchaseModal()">+ 新建采购单</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>采购单号</th><th>日期</th><th>供应商</th><th>入库仓库</th><th>商品明细</th><th>金额</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="pg-tbody">
+        ${list.map(p=>`<tr>
+          <td class="font-bold">${p.no}</td><td>${p.date}</td>
+          <td>${getSupplier(p.supplierId)?.name||'-'}</td>
+          <td>${getWarehouse(p.warehouseId)?.name||'-'}</td>
+          <td class="text-xs text-muted">${p.items.map(it=>skuName(it.skuId)+' ×'+it.qty).join('，')}</td>
+          <td class="font-bold">${money(p.amount)}</td>
+          <td><span class="tag ${p.status==='已入库'?'tag-success':'tag-warning'}">${p.status}</span></td>
+          <td><div class="action-btns">
+            ${p.status==='待入库'?`<a onclick="purchaseIn('${p.id}')">入库</a>`:''}
+            <a onclick="showPurchaseModal('${p.id}')">查看</a>
+            <a class="danger" onclick="delPurchase('${p.id}')">删除</a>
+          </div></td>
+        </tr>`).join('') || `<tr><td colspan="8" class="empty">暂无采购单</td></tr>`}
+      </tbody>
+    </table></div>
+  </div></div>`;
+}
+routes.purchase.bind = function(){
+  const inp = document.getElementById('pg-search');
+  if(inp) inp.oninput = ()=>{ document.querySelectorAll('#pg-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(inp.value.toLowerCase())?'':'none'); };
+};
+function showPurchaseModal(id){
+  const p = id? DB.purchases.find(x=>x.id===id) : {date:today(),supplierId:DB.suppliers[0]?.id||'',warehouseId:DB.warehouses[0]?.id||'',items:[],status:'待入库'};
+  const suOpts = DB.suppliers.map(s=>`<option value="${s.id}" ${s.id===p.supplierId?'selected':''}>${s.name}</option>`).join('');
+  const whOpts = DB.warehouses.map(w=>`<option value="${w.id}" ${w.id===p.warehouseId?'selected':''}>${w.name}</option>`).join('');
+  window._editPur = JSON.parse(JSON.stringify(p));
+  window._editPur.id = id || null;
+  window._editPurSerials = {}; // rowIdx -> [serialNo,...]
+  const itemRows = p.items.length? p.items.map((it,i)=>{ window._editPurSerials[i] = it.serials?[...it.serials]:[]; return purItemRow(it,i); }).join('') : purItemRow({skuId:'',qty:1,price:0,serials:[]},0);
+  const viewOnly = id && p.status==='已入库';
+  showModal(`<h3>${id?'查看采购单':'新建采购单'}</h3>
+    <div class="form-row">
+      <div class="form-group"><label>日期</label><input id="pg-date" type="date" value="${p.date}" ${viewOnly?'disabled':''}></div>
+      <div class="form-group"><label>供应商</label><select id="pg-supplier" ${viewOnly?'disabled':''}>${suOpts}</select></div>
+      <div class="form-group"><label>入库仓库 *</label><select id="pg-warehouse" ${viewOnly?'disabled':''}>${whOpts}</select></div>
+    </div>
+    <div class="form-group"><label>商品明细</label>
+      <div class="table-wrap"><table><thead><tr><th>商品规格</th><th>数量</th><th>单价</th><th>小计</th><th>序列号</th><th></th></tr></thead>
+      <tbody id="pg-items">${itemRows}</tbody></table></div>
+      ${!viewOnly?`<button class="btn btn-outline btn-sm mt-2" onclick="addPurItem()">+ 添加商品</button>`:''}
+      <div class="text-right mt-3 font-bold text-lg">合计：<span id="pg-total" class="text-danger">${money(p.amount||0)}</span></div>
+    </div>`, viewOnly?null:()=>savePurchase(), 'modal-lg');
+  if(!viewOnly) bindPurCalc();
+}
+function purItemRow(it,i){
+  const skuOpts = DB.products.flatMap(pr=>pr.skuList.map(sk=>`<option value="${sk.id}" ${sk.id===it.skuId?'selected':''}>${pr.name} - ${sk.spec}${pr.needSerial?' 🔢':''}</option>`)).join('');
+  const needSer = skuNeedSerial(it.skuId);
+  const serials = window._editPurSerials[i] || (it.serials||[]);
+  return `<tr data-idx="${i}">
+    <td style="min-width:200px"><select class="w-full pg-sku" onchange="onPurSkuChange(this)">${skuOpts}</select></td>
+    <td style="width:80px"><input type="number" class="w-full pg-qty" value="${it.qty}" min="1" ${needSer?'readonly style="background:#f1f5f9"':''}></td>
+    <td style="width:100px"><input type="number" class="w-full pg-price" value="${it.price}"></td>
+    <td class="pg-sub">${money((it.qty||0)*(it.price||0))}</td>
+    <td>${needSer?`<button class="btn btn-outline btn-sm" onclick="showPurSerialModal(${i})">序列号(${serials.length})</button>`:'<span class="text-muted text-xs">-</span>'}</td>
+    <td><a class="danger" onclick="this.closest('tr').remove();calcPur()">✕</a></td>
+  </tr>`;
+}
+function onPurSkuChange(sel){
+  const tr = sel.closest('tr');
+  const idx = tr.dataset.idx;
+  const needSer = skuNeedSerial(sel.value);
+  // re-render this row's serial/qty columns
+  const qtyInp = tr.querySelector('.pg-qty');
+  if(needSer){
+    qtyInp.setAttribute('readonly','readonly'); qtyInp.style.background='#f1f5f9';
+    qtyInp.value = (window._editPurSerials[idx]||[]).length;
+  } else {
+    qtyInp.removeAttribute('readonly'); qtyInp.style.background='';
+  }
+  const serials = window._editPurSerials[idx]||[];
+  const td = tr.children[4];
+  td.innerHTML = needSer?`<button class="btn btn-outline btn-sm" onclick="showPurSerialModal(${idx})">序列号(${serials.length})</button>`:'<span class="text-muted text-xs">-</span>';
+  calcPur();
+}
+function addPurItem(){
+  const tb = document.getElementById('pg-items');
+  const idx = tb.children.length;
+  window._editPurSerials[idx] = [];
+  const tr = document.createElement('tr');
+  tr.innerHTML = purItemRow({skuId:DB.products[0]?.skuList[0]?.id||'',qty:1,price:0,serials:[]},idx);
+  tr.dataset.idx = idx;
+  tb.appendChild(tr);
+  bindPurCalc();
+}
+function showPurSerialModal(idx){
+  const serials = window._editPurSerials[idx] || [];
+  const rows = serials.map((s,i)=>`<tr><td><input class="w-full pur-ser" value="${s}"></td><td><a class="danger" onclick="this.closest('tr').remove()">✕</a></td></tr>`).join('');
+  showModal(`<h3>录入序列号</h3>
+    <p class="text-xs text-muted mb-2">每行一个序列号，数量将自动等于序列号条数。</p>
+    <table><thead><tr><th>序列号</th><th></th></tr></thead><tbody id="pur-ser-body">${rows}</tbody></table>
+    <button class="btn btn-outline btn-sm mt-2" onclick="addPurSerRow()">+ 添加一行</button>
+    <button class="btn btn-outline btn-sm mt-2" onclick="pastePurSerials()">批量粘贴（换行分隔）</button>
+  `, ()=>{
+    const arr = Array.from(document.querySelectorAll('.pur-ser')).map(i=>i.value.trim()).filter(Boolean);
+    // dedupe
+    if(new Set(arr).size !== arr.length){ alert('序列号重复，请检查'); return false; }
+    window._editPurSerials[idx] = arr;
+    // update row qty display
+    const tr = document.querySelector(`#pg-items tr[data-idx="${idx}"]`);
+    if(tr){ tr.querySelector('.pg-qty').value = arr.length; tr.children[4].innerHTML = `<button class="btn btn-outline btn-sm" onclick="showPurSerialModal(${idx})">序列号(${arr.length})</button>`; }
+    calcPur();
+    closeModal();
+    return true;
+  });
+}
+function addPurSerRow(){
+  const tb = document.getElementById('pur-ser-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<tr><td><input class="w-full pur-ser" value=""></td><td><a class="danger" onclick="this.closest('tr').remove()">✕</a></td></tr>`;
+  tb.appendChild(tr);
+}
+function pastePurSerials(){
+  const text = prompt('粘贴序列号，每行一个：');
+  if(!text) return;
+  const arr = text.split(/[\n,，]/).map(s=>s.trim()).filter(Boolean);
+  const tb = document.getElementById('pur-ser-body');
+  tb.innerHTML = arr.map(s=>`<tr><td><input class="w-full pur-ser" value="${s}"></td><td><a class="danger" onclick="this.closest('tr').remove()">✕</a></td></tr>`).join('');
+}
+function bindPurCalc(){
+  document.querySelectorAll('.pg-qty,.pg-price').forEach(inp=>inp.oninput=calcPur);
+}
+function calcPur(){
+  let total=0;
+  document.querySelectorAll('#pg-items tr').forEach(tr=>{
+    const q = Number(tr.querySelector('.pg-qty').value)||0;
+    const p = Number(tr.querySelector('.pg-price').value)||0;
+    tr.querySelector('.pg-sub').textContent = money(q*p);
+    total += q*p;
+  });
+  document.getElementById('pg-total').textContent = money(total);
+}
+function savePurchase(){
+  const p = window._editPur;
+  p.date = document.getElementById('pg-date').value;
+  p.supplierId = document.getElementById('pg-supplier').value;
+  p.warehouseId = document.getElementById('pg-warehouse').value;
+  p.items = [];
+  let total = 0;
+  let err = null;
+  document.querySelectorAll('#pg-items tr').forEach(tr=>{
+    if(err) return;
+    const idx = tr.dataset.idx;
+    const skuId = tr.querySelector('.pg-sku').value;
+    const qty = Number(tr.querySelector('.pg-qty').value)||0;
+    const price = Number(tr.querySelector('.pg-price').value)||0;
+    const serials = skuNeedSerial(skuId)? (window._editPurSerials[idx]||[]) : [];
+    if(skuId && qty>0){
+      if(skuNeedSerial(skuId) && serials.length !== qty){ err = `「${skuName(skuId)}」需要序列号管理，序列号数量(${serials.length})必须等于数量(${qty})`; return; }
+      p.items.push({skuId,qty,price,serials}); total += qty*price;
+    }
+  });
+  if(err){ alert(err); return false; }
+  if(!p.items.length){ alert('请添加商品'); return false; }
+  p.amount = total;
+  if(p.id){
+    const idx = DB.purchases.findIndex(x=>x.id===p.id);
+    DB.purchases[idx] = p;
+  } else {
+    p.id = uid();
+    p.no = 'CG'+p.date.replace(/-/g,'')+String(DB.purchases.length+101);
+    p.status = '待入库';
+    p.createdAt = now();
+    DB.purchases.push(p);
+  }
+  saveData(DB); closeModal(); render(); return true;
+}
+function purchaseIn(id){
+  const p = DB.purchases.find(x=>x.id===id);
+  if(!p || p.status==='已入库') return;
+  if(!confirm(`确认入库采购单 ${p.no} 到「${getWarehouse(p.warehouseId)?.name}」？库存将增加。`)) return;
+  p.items.forEach(it=>{
+    addStock(it.skuId, p.warehouseId, it.qty);
+    if(skuNeedSerial(it.skuId) && it.serials){
+      it.serials.forEach(no=>{
+        if(DB.serials.some(s=>s.serialNo===no)){ alert(`序列号 ${no} 已存在，跳过`); return; }
+        DB.serials.push({id:uid(),skuId:it.skuId,serialNo:no,warehouseId:p.warehouseId,status:'在库',purchaseNo:p.no,saleNo:'',createdAt:now()});
+      });
+    }
+  });
+  p.status = '已入库';
+  saveData(DB); render();
+}
+function delPurchase(id){
+  const p = DB.purchases.find(x=>x.id===id);
+  if(p && p.status==='已入库'){ alert('已入库的采购单不可删除'); return; }
+  if(!confirm('确定删除该采购单？')) return;
+  DB.purchases = DB.purchases.filter(x=>x.id!==id);
+  saveData(DB); render();
+}
+
+/* ==================== SALES ==================== */
+function renderSales(){
+  const list = DB.sales.slice().reverse();
+  return `<div class="card"><div class="card-body">
+    <div class="toolbar">
+      <div class="search"><span class="s-ico">🔍</span><input id="sl-search" placeholder="搜索单号/客户"></div>
+      <button class="btn btn-primary btn-sm" onclick="showSaleModal()">+ 新建销售单</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>销售单号</th><th>日期</th><th>客户</th><th>出库仓库</th><th>商品明细</th><th>金额</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="sl-tbody">
+        ${list.map(s=>`<tr>
+          <td class="font-bold">${s.no}</td><td>${s.date}</td>
+          <td>${getCustomer(s.customerId)?.name||'-'}</td>
+          <td>${getWarehouse(s.warehouseId)?.name||'-'}</td>
+          <td class="text-xs text-muted">${s.items.map(it=>skuName(it.skuId)+' ×'+it.qty).join('，')}</td>
+          <td class="font-bold">${money(s.amount)}</td>
+          <td><span class="tag ${s.status==='已完成'?'tag-success':s.status==='已退货'?'tag-muted':'tag-warning'}">${s.status}</span></td>
+          <td><div class="action-btns">
+            ${s.status==='待出库'?`<a onclick="saleOut('${s.id}')">出库</a>`:''}
+            ${s.status==='已完成'?`<a onclick="saleReturn('${s.id}')">退货</a>`:''}
+            <a onclick="showSaleModal('${s.id}')">查看</a>
+            <a class="danger" onclick="delSale('${s.id}')">删除</a>
+          </div></td>
+        </tr>`).join('') || `<tr><td colspan="8" class="empty">暂无销售单</td></tr>`}
+      </tbody>
+    </table></div>
+  </div></div>`;
+}
+routes.sales.bind = function(){
+  const inp = document.getElementById('sl-search');
+  if(inp) inp.oninput = ()=>{ document.querySelectorAll('#sl-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(inp.value.toLowerCase())?'':'none'); };
+};
+function showSaleModal(id){
+  const s = id? DB.sales.find(x=>x.id===id) : {date:today(),customerId:DB.customers[0]?.id||'',warehouseId:DB.warehouses[0]?.id||'',items:[],status:'待出库'};
+  const cuOpts = DB.customers.map(c=>`<option value="${c.id}" ${c.id===s.customerId?'selected':''}>${c.name}</option>`).join('');
+  const whOpts = DB.warehouses.map(w=>`<option value="${w.id}" ${w.id===s.warehouseId?'selected':''}>${w.name}</option>`).join('');
+  window._editSale = JSON.parse(JSON.stringify(s));
+  window._editSale.id = id || null;
+  window._editSaleSerials = {}; // rowIdx -> [serialNo,...]
+  const itemRows = s.items.length? s.items.map((it,i)=>{ window._editSaleSerials[i]=it.serials?[...it.serials]:[]; return saleItemRow(it,i); }).join('') : saleItemRow({skuId:'',qty:1,price:0,serials:[]},0);
+  const viewOnly = id && (s.status==='已完成'||s.status==='已退货');
+  showModal(`<h3>${id?'查看销售单':'新建销售单'}</h3>
+    <div class="form-row">
+      <div class="form-group"><label>日期</label><input id="sl-date" type="date" value="${s.date}" ${viewOnly?'disabled':''}></div>
+      <div class="form-group"><label>客户</label><select id="sl-customer" ${viewOnly?'disabled':''}>${cuOpts}</select></div>
+      <div class="form-group"><label>出库仓库 *</label><select id="sl-warehouse" ${viewOnly?'disabled':''} onchange="refreshSaleStock()">${whOpts}</select></div>
+    </div>
+    <div class="form-group"><label>商品明细</label>
+      <div class="table-wrap"><table><thead><tr><th>商品规格</th><th>仓库库存</th><th>数量</th><th>单价</th><th>小计</th><th>序列号</th><th></th></tr></thead>
+      <tbody id="sl-items">${itemRows}</tbody></table></div>
+      ${!viewOnly?`<button class="btn btn-outline btn-sm mt-2" onclick="addSaleItem()">+ 添加商品</button>`:''}
+      <div class="text-right mt-3 font-bold text-lg">合计：<span id="sl-total" class="text-danger">${money(s.amount||0)}</span></div>
+    </div>`, viewOnly?null:()=>saveSale(), 'modal-lg');
+  if(!viewOnly) bindSaleCalc();
+}
+function saleItemRow(it,i){
+  const skuOpts = DB.products.flatMap(pr=>pr.skuList.map(sk=>`<option value="${sk.id}" ${sk.id===it.skuId?'selected':''}>${pr.name} - ${sk.spec}${pr.needSerial?' 🔢':''}</option>`)).join('');
+  const needSer = skuNeedSerial(it.skuId);
+  const wid = window._editSale.warehouseId;
+  const stock = getSkuWarehouseStock(it.skuId, wid);
+  const serials = window._editSaleSerials[i] || (it.serials||[]);
+  return `<tr data-idx="${i}">
+    <td style="min-width:200px"><select class="w-full sl-sku" onchange="onSaleSkuChange(this)">${skuOpts}</select></td>
+    <td class="sl-stock text-center">${stock}</td>
+    <td style="width:70px"><input type="number" class="w-full sl-qty" value="${it.qty}" min="1" ${needSer?'readonly style="background:#f1f5f9"':''}></td>
+    <td style="width:90px"><input type="number" class="w-full sl-price" value="${it.price}"></td>
+    <td class="sl-sub">${money((it.qty||0)*(it.price||0))}</td>
+    <td>${needSer?`<button class="btn btn-outline btn-sm" onclick="showSaleSerialModal(${i})">序列号(${serials.length})</button>`:'<span class="text-muted text-xs">-</span>'}</td>
+    <td><a class="danger" onclick="this.closest('tr').remove();calcSale()">✕</a></td>
+  </tr>`;
+}
+function refreshSaleStock(){
+  window._editSale.warehouseId = document.getElementById('sl-warehouse').value;
+  document.querySelectorAll('#sl-items tr').forEach(tr=>{
+    const sel = tr.querySelector('.sl-sku');
+    const r = getSku(sel.value);
+    if(r) tr.querySelector('.sl-stock').textContent = getSkuWarehouseStock(sel.value, window._editSale.warehouseId);
+  });
+}
+function onSaleSkuChange(sel){
+  const tr = sel.closest('tr');
+  const idx = tr.dataset.idx;
+  const r = getSku(sel.value);
+  const needSer = r? r.product.needSerial : false;
+  tr.querySelector('.sl-stock').textContent = getSkuWarehouseStock(sel.value, window._editSale.warehouseId);
+  if(!Number(tr.querySelector('.sl-price').value) && r) tr.querySelector('.sl-price').value = r.sku.price;
+  const qtyInp = tr.querySelector('.sl-qty');
+  if(needSer){ qtyInp.setAttribute('readonly','readonly'); qtyInp.style.background='#f1f5f9'; qtyInp.value=(window._editSaleSerials[idx]||[]).length; }
+  else { qtyInp.removeAttribute('readonly'); qtyInp.style.background=''; }
+  const serials = window._editSaleSerials[idx]||[];
+  tr.children[5].innerHTML = needSer?`<button class="btn btn-outline btn-sm" onclick="showSaleSerialModal(${idx})">序列号(${serials.length})</button>`:'<span class="text-muted text-xs">-</span>';
+  calcSale();
+}
+function showSaleSerialModal(idx){
+  const tr = document.querySelector(`#sl-items tr[data-idx="${idx}"]`);
+  const skuId = tr.querySelector('.sl-sku').value;
+  const wid = window._editSale.warehouseId;
+  const available = getAvailableSerials(skuId, wid);
+  const selected = window._editSaleSerials[idx] || [];
+  const rows = available.map(s=>`<tr><td><input type="checkbox" class="sl-ser-cb" value="${s.serialNo}" ${selected.includes(s.serialNo)?'checked':''}></td><td>${s.serialNo}</td><td>${getWarehouse(s.warehouseId)?.name||'-'}</td></tr>`).join('');
+  showModal(`<h3>选择出库序列号</h3>
+    <p class="text-xs text-muted mb-2">商品：${skuName(skuId)} · 仓库：${getWarehouse(wid)?.name} · 可用 ${available.length} 个</p>
+    ${available.length?`<table><thead><tr><th><input type="checkbox" id="sl-ser-all" onchange="document.querySelectorAll('.sl-ser-cb').forEach(c=>c.checked=this.checked)"></th><th>序列号</th><th>仓库</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">该仓库无可用序列号</div>'}
+  `, ()=>{
+    const arr = Array.from(document.querySelectorAll('.sl-ser-cb:checked')).map(c=>c.value);
+    window._editSaleSerials[idx] = arr;
+    tr.querySelector('.sl-qty').value = arr.length;
+    tr.children[5].innerHTML = `<button class="btn btn-outline btn-sm" onclick="showSaleSerialModal(${idx})">序列号(${arr.length})</button>`;
+    calcSale();
+    closeModal();
+    return true;
+  }, 'modal-lg');
+}
+function addSaleItem(){
+  const tb = document.getElementById('sl-items');
+  const idx = tb.children.length;
+  window._editSaleSerials[idx] = [];
+  const tr = document.createElement('tr');
+  const first = DB.products[0]?.skuList[0];
+  tr.innerHTML = saleItemRow({skuId:first?.id||'',qty:1,price:first?.price||0,serials:[]},idx);
+  tr.dataset.idx = idx;
+  tb.appendChild(tr);
+  bindSaleCalc();
+}
+function bindSaleCalc(){
+  document.querySelectorAll('.sl-qty,.sl-price').forEach(inp=>inp.oninput=calcSale);
+}
+function calcSale(){
+  let total=0;
+  document.querySelectorAll('#sl-items tr').forEach(tr=>{
+    const q = Number(tr.querySelector('.sl-qty').value)||0;
+    const p = Number(tr.querySelector('.sl-price').value)||0;
+    tr.querySelector('.sl-sub').textContent = money(q*p);
+    total += q*p;
+  });
+  document.getElementById('sl-total').textContent = money(total);
+}
+function saveSale(){
+  const s = window._editSale;
+  s.date = document.getElementById('sl-date').value;
+  s.customerId = document.getElementById('sl-customer').value;
+  s.warehouseId = document.getElementById('sl-warehouse').value;
+  s.items = [];
+  let total = 0;
+  for(const tr of document.querySelectorAll('#sl-items tr')){
+    const idx = tr.dataset.idx;
+    const skuId = tr.querySelector('.sl-sku').value;
+    const qty = Number(tr.querySelector('.sl-qty').value)||0;
+    const price = Number(tr.querySelector('.sl-price').value)||0;
+    const serials = skuNeedSerial(skuId)? (window._editSaleSerials[idx]||[]) : [];
+    if(skuId && qty>0){
+      const whStock = getSkuWarehouseStock(skuId, s.warehouseId);
+      if(qty > whStock){ alert(`「${skuName(skuId)}」在「${getWarehouse(s.warehouseId)?.name}」库存不足，当前 ${whStock}`); return false; }
+      if(skuNeedSerial(skuId) && serials.length !== qty){ alert(`「${skuName(skuId)}」需要选择 ${qty} 个序列号，当前选了 ${serials.length} 个`); return false; }
+      s.items.push({skuId,qty,price,serials}); total += qty*price;
+    }
+  }
+  if(!s.items.length){ alert('请添加商品'); return false; }
+  s.amount = total;
+  if(s.id){
+    const idx = DB.sales.findIndex(x=>x.id===s.id);
+    DB.sales[idx] = s;
+  } else {
+    s.id = uid();
+    s.no = 'XS'+s.date.replace(/-/g,'')+String(DB.sales.length+101);
+    s.status = '待出库';
+    s.createdAt = now();
+    DB.sales.push(s);
+  }
+  saveData(DB); closeModal(); render(); return true;
+}
+function saleOut(id){
+  const s = DB.sales.find(x=>x.id===id);
+  if(!s || s.status!=='待出库') return;
+  if(!confirm(`确认从「${getWarehouse(s.warehouseId)?.name}」出库销售单 ${s.no}？库存将扣减，客户应收增加。`)) return;
+  for(const it of s.items){
+    const whStock = getSkuWarehouseStock(it.skuId, s.warehouseId);
+    if(whStock < it.qty){ alert(`「${skuName(it.skuId)}」库存不足`); return; }
+    if(skuNeedSerial(it.skuId)){
+      // verify all selected serials are available
+      for(const no of (it.serials||[])){
+        const ser = DB.serials.find(sr=>sr.serialNo===no);
+        if(!ser || ser.status!=='在库' || ser.warehouseId!==s.warehouseId){ alert(`序列号 ${no} 不可用`); return; }
+      }
+    }
+  }
+  s.items.forEach(it=>{
+    subStock(it.skuId, s.warehouseId, it.qty);
+    if(skuNeedSerial(it.skuId) && it.serials){
+      it.serials.forEach(no=>{
+        const ser = DB.serials.find(sr=>sr.serialNo===no);
+        if(ser){ ser.status='已售出'; ser.saleNo=s.no; }
+      });
+    }
+  });
+  const cu = getCustomer(s.customerId);
+  if(cu) cu.receivable += s.amount;
+  s.status = '已完成';
+  saveData(DB); render();
+}
+function saleReturn(id){
+  const s = DB.sales.find(x=>x.id===id);
+  if(!s) return;
+  if(!confirm(`确认对销售单 ${s.no} 退货？库存将退回，客户应收将减少。`)) return;
+  s.items.forEach(it=>{
+    addStock(it.skuId, s.warehouseId, it.qty);
+    if(skuNeedSerial(it.skuId) && it.serials){
+      it.serials.forEach(no=>{
+        const ser = DB.serials.find(sr=>sr.serialNo===no);
+        if(ser){ ser.status='在库'; ser.saleNo=''; }
+      });
+    }
+  });
+  const cu = getCustomer(s.customerId);
+  if(cu) cu.receivable = Math.max(0, cu.receivable - s.amount);
+  s.status = '已退货';
+  saveData(DB); render();
+}
+function delSale(id){
+  const s = DB.sales.find(x=>x.id===id);
+  if(s && (s.status==='已完成'||s.status==='已退货')){ alert('已完成/已退货的销售单不可删除，请使用退货'); return; }
+  if(!confirm('确定删除该销售单？')) return;
+  DB.sales = DB.sales.filter(x=>x.id!==id);
+  saveData(DB); render();
+}
+
+/* ==================== STOCK ==================== */
+let _stockFilter = 'all';
+let _stockWarehouse = 'all';
+function renderStock(){
+  const all = [];
+  DB.products.forEach(p=>p.skuList.forEach(sk=>all.push({product:p,sku:sk})));
+  const totalStockQty = totalStock();
+  const totalVal = stockValue();
+  const lowCount = all.filter(x=>getSkuTotalStock(x.sku.id)<=x.sku.minStock).length;
+  const outCount = all.filter(x=>getSkuTotalStock(x.sku.id)===0).length;
+
+  // warehouse filter for table
+  const showWh = _stockWarehouse==='all'? DB.warehouses : DB.warehouses.filter(w=>w.id===_stockWarehouse);
+  const whCols = showWh.map(w=>`<th>${w.name}</th>`).join('');
+
+  const filtered = all.filter(x=>{
+    if(_stockFilter==='low') return getSkuTotalStock(x.sku.id)<=x.sku.minStock;
+    if(_stockFilter==='out') return getSkuTotalStock(x.sku.id)===0;
+    return true;
+  });
+
+  const whOpts = DB.warehouses.map(w=>`<option value="${w.id}" ${_stockWarehouse===w.id?'selected':''}>${w.name}</option>`).join('');
+
+  return `<div class="card"><div class="card-body">
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="s-icon" style="background:#6366f1">📦</div><div><div class="s-label">库存总量</div><div class="s-value">${totalStockQty}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#10b981">💰</div><div><div class="s-label">库存价值</div><div class="s-value">${money(totalVal)}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#f59e0b">⚠️</div><div><div class="s-label">预警商品</div><div class="s-value">${lowCount}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#ef4444">🚫</div><div><div class="s-label">缺货商品</div><div class="s-value">${outCount}</div></div></div>
+    </div>
+    <div class="toolbar" style="flex-wrap:wrap">
+      <div class="flex gap-2" style="flex-wrap:wrap">
+        <button class="btn btn-sm ${_stockFilter==='all'?'btn-primary':'btn-outline'}" onclick="_stockFilter='all';render()">全部</button>
+        <button class="btn btn-sm ${_stockFilter==='low'?'btn-primary':'btn-outline'}" onclick="_stockFilter='low';render()">库存预警</button>
+        <button class="btn btn-sm ${_stockFilter==='out'?'btn-primary':'btn-outline'}" onclick="_stockFilter='out';render()">缺货</button>
+      </div>
+      <select class="btn btn-outline btn-sm" onchange="_stockWarehouse=this.value;render()" style="background:#fff">
+        <option value="all" ${_stockWarehouse==='all'?'selected':''}>全部仓库</option>
+        ${whOpts}
+      </select>
+      <div class="search"><span class="s-ico">🔍</span><input id="st-search" placeholder="搜索商品/规格/条码"></div>
+      <button class="btn btn-outline btn-sm" onclick="showCheckModal()">库存盘点</button>
+      <button class="btn btn-primary btn-sm" onclick="showTransferModal()">仓库调拨</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>商品</th><th>规格</th><th>条码</th><th>成本</th><th>售价</th>${whCols}<th>合计</th><th>序列号</th><th>操作</th></tr></thead>
+      <tbody id="st-tbody">
+        ${filtered.map(x=>{
+          const total = getSkuTotalStock(x.sku.id);
+          return `<tr>
+            <td class="font-bold">${x.product.name}</td><td>${x.sku.spec}</td><td class="text-xs text-muted">${x.sku.barcode||'-'}</td>
+            <td>${fmt(x.sku.cost)}</td><td>${fmt(x.sku.price)}</td>
+            ${showWh.map(w=>{ const q=getSkuWarehouseStock(x.sku.id,w.id); return `<td class="${q<=x.sku.minStock?'text-danger font-bold':''}">${q}</td>`; }).join('')}
+            <td class="font-bold ${total<=x.sku.minStock?'text-danger':''}">${total}</td>
+            <td>${x.product.needSerial?`<a onclick="showSerialsModal('${x.sku.id}')">${getAllSerials(x.sku.id).length}条</a>`:'<span class="text-muted">-</span>'}</td>
+            <td><div class="action-btns"><a onclick="showCheckModal('${x.sku.id}')">盘点</a></div></td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="${6+showWh.length}" class="empty">暂无数据</td></tr>`}
+      </tbody>
+    </table></div>
+
+    ${DB.transfers.length?`<div class="card mt-3"><div class="card-header"><h3>调拨记录</h3></div><div class="card-body"><div class="table-wrap"><table>
+      <thead><tr><th>调拨单号</th><th>日期</th><th>调出仓库</th><th>调入仓库</th><th>商品明细</th><th>状态</th></tr></thead><tbody>
+      ${DB.transfers.slice().reverse().map(t=>`<tr>
+        <td class="font-bold">${t.no}</td><td>${t.date}</td>
+        <td>${getWarehouse(t.fromWarehouseId)?.name||'-'}</td>
+        <td>${getWarehouse(t.toWarehouseId)?.name||'-'}</td>
+        <td class="text-xs text-muted">${t.items.map(it=>skuName(it.skuId)+' ×'+it.qty).join('，')}</td>
+        <td><span class="tag tag-success">${t.status}</span></td>
+      </tr>`).join('')}
+    </tbody></table></div></div></div>`:''}
+
+    ${DB.checks.length?`<div class="card mt-3"><div class="card-header"><h3>盘点记录</h3></div><div class="card-body"><div class="table-wrap"><table>
+      <thead><tr><th>盘点单号</th><th>日期</th><th>仓库</th><th>商品</th><th>规格</th><th>账面</th><th>实盘</th><th>盈亏</th></tr></thead><tbody>
+      ${DB.checks.slice().reverse().slice(0,20).map(c=>`<tr><td>${c.no}</td><td>${c.date}</td><td>${getWarehouse(c.warehouseId)?.name||'-'}</td><td>${c.productName}</td><td>${c.spec}</td><td>${c.before}</td><td>${c.after}</td><td class="${c.diff>0?'text-success':c.diff<0?'text-danger':''}">${c.diff>0?'+':''}${c.diff}</td></tr>`).join('')}
+    </tbody></table></div></div></div>`:''}
+  </div></div>`;
+}
+routes.stock.bind = function(){
+  const inp = document.getElementById('st-search');
+  if(inp) inp.oninput = ()=>{ document.querySelectorAll('#st-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(inp.value.toLowerCase())?'':'none'); };
+};
+function showCheckModal(skuId){
+  const r = skuId? getSku(skuId) : null;
+  const defWh = DB.warehouses[0]?.id||'';
+  const skuOpts = DB.products.flatMap(pr=>pr.skuList.map(sk=>`<option value="${sk.id}" ${skuId===sk.id?'selected':''}>${pr.name} - ${sk.spec}</option>`)).join('');
+  const whOpts = DB.warehouses.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
+  showModal(`<h3>库存盘点</h3>
+    <div class="form-row">
+      <div class="form-group"><label>仓库 *</label><select id="ck-warehouse" onchange="refreshCheckBefore()">${whOpts}</select></div>
+      <div class="form-group form-row-full"><label>选择商品规格</label><select id="ck-sku" onchange="refreshCheckBefore()">${skuOpts}</select></div>
+      <div class="form-group"><label>账面库存</label><input id="ck-before" type="number" value="${r? getSkuWarehouseStock(r.sku.id,defWh):0}" readonly></div>
+      <div class="form-group"><label>实际盘点数 *</label><input id="ck-after" type="number" value="${r? getSkuWarehouseStock(r.sku.id,defWh):0}"></div>
+    </div>`, ()=>{
+    const sid = document.getElementById('ck-sku').value;
+    const wid = document.getElementById('ck-warehouse').value;
+    const after = Number(document.getElementById('ck-after').value);
+    const res = getSku(sid);
+    if(!res) return false;
+    const before = getSkuWarehouseStock(sid, wid);
+    const diff = after - before;
+    setSkuWarehouseStock(sid, wid, after);
+    DB.checks.push({id:uid(),no:'PD'+today().replace(/-/g,'')+String(DB.checks.length+1),date:today(),warehouseId:wid,skuId:sid,productName:res.product.name,spec:res.sku.spec,before,after,diff,createdAt:now()});
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function refreshCheckBefore(){
+  const sid = document.getElementById('ck-sku').value;
+  const wid = document.getElementById('ck-warehouse').value;
+  const v = getSkuWarehouseStock(sid, wid);
+  document.getElementById('ck-before').value = v;
+  document.getElementById('ck-after').value = v;
+}
+function showTransferModal(){
+  const whOpts = DB.warehouses.map(w=>`<option value="${w.id}">${w.name}</option>`).join('');
+  window._transferItems = [{skuId:DB.products[0]?.skuList[0]?.id||'', qty:1, serials:[]}];
+  renderTransferItems();
+  showModal(`<h3>仓库调拨</h3>
+    <div class="form-row">
+      <div class="form-group"><label>调出仓库 *</label><select id="tf-from">${whOpts}</select></div>
+      <div class="form-group"><label>调入仓库 *</label><select id="tf-to">${DB.warehouses.slice(1).concat(DB.warehouses.slice(0,1)).map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select></div>
+      <div class="form-group"><label>日期</label><input id="tf-date" type="date" value="${today()}"></div>
+    </div>
+    <div class="form-group"><label>调拨商品</label>
+      <div class="table-wrap"><table><thead><tr><th>商品规格</th><th>调出仓库存</th><th>数量</th><th>序列号</th><th></th></tr></thead>
+      <tbody id="tf-items"></tbody></table></div>
+      <button class="btn btn-outline btn-sm mt-2" onclick="addTransferItem()">+ 添加商品</button>
+    </div>`, ()=>saveTransfer(), 'modal-lg');
+  // bind warehouse change to refresh stock display
+  document.getElementById('tf-from').onchange = renderTransferItems;
+}
+function renderTransferItems(){
+  const fromWh = document.getElementById('tf-from')?.value || DB.warehouses[0]?.id;
+  const tb = document.getElementById('tf-items');
+  if(!tb) return;
+  tb.innerHTML = window._transferItems.map((it,i)=>{
+    const skuOpts = DB.products.flatMap(pr=>pr.skuList.map(sk=>`<option value="${sk.id}" ${sk.id===it.skuId?'selected':''}>${pr.name} - ${sk.spec}${pr.needSerial?' 🔢':''}</option>`)).join('');
+    const needSer = skuNeedSerial(it.skuId);
+    const stock = getSkuWarehouseStock(it.skuId, fromWh);
+    return `<tr data-idx="${i}">
+      <td style="min-width:180px"><select class="w-full tf-sku" onchange="onTfSkuChange(this,${i})">${skuOpts}</select></td>
+      <td class="tf-stock text-center">${stock}</td>
+      <td style="width:70px"><input type="number" class="w-full tf-qty" value="${it.qty}" min="1" ${needSer?'readonly style="background:#f1f5f9"':''}></td>
+      <td>${needSer?`<button class="btn btn-outline btn-sm" onclick="showTfSerialModal(${i})">序列号(${(it.serials||[]).length})</button>`:'<span class="text-muted">-</span>'}</td>
+      <td><a class="danger" onclick="window._transferItems.splice(${i},1);renderTransferItems()">✕</a></td>
+    </tr>`;
+  }).join('');
+}
+function onTfSkuChange(sel,i){
+  const needSer = skuNeedSerial(sel.value);
+  const fromWh = document.getElementById('tf-from').value;
+  window._transferItems[i].skuId = sel.value;
+  if(needSer) window._transferItems[i].serials = window._transferItems[i].serials||[];
+  const tr = sel.closest('tr');
+  tr.querySelector('.tf-stock').textContent = getSkuWarehouseStock(sel.value, fromWh);
+  const qty = tr.querySelector('.tf-qty');
+  if(needSer){ qty.setAttribute('readonly','readonly'); qty.style.background='#f1f5f9'; qty.value=(window._transferItems[i].serials||[]).length; }
+  else { qty.removeAttribute('readonly'); qty.style.background=''; }
+  renderTransferItems();
+}
+function showTfSerialModal(idx){
+  const it = window._transferItems[idx];
+  const fromWh = document.getElementById('tf-from').value;
+  const available = getAvailableSerials(it.skuId, fromWh);
+  const selected = it.serials || [];
+  const rows = available.map(s=>`<tr><td><input type="checkbox" class="tf-ser-cb" value="${s.serialNo}" ${selected.includes(s.serialNo)?'checked':''}></td><td>${s.serialNo}</td></tr>`).join('');
+  showModal(`<h3>选择调拨序列号</h3>
+    <p class="text-xs text-muted mb-2">${skuName(it.skuId)} · 调出仓：${getWarehouse(fromWh)?.name} · 可用 ${available.length}</p>
+    ${available.length?`<table><thead><tr><th><input type="checkbox" onchange="document.querySelectorAll('.tf-ser-cb').forEach(c=>c.checked=this.checked)"></th><th>序列号</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">无可用序列号</div>'}
+  `, ()=>{
+    const arr = Array.from(document.querySelectorAll('.tf-ser-cb:checked')).map(c=>c.value);
+    window._transferItems[idx].serials = arr;
+    window._transferItems[idx].qty = arr.length;
+    renderTransferItems();
+    closeModal();
+    return true;
+  });
+}
+function addTransferItem(){
+  window._transferItems.push({skuId:DB.products[0]?.skuList[0]?.id||'', qty:1, serials:[]});
+  renderTransferItems();
+}
+function saveTransfer(){
+  const fromWh = document.getElementById('tf-from').value;
+  const toWh = document.getElementById('tf-to').value;
+  const date = document.getElementById('tf-date').value;
+  if(fromWh===toWh){ alert('调出和调入仓库不能相同'); return false; }
+  const items = [];
+  let err = null;
+  document.querySelectorAll('#tf-items tr').forEach(tr=>{
+    if(err) return;
+    const skuId = tr.querySelector('.tf-sku').value;
+    const qty = Number(tr.querySelector('.tf-qty').value)||0;
+    const serials = skuNeedSerial(skuId)? (window._transferItems[tr.dataset.idx]?.serials||[]) : [];
+    if(skuId && qty>0){
+      const stock = getSkuWarehouseStock(skuId, fromWh);
+      if(qty>stock){ err = `「${skuName(skuId)}」在调出仓库存不足（${stock}）`; return; }
+      if(skuNeedSerial(skuId) && serials.length!==qty){ err = `「${skuName(skuId)}」需选择 ${qty} 个序列号`; return; }
+      items.push({skuId,qty,serials});
+    }
+  });
+  if(err){ alert(err); return false; }
+  if(!items.length){ alert('请添加调拨商品'); return false; }
+  // execute transfer
+  items.forEach(it=>{
+    subStock(it.skuId, fromWh, it.qty);
+    addStock(it.skuId, toWh, it.qty);
+    if(skuNeedSerial(it.skuId) && it.serials){
+      it.serials.forEach(no=>{
+        const ser = DB.serials.find(s=>s.serialNo===no);
+        if(ser) ser.warehouseId = toWh;
+      });
+    }
+  });
+  DB.transfers.push({id:uid(),no:'DB'+date.replace(/-/g,'')+String(DB.transfers.length+1),date,fromWarehouseId:fromWh,toWarehouseId:toWh,items,status:'已调拨',createdAt:now()});
+  saveData(DB); closeModal(); render(); return true;
+}
+
+/* ==================== FINANCE ==================== */
+let _finTab = 'receivable';
+function renderFinance(){
+  const recv = DB.customers.reduce((s,c)=>s+c.receivable,0);
+  const pay = DB.suppliers.reduce((s,sup)=>s+sup.payable,0);
+  const recvIn = DB.receipts.reduce((s,r)=>s+r.amount,0);
+  const payOut = DB.payments.reduce((s,p)=>s+p.amount,0);
+  const tabs = {
+    receivable: `<div class="card"><div class="card-header"><h3>应收账款（客户欠款）</h3><button class="btn btn-primary btn-sm" onclick="showReceiptModal()">+ 收款</button></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>客户</th><th>类型</th><th>电话</th><th>应收余额</th><th>操作</th></tr></thead><tbody>
+      ${DB.customers.filter(c=>c.receivable>0).map(c=>`<tr><td class="font-bold">${c.name}</td><td>${c.type}</td><td>${c.phone}</td><td class="text-danger font-bold">${money(c.receivable)}</td><td><a onclick="showReceiptModal('${c.id}')">收款</a></td></tr>`).join('') || `<tr><td colspan="5" class="empty">✅ 无应收款</td></tr>`}
+      </tbody></table></div></div></div>`,
+    payable: `<div class="card"><div class="card-header"><h3>应付账款（欠供应商）</h3><button class="btn btn-primary btn-sm" onclick="showPaymentModal()">+ 付款</button></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>供应商</th><th>联系人</th><th>电话</th><th>应付余额</th><th>操作</th></tr></thead><tbody>
+      ${DB.suppliers.filter(s=>s.payable>0).map(s=>`<tr><td class="font-bold">${s.name}</td><td>${s.contact||'-'}</td><td>${s.phone}</td><td class="text-danger font-bold">${money(s.payable)}</td><td><a onclick="showPaymentModal('${s.id}')">付款</a></td></tr>`).join('') || `<tr><td colspan="5" class="empty">✅ 无应付款</td></tr>`}
+      </tbody></table></div></div></div>`,
+    records: `<div class="card"><div class="card-header"><h3>收付款记录</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>单号</th><th>日期</th><th>类型</th><th>往来单位</th><th>金额</th><th>备注</th></tr></thead><tbody>
+      ${[...DB.receipts.map(r=>({...r,type:'收款'})),...DB.payments.map(p=>({...p,type:'付款'}))].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(r=>`<tr>
+        <td>${r.no}</td><td>${r.date}</td><td><span class="tag ${r.type==='收款'?'tag-success':'tag-warning'}">${r.type}</span></td>
+        <td>${r.partnerName}</td><td class="font-bold ${r.type==='收款'?'text-success':'text-danger'}">${r.type==='收款'?'+':'-'}${money(r.amount)}</td><td class="text-xs text-muted">${r.remark||'-'}</td>
+      </tr>`).join('') || `<tr><td colspan="6" class="empty">暂无记录</td></tr>`}
+      </tbody></table></div></div></div>`,
+  };
+  return `
+  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-card"><div class="s-icon" style="background:#dc2626">📥</div><div><div class="s-label">应收总额</div><div class="s-value">${money(recv)}</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#d97706">📤</div><div><div class="s-label">应付总额</div><div class="s-value">${money(pay)}</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#16a34a">💰</div><div><div class="s-label">累计收款</div><div class="s-value">${money(recvIn)}</div></div></div>
+    <div class="stat-card"><div class="s-icon" style="background:#0891b2">💸</div><div><div class="s-label">累计付款</div><div class="s-value">${money(payOut)}</div></div></div>
+  </div>
+  <div class="flex gap-2 mb-3">
+    <button class="btn btn-sm ${_finTab==='receivable'?'btn-primary':'btn-outline'}" onclick="_finTab='receivable';render()">应收账款</button>
+    <button class="btn btn-sm ${_finTab==='payable'?'btn-primary':'btn-outline'}" onclick="_finTab='payable';render()">应付账款</button>
+    <button class="btn btn-sm ${_finTab==='records'?'btn-primary':'btn-outline'}" onclick="_finTab='records';render()">收付款记录</button>
+  </div>
+  ${tabs[_finTab]}`;
+}
+function showReceiptModal(customerId){
+  const cuOpts = DB.customers.map(c=>`<option value="${c.id}" ${c.id===customerId?'selected':''}>${c.name} (应收:${money(c.receivable)})</option>`).join('');
+  showModal(`<h3>客户收款</h3>
+    <div class="form-row">
+      <div class="form-group"><label>客户</label><select id="rp-customer">${cuOpts}</select></div>
+      <div class="form-group"><label>收款金额 *</label><input id="rp-amount" type="number" placeholder="0.00"></div>
+      <div class="form-group"><label>日期</label><input id="rp-date" type="date" value="${today()}"></div>
+      <div class="form-group form-row-full"><label>备注</label><input id="rp-remark" placeholder="如：现金/微信/银行转账"></div>
+    </div>`, ()=>{
+    const cid = document.getElementById('rp-customer').value;
+    const amount = Number(document.getElementById('rp-amount').value);
+    if(!amount || amount<=0){ alert('请输入收款金额'); return false; }
+    const c = getCustomer(cid);
+    c.receivable = Math.max(0, c.receivable - amount);
+    DB.receipts.push({id:uid(),no:'SK'+today().replace(/-/g,'')+String(DB.receipts.length+1),date:document.getElementById('rp-date').value,customerId:cid,partnerName:c.name,amount,remark:document.getElementById('rp-remark').value,createdAt:now()});
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function showPaymentModal(supplierId){
+  const suOpts = DB.suppliers.map(s=>`<option value="${s.id}" ${s.id===supplierId?'selected':''}>${s.name} (应付:${money(s.payable)})</option>`).join('');
+  showModal(`<h3>供应商付款</h3>
+    <div class="form-row">
+      <div class="form-group"><label>供应商</label><select id="pm-su">${suOpts}</select></div>
+      <div class="form-group"><label>付款金额 *</label><input id="pm-amount" type="number" placeholder="0.00"></div>
+      <div class="form-group"><label>日期</label><input id="pm-date" type="date" value="${today()}"></div>
+      <div class="form-group form-row-full"><label>备注</label><input id="pm-remark" placeholder="如：银行转账"></div>
+    </div>`, ()=>{
+    const sid = document.getElementById('pm-su').value;
+    const amount = Number(document.getElementById('pm-amount').value);
+    if(!amount || amount<=0){ alert('请输入付款金额'); return false; }
+    const s = getSupplier(sid);
+    s.payable = Math.max(0, s.payable - amount);
+    DB.payments.push({id:uid(),no:'FK'+today().replace(/-/g,'')+String(DB.payments.length+1),date:document.getElementById('pm-date').value,supplierId:sid,partnerName:s.name,amount,remark:document.getElementById('pm-remark').value,createdAt:now()});
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+
+/* ==================== REPORT ==================== */
+let _rptTab = 'sales';
+function renderReport(){
+  const completedSales = DB.sales.filter(s=>s.status==='已完成');
+  const totalSales = completedSales.reduce((s,x)=>s+x.amount,0);
+  // cost: sum of items qty * sku.cost
+  const totalCost = completedSales.reduce((sum,s)=>sum + s.items.reduce((a,it)=>{ const r=getSku(it.skuId); return a + it.qty*(r?r.sku.cost:0); },0),0);
+  const totalProfit = totalSales - totalCost;
+  const profitRate = totalSales? (totalProfit/totalSales*100).toFixed(1) : 0;
+
+  // sales by product
+  const bySku = {};
+  completedSales.forEach(s=>s.items.forEach(it=>{
+    if(!bySku[it.skuId]) bySku[it.skuId]={qty:0,amount:0,cost:0};
+    const r=getSku(it.skuId);
+    bySku[it.skuId].qty += it.qty;
+    bySku[it.skuId].amount += it.qty*it.price;
+    bySku[it.skuId].cost += it.qty*(r?r.sku.cost:0);
+  }));
+  const topProducts = Object.entries(bySku).map(([id,d])=>({name:skuName(id),...d,profit:d.amount-d.cost})).sort((a,b)=>b.amount-a.amount);
+
+  // sales by customer
+  const byCu = {};
+  completedSales.forEach(s=>{ if(!byCu[s.customerId]) byCu[s.customerId]={amount:0,count:0}; byCu[s.customerId].amount+=s.amount; byCu[s.customerId].count++; });
+  const topCustomers = Object.entries(byCu).map(([id,d])=>({name:getCustomer(id)?.name||'-',...d})).sort((a,b)=>b.amount-a.amount);
+
+  // purchase stats
+  const inPurchases = DB.purchases.filter(p=>p.status==='已入库');
+  const totalPurchase = inPurchases.reduce((s,x)=>s+x.amount,0);
+
+  const tabs = {
+    sales: `<div class="card"><div class="card-header"><h3>商品销售排行</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>排名</th><th>商品规格</th><th>销量</th><th>销售额</th><th>成本</th><th>毛利</th><th>毛利率</th></tr></thead><tbody>
+      ${topProducts.map((p,i)=>`<tr>
+        <td>${i+1}</td><td class="font-bold">${p.name}</td><td>${p.qty}</td>
+        <td>${money(p.amount)}</td><td>${money(p.cost)}</td>
+        <td class="${p.profit>=0?'text-success':'text-danger'} font-bold">${money(p.profit)}</td>
+        <td>${p.amount?((p.profit/p.amount*100).toFixed(1)):0}%</td>
+      </tr>`).join('') || `<tr><td colspan="7" class="empty">暂无销售数据</td></tr>`}
+      </tbody></table></div></div></div>
+      <div class="card mt-3"><div class="card-header"><h3>客户销售排行</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>排名</th><th>客户</th><th>订单数</th><th>销售额</th></tr></thead><tbody>
+      ${topCustomers.map((c,i)=>`<tr><td>${i+1}</td><td class="font-bold">${c.name}</td><td>${c.count}</td><td class="font-bold">${money(c.amount)}</td></tr>`).join('') || `<tr><td colspan="4" class="empty">暂无数据</td></tr>`}
+      </tbody></table></div></div></div>`,
+    profit: `<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="s-icon" style="background:#2563eb">💰</div><div><div class="s-label">销售总额</div><div class="s-value">${money(totalSales)}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#d97706">📦</div><div><div class="s-label">销售成本</div><div class="s-value">${money(totalCost)}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#16a34a">📈</div><div><div class="s-label">毛利润</div><div class="s-value text-success">${money(totalProfit)}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#0891b2">%</div><div><div class="s-label">毛利率</div><div class="s-value">${profitRate}%</div></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>各商品利润明细</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>商品规格</th><th>销量</th><th>销售额</th><th>成本</th><th>毛利</th></tr></thead><tbody>
+      ${topProducts.map(p=>`<tr><td class="font-bold">${p.name}</td><td>${p.qty}</td><td>${money(p.amount)}</td><td>${money(p.cost)}</td><td class="${p.profit>=0?'text-success':'text-danger'} font-bold">${money(p.profit)}</td></tr>`).join('') || `<tr><td colspan="5" class="empty">暂无数据</td></tr>`}
+      </tbody></table></div></div></div>`,
+    purchase: `<div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="s-icon" style="background:#2563eb">🛒</div><div><div class="s-label">采购总额</div><div class="s-value">${money(totalPurchase)}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#16a34a">📄</div><div><div class="s-label">采购单数</div><div class="s-value">${inPurchases.length}</div></div></div>
+      <div class="stat-card"><div class="s-icon" style="background:#d97706">🏭</div><div><div class="s-label">供应商数</div><div class="s-value">${DB.suppliers.length}</div></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h3>采购明细</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>单号</th><th>日期</th><th>供应商</th><th>金额</th><th>状态</th></tr></thead><tbody>
+      ${inPurchases.slice().reverse().map(p=>`<tr><td>${p.no}</td><td>${p.date}</td><td>${getSupplier(p.supplierId)?.name||'-'}</td><td class="font-bold">${money(p.amount)}</td><td><span class="tag tag-success">${p.status}</span></td></tr>`).join('') || `<tr><td colspan="5" class="empty">暂无采购数据</td></tr>`}
+      </tbody></table></div></div></div>`,
+    stock: `<div class="card"><div class="card-header"><h3>库存价值明细</h3></div><div class="card-body">
+      <div class="table-wrap"><table><thead><tr><th>商品</th><th>规格</th><th>库存</th><th>成本价</th><th>库存价值</th><th>状态</th></tr></thead><tbody>
+      ${DB.products.flatMap(p=>p.skuList.map(sk=>({p,sk}))).map(x=>{ const q=getSkuTotalStock(x.sk.id); return `<tr>
+        <td class="font-bold">${x.p.name}</td><td>${x.sk.spec}</td><td>${q}</td><td>${fmt(x.sk.cost)}</td>
+        <td class="font-bold">${money(q*x.sk.cost)}</td>
+        <td>${q===0?'<span class="tag tag-danger">缺货</span>':q<=x.sk.minStock?'<span class="tag tag-warning">预警</span>':'<span class="tag tag-success">正常</span>'}</td>
+      </tr>`;}).join('')}
+      </tbody></table></div></div></div>`,
+  };
+  return `<div class="flex gap-2 mb-3" style="flex-wrap:wrap">
+    <button class="btn btn-sm ${_rptTab==='sales'?'btn-primary':'btn-outline'}" onclick="_rptTab='sales';render()">销售报表</button>
+    <button class="btn btn-sm ${_rptTab==='profit'?'btn-primary':'btn-outline'}" onclick="_rptTab='profit';render()">利润报表</button>
+    <button class="btn btn-sm ${_rptTab==='purchase'?'btn-primary':'btn-outline'}" onclick="_rptTab='purchase';render()">采购报表</button>
+    <button class="btn btn-sm ${_rptTab==='stock'?'btn-primary':'btn-outline'}" onclick="_rptTab='stock';render()">库存报表</button>
+  </div>${tabs[_rptTab]}`;
+}
+
+/* ==================== SETTINGS ==================== */
+function renderSettings(){
+  const roles = {admin:'管理员',sales:'销售员',buyer:'采购员'};
+  return `<div class="card"><div class="card-header"><h3>用户管理</h3><button class="btn btn-primary btn-sm" onclick="showUserModal()">+ 新增用户</button></div><div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>账号</th><th>姓名</th><th>角色</th><th>电话</th><th>操作</th></tr></thead><tbody>
+      ${DB.users.map(u=>`<tr>
+        <td class="font-bold">${u.username}</td><td>${u.name}</td>
+        <td><span class="tag ${u.role==='admin'?'tag-danger':'tag-info'}">${roles[u.role]||u.role}</span></td>
+        <td>${u.phone}</td>
+        <td><div class="action-btns"><a onclick="showUserModal('${u.id}')">编辑</a>${u.username!=='admin'?`<a class="danger" onclick="delUser('${u.id}')">删除</a>`:''}</div></td>
+      </tr>`).join('')}
+    </tbody></table></div>
+  </div></div>
+  <div class="card mt-3"><div class="card-header"><h3>仓库管理</h3><button class="btn btn-primary btn-sm" onclick="showWarehouseModal()">+ 新增仓库</button></div><div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>仓库名称</th><th>地址</th><th>负责人</th><th>操作</th></tr></thead><tbody>
+      ${DB.warehouses.map(w=>`<tr>
+        <td class="font-bold">${w.name}</td><td>${w.address||'-'}</td><td>${w.manager||'-'}</td>
+        <td><div class="action-btns"><a onclick="showWarehouseModal('${w.id}')">编辑</a>${DB.warehouses.length>1?`<a class="danger" onclick="delWarehouse('${w.id}')">删除</a>`:''}</div></td>
+      </tr>`).join('')}
+    </tbody></table></div>
+  </div></div>
+  <div class="card mt-3"><div class="card-header"><h3>数据管理</h3></div><div class="card-body">
+    <p class="text-muted mb-3">重置所有数据为初始演示数据（将清空你所有的操作记录）。</p>
+    <button class="btn btn-danger btn-sm" onclick="resetData()">重置演示数据</button>
+  </div></div>`;
+}
+function showWarehouseModal(id){
+  const w = id? getWarehouse(id) : {name:'',address:'',manager:''};
+  showModal(`<h3>${id?'编辑':'新增'}仓库</h3>
+    <div class="form-row">
+      <div class="form-group form-row-full"><label>仓库名称 *</label><input id="wh-name" value="${w.name}"></div>
+      <div class="form-group"><label>地址</label><input id="wh-addr" value="${w.address||''}"></div>
+      <div class="form-group"><label>负责人</label><input id="wh-mgr" value="${w.manager||''}"></div>
+    </div>`, ()=>{
+    const name = document.getElementById('wh-name').value.trim();
+    if(!name){ alert('请输入仓库名称'); return false; }
+    const data = {name, address:document.getElementById('wh-addr').value.trim(), manager:document.getElementById('wh-mgr').value.trim()};
+    if(id){ Object.assign(getWarehouse(id), data); } else { DB.warehouses.push({id:uid(),...data}); }
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function delWarehouse(id){
+  if(DB.stocks.some(s=>s.warehouseId===id && s.qty>0)){ alert('该仓库还有库存，无法删除'); return; }
+  if(!confirm('确定删除该仓库？')) return;
+  DB.warehouses = DB.warehouses.filter(w=>w.id!==id);
+  saveData(DB); render();
+}
+function showUserModal(id){
+  const u = id? DB.users.find(x=>x.id===id) : {username:'',password:'',name:'',role:'sales',phone:''};
+  showModal(`<h3>${id?'编辑':'新增'}用户</h3>
+    <div class="form-row">
+      <div class="form-group"><label>账号 *</label><input id="us-user" value="${u.username}" ${id?'readonly':''}></div>
+      <div class="form-group"><label>姓名 *</label><input id="us-name" value="${u.name}"></div>
+      <div class="form-group"><label>密码${id?'（留空不修改）':' *'}</label><input id="us-pass" type="text" value="" placeholder="${id?'不修改请留空':'请输入密码'}"></div>
+      <div class="form-group"><label>角色</label><select id="us-role"><option value="sales" ${u.role==='sales'?'selected':''}>销售员</option><option value="buyer" ${u.role==='buyer'?'selected':''}>采购员</option><option value="admin" ${u.role==='admin'?'selected':''}>管理员</option></select></div>
+      <div class="form-group form-row-full"><label>电话</label><input id="us-phone" value="${u.phone}"></div>
+    </div>`, ()=>{
+    const username = document.getElementById('us-user').value.trim();
+    const name = document.getElementById('us-name').value.trim();
+    if(!username || !name){ alert('请填写账号和姓名'); return false; }
+    const data = {name, role:document.getElementById('us-role').value, phone:document.getElementById('us-phone').value.trim()};
+    const pass = document.getElementById('us-pass').value;
+    if(id){
+      const user = DB.users.find(x=>x.id===id);
+      Object.assign(user, data);
+      if(pass) user.password = pass;
+    } else {
+      if(DB.users.some(x=>x.username===username)){ alert('账号已存在'); return false; }
+      if(!pass){ alert('请输入密码'); return false; }
+      DB.users.push({id:uid(),username,password:pass,...data});
+    }
+    saveData(DB); closeModal(); render(); return true;
+  });
+}
+function delUser(id){ if(!confirm('确定删除该用户？')) return; DB.users=DB.users.filter(u=>u.id!==id); saveData(DB); render(); }
+
+function placeholder(t){ return `<div class="card"><div class="card-body text-center text-muted" style="padding:60px">${t} 模块开发中...</div></div>`; }
+
+/* ==================== START ==================== */
+render();
+</script>
+</body>
+</html>
