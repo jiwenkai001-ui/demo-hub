@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>登录 · 鲜邻便利店进销存</title>
+<style>
+:root {
+  --primary: #f97316; --primary-deep: #ea580c;
+  --ink: #1c1917; --muted: #a8a29e; --border: #e7e0d8;
+  --bg: #faf7f2; --card: #ffffff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--ink); min-height: 100vh;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  position: relative; overflow: hidden;
+}
+/* 背景装饰 */
+.blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .5; pointer-events: none; }
+.blob-1 { width: 420px; height: 420px; background: #fed7aa; top: -120px; left: -100px; animation: float 22s ease-in-out infinite; }
+.blob-2 { width: 380px; height: 380px; background: #fde68a; bottom: -120px; right: -80px; animation: float 26s ease-in-out infinite reverse; }
+@keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(24px,-20px); } }
+
+.login-card {
+  position: relative; z-index: 1; width: 100%; max-width: 400px;
+  background: var(--card); border-radius: 24px; padding: 36px 30px 30px;
+  box-shadow: 0 24px 64px rgba(28,25,23,0.12); border: 1px solid var(--border);
+  animation: cardIn .4s ease;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+.brand { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 26px; text-align: center; }
+.brand-logo {
+  width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, #fb923c, #ea580c);
+  color: #fff; font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 24px rgba(249,115,22,.35);
+}
+.brand h1 { font-size: 22px; letter-spacing: .5px; }
+.brand p { font-size: 13px; color: var(--muted); }
+
+.form-item { margin-bottom: 16px; }
+.form-item label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #44403c; }
+.input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px;
+  background: #fdfbf8; transition: border-color .15s, box-shadow .15s;
+}
+.input-wrap:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+.input-wrap .ic { font-size: 16px; }
+.input-wrap input {
+  flex: 1; border: none; background: none; outline: none;
+  padding: 12px 0; font-size: 15px; color: var(--ink); min-width: 0;
+}
+.pwd-toggle { border: none; background: none; cursor: pointer; font-size: 14px; color: var(--muted); padding: 4px; }
+.field-err { display: none; color: #dc2626; font-size: 12px; margin-top: 5px; }
+.form-item.error .input-wrap { border-color: #dc2626; }
+.form-item.error .field-err { display: block; }
+
+.login-row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 18px; font-size: 13px; }
+.remember { display: flex; align-items: center; gap: 6px; color: #57534e; cursor: pointer; }
+.remember input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+.forgot { color: var(--primary-deep); text-decoration: none; cursor: pointer; }
+
+.btn-login {
+  width: 100%; padding: 13px; border: none; border-radius: 12px; cursor: pointer;
+  background: linear-gradient(135deg, #fb923c, #f97316); color: #fff;
+  font-size: 16px; font-weight: 700; letter-spacing: 4px;
+  box-shadow: 0 8px 20px rgba(249,115,22,.35); transition: transform .15s, box-shadow .15s, opacity .15s;
+}
+.btn-login:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(249,115,22,.42); }
+.btn-login:active { transform: none; }
+.btn-login:disabled { opacity: .6; cursor: wait; transform: none; }
+
+.demo-tip {
+  margin-top: 20px; padding: 10px 14px; border-radius: 10px;
+  background: #fff7ed; border: 1px dashed #fdba74;
+  font-size: 12.5px; color: #9a3412; text-align: center; line-height: 1.7;
+}
+.demo-tip b { color: #c2410c; }
+.error-toast {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-8px);
+  background: #1c1917; color: #fff; font-size: 13.5px; padding: 10px 18px;
+  border-radius: 10px; opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 99;
+}
+.error-toast.show { opacity: 1; transform: translateX(-50%); }
+@media (max-width: 420px) {
+  .login-card { padding: 30px 22px 24px; border-radius: 20px; }
+  .brand h1 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="error-toast" id="errToast"></div>
+
+<div class="login-card">
+  <div class="brand">
+    <div class="brand-logo">鲜</div>
+    <h1>鲜邻便利店 · 进销存</h1>
+    <p>PC 管理后台 + 手机 H5 · 请登录后使用</p>
+  </div>
+  <form id="loginForm" novalidate>
+    <div class="form-item" id="fiAccount">
+      <label>登录账号</label>
+      <div class="input-wrap">
+        <span class="ic">👤</span>
+        <input type="text" id="account" placeholder="请输入登录账号" autocomplete="username">
+      </div>
+      <div class="field-err">请输入登录账号</div>
+    </div>
+    <div class="form-item" id="fiPwd">
+      <label>密码</label>
+      <div class="input-wrap">
+        <span class="ic">🔒</span>
+        <input type="password" id="pwd" placeholder="请输入密码" autocomplete="current-password">
+        <button type="button" class="pwd-toggle" id="pwdToggle">显示</button>
+      </div>
+      <div class="field-err">请输入密码</div>
+    </div>
+    <div class="login-row">
+      <label class="remember"><input type="checkbox" id="remember" checked> 记住账号</label>
+      <a class="forgot" onclick="showErr('请联系管理员在「系统设置 → 用户管理」重置密码')">忘记密码？</a>
+    </div>
+    <button class="btn-login" id="btnLogin" type="submit">登 录</button>
+  </form>
+  <div class="demo-tip">演示环境 · 账号 <b>admin</b> ／ 密码 <b>123456</b><br>收银员 cashier、库管员 keeper 密码均为 123456</div>
+</div>
+
+<script>
+// 演示账号（与 admin.html 系统设置-用户管理保持一致）
+const USERS = {
+  admin:    { pwd: '123456', name: '张店长', role: '超级管理员' },
+  cashier:  { pwd: '123456', name: '李收银', role: '收银员' },
+  keeper:   { pwd: '123456', name: '王库管', role: '库管员' },
+};
+// 已登录直接进入后台
+if (localStorage.getItem('cvs_auth')) location.replace('admin.html');
+// 记住账号回填
+const saved = localStorage.getItem('cvs_saved_account');
+if (saved) { document.getElementById('account').value = saved; }
+
+const $ = id => document.getElementById(id);
+function showErr(msg) {
+  const t = $('errToast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove('show'), 2200);
+}
+$('pwdToggle').onclick = () => {
+  const p = $('pwd');
+  const show = p.type === 'password';
+  p.type = show ? 'text' : 'password';
+  $('pwdToggle').textContent = show ? '隐藏' : '显示';
+};
+$('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const acc = $('account').value.trim(), pwd = $('pwd').value;
+  $('fiAccount').classList.toggle('error', !acc);
+  $('fiPwd').classList.toggle('error', !pwd);
+  if (!acc || !pwd) { showErr(!acc ? '请输入登录账号' : '请输入密码'); return; }
+  const u = USERS[acc.toLowerCase()];
+  if (!u || u.pwd !== pwd) { showErr('账号或密码错误（演示账号 admin / 123456）'); return; }
+  const btn = $('btnLogin');
+  btn.disabled = true; btn.textContent = '登录中…';
+  if ($('remember').checked) localStorage.setItem('cvs_saved_account', acc.toLowerCase());
+  else localStorage.removeItem('cvs_saved_account');
+  localStorage.setItem('cvs_auth', '1');
+  localStorage.setItem('cvs_login_user', u.name);
+  setTimeout(() => { location.href = 'admin.html'; }, 300);
+});
+</script>
+</body>
+</html>
