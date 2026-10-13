@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智录 · 通用型 AI 录单台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Long+Cang&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e0b;
+    --bg2:#0e130f;
+    --panel:#121812;
+    --panel2:#161d15;
+    --ink:#e9f1e4;
+    --muted:#8b9c85;
+    --faint:#5a6b55;
+    --lime:#c6f24e;
+    --lime-dim:#9bc832;
+    --amber:#ffb224;
+    --cyan:#5fd4e8;
+    --red:#ff6b5e;
+    --line:rgba(233,241,228,.09);
+    --line-lime:rgba(198,242,78,.22);
+    --mono:"IBM Plex Mono",Consolas,monospace;
+    --disp:"ZCOOL QingKe HuangYou","Noto Sans SC",sans-serif;
+    --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    --hand:"Long Cang","KaiTi",cursive;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:14px;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    background-image:
+      linear-gradient(rgba(198,242,78,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(198,242,78,.025) 1px,transparent 1px);
+    background-size:44px 44px;
+  }
+  /* ===== 噪点纹理 ===== */
+  .noise{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#25301f;border-radius:5px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:#38472e}
+  ::selection{background:rgba(198,242,78,.3)}
+
+  /* ================= 顶栏 ================= */
+  .topbar{
+    height:58px;flex:none;display:flex;align-items:center;gap:18px;
+    padding:0 20px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#10160f,#0b0f0c);
+    position:relative;z-index:5;
+  }
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-mark{
+    width:36px;height:36px;flex:none;position:relative;
+    background:var(--lime);color:#0c110a;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--disp);font-size:22px;line-height:1;
+    box-shadow:0 0 24px rgba(198,242,78,.35);
+  }
+  .logo-mark::after{
+    content:"";position:absolute;inset:-4px;border:1px solid var(--line-lime);border-radius:11px;
+    animation:pulse-ring 2.6s ease-out infinite;
+  }
+  @keyframes pulse-ring{0%{opacity:.9;transform:scale(.94)}70%{opacity:0;transform:scale(1.18)}100%{opacity:0}}
+  .logo-txt{line-height:1.05}
+  .logo-txt b{font-family:var(--disp);font-size:21px;font-weight:400;letter-spacing:2px;color:var(--ink)}
+  .logo-txt b i{color:var(--lime);font-style:normal}
+  .logo-txt span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:3.5px;color:var(--faint);margin-top:2px}
+  .topbar-sep{width:1px;height:26px;background:var(--line)}
+  .industry-switch{display:flex;align-items:center;gap:10px}
+  .industry-switch label{font-size:12px;color:var(--muted);letter-spacing:1px}
+  .industry-switch select{
+    appearance:none;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    font-family:var(--sans);font-size:13px;font-weight:500;padding:7px 34px 7px 12px;border-radius:8px;
+    cursor:pointer;transition:border-color .2s;outline:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b9c85' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;
+  }
+  .industry-switch select:hover,.industry-switch select:focus{border-color:var(--line-lime)}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+  .engine-live{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px}
+  .engine-live .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:blink 2.2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .clock{font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:1px}
+  .clock b{color:var(--ink);font-weight:500}
+
+  /* ================= 主区 ================= */
+  main{flex:1;display:flex;min-height:0;position:relative}
+  .col{display:flex;flex-direction:column;min-height:0}
+  .col-head{
+    flex:none;padding:14px 18px 12px;border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .col-head h2{font-family:var(--disp);font-weight:400;font-size:17px;letter-spacing:2px}
+  .col-head .sub{font-size:11.5px;color:var(--faint);letter-spacing:.5px}
+  .col-head .count{
+    margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--lime);
+    border:1px solid var(--line-lime);border-radius:20px;padding:2px 10px;
+  }
+  /* --- 收件箱 --- */
+  .col-inbox{width:300px;flex:none;border-right:1px solid var(--line);background:var(--bg2)}
+  .inbox-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+  .in-card{
+    border:1px solid var(--line);border-radius:12px;background:var(--panel);
+    padding:13px 14px;cursor:pointer;position:relative;overflow:hidden;
+    transition:border-color .2s,transform .2s,background .2s;
+    animation:rise .55s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .in-card:hover{border-color:var(--line-lime);transform:translateY(-1px)}
+  .in-card.sel{border-color:var(--lime);background:var(--panel2);box-shadow:0 0 0 1px var(--lime),0 8px 28px rgba(198,242,78,.08)}
+  .in-card.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--lime)}
+  .in-card.written{opacity:.55}
+  .in-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .in-type{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:5px}
+  .in-type.t-text{color:var(--cyan);background:rgba(95,212,232,.1)}
+  .in-type.t-image{color:var(--amber);background:rgba(255,178,36,.1)}
+  .in-type.t-voice{color:var(--lime);background:rgba(198,242,78,.1)}
+  .in-time{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .in-src{font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;gap:6px;align-items:baseline}
+  .in-src b{color:var(--ink);font-weight:500}
+  .in-snippet{font-size:12.5px;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .in-stamp{
+    position:absolute;right:10px;top:34px;font-family:var(--disp);font-size:13px;color:var(--lime);
+    border:1.5px solid var(--lime);border-radius:6px;padding:1px 7px;transform:rotate(-8deg);
+    letter-spacing:2px;background:rgba(198,242,78,.08);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .paste-zone{flex:none;padding:0 14px 14px}
+  .paste-box{
+    width:100%;background:var(--panel);border:1px dashed var(--line);border-radius:12px;
+    color:var(--muted);font-size:12px;transition:border-color .2s;
+  }
+  .paste-box summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;transition:color .2s}
+  .paste-box summary::-webkit-details-marker{display:none}
+  .paste-box summary:hover{color:var(--lime)}
+  .paste-box[open]{border-color:var(--line-lime);border-style:solid}
+  .paste-box textarea{
+    width:100%;min-height:74px;resize:vertical;background:transparent;border:none;outline:none;
+    color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.6;padding:2px 14px 10px;
+  }
+  .paste-actions{display:flex;gap:8px;padding:0 14px 12px}
+  .btn-ghost{
+    background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;
+    font-family:var(--sans);font-size:12px;padding:6px 12px;cursor:pointer;transition:.2s;
+  }
+  .btn-ghost:hover{border-color:var(--line-lime);color:var(--lime)}
+  .btn-lime-s{
+    background:var(--lime);border:none;color:#0c110a;font-weight:700;border-radius:8px;
+    font-size:12px;padding:6px 14px;cursor:pointer;transition:.2s;font-family:var(--sans);
+  }
+  .btn-lime-s:hover{filter:brightness(1.1)}
+  .btn-lime-s:disabled{opacity:.4;cursor:not-allowed}
+
+  /* --- AI 引擎 --- */
+  .col-engine{flex:1;min-width:0;border-right:1px solid var(--line);background:var(--bg)}
+  .engine-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:16px}
+  .eng-empty{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    color:var(--faint);text-align:center;
+  }
+  .eng-empty .big-ico{font-size:44px;opacity:.5;filter:grayscale(1)}
+  .eng-empty h3{font-family:var(--disp);font-weight:400;font-size:19px;letter-spacing:3px;color:var(--muted)}
+  .eng-empty p{font-size:12.5px;line-height:1.9;max-width:320px}
+  .cap-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:340px}
+  .cap-chips span{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted);
+    border:1px solid var(--line);border-radius:20px;padding:4px 12px;
+  }
+  .raw-wrap{border:1px solid var(--line);border-radius:14px;background:var(--panel);position:relative;overflow:hidden}
+  .raw-head{
+    display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--faint);
+  }
+  .raw-head .src-tag{color:var(--cyan)}
+  .raw-content{padding:18px 20px 22px;font-size:14.5px;line-height:2.05;color:var(--muted);letter-spacing:.4px}
+  .raw-content mark{
+    background:transparent;color:var(--ink);border-bottom:2px solid var(--lime);
+    transition:color .35s,border-color .35s,background .35s;padding:1px 2px;
+  }
+  .raw-content mark.lit{background:rgba(198,242,78,.13)}
+  .raw-content .lit-done{color:var(--ink)}
+  .scanline{
+    position:absolute;left:0;right:0;height:58px;top:-70px;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(198,242,78,.14) 45%,rgba(198,242,78,.35) 50%,rgba(198,242,78,.14) 55%,transparent);
+    border-bottom:1px solid rgba(198,242,78,.6);
+    filter:drop-shadow(0 0 12px rgba(198,242,78,.4));
+  }
+  .scanline.run{animation:scan 1.5s cubic-bezier(.4,0,.6,1) 2}
+  @keyframes scan{from{top:-70px}to{top:110%}}
+  /* 手写单纸张 */
+  .paper{
+    width:min(330px,86%);margin:16px auto 24px;background:#f6f1e3;border-radius:4px;
+    padding:26px 30px 30px;transform:rotate(-1.6deg);position:relative;
+    box-shadow:0 14px 34px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+    color:#2c3440;
+  }
+  .paper::before{
+    content:"";position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+    width:92px;height:24px;background:rgba(198,242,78,.45);border:1px solid rgba(198,242,78,.7);
+    transform:translateX(-50%) rotate(1.2deg);
+  }
+  .paper-title{font-family:var(--hand);font-size:23px;text-align:center;letter-spacing:4px;border-bottom:1px solid rgba(44,52,64,.25);padding-bottom:9px;margin-bottom:6px}
+  .paper-line{
+    font-family:var(--hand);font-size:21px;line-height:2.15;display:flex;justify-content:space-between;
+    border-bottom:1px dashed rgba(44,52,64,.18);transition:background .4s;
+  }
+  .paper-line .n{padding-right:26px;white-space:nowrap}
+  .paper-line .q{font-family:var(--mono);font-size:17px;color:#8a4a2a}
+  .paper-line.lit{background:rgba(198,242,78,.3);border-radius:3px}
+  .paper-stamp{
+    position:absolute;right:14px;bottom:14px;width:64px;height:64px;border:2.5px solid rgba(200,44,44,.65);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:rgba(200,44,44,.72);
+    font-family:var(--disp);font-size:20px;letter-spacing:2px;transform:rotate(12deg);
+  }
+  /* 阶段进度 */
+  .phase-panel{border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+  .phase-list{padding:8px 6px}
+  .phase{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:9px;font-size:12.5px;color:var(--faint);transition:.25s}
+  .phase .ph-dot{width:8px;height:8px;border-radius:50%;background:#28321f;flex:none;transition:.25s}
+  .phase .ph-name{font-family:var(--mono);letter-spacing:1px;min-width:150px}
+  .phase .ph-bar{flex:1;height:3px;border-radius:2px;background:#1c2417;overflow:hidden;opacity:0;transition:opacity .2s}
+  .phase .ph-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--lime-dim),var(--lime));border-radius:2px}
+  .phase.active{color:var(--ink)}
+  .phase.active .ph-dot{background:var(--lime);box-shadow:0 0 8px var(--lime);animation:blink 1s infinite}
+  .phase.active .ph-bar{opacity:1}
+  .phase.done{color:var(--muted)}
+  .phase.done .ph-dot{background:var(--lime-dim)}
+  .phase.done .ph-bar i{width:100%!important}
+  /* 解析结果 */
+  .results-head{display:flex;align-items:baseline;gap:10px}
+  .results-head h3{font-family:var(--disp);font-weight:400;font-size:16px;letter-spacing:2px}
+  .results-head span{font-size:11.5px;color:var(--faint);font-family:var(--mono)}
+  .pr-list{display:flex;flex-direction:column;gap:9px}
+  .pr-row{
+    display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:12px;
+    background:var(--panel);padding:12px 15px;animation:rise .5s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .pr-row.unmatched{border-color:rgba(255,107,94,.4);background:rgba(255,107,94,.05)}
+  .pr-row.lowconf{border-color:rgba(255,178,36,.35)}
+  .pr-idx{font-family:var(--mono);font-size:11px;color:var(--faint);width:20px;flex:none}
+  .pr-main{flex:1;min-width:0}
+  .pr-name{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;flex-wrap:wrap}
+  .pr-name .code{font-family:var(--mono);font-size:10.5px;color:var(--cyan);border:1px solid rgba(95,212,232,.3);border-radius:4px;padding:1px 6px;letter-spacing:.5px}
+  .pr-name .code.none{color:var(--red);border-color:rgba(255,107,94,.4)}
+  .alias-tag{font-size:10.5px;color:var(--lime);background:rgba(198,242,78,.09);border-radius:4px;padding:2px 7px;letter-spacing:.5px}
+  .warn-tag{font-size:10.5px;color:var(--amber);background:rgba(255,178,36,.1);border-radius:4px;padding:2px 7px}
+  .pr-raw{font-size:11.5px;color:var(--faint);margin-top:4px;font-family:var(--mono)}
+  .pr-qty{font-family:var(--mono);font-size:15px;color:var(--ink);white-space:nowrap;text-align:right}
+  .pr-qty i{font-style:normal;font-size:11px;color:var(--muted);margin-left:3px}
+  .ring{position:relative;width:38px;height:38px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px}
+  .badge{font-size:10.5px;letter-spacing:1px;padding:3px 9px;border-radius:5px;white-space:nowrap;font-weight:500}
+  .badge.b-auto{color:var(--lime);background:rgba(198,242,78,.12);border:1px solid rgba(198,242,78,.35)}
+  .badge.b-manual{color:var(--cyan);background:rgba(95,212,232,.1);border:1px solid rgba(95,212,232,.35)}
+  .badge.b-unmatched{color:var(--red);background:rgba(255,107,94,.1);border:1px solid rgba(255,107,94,.4)}
+  .badge.b-review{color:var(--amber);background:rgba(255,178,36,.1);border:1px solid rgba(255,178,36,.4)}
+  .pr-cands{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pr-cands .cand{
+    display:flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);
+    border-radius:8px;padding:5px 10px;cursor:pointer;transition:.2s;background:var(--panel2);
+  }
+  .pr-cands .cand:hover{border-color:var(--cyan);color:var(--cyan)}
+  .pr-cands .cand .c-conf{font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .pr-cands .cand-new{border-style:dashed;color:var(--muted)}
+  .pr-cands .cand-new:hover{border-color:var(--amber);color:var(--amber)}
+  .engine-footer{
+    flex:none;padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center;
+    background:linear-gradient(180deg,transparent,rgba(198,242,78,.03));
+  }
+  .btn-run{
+    flex:1;height:46px;border:none;border-radius:12px;cursor:pointer;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--lime),#a8dc3a);color:#0c110a;
+    font-family:var(--disp);font-size:18px;letter-spacing:4px;font-weight:400;
+    transition:.2s;box-shadow:0 6px 24px rgba(198,242,78,.22);
+  }
+  .btn-run:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 9px 30px rgba(198,242,78,.32)}
+  .btn-run:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+  .btn-write{
+    flex:1;height:46px;border:1px solid var(--line-lime);border-radius:12px;cursor:pointer;
+    background:transparent;color:var(--lime);font-family:var(--disp);font-size:17px;letter-spacing:3px;
+    transition:.2s;
+  }
+  .btn-write:hover:not(:disabled){background:rgba(198,242,78,.1)}
+  .btn-write:disabled{opacity:.3;cursor:not-allowed}
+  .eng-status{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:1px;min-width:74px;text-align:center}
+  .eng-status.ok{color:var(--lime)}
+
+  /* --- 订单工作台 --- */
+  .col-orders{width:47%;min-width:520px;background:var(--bg2)}
+  .orders-toolbar{flex:none;display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+  .orders-body{flex:1;overflow:auto;padding:14px 16px}
+  table.orders{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.orders th{
+    text-align:left;font-size:10.5px;font-family:var(--mono);letter-spacing:1.5px;color:var(--faint);
+    font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;
+    background:var(--bg2);z-index:2;white-space:nowrap;
+  }
+  table.orders td{padding:9px 10px;border-bottom:1px solid rgba(233,241,228,.05);vertical-align:middle}
+  table.orders tr.fresh-row{animation:rowIn .6s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rowIn{from{opacity:0;background:rgba(198,242,78,.16);transform:translateX(-8px)}to{opacity:1}}
+  td.mono{font-family:var(--mono);font-size:12px}
+  td .cust{cursor:text;border-bottom:1px dashed transparent;border-radius:2px;padding:1px 3px;outline:none;min-width:60px;display:inline-block}
+  td .cust:hover,td .cust:focus{border-color:var(--line-lime);background:rgba(198,242,78,.06)}
+  .cell-input{
+    width:64px;background:transparent;border:1px solid transparent;border-radius:5px;color:var(--ink);
+    font-family:var(--mono);font-size:12.5px;padding:3px 6px;outline:none;transition:.2s;
+  }
+  .cell-input:hover{border-color:var(--line)}
+  .cell-input:focus{border-color:var(--lime);background:rgba(198,242,78,.07)}
+  td .raw-frag{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .del-btn{background:transparent;border:none;color:var(--faint);cursor:pointer;font-size:13px;padding:3px 6px;border-radius:5px;transition:.2s}
+  .del-btn:hover{color:var(--red);background:rgba(255,107,94,.1)}
+  .orders-empty{padding:60px 0;text-align:center;color:var(--faint)}
+  .orders-empty .ico{font-size:36px;opacity:.45;margin-bottom:12px}
+  .orders-empty p{font-size:12.5px;line-height:2}
+  .summary-bar{
+    flex:none;border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:22px;align-items:center;
+    flex-wrap:wrap;background:var(--panel);
+  }
+  .sum-item{display:flex;flex-direction:column;gap:2px}
+  .sum-item .k{font-size:10px;font-family:var(--mono);letter-spacing:1.5px;color:var(--faint)}
+  .sum-item .v{font-family:var(--mono);font-size:16px;font-weight:600}
+  .sum-item .v.lime{color:var(--lime)}
+  .sum-groups{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+  .sum-group{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:5px 11px}
+  .sum-group b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+  /* ================= 底部 Ticker ================= */
+  .ticker{
+    flex:none;height:52px;border-top:1px solid var(--line);
+    display:flex;align-items:stretch;background:linear-gradient(180deg,#0d120d,#0a0e0b);
+    position:relative;z-index:4;
+  }
+  .tick-cell{
+    flex:1;display:flex;align-items:center;gap:12px;padding:0 20px;border-right:1px solid var(--line);
+    min-width:0;
+  }
+  .tick-cell:last-child{border-right:none;flex:1.3}
+  .tick-ico{font-size:17px;opacity:.8}
+  .tick-txt .k{font-size:9.5px;font-family:var(--mono);letter-spacing:2px;color:var(--faint);white-space:nowrap}
+  .tick-txt .v{font-family:var(--mono);font-size:17px;font-weight:600;line-height:1.15;white-space:nowrap}
+  .tick-txt .v small{font-size:10px;color:var(--muted);font-weight:400}
+  .v.lime{color:var(--lime)}
+  .v.amber{color:var(--amber)}
+  .v.cyan{color:var(--cyan)}
+  .demo-note{font-size:10.5px;color:var(--faint);letter-spacing:.5px;line-height:1.6;text-align:right}
+  .demo-note b{color:var(--muted);font-weight:500}
+
+  /* ================= Toast ================= */
+  .toast-wrap{position:fixed;bottom:66px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .toast{
+    background:#161d15;border:1px solid var(--line-lime);color:var(--ink);border-radius:10px;
+    padding:10px 20px;font-size:13px;display:flex;align-items:center;gap:9px;
+    box-shadow:0 10px 34px rgba(0,0,0,.55);animation:toastIn .35s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .toast.warn{border-color:rgba(255,178,36,.5)}
+  .toast .t-ico{color:var(--lime)}
+  .toast.warn .t-ico{color:var(--amber)}
+  @keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .toast.out{animation:toastOut .3s forwards}
+  @keyframes toastOut{to{opacity:0;transform:translateY(8px)}}
+
+  /* 响应式 */
+  @media (max-width:1240px){
+    .col-inbox{width:260px}
+    .col-orders{min-width:440px}
+  }
+  @media (max-width:1020px){
+    body{overflow:auto}
+    main{flex-direction:column;overflow:visible}
+    .col{overflow:visible!important}
+    .col-inbox{width:100%;border-right:none;border-bottom:1px solid var(--line)}
+    .inbox-list{max-height:280px}
+    .col-engine{border-right:none;border-bottom:1px solid var(--line)}
+    .col-orders{width:100%;min-width:0}
+    .engine-body{min-height:300px}
+    .ticker{flex-wrap:wrap;height:auto}
+    .tick-cell{flex:1 1 45%;padding:10px 16px;border-bottom:1px solid var(--line)}
+    .demo-note{text-align:left;padding:10px 16px;flex:1 1 100%}
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- ================= 顶栏 ================= -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">录</div>
+    <div class="logo-txt">
+      <b>智<i>录</i> · AI 录单台</b>
+      <span>UNIVERSAL AI ORDER ENTRY</span>
+    </div>
+  </div>
+  <div class="topbar-sep"></div>
+  <div class="industry-switch">
+    <label>行业方案</label>
+    <select id="industrySelect"></select>
+  </div>
+  <div class="topbar-right">
+    <div class="engine-live"><span class="dot"></span>引擎在线 · 模拟环境</div>
+    <div class="topbar-sep"></div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ 收件箱 ============ -->
+  <section class="col col-inbox">
+    <div class="col-head">
+      <h2>进件收件箱</h2>
+      <span class="sub">微信群 / 图片 / 语音 / 手工粘贴</span>
+      <span class="count" id="inboxCount">0</span>
+    </div>
+    <div class="inbox-list" id="inboxList"></div>
+    <div class="paste-zone">
+      <details class="paste-box" id="pasteBox">
+        <summary>✎ 粘贴任意文本，体验通用解析</summary>
+        <textarea id="pasteInput" placeholder="例：螺纹钢3吨，水泥15吨，电线10卷&#10;或：番茄10斤，土豆20斤&#10;支持中英文数字、常见单位与口语片段"></textarea>
+        <div class="paste-actions">
+          <button class="btn-lime-s" id="pasteBtn">提交进件</button>
+          <button class="btn-ghost" id="pasteClear">清空</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ AI 引擎 ============ -->
+  <section class="col col-engine">
+    <div class="col-head">
+      <h2>解析引擎</h2>
+      <span class="sub" id="engineSub">一套引擎 · 多行业品池 · 字段级溯源</span>
+    </div>
+    <div class="engine-body" id="engineBody">
+      <div class="eng-empty" id="engEmpty">
+        <div class="big-ico">⌁</div>
+        <h3>等待进件</h3>
+        <p>从左侧选择一条消息，或粘贴任意文本。<br>引擎将自动完成识别、抽取、商品匹配与置信度标注。</p>
+        <div class="cap-chips">
+          <span>文字订单</span><span>图片/手写单</span><span>语音转写</span><span>表格截图</span><span>接口推送</span>
+        </div>
+      </div>
+      <div id="engWork" style="display:none;flex-direction:column;gap:16px;flex:1;min-height:0">
+        <div class="raw-wrap">
+          <div class="scanline" id="scanline"></div>
+          <div class="raw-head">
+            <span class="src-tag" id="rawSrc">SOURCE</span>
+            <span id="rawMeta"></span>
+          </div>
+          <div class="raw-content" id="rawContent"></div>
+        </div>
+        <div class="phase-panel">
+          <div class="phase-list" id="phaseList"></div>
+        </div>
+        <div id="resultsBlock" style="display:none;flex-direction:column;gap:11px">
+          <div class="results-head">
+            <h3>结构化明细</h3>
+            <span id="resultsMeta"></span>
+          </div>
+          <div class="pr-list" id="prList"></div>
+        </div>
+      </div>
+    </div>
+    <div class="engine-footer">
+      <button class="btn-run" id="runBtn" disabled>▶ AI 解析</button>
+      <button class="btn-write" id="writeBtn" disabled>写入订单</button>
+      <span class="eng-status" id="engStatus">IDLE</span>
+    </div>
+  </section>
+
+  <!-- ============ 订单工作台 ============ -->
+  <section class="col col-orders">
+    <div class="col-head">
+      <h2>订单明细工作台</h2>
+      <span class="sub">核对 · 修正 · 汇总 · 导出</span>
+      <span class="count" id="orderCount">0</span>
+    </div>
+    <div class="orders-toolbar">
+      <button class="btn-ghost" id="filterUnmatched">只看待处理</button>
+      <button class="btn-ghost" id="exportBtn">⤓ 导出 CSV</button>
+      <button class="btn-ghost" id="clearBtn" style="color:var(--red)">清空</button>
+    </div>
+    <div class="orders-body">
+      <table class="orders" id="ordersTable">
+        <thead>
+          <tr>
+            <th>#</th><th>下单日期</th><th>客户</th><th>商品编号</th><th>品名</th>
+            <th>单位</th><th>数量</th><th>单价</th><th>小计</th><th>匹配</th><th>原文片段</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+      <div class="orders-empty" id="ordersEmpty">
+        <div class="ico">▦</div>
+        <p>暂无明细<br>在解析引擎中完成解析后点击「写入订单」</p>
+      </div>
+    </div>
+    <div class="summary-bar">
+      <div class="sum-item"><span class="k">明细条数</span><span class="v" id="sumCount">0</span></div>
+      <div class="sum-item"><span class="k">订单总额</span><span class="v lime" id="sumAmount">¥0.00</span></div>
+      <div class="sum-item"><span class="k">待处理</span><span class="v amber" id="sumPending">0</span></div>
+      <div class="sum-groups" id="sumGroups"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= 底部 Ticker ================= -->
+<footer class="ticker">
+  <div class="tick-cell">
+    <span class="tick-ico">⚡</span>
+    <div class="tick-txt"><span class="k">已解析进件</span><br><span class="v cyan" id="tkParsed">0</span></div>
+  </div>
+  <div class="tick-cell">
+    <span class="tick-ico">◇</span>
+    <div class="tick-txt"><span class="k">累计明细</span><br><span class="v" id="tkLines">0</span></div>
+  </div>
+  <div class="tick-cell">
+    <span class="tick-ico">◎</span>
+    <div class="tick-txt"><span class="k">自动匹配率</span><br><span class="v lime" id="tkMatch">--</span></div>
+  </div>
+  <div class="tick-cell">
+    <span class="tick-ico">⚑</span>
+    <div class="tick-txt"><span class="k">待人工处理</span><br><span class="v amber" id="tkPending">0</span></div>
+  </div>
+  <div class="tick-cell">
+    <span class="tick-ico">◷</span>
+    <div class="tick-txt"><span class="k">预计节省工时</span><br><span class="v" id="tkHours">0<small> min</small></span></div>
+  </div>
+  <div class="tick-cell">
+    <div class="demo-note"><b>演示环境 · 数据为模拟</b><br>字段口径参考真实业务：日期/客户/编号/单位/数量/单价/原文溯源</div>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+"use strict";
+/* ================================================================
+   智录 · 通用型 AI 录单台（纯前端 Demo，全部数据为本地模拟）
+   ================================================================ */
+const $ = (s) => document.querySelector(s);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const fmtMoney = (n) => "¥" + Number(n || 0).toFixed(2);
+const today = () => {
+  const d = new Date();
+  const p = (x) => String(x).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+};
+let uid = 1000;
+const nid = () => ++uid;
+
+/* ---------------- 行业品池（通用型核心：可插拔商品库） ---------------- */
+const INDUSTRIES = {
+  fresh: {
+    label: "🥬 生鲜配送",
+    catalog: [
+      { code: "SC001", name: "番茄",   unit: "斤", price: 3.8,  spec: "普罗旺斯" },
+      { code: "SC002", name: "土豆",   unit: "斤", price: 1.9,  spec: "黄心" },
+      { code: "SC003", name: "黄瓜",   unit: "斤", price: 2.6,  spec: "旱黄瓜" },
+      { code: "SC004", name: "西兰花", unit: "斤", price: 5.2,  spec: "" },
+      { code: "SC005", name: "生菜",   unit: "斤", price: 2.2,  spec: "" },
+      { code: "SC006", name: "五花肉", unit: "斤", price: 13.8, spec: "黑猪" },
+      { code: "SC007", name: "鸡蛋",   unit: "箱", price: 168,  spec: "30枚/箱" },
+      { code: "SC008", name: "鲈鱼",   unit: "条", price: 22,   spec: "1-1.2斤/条" },
+      { code: "SC009", name: "胡萝卜", unit: "斤", price: 1.4,  spec: "" },
+      { code: "SC010", name: "尖椒",   unit: "斤", price: 3.2,  spec: "" }
+    ],
+    aliases: { "西红柿": "番茄", "洋芋": "土豆", "青瓜": "黄瓜", "绿花菜": "西兰花" },
+    inbox: [
+      {
+        id: "f1", type: "text", source: "微信群 · 锦华生鲜采购群", sender: "张老板", customer: "锦华火锅", time: "08:42",
+        content: "明天早上要：西红柿10斤，洋芋20斤，青瓜15斤，鸡蛋2箱，冰鲜带鱼10斤",
+        result: [
+          { raw: "西红柿10斤",  name: "番茄",     code: "SC001", unit: "斤", qty: 10, price: 3.8,  conf: 0.98, note: "别名映射 西红柿→番茄" },
+          { raw: "洋芋20斤",    name: "土豆",     code: "SC002", unit: "斤", qty: 20, price: 1.9,  conf: 0.97, note: "别名映射 洋芋→土豆" },
+          { raw: "青瓜15斤",    name: "黄瓜",     code: "SC003", unit: "斤", qty: 15, price: 2.6,  conf: 0.96, note: "别名映射 青瓜→黄瓜" },
+          { raw: "鸡蛋2箱",     name: "鸡蛋",     code: "SC007", unit: "箱", qty: 2,  price: 168,  conf: 0.99, note: "规格 30枚/箱" },
+          { raw: "冰鲜带鱼10斤", name: "冰鲜带鱼", code: null,   unit: "斤", qty: 10, price: null, conf: 0.91,
+            note: "商品库无此品，需人工处理", candidates: [{ name: "鲈鱼", code: "SC008", conf: 0.38 }] }
+        ]
+      },
+      {
+        id: "f2", type: "image", source: "微信图片 · 手写申购单", sender: "王姐", customer: "鲜丰超市·高新店", time: "09:15",
+        paperTitle: "晨采单 3.14",
+        paper: [["西兰花", "8 斤"], ["生菜", "12 斤"], ["五花肉", "5 斤"], ["胡萝卜", "30 斤"]],
+        result: [
+          { raw: "西兰花 8斤",  name: "西兰花", code: "SC004", unit: "斤", qty: 8,  price: 5.2,  conf: 0.97 },
+          { raw: "生菜 12斤",   name: "生菜",   code: "SC005", unit: "斤", qty: 12, price: 2.2,  conf: 0.66, note: "字迹模糊，数量请人工复核" },
+          { raw: "五花肉 5斤",  name: "五花肉", code: "SC006", unit: "斤", qty: 5,  price: 13.8, conf: 0.95 },
+          { raw: "胡萝卜 30斤", name: "胡萝卜", code: "SC009", unit: "斤", qty: 30, price: 1.4,  conf: 0.96 }
+        ]
+      },
+      {
+        id: "f3", type: "voice", source: "语音转写 · 60s", sender: "李姐", customer: "李记快餐", time: "10:03",
+        content: "给我来二十斤土豆，尖椒来个十来斤吧，再要六条鲈鱼，下午三点前送到",
+        result: [
+          { raw: "二十斤土豆",     name: "土豆", code: "SC002", unit: "斤", qty: 20, price: 1.9, conf: 0.93, note: "中文数字已转换" },
+          { raw: "尖椒来个十来斤", name: "尖椒", code: "SC010", unit: "斤", qty: 10, price: 3.2, conf: 0.72, note: "口语数量，请人工复核" },
+          { raw: "六条鲈鱼",       name: "鲈鱼", code: "SC008", unit: "条", qty: 6,  price: 22,  conf: 0.95 }
+        ]
+      }
+    ]
+  },
+  food: {
+    label: "🍲 餐饮食材",
+    catalog: [
+      { code: "FD001", name: "牛腩",   unit: "kg", price: 58,  spec: "冷冻" },
+      { code: "FD002", name: "鸡翅中", unit: "kg", price: 36,  spec: "" },
+      { code: "FD003", name: "基围虾", unit: "kg", price: 88,  spec: "30/40" },
+      { code: "FD004", name: "嫩豆腐", unit: "盒", price: 3.5, spec: "400g" },
+      { code: "FD005", name: "干香菇", unit: "包", price: 45,  spec: "500g" },
+      { code: "FD006", name: "花生油", unit: "桶", price: 129, spec: "5L" },
+      { code: "FD007", name: "面粉",   unit: "袋", price: 96,  spec: "25kg" },
+      { code: "FD008", name: "生抽",   unit: "箱", price: 120, spec: "12×500ml" }
+    ],
+    aliases: { "鸡翅": "鸡翅中", "虾": "基围虾", "酱油": "生抽", "豆油": "花生油" },
+    inbox: [
+      {
+        id: "d1", type: "text", source: "微信群 · 满堂红后厨群", sender: "刘师傅", customer: "满堂红酒楼", time: "07:58",
+        content: "周一到货：牛腩15公斤，鸡翅10公斤，基围虾8斤，嫩豆腐3箱，干香菇2包",
+        result: [
+          { raw: "牛腩15公斤",   name: "牛腩",   code: "FD001", unit: "kg", qty: 15, price: 58,  conf: 0.98, note: "单位换算 公斤→kg" },
+          { raw: "鸡翅10公斤",   name: "鸡翅中", code: "FD002", unit: "kg", qty: 10, price: 36,  conf: 0.95, note: "别名映射 鸡翅→鸡翅中" },
+          { raw: "基围虾8斤",    name: "基围虾", code: "FD003", unit: "kg", qty: 4,  price: 88,  conf: 0.9,  note: "单位换算 斤→kg ÷2" },
+          { raw: "嫩豆腐3箱",    name: "嫩豆腐", code: "FD004", unit: "盒", qty: 30, price: 3.5, conf: 0.86, note: "整箱拆盒 1箱=12盒，请复核" },
+          { raw: "干香菇2包",    name: "干香菇", code: "FD005", unit: "包", qty: 2,  price: 45,  conf: 0.97 }
+        ]
+      },
+      {
+        id: "d2", type: "image", source: "微信图片 · 采购清单拍照", sender: "周经理", customer: "膳合团餐", time: "11:26",
+        paperTitle: "膳合·周采",
+        paper: [["花生油", "5 桶"], ["面粉", "10 袋"], ["生抽", "3 箱"]],
+        result: [
+          { raw: "花生油 5桶", name: "花生油", code: "FD006", unit: "桶", qty: 5,  price: 129, conf: 0.97 },
+          { raw: "面粉 10袋",  name: "面粉",   code: "FD007", unit: "袋", qty: 10, price: 96,  conf: 0.98 },
+          { raw: "生抽 3箱",   name: "生抽",   code: "FD008", unit: "箱", qty: 3,  price: 120, conf: 0.96 }
+        ]
+      }
+    ]
+  },
+  hardware: {
+    label: "🔧 五金建材",
+    catalog: [
+      { code: "HJ001", name: "镀锌钢管", unit: "支", price: 86,  spec: "DN25×6m" },
+      { code: "HJ002", name: "水泥",     unit: "吨", price: 420, spec: "P.O42.5" },
+      { code: "HJ003", name: "螺纹钢",   unit: "吨", price: 3860, spec: "HRB400E Φ12" },
+      { code: "HJ004", name: "电线",     unit: "卷", price: 238, spec: "BV2.5 100m" },
+      { code: "HJ005", name: "防水涂料", unit: "桶", price: 268, spec: "20kg" },
+      { code: "HJ006", name: "角钢",     unit: "支", price: 64,  spec: "40×40×4" }
+    ],
+    aliases: { "钢筋": "螺纹钢", "电缆": "电线", "涂料": "防水涂料" },
+    inbox: [
+      {
+        id: "h1", type: "text", source: "微信群 · 城建B栋项目群", sender: "赵工", customer: "城建三公司·B栋", time: "09:31",
+        content: "工地B栋这周要用：螺纹钢3吨，水泥15吨，镀锌钢管200支，电线10卷，角钢50支",
+        result: [
+          { raw: "螺纹钢3吨",     name: "螺纹钢",   code: "HJ003", unit: "吨", qty: 3,   price: 3860, conf: 0.99 },
+          { raw: "水泥15吨",      name: "水泥",     code: "HJ002", unit: "吨", qty: 15,  price: 420,  conf: 0.98 },
+          { raw: "镀锌钢管200支", name: "镀锌钢管", code: "HJ001", unit: "支", qty: 200, price: 86,   conf: 0.97 },
+          { raw: "电线10卷",      name: "电线",     code: "HJ004", unit: "卷", qty: 10,  price: 238,  conf: 0.98 },
+          { raw: "角钢50支",      name: "角钢",     code: "HJ006", unit: "支", qty: 50,  price: 64,   conf: 0.96 }
+        ]
+      },
+      {
+        id: "h2", type: "voice", source: "语音转写 · 45s", sender: "孙队长", customer: "恒基劳务", time: "14:10",
+        content: "给我送二十桶防水涂料，再要三吨水泥，下午要",
+        result: [
+          { raw: "二十桶防水涂料", name: "防水涂料", code: "HJ005", unit: "桶", qty: 20, price: 268, conf: 0.94, note: "中文数字已转换" },
+          { raw: "三吨水泥",       name: "水泥",     code: "HJ002", unit: "吨", qty: 3,  price: 420, conf: 0.96 }
+        ]
+      }
+    ]
+  },
+  general: {
+    label: "🧺 日用百货",
+    catalog: [
+      { code: "RB001", name: "抽纸",   unit: "箱", price: 145, spec: "60包/箱" },
+      { code: "RB002", name: "洗衣液", unit: "箱", price: 168, spec: "12瓶/箱" },
+      { code: "RB003", name: "垃圾袋", unit: "件", price: 78,  spec: "100只×30卷" },
+      { code: "RB004", name: "保温杯", unit: "个", price: 39,  spec: "500ml" },
+      { code: "RB005", name: "数据线", unit: "条", price: 9.9, spec: "Type-C 1m" }
+    ],
+    aliases: { "纸巾": "抽纸", "充电线": "数据线" },
+    inbox: [
+      {
+        id: "g1", type: "text", source: "微信群 · 优品连锁补货群", sender: "陈店长", customer: "优品连锁·8家门店", time: "16:20",
+        content: "补货：抽纸5箱，洗衣液8箱，垃圾袋20件，保温杯50个，充电线200条",
+        result: [
+          { raw: "抽纸5箱",     name: "抽纸",   code: "RB001", unit: "箱", qty: 5,   price: 145, conf: 0.99 },
+          { raw: "洗衣液8箱",   name: "洗衣液", code: "RB002", unit: "箱", qty: 8,   price: 168, conf: 0.99 },
+          { raw: "垃圾袋20件",  name: "垃圾袋", code: "RB003", unit: "件", qty: 20,  price: 78,  conf: 0.97 },
+          { raw: "保温杯50个",  name: "保温杯", code: "RB004", unit: "个", qty: 50,  price: 39,  conf: 0.98 },
+          { raw: "充电线200条", name: "数据线", code: "RB005", unit: "条", qty: 200, price: 9.9, conf: 0.95, note: "别名映射 充电线→数据线" }
+        ]
+      }
+    ]
+  }
+};
+
+/* ---------------- 全局状态 ---------------- */
+const state = {
+  industry: "fresh",
+  inbox: [],
+  selected: null,
+  parsed: null,        // 当前解析结果（含 match 状态）
+  parsedDone: false,
+  written: false,
+  filterUnmatchedOnly: false,
+  orders: [],
+  stats: { sessions: 0, lines: 0, auto: 0, manual: 0, unmatched: 0 }
+};
+const cat = () => INDUSTRIES[state.industry].catalog;
+const aliases = () => INDUSTRIES[state.industry].aliases;
+
+/* ---------------- 商品匹配 ---------------- */
+function matchProduct(name) {
+  const list = cat(), map = aliases();
+  if (map[name]) {
+    const hit = list.find((c) => c.name === map[name]);
+    if (hit) return { hit, conf: 0.95, note: "别名映射 " + name + "→" + hit.name };
+  }
+  const exact = list.find((c) => c.name === name);
+  if (exact) return { hit: exact, conf: 0.99, note: "" };
+  const sub = list.find((c) => c.name.includes(name) || name.includes(c.name));
+  if (sub) return { hit: sub, conf: 0.82, note: "模糊匹配，请确认" };
+  // 字符重合模糊推荐
+  const scored = list.map((c) => {
+    const set = new Set(c.name.split(""));
+    let hit = 0;
+    for (const ch of name) if (set.has(ch)) hit++;
+    return { c, score: hit / Math.max(c.name.length, 1) };
+  }).sort((a, b) => b.score - a.score).filter((x) => x.score > 0.25).slice(0, 2);
+  return {
+    hit: null, conf: null,
+    candidates: scored.map((x) => ({ name: x.c.name, code: x.c.code, conf: Math.min(0.45, x.score * 0.6) }))
+  };
+}
+
+/* ---------------- 自由文本规则解析（模拟 LLM 输出） ---------------- */
+const CN_NUM = { 零: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+function cnToNum(s) {
+  if (/^[0-9.]+$/.test(s)) return parseFloat(s);
+  if (s.includes("十") || s.includes("百")) {
+    let total = 0, cur = 0;
+    for (const ch of s) {
+      if (CN_NUM[ch] !== undefined) cur = CN_NUM[ch];
+      else if (ch === "十") total += (cur || 1) * 10, cur = 0;
+      else if (ch === "百") total += (cur || 1) * 100, cur = 0;
+    }
+    return total + cur;
+  }
+  return CN_NUM[s] !== undefined ? CN_NUM[s] : null;
+}
+function normalizeUnit(u) {
+  if (!u) return "";
+  if (/^(公斤|千克|kg|KG|Kg)$/.test(u)) return "kg";
+  if (/^(斤)$/.test(u)) return "斤";
+  return u;
+}
+function ruleParse(text) {
+  const UNIT = "(斤|公斤|千克|kg|KG|箱|件|瓶|桶|包|把|袋|个|条|盒|扎|支|卷|吨|枚|米|台|双|只|盒)";
+  const segs = text.split(/[\n;；。，,、]/).map((s) => s.trim()).filter(Boolean);
+  const out = [];
+  for (let seg of segs) {
+    seg = seg.replace(/^(明天|今天|早上|下午|晚上|周一|周二|周三|周四|周五|周六|周日|麻烦|请|帮我|给我|这周|这周要|再要|再来|来个|来|要|需要|订|补货|个)[:：]?\s*/, "");
+    seg = seg.replace(/(左右|上下|吧|哈|呢|了|谢谢|辛苦| ASAP)$/i, "");
+    seg = seg.replace(/(再|还|又|给我|给我来|来个?|要|需要|下单|买|送)$/u, "");
+    seg = seg.replace(/下午[一二两三四五六七八九十\d]+点前送到$/, "");
+    seg = seg.replace(/送(到|至|货).*/, "");
+    seg = seg.trim();
+    if (!seg) continue;
+    let name = "", qty = null, unit = "";
+    // 数量前置：二十斤土豆 / 15kg牛腩
+    let m = seg.match(new RegExp("^([0-9]+(?:\\.[0-9]+)?|[零一二两三四五六七八九十百]{1,5})\\s*" + UNIT + "?\\s*(.+)$"));
+    // 数量后置：西红柿10斤 / 鸡蛋2箱
+    let m2 = seg.match(new RegExp("^(.+?)\\s*([0-9]+(?:\\.[0-9]+)?|[零一二两三四五六七八九十百]{1,5})\\s*" + UNIT + "?\\s*$"));
+    if (m) {
+      qty = cnToNum(m[1]); unit = normalizeUnit(m[2] || ""); name = m[3].trim();
+    } else if (m2) {
+      name = m2[1].trim(); qty = cnToNum(m2[2]); unit = normalizeUnit(m2[3] || "");
+    } else {
+      name = seg;
+    }
+    if (!name || qty === null || isNaN(qty)) continue;
+    name = name.replace(/^(再|还|又|给我|来个?|要|需要|买|订)/, "").replace(/来个?$/, "").trim();
+    if (!name) continue;
+    const r = matchProduct(name);
+    const base = {
+      raw: seg, name: name, code: r.hit ? r.hit.code : null,
+      unit: unit || (r.hit ? r.hit.unit : "件"),
+      qty: qty, price: r.hit ? r.hit.price : null, conf: r.conf || 0.42,
+      note: r.note || (r.hit ? "" : "商品库无此品，需人工处理")
+    };
+    if (r.hit) base.candidates = undefined;
+    else base.candidates = r.candidates || [];
+    out.push(base);
+  }
+  return out;
+}
+
+/* ---------------- 渲染：收件箱 ---------------- */
+const TYPE_META = {
+  text:  { cls: "t-text",  ico: "💬", label: "TEXT" },
+  image: { cls: "t-image", ico: "📷", label: "IMAGE" },
+  voice: { cls: "t-voice", ico: "🎙", label: "VOICE" }
+};
+function renderInbox() {
+  const wrap = $("#inboxList");
+  wrap.innerHTML = "";
+  state.inbox.forEach((item, i) => {
+    const t = TYPE_META[item.type];
+    const snippet = item.type === "image" ? (item.paperTitle || "") + " · " + item.paper.length + " 行明细" : item.content;
+    const el = document.createElement("div");
+    el.className = "in-card" + (state.selected === item.id ? " sel" : "") + (item.written ? " written" : "");
+    el.style.animationDelay = (i * 60) + "ms";
+    el.innerHTML =
+      '<div class="in-top"><span class="in-type ' + t.cls + '">' + t.ico + " " + t.label + '</span>' +
+      '<span class="in-time">' + item.time + '</span></div>' +
+      '<div class="in-src"><b>' + esc(item.sender) + "</b>" + esc(item.source) + '</div>' +
+      '<div class="in-snippet">' + esc(snippet) + "</div>" +
+      (item.written ? '<span class="in-stamp">已录入</span>' : "");
+    el.onclick = () => selectInbox(item.id);
+    wrap.appendChild(el);
+  });
+  $("#inboxCount").textContent = state.inbox.length + " 件";
+}
+
+/* ---------------- 选中进件 → 引擎台 ---------------- */
+function selectInbox(id) {
+  state.selected = id;
+  state.parsed = null;
+  state.parsedDone = false;
+  state.written = false;
+  renderInbox();
+  const item = state.inbox.find((x) => x.id === id);
+  $("#engEmpty").style.display = "none";
+  const work = $("#engWork");
+  work.style.display = "flex";
+  $("#resultsBlock").style.display = "none";
+  $("#prList").innerHTML = "";
+  $("#rawSrc").textContent = TYPE_META[item.type].label + " · " + item.sender;
+  $("#rawMeta").textContent = item.source;
+  const rc = $("#rawContent");
+  if (item.type === "image") {
+    rc.innerHTML = '<div class="paper"><div class="paper-title">' + esc(item.paperTitle) + "</div>" +
+      item.paper.map((p) => '<div class="paper-line"><span class="n">' + esc(p[0]) + '</span><span class="q">' + esc(p[1]) + "</span></div>").join("") +
+      '<div class="paper-stamp">急</div></div>';
+  } else {
+    rc.textContent = item.content;
+  }
+  const canRun = !item.written;
+  $("#runBtn").disabled = !canRun;
+  $("#writeBtn").disabled = true;
+  $("#runBtn").textContent = item.written ? "✓ 已录入订单" : "▶ AI 解析";
+  $("#engStatus").textContent = "IDLE";
+  $("#engStatus").className = "eng-status";
+  work.scrollTop = 0;
+}
+
+/* ---------------- 解析动画 ---------------- */
+const PHASES = [
+  ["预处理 · 通道检测", 550],
+  ["版面分析 · 结构识别", 650],
+  ["字段抽取 · 语义对齐", 950],
+  ["商品匹配 · 库内检索", 750],
+  ["置信度校验 · 输出JSON", 500]
+];
+function renderPhases(activeIdx, doneUpto) {
+  $("#phaseList").innerHTML = PHASES.map((p, i) => {
+    const cls = i === activeIdx ? "active" : (i < activeIdx ? "done" : "");
+    return '<div class="phase ' + cls + '"><span class="ph-dot"></span><span class="ph-name">' + p[0] +
+      '</span><span class="ph-bar"><i style="width:' + (i === activeIdx ? "62" : "0") + '%"></i></span></div>';
+  }).join("");
+}
+function lightTargets(item, results) {
+  const rc = $("#rawContent");
+  if (item.type === "image") {
+    const lines = rc.querySelectorAll(".paper-line");
+    const marks = results.map((r) => {
+      const nm = r.raw.split(/\s+/)[0];
+      for (const ln of lines) if (ln.textContent.includes(nm)) return ln;
+      return null;
+    }).filter(Boolean);
+    return marks;
+  }
+  let html = esc(item.content);
+  const spans = [];
+  results.forEach((r, i) => {
+    const key = esc(r.raw.length > 4 ? r.raw : r.raw);
+    const idx = html.indexOf(key);
+    if (idx >= 0) {
+      html = html.slice(0, idx) + "<mark data-i='" + i + "'>" + key + "</mark>" + html.slice(idx + key.length);
+      spans.push(i);
+    }
+  });
+  rc.innerHTML = html;
+  return spans.map((i) => rc.querySelector("mark[data-i='" + i + "']")).filter(Boolean);
+}
+async function runParse() {
+  const item = state.inbox.find((x) => x.id === state.selected);
+  if (!item || item.written) return;
+  const source = item.custom ? ruleParse(item.content) : item.result;
+  const btn = $("#runBtn");
+  btn.disabled = true;
+  btn.textContent = "解析中…";
+  const scan = $("#scanline");
+  scan.classList.remove("run");
+  void scan.offsetWidth;
+  scan.classList.add("run");
+  $("#engStatus").textContent = "RUN…";
+  $("#engStatus").className = "eng-status";
+  for (let i = 0; i < PHASES.length; i++) {
+    renderPhases(i, i);
+    const bar = $("#phaseList").children[i].querySelector(".ph-bar i");
+    const t0 = performance.now(), dur = PHASES[i][1];
+    await new Promise((res) => {
+      (function tick() {
+        const p = Math.min(1, (performance.now() - t0) / dur);
+        bar.style.width = (p * 100).toFixed(0) + "%";
+        p < 1 ? requestAnimationFrame(tick) : res();
+      })();
+    });
+    if (i === 2) {
+      const targets = lightTargets(item, source);
+      for (let k = 0; k < targets.length; k++) {
+        targets[k].classList.add("lit");
+        await sleep(160);
+      }
+    }
+    await sleep(60);
+  }
+  renderPhases(-1);
+  $("#phaseList").querySelectorAll(".phase").forEach((p) => p.classList.add("done"));
+  scan.classList.remove("run");
+  // 展示结果
+  if (!source.length) {
+    btn.disabled = true;
+    btn.textContent = "未抽取到明细";
+    $("#engStatus").textContent = "EMPTY";
+    $("#phaseList").querySelectorAll(".phase").forEach((p) => p.classList.add("done"));
+    toast("未能从文本中抽取到「品名+数量」明细，请调整措辞", "warn");
+    return;
+  }
+  state.parsed = source.map((r) => Object.assign({}, r, {
+    match: r.code ? (r.conf < 0.8 ? "review" : "auto") : "unmatched"
+  }));
+  state.parsedDone = true;
+  renderResults();
+  $("#resultsBlock").style.display = "flex";
+  const unmatched = state.parsed.filter((p) => p.match === "unmatched").length;
+  $("#resultsMeta").textContent = state.parsed.length + " 项 · " + (unmatched ? unmatched + " 项待处理" : "全部匹配");
+  $("#engStatus").textContent = "DONE ✓";
+  $("#engStatus").className = "eng-status ok";
+  $("#writeBtn").disabled = false;
+  btn.textContent = "✓ 解析完成";
+  state.stats.sessions++;
+  renderStats();
+}
+
+/* ---------------- 渲染解析结果 ---------------- */
+function ringSvg(conf) {
+  const col = conf >= 0.9 ? "var(--lime)" : conf >= 0.7 ? "var(--amber)" : "var(--red)";
+  const c = 2 * Math.PI * 16;
+  return '<svg width="38" height="38"><circle cx="19" cy="19" r="16" fill="none" stroke="rgba(233,241,228,.1)" stroke-width="3"/>' +
+    '<circle cx="19" cy="19" r="16" fill="none" stroke="' + col + '" stroke-width="3" stroke-linecap="round" ' +
+    'stroke-dasharray="' + (c * conf).toFixed(1) + " " + c.toFixed(1) + '"/></svg>';
+}
+function badgeOf(p) {
+  if (p.match === "auto") return '<span class="badge b-auto">自动匹配</span>';
+  if (p.match === "manual") return '<span class="badge b-manual">手动匹配</span>';
+  if (p.match === "review") return '<span class="badge b-review">待复核</span>';
+  return '<span class="badge b-unmatched">未匹配</span>';
+}
+function renderResults() {
+  const list = $("#prList");
+  list.innerHTML = "";
+  state.parsed.forEach((p, i) => {
+    const row = document.createElement("div");
+    row.className = "pr-row" + (p.match === "unmatched" ? " unmatched" : "") + (p.conf < 0.8 && p.match !== "unmatched" ? " lowconf" : "");
+    row.style.animationDelay = (i * 90) + "ms";
+    row.dataset.pid = p._pid || (p._pid = nid());
+    let candHtml = "";
+    if (p.match === "unmatched") {
+      candHtml = '<div class="pr-cands"><span style="font-size:11px;color:var(--faint)">候选：</span>' +
+        (p.candidates || []).map((c) =>
+          '<span class="cand" data-cand="' + c.code + '">' + esc(c.name) + ' <span class="c-conf">' + Math.round(c.conf * 100) + "%</span></span>"
+        ).join("") +
+        '<span class="cand cand-new" data-cand="new">＋ 标记新品待建</span></div>';
+    }
+    row.innerHTML =
+      '<span class="pr-idx">' + String(i + 1).padStart(2, "0") + "</span>" +
+      '<div class="pr-main"><div class="pr-name">' +
+      (p.match === "unmatched" ? '<b style="color:var(--red)">' + esc(p.name) + "</b>" : "<b>" + esc(p.name) + "</b>") +
+      (p.code ? '<span class="code">' + p.code + "</span>" : '<span class="code none">NO-CODE</span>') +
+      (p.note ? '<span class="' + (p.match === "unmatched" ? "warn-tag" : "alias-tag") + '">' + esc(p.note) + "</span>" : "") +
+      "</div>" +
+      (p.raw ? '<div class="pr-raw">原文「' + esc(p.raw) + '」</div>' : "") +
+      candHtml + "</div>" +
+      '<div class="pr-qty">' + p.qty + "<i>" + esc(p.unit) + "</i></div>" +
+      '<div class="ring">' + ringSvg(p.conf) + '<span class="v">' + Math.round(p.conf * 100) + "%</span></div>" +
+      badgeOf(p);
+    list.appendChild(row);
+  });
+  list.querySelectorAll(".cand[data-cand]").forEach((el) => {
+    el.onclick = () => applyCandidate(el.closest(".pr-row").dataset.pid, el.dataset.cand);
+  });
+}
+function applyCandidate(pid, cand) {
+  const p = state.parsed.find((x) => String(x._pid) === String(pid));
+  if (!p) return;
+  if (cand === "new") {
+    p.match = "manual";
+    p.note = "新品待建，先按原文名录入";
+    p.code = "NEW";
+    toast("已标记新品，录入后请补商品档案", "warn");
+  } else {
+    const hit = cat().find((c) => c.code === cand);
+    if (!hit) return;
+    p.match = "manual";
+    p.name = hit.name; p.code = hit.code; p.unit = hit.unit; p.price = hit.price; p.conf = 0.9;
+    p.note = "手动绑定 " + hit.code; p.candidates = null;
+    toast("已绑定 " + hit.name + "（" + hit.code + "）");
+  }
+  renderResults();
+  const unmatched = state.parsed.filter((x) => x.match === "unmatched").length;
+  $("#resultsMeta").textContent = state.parsed.length + " 项 · " + (unmatched ? unmatched + " 项待处理" : "全部匹配");
+}
+
+/* ---------------- 写入订单 ---------------- */
+function writeOrders() {
+  if (!state.parsedDone || !state.parsed.length) return;
+  const item = state.inbox.find((x) => x.id === state.selected);
+  const count = state.parsed.length;
+  const d = today();
+  state.parsed.forEach((p, i) => {
+    state.orders.push({
+      id: nid(), date: d, customer: item.customer, code: p.code || "—",
+      name: p.name, unit: p.unit, qty: p.qty,
+      price: p.price !== null ? p.price : 0,
+      match: p.match === "review" ? "review" : p.match,
+      raw: p.raw || "", fresh: true
+    });
+    if (p.match === "auto") state.stats.auto++;
+    else if (p.match === "manual") state.stats.manual++;
+    else state.stats.unmatched++;
+    state.stats.lines++;
+  });
+  item.written = true;
+  state.written = true;
+  state.selected = null;
+  state.parsed = null;
+  state.parsedDone = false;
+  $("#writeBtn").disabled = true;
+  $("#runBtn").disabled = true;
+  $("#runBtn").textContent = "✓ 已录入订单";
+  $("#engStatus").textContent = "PUSHED";
+  $("#engStatus").className = "eng-status ok";
+  toast("已写入 " + count + " 条明细（客户：" + item.customer + "）");
+  renderInbox();
+  renderOrders();
+  renderStats();
+}
+
+/* ---------------- 渲染订单表 ---------------- */
+function renderOrders() {
+  const body = $("#ordersBody");
+  body.innerHTML = "";
+  let rows = state.orders;
+  if (state.filterUnmatchedOnly) rows = rows.filter((o) => o.match === "unmatched" || o.match === "review");
+  rows.forEach((o, ri) => {
+    const tr = document.createElement("tr");
+    tr.className = o.fresh ? "fresh-row" : "";
+    tr.innerHTML =
+      "<td class='mono'>" + (ri + 1) + "</td>" +
+      "<td class='mono'>" + o.date + "</td>" +
+      "<td><span class='cust' contenteditable='true' spellcheck='false'>" + esc(o.customer) + "</span></td>" +
+      "<td class='mono'>" + esc(o.code) + "</td>" +
+      "<td><b>" + esc(o.name) + "</b></td>" +
+      "<td>" + esc(o.unit) + "</td>" +
+      "<td><input class='cell-input' data-f='qty' value='" + o.qty + "'></td>" +
+      "<td><input class='cell-input' data-f='price' value='" + Number(o.price).toFixed(2) + "'></td>" +
+      "<td class='mono' data-sub>" + fmtMoney(o.qty * o.price) + "</td>" +
+      "<td>" + (o.match === "auto" ? '<span class="badge b-auto">自动</span>'
+        : o.match === "manual" ? '<span class="badge b-manual">手动</span>'
+        : o.match === "review" ? '<span class="badge b-review">待复核</span>'
+        : '<span class="badge b-unmatched">未匹配</span>') + "</td>" +
+      "<td><span class='raw-frag'>" + esc(o.raw || "—") + "</span></td>" +
+      "<td><button class='del-btn' data-del='" + o.id + "'>✕</button></td>";
+    o.fresh = false;
+    tr.querySelector("[data-del]").onclick = () => {
+      state.orders = state.orders.filter((x) => x.id !== o.id);
+      renderOrders(); renderStats();
+    };
+    tr.querySelectorAll(".cell-input").forEach((inp) => {
+      inp.onchange = () => {
+        const v = parseFloat(inp.value);
+        if (isNaN(v) || v < 0) { inp.value = o[inp.dataset.f]; return; }
+        o[inp.dataset.f] = v;
+        renderSummary();
+        tr.querySelector("[data-sub]").textContent = fmtMoney(o.qty * o.price);
+      };
+    });
+    tr.querySelector(".cust").onblur = (e) => { o.customer = e.target.textContent.trim() || o.customer; renderSummary(); };
+    body.appendChild(tr);
+  });
+  $("#ordersEmpty").style.display = rows.length ? "none" : "block";
+  $("#orderCount").textContent = state.orders.length + " 条";
+  renderSummary();
+}
+function renderSummary() {
+  const n = state.orders.length;
+  const total = state.orders.reduce((s, o) => s + o.qty * o.price, 0);
+  const pending = state.orders.filter((o) => o.match === "unmatched" || o.match === "review").length;
+  $("#sumCount").textContent = n;
+  $("#sumAmount").textContent = fmtMoney(total);
+  $("#sumPending").textContent = pending;
+  const groups = {};
+  state.orders.forEach((o) => {
+    if (!groups[o.customer]) groups[o.customer] = { n: 0, amt: 0 };
+    groups[o.customer].n++;
+    groups[o.customer].amt += o.qty * o.price;
+  });
+  $("#sumGroups").innerHTML = Object.keys(groups).map((k) =>
+    '<span class="sum-group">' + esc(k) + " <b>" + groups[k].n + "项</b> <b>" + fmtMoney(groups[k].amt) + "</b></span>"
+  ).join("");
+}
+
+/* ---------------- 统计 Ticker ---------------- */
+function renderStats() {
+  $("#tkParsed").textContent = state.stats.sessions;
+  $("#tkLines").textContent = state.stats.lines;
+  const total = state.stats.auto + state.stats.manual + state.stats.unmatched;
+  $("#tkMatch").textContent = total ? Math.round(state.stats.auto / total * 100) + "%" : "--";
+  const pending = state.orders.filter((o) => o.match === "unmatched" || o.match === "review").length;
+  $("#tkPending").textContent = pending;
+  const mins = Math.round(state.stats.lines * 3.2);
+  $("#tkHours").innerHTML = mins >= 60
+    ? Math.floor(mins / 60) + "<small> h </small>" + (mins % 60) + "<small> min</small>"
+    : mins + "<small> min</small>";
+}
+
+/* ---------------- 行业切换 ---------------- */
+function loadIndustry(key) {
+  state.industry = key;
+  state.inbox = INDUSTRIES[key].inbox.map((x) => Object.assign({}, x, { written: false, result: x.result.map((r) => Object.assign({}, r)) }));
+  state.selected = null;
+  state.parsed = null;
+  state.parsedDone = false;
+  state.orders = [];
+  state.stats = { sessions: 0, lines: 0, auto: 0, manual: 0, unmatched: 0 };
+  $("#engEmpty").style.display = "flex";
+  $("#engWork").style.display = "none";
+  $("#runBtn").disabled = true;
+  $("#writeBtn").disabled = true;
+  $("#runBtn").textContent = "▶ AI 解析";
+  $("#engStatus").textContent = "IDLE";
+  $("#engStatus").className = "eng-status";
+  $("#engineSub").textContent = "当前品池 " + INDUSTRIES[key].catalog.length + " 个标准商品 · 别名 " + Object.keys(INDUSTRIES[key].aliases).length + " 组";
+  renderInbox(); renderOrders(); renderStats();
+}
+
+/* ---------------- Toast ---------------- */
+function toast(msg, kind) {
+  const el = document.createElement("div");
+  el.className = "toast" + (kind === "warn" ? " warn" : "");
+  el.innerHTML = '<span class="t-ico">' + (kind === "warn" ? "⚑" : "✓") + "</span>" + esc(msg);
+  $("#toastWrap").appendChild(el);
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 320); }, 2600);
+}
+
+/* ---------------- 导出 CSV ---------------- */
+function exportCSV() {
+  if (!state.orders.length) { toast("暂无明细可导出", "warn"); return; }
+  const head = ["下单日期", "客户", "商品编号", "品名", "单位", "数量", "单价", "小计", "匹配状态", "原文片段"];
+  const lines = state.orders.map((o) =>
+    [o.date, o.customer, o.code, o.name, o.unit, o.qty, Number(o.price).toFixed(2), (o.qty * o.price).toFixed(2),
+      { auto: "自动匹配", manual: "手动匹配", review: "待复核", unmatched: "未匹配" }[o.match], o.raw]
+      .map((v) => '"' + String(v).replace(/"/g, '""') + '"').join(",")
+  );
+  const csv = "\uFEFF" + head.map((h) => '"' + h + '"').join(",") + "\r\n" + lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "AI录单明细_" + today().replace(/-/g, "") + ".csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("已导出 " + state.orders.length + " 条明细 CSV");
+}
+
+/* ---------------- 事件绑定 ---------------- */
+$("#runBtn").onclick = runParse;
+$("#writeBtn").onclick = writeOrders;
+$("#exportBtn").onclick = exportCSV;
+$("#filterUnmatched").onclick = (e) => {
+  state.filterUnmatchedOnly = !state.filterUnmatchedOnly;
+  e.target.style.borderColor = state.filterUnmatchedOnly ? "var(--amber)" : "";
+  e.target.style.color = state.filterUnmatchedOnly ? "var(--amber)" : "";
+  renderOrders();
+};
+$("#clearBtn").onclick = () => {
+  if (!state.orders.length) return;
+  if (confirm("确认清空全部订单明细？")) {
+    state.orders = [];
+    renderOrders(); renderStats();
+    toast("工作台已清空");
+  }
+};
+$("#pasteBtn").onclick = () => {
+  const v = $("#pasteInput").value.trim();
+  if (!v) { toast("请先粘贴文本内容", "warn"); return; }
+  const item = {
+    id: nid(), type: "text", source: "手工粘贴 · 自由文本", sender: "操作员",
+    customer: "散单/待指定", time: (new Date().toTimeString().slice(0, 5)),
+    content: v, custom: true
+  };
+  state.inbox.unshift(item);
+  $("#pasteInput").value = "";
+  $("#pasteBox").open = false;
+  renderInbox();
+  selectInbox(item.id);
+  toast("进件已入列，点击「AI 解析」体验通用抽取");
+};
+$("#pasteClear").onclick = () => { $("#pasteInput").value = ""; };
+$("#industrySelect").onchange = (e) => {
+  loadIndustry(e.target.value);
+  toast("已切换至「" + INDUSTRIES[e.target.value].label + "」方案，工作台已重置");
+};
+setInterval(() => {
+  const d = new Date();
+  const p = (x) => String(x).padStart(2, "0");
+  $("#clock").innerHTML = "<b>" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) + "</b>";
+}, 1000);
+
+/* ---------------- 启动 ---------------- */
+(function init() {
+  $("#industrySelect").innerHTML = Object.keys(INDUSTRIES).map((k) =>
+    '<option value="' + k + '">' + INDUSTRIES[k].label + "</option>"
+  ).join("");
+  loadIndustry("fresh");
+  const d = new Date();
+  const p = (x) => String(x).padStart(2, "0");
+  $("#clock").innerHTML = "<b>" + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds()) + "</b>";
+})();
+</script>
+</body>
+</html>
