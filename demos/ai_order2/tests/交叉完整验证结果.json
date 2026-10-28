@@ -1,0 +1,1255 @@
+{
+  "date": "2026-10-22",
+  "total": 177,
+  "passed": 177,
+  "results": [
+    {
+      "name": "旧版源码快照未经覆盖",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC001",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC002",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC003",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC004",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC005",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC006",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC007",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC008",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC009",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 SC010",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 西红柿",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 洋芋",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 青瓜",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 绿花菜",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 f1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f1-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f1-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f1-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f1-4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f1-5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 f2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f2-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f2-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f2-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f2-4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 f3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f3-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f3-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 f3-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD001",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD002",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD003",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD004",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD005",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD006",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD007",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 FD008",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 鸡翅",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 虾",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 酱油",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 豆油",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 d1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d1-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d1-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d1-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d1-4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d1-5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 d2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d2-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d2-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 d2-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ001",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ002",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ003",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ004",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ005",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 HJ006",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 钢筋",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 电缆",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 涂料",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 h1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h1-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h1-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h1-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h1-4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h1-5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 h2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h2-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 h2-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 RB001",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 RB002",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 RB003",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 RB004",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "商品完整保留 RB005",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 纸巾",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "别名完整保留 充电线",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例来源原文完整保留 g1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 g1-1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 g1-2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 g1-3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 g1-4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "案例原文明细保留 g1-5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "新旧有效文本交叉 番茄10斤",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "番茄10斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-bc490d24-395a-4311-92fe-32b8cdf57b35",
+            "sourceId": "inbox-2fc3d3c3-1658-40d8-a631-29a9f6cba8ff",
+            "raw": "番茄10斤",
+            "start": 0,
+            "end": 5,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 西红柿10斤",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "西红柿10斤",
+            "name": "西红柿",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.95,
+            "note": "别名映射 西红柿→番茄",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-8e7553f4-6c67-493c-9ddd-d66b6abe1863",
+            "sourceId": "inbox-996ccab9-b42e-4f04-9a2e-4b6f7970e47c",
+            "raw": "西红柿10斤",
+            "start": 0,
+            "end": 6,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.97,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "别名 西红柿 → 番茄",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 二十斤土豆",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "二十斤土豆",
+            "name": "土豆",
+            "code": "SC002",
+            "unit": "斤",
+            "qty": 20,
+            "price": 1.9,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-cb1381d6-db4f-4989-8c4d-faf68edb3b1b",
+            "sourceId": "inbox-674a2abe-6c8b-4f88-905e-b0ea639f887b",
+            "raw": "二十斤土豆",
+            "start": 0,
+            "end": 5,
+            "sourceQty": "20",
+            "sourceUnit": "斤",
+            "name": "土豆",
+            "code": "SC002",
+            "unit": "斤",
+            "qty": "20",
+            "priceCents": 190,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 番茄10斤送到店里",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "番茄10斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-5e80857b-1cc6-4d01-9d7e-48d11b562db0",
+            "sourceId": "inbox-3fcd39f9-0c97-4304-856c-c9a9844a3b2a",
+            "raw": "番茄10斤送到店里",
+            "start": 0,
+            "end": 9,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 番茄10斤 ASAP",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "番茄10斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-f316342a-a5b6-484d-bcb1-0ce45670d1d2",
+            "sourceId": "inbox-a38e2575-d0dc-49cc-96b0-dee13086aede",
+            "raw": "番茄10斤 ASAP",
+            "start": 0,
+            "end": 10,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 番茄10斤下午三点前送到",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "番茄10斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-3552eb48-c2cb-412e-a6e0-81f4b249cfbb",
+            "sourceId": "inbox-7b103be2-a2f0-4b2e-a392-f73f2a31e74a",
+            "raw": "番茄10斤下午三点前送到",
+            "start": 0,
+            "end": 12,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 请番茄10斤",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "番茄10斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": 10,
+            "price": 3.8,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-1ca42223-d8d6-4350-ae49-9e3b22514b61",
+            "sourceId": "inbox-884783a6-c3c9-4b02-8332-df600958f099",
+            "raw": "请番茄10斤",
+            "start": 0,
+            "end": 6,
+            "sourceQty": "10",
+            "sourceUnit": "斤",
+            "name": "番茄",
+            "code": "SC001",
+            "unit": "斤",
+            "qty": "10",
+            "priceCents": 380,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 买土豆2斤",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "买土豆2斤",
+            "name": "土豆",
+            "code": "SC002",
+            "unit": "斤",
+            "qty": 2,
+            "price": 1.9,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-7e430bc6-54cb-4944-a7ee-7d15eca77844",
+            "sourceId": "inbox-8c862bcd-b113-45a3-904a-1a568a5e9fed",
+            "raw": "买土豆2斤",
+            "start": 0,
+            "end": 5,
+            "sourceQty": "2",
+            "sourceUnit": "斤",
+            "name": "土豆",
+            "code": "SC002",
+            "unit": "斤",
+            "qty": "2",
+            "priceCents": 190,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 15kg牛腩",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "15kg牛腩",
+            "name": "牛腩",
+            "code": "FD001",
+            "unit": "kg",
+            "qty": 15,
+            "price": 58,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-693cba8e-55ca-4257-b3c6-5b47cef497b6",
+            "sourceId": "inbox-d3f92ca5-bde2-48c3-950c-66f526ae0144",
+            "raw": "15kg牛腩",
+            "start": 0,
+            "end": 6,
+            "sourceQty": "15",
+            "sourceUnit": "kg",
+            "name": "牛腩",
+            "code": "FD001",
+            "unit": "kg",
+            "qty": "15",
+            "priceCents": 5800,
+            "confidence": 0.99,
+            "match": "auto",
+            "confirmed": true,
+            "issues": [],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "修正旧版袋直接按吨计价，保留原量等待换算",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "水泥20袋",
+            "name": "水泥",
+            "code": "HJ002",
+            "unit": "袋",
+            "qty": 20,
+            "price": 420,
+            "conf": 0.99,
+            "note": "",
+            "candidates": null
+          }
+        ],
+        "new": [
+          {
+            "id": "line-bfc14831-49cd-417e-b725-c3d01cbe81bb",
+            "sourceId": "inbox-55d273e7-c6b6-4617-a016-b0996fe1b181",
+            "raw": "水泥20袋",
+            "start": 0,
+            "end": 5,
+            "sourceQty": "20",
+            "sourceUnit": "袋",
+            "name": "水泥",
+            "code": "HJ002",
+            "unit": "吨",
+            "qty": "",
+            "priceCents": 42000,
+            "confidence": 0.99,
+            "match": "review",
+            "confirmed": false,
+            "issues": [
+              "缺少「袋 → 吨」换算关系，请核实数量后手动填写吨数"
+            ],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ],
+        "intentionalCorrection": true
+      }
+    },
+    {
+      "name": "新旧有效文本交叉 矿泉水3箱",
+      "passed": true,
+      "detail": {
+        "old": [
+          {
+            "raw": "矿泉水3箱",
+            "name": "矿泉水",
+            "code": null,
+            "unit": "箱",
+            "qty": 3,
+            "price": null,
+            "conf": 0.42,
+            "note": "商品库无此品，需人工处理",
+            "candidates": []
+          }
+        ],
+        "new": [
+          {
+            "id": "line-db5d08c1-0204-4b8f-9126-b6cb9cad965d",
+            "sourceId": "inbox-c40c73b0-522f-4dcc-be9f-387b005896e6",
+            "raw": "矿泉水3箱",
+            "start": 0,
+            "end": 5,
+            "sourceQty": "3",
+            "sourceUnit": "箱",
+            "name": "矿泉水",
+            "code": null,
+            "unit": "箱",
+            "qty": "3",
+            "priceCents": null,
+            "confidence": 0.35,
+            "match": "unmatched",
+            "confirmed": false,
+            "issues": [
+              "尚未绑定商品，请选品或建立新品档案"
+            ],
+            "note": "",
+            "reviewedBy": null,
+            "reviewedAt": null,
+            "candidates": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "连续中文数字一〇〇解析100",
+      "passed": true
+    },
+    {
+      "name": "中文小数二点五解析2.5",
+      "passed": true
+    },
+    {
+      "name": "范围与估量须人工复核",
+      "passed": true
+    },
+    {
+      "name": "无效真实日期拒绝",
+      "passed": true
+    },
+    {
+      "name": "配送后缀保留数量：送到店里",
+      "passed": true
+    },
+    {
+      "name": "配送后缀保留数量： ASAP",
+      "passed": true
+    },
+    {
+      "name": "配送后缀保留数量：下午三点前送到",
+      "passed": true
+    },
+    {
+      "name": "配送后缀保留数量：明天下午三点前送至仓库",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：再",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：还",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：又",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：下单",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：买",
+      "passed": true
+    },
+    {
+      "name": "原口语前缀：请帮我来",
+      "passed": true
+    },
+    {
+      "name": "原未知案例置信度说明保留",
+      "passed": true
+    },
+    {
+      "name": "未知商品建档重解析使用新目录",
+      "passed": true
+    },
+    {
+      "name": "逐行客户同步原进件",
+      "passed": true
+    },
+    {
+      "name": "逐行客户汇总不混单",
+      "passed": true
+    },
+    {
+      "name": "逐行客户导出对应行",
+      "passed": true
+    },
+    {
+      "name": "整单改客户保持行客户覆盖",
+      "passed": true
+    },
+    {
+      "name": "清空行客户恢复继承",
+      "passed": true
+    },
+    {
+      "name": "明细改动清除过期复核人时间",
+      "passed": true
+    },
+    {
+      "name": "整单改客户清除正式确认人时间",
+      "passed": true
+    },
+    {
+      "name": "已确认订单删行须重新正式确认",
+      "passed": true
+    },
+    {
+      "name": "错误计价单位不计入汇总及CSV",
+      "passed": true
+    },
+    {
+      "name": "错误单位无法复核或正式确认",
+      "passed": true
+    },
+    {
+      "name": "手动改量再次换品保留人工数量",
+      "passed": true
+    },
+    {
+      "name": "商品标准名不能占用已有别名",
+      "passed": true
+    },
+    {
+      "name": "商品别名不能占用已有标准名",
+      "passed": true
+    },
+    {
+      "name": "同商品别名去重去自身",
+      "passed": true
+    },
+    {
+      "name": "同单位换算不接受倍数",
+      "passed": true
+    },
+    {
+      "name": "重复包装换算不能静默覆盖",
+      "passed": true
+    },
+    {
+      "name": "商品改价不覆盖历史成交价",
+      "passed": true
+    },
+    {
+      "name": "引用后禁改计价单位",
+      "passed": true
+    },
+    {
+      "name": "失败批次零写入且无通知",
+      "passed": true
+    },
+    {
+      "name": "成功批次单次提交且去重",
+      "passed": true
+    },
+    {
+      "name": "拒绝对象型进件字段 sender",
+      "passed": true
+    },
+    {
+      "name": "拒绝对象型进件字段 source",
+      "passed": true
+    },
+    {
+      "name": "拒绝对象型进件字段 customer",
+      "passed": true
+    },
+    {
+      "name": "拒绝对象型进件字段 externalId",
+      "passed": true
+    },
+    {
+      "name": "进件接收拒绝不存在日期",
+      "passed": true
+    },
+    {
+      "name": "编辑进件失败不改变任何数据",
+      "passed": true
+    },
+    {
+      "name": "取消确认时无效修正保持原数据",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏进件异常数组",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏进件品名对象",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏候选商品对象",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏无效交期",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏订单镜像",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏撤销记录",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝损坏处理记录",
+      "passed": true
+    },
+    {
+      "name": "删除恢复保留其后客户修改",
+      "passed": true
+    },
+    {
+      "name": "删除后重录撤销不会产生同源双单",
+      "passed": true
+    },
+    {
+      "name": "删最后一行恢复关联",
+      "passed": true
+    },
+    {
+      "name": "全行业清空与逐行业撤销隔离",
+      "passed": true
+    },
+    {
+      "name": "超安全合计拒绝修改且保持原数据",
+      "passed": true
+    },
+    {
+      "name": "全部案例操作后备份完整恢复",
+      "passed": true
+    },
+    {
+      "name": "全案例复核到正式导出闭环 fresh",
+      "passed": true
+    },
+    {
+      "name": "全案例复核到正式导出闭环 food",
+      "passed": true
+    },
+    {
+      "name": "全案例复核到正式导出闭环 hardware",
+      "passed": true
+    },
+    {
+      "name": "全案例复核到正式导出闭环 general",
+      "passed": true
+    },
+    {
+      "name": "清空文本不清空客户",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "行客户失焦后修正点击不丢失",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "逐行客户可完成正式确认",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "按明细客户搜索命中一行",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实筛选导出客户对应且仅一行",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "改量联动草稿徽标与汇总",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实下载备份完整含逐行客户",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "界面坏批次拒绝且零数据变化",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "损坏备份未覆盖当前工作区",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "刷新后行客户和正式订单保留",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实图片附件保留并可预览",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "附件人工补录可走统一解析",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "取消新进件零写入",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实备份恢复行客户与正式状态",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实浏览器完整状态通过服务端校验",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "服务端拒绝损坏进件明细issues",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "服务端拒绝损坏进件字段对象",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "服务端拒绝损坏进件日期",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "服务端拒绝损坏镜像数量",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Webhook拒绝来源对象",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Webhook拒绝无效交期",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Webhook拒绝错误类型",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "客户演示全程无脚本异常",
+      "passed": true,
+      "detail": []
+    }
+  ]
+}

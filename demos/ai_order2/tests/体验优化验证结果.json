@@ -1,0 +1,312 @@
+{
+  "date": "2026-10-22",
+  "passed": 65,
+  "total": 65,
+  "results": [
+    {
+      "name": "无变化修正保持正式确认及时间",
+      "passed": true
+    },
+    {
+      "name": "无变化客户表单不撤销正式确认",
+      "passed": true
+    },
+    {
+      "name": "仅改说明保留复核及正式确认信息",
+      "passed": true
+    },
+    {
+      "name": "关键字段变更清除整单确认",
+      "passed": true
+    },
+    {
+      "name": "添加空行同步来源且保持待处理",
+      "passed": true
+    },
+    {
+      "name": "添加有效商品仍须核对",
+      "passed": true
+    },
+    {
+      "name": "复制保留来源并生成独立ID",
+      "passed": true
+    },
+    {
+      "name": "小数拆分保持六位数量之和",
+      "passed": true
+    },
+    {
+      "name": "非法拆分零变化",
+      "passed": true
+    },
+    {
+      "name": "批量修正全部同步到来源",
+      "passed": true
+    },
+    {
+      "name": "批量复核失败整批回滚",
+      "passed": true
+    },
+    {
+      "name": "批量选中过期行不产生部分更新",
+      "passed": true
+    },
+    {
+      "name": "按客户拆单保持明细金额和共同原文",
+      "passed": true
+    },
+    {
+      "name": "拆单后可独立确认、删除撤销、备份恢复",
+      "passed": true
+    },
+    {
+      "name": "客户档案与协议价按整数分保存",
+      "passed": true
+    },
+    {
+      "name": "无效客户档案零变化",
+      "passed": true
+    },
+    {
+      "name": "客户协议价拒绝未知商品或三位小数",
+      "passed": true
+    },
+    {
+      "name": "档案更新不覆盖历史成交价",
+      "passed": true
+    },
+    {
+      "name": "损坏客户备份不能恢复",
+      "passed": true
+    },
+    {
+      "name": "CSV解析保留逗号换行及引号",
+      "passed": true
+    },
+    {
+      "name": "确认订单默认只读",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实无变化保存保持已确认",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "显式变更后改量回草稿",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "确认并导出显示当前订单预览",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "取消补行零数据变化",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "按别名搜索商品",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实补行保存到订单",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实复制生成第四条",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实拆分数量不丢失",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "工作台只显示真实异常",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "异常导航定位高亮",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "保存后进入下一待处理明细",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实批量客户更新两行",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实批量交期同步到来源",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "批量复核不自动确认整单",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实按客户拆为两张订单",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "高级客户筛选随行级修改实时移除不匹配行",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "日期筛选排除旧日期",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "清空筛选恢复全部行",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "常用筛选可恢复",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "所选导出范围仅一条",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Excel为有效OOXML且只导出所选一行十九列",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Excel数量价格小计为可计算数值单元格",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "真实客户档案保存展示",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "客户联系人地址交期自动回填",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "切换客户刷新自动回填地址和联系人",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "切换客户保留人工填写收货地址",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "收货信息随新订单保存",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "协议价显式应用并重新待核对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "客户及订单信息刷新保留",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "原单旋转缩放可用",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "关闭图片预览保留未提交表单",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "对照修正后数量保存",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "手机默认明细卡片并可见保存状态",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "手机自动匹配不误标人工核对",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "手机业务明细位置较原884px提前",
+      "passed": true,
+      "detail": 643.609375
+    },
+    {
+      "name": "手机卡片修正更新金额",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "手机仍保留表格入口",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "写入并下一件保留草稿且切换需求",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "体验交互全程无未捕获脚本错误",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "优化后真实状态通过服务端校验",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "HTTP模式加载新增体验和Excel脚本",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "客户协议价真实保存SQLite",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "HTTP刷新恢复客户资料",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "服务端拒绝录单员修改客户协议资料",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

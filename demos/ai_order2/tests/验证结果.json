@@ -1,0 +1,387 @@
+{
+  "date": "2026-10-22",
+  "browser": "系统Edge无头模式",
+  "browserChecks": 56,
+  "serverChecks": 17,
+  "passed": 73,
+  "total": 73,
+  "results": [
+    {
+      "name": "保留生鲜5条原始明细",
+      "passed": true,
+      "detail": [
+        [
+          "番茄",
+          "10",
+          "SC001"
+        ],
+        [
+          "土豆",
+          "20",
+          "SC002"
+        ],
+        [
+          "黄瓜",
+          "15",
+          "SC003"
+        ],
+        [
+          "鸡蛋",
+          "2",
+          "SC007"
+        ],
+        [
+          "冰鲜带鱼",
+          "10",
+          null
+        ]
+      ]
+    },
+    {
+      "name": "别名统一标准名称",
+      "passed": true
+    },
+    {
+      "name": "未知商品保持未定价格且待处理",
+      "passed": true
+    },
+    {
+      "name": "默认文字单已计价451元",
+      "passed": true
+    },
+    {
+      "name": "同一进件写入幂等",
+      "passed": true
+    },
+    {
+      "name": "异常不允许确认正式订单",
+      "passed": true
+    },
+    {
+      "name": "不同计量维度绑定不直接搬用数量",
+      "passed": true
+    },
+    {
+      "name": "换商品时保留人工明确填写的单价",
+      "passed": true
+    },
+    {
+      "name": "人工补正后关闭复核并同步进件",
+      "passed": true
+    },
+    {
+      "name": "全明细有效后确认订单",
+      "passed": true
+    },
+    {
+      "name": "订单编辑自动回草稿与待复核",
+      "passed": true
+    },
+    {
+      "name": "拒绝千位分隔、字母、Infinity和隐藏单价精度",
+      "passed": true
+    },
+    {
+      "name": "中文千与万数量正确",
+      "passed": true
+    },
+    {
+      "name": "数量范围不得取上限",
+      "passed": true
+    },
+    {
+      "name": "负数不得变正数",
+      "passed": true
+    },
+    {
+      "name": "只有数量不生成伪商品",
+      "passed": true
+    },
+    {
+      "name": "英文混合大小写单位可识别",
+      "passed": true
+    },
+    {
+      "name": "重量换算正确",
+      "passed": true
+    },
+    {
+      "name": "豆腐包装3箱正确换算36盒且提示复核",
+      "passed": true
+    },
+    {
+      "name": "虾8斤为4kg，单价88元/kg",
+      "passed": true
+    },
+    {
+      "name": "自由文本与示例使用相同换算",
+      "passed": true
+    },
+    {
+      "name": "重复片段有不同位置区间",
+      "passed": true
+    },
+    {
+      "name": "高亮不嵌套且覆盖两处",
+      "passed": true
+    },
+    {
+      "name": "保留重复商品独立明细",
+      "passed": true
+    },
+    {
+      "name": "特殊客户分组不遗漏",
+      "passed": true
+    },
+    {
+      "name": "行业切换保留订单与进件",
+      "passed": true
+    },
+    {
+      "name": "完整持久化快照可恢复",
+      "passed": true
+    },
+    {
+      "name": "删除订单恢复进件可写入",
+      "passed": true
+    },
+    {
+      "name": "清空支持撤销",
+      "passed": true
+    },
+    {
+      "name": "撤销恢复关联订单",
+      "passed": true
+    },
+    {
+      "name": "新品待建不会退出待处理",
+      "passed": true
+    },
+    {
+      "name": "新品真实建档并回填明细",
+      "passed": true
+    },
+    {
+      "name": "CSV保留来源与复核状态且未缺列",
+      "passed": true
+    },
+    {
+      "name": "CSV文字防止公式执行",
+      "passed": true
+    },
+    {
+      "name": "缺失价格保持空白而非0元",
+      "passed": true
+    },
+    {
+      "name": "金额逐行取分再求和",
+      "passed": true
+    },
+    {
+      "name": "汇总与可见小计严格一致",
+      "passed": true
+    },
+    {
+      "name": "不接受损坏备份",
+      "passed": true
+    },
+    {
+      "name": "撤销删除保留之后新增的商品与进件",
+      "passed": true
+    },
+    {
+      "name": "分数包装系数可原样编辑",
+      "passed": true
+    },
+    {
+      "name": "图片纸单高亮覆盖完整数量及单位",
+      "passed": true
+    },
+    {
+      "name": "备份不能伪造未解决的正式订单",
+      "passed": true
+    },
+    {
+      "name": "备份拒绝不一致的进件关联",
+      "passed": true
+    },
+    {
+      "name": "客户与明天交期可提取",
+      "passed": true
+    },
+    {
+      "name": "外部消息重复编号去重",
+      "passed": true
+    },
+    {
+      "name": "带下午要前缀的商品需求不会当作交期漏掉",
+      "passed": true
+    },
+    {
+      "name": "完整保留四行业8案例32行",
+      "passed": true,
+      "detail": [
+        {
+          "industry": "fresh",
+          "id": "f1",
+          "rows": 5,
+          "cents": 45100,
+          "pending": 1
+        },
+        {
+          "industry": "fresh",
+          "id": "f2",
+          "rows": 4,
+          "cents": 17900,
+          "pending": 1
+        },
+        {
+          "industry": "fresh",
+          "id": "f3",
+          "rows": 3,
+          "cents": 20200,
+          "pending": 1
+        },
+        {
+          "industry": "food",
+          "id": "d1",
+          "rows": 5,
+          "cents": 179800,
+          "pending": 2
+        },
+        {
+          "industry": "food",
+          "id": "d2",
+          "rows": 3,
+          "cents": 196500,
+          "pending": 0
+        },
+        {
+          "industry": "hardware",
+          "id": "h1",
+          "rows": 5,
+          "cents": 4066000,
+          "pending": 0
+        },
+        {
+          "industry": "hardware",
+          "id": "h2",
+          "rows": 2,
+          "cents": 662000,
+          "pending": 0
+        },
+        {
+          "industry": "general",
+          "id": "g1",
+          "rows": 5,
+          "cents": 755900,
+          "pending": 0
+        }
+      ]
+    },
+    {
+      "name": "修正餐饮案例金额为1798元",
+      "passed": true
+    },
+    {
+      "name": "实际界面切换进件取消旧任务",
+      "passed": true
+    },
+    {
+      "name": "实际界面切行业取消旧任务且不污染目录",
+      "passed": true
+    },
+    {
+      "name": "真实写入按钮生成草稿并切到订单中心",
+      "passed": true
+    },
+    {
+      "name": "写入后修正入口仍绑定有效订单",
+      "passed": true
+    },
+    {
+      "name": "实际明细修正窗口可打开",
+      "passed": true
+    },
+    {
+      "name": "实际表格拒绝千位误读并恢复输入",
+      "passed": true
+    },
+    {
+      "name": "浏览器自动保存可读",
+      "passed": true
+    },
+    {
+      "name": "控制台主要页面都存在",
+      "passed": true
+    },
+    {
+      "name": "未登录不能读取业务数据",
+      "passed": true
+    },
+    {
+      "name": "管理员能登录",
+      "passed": true
+    },
+    {
+      "name": "SQLite首次保存",
+      "passed": true
+    },
+    {
+      "name": "SQLite读取一致",
+      "passed": true
+    },
+    {
+      "name": "乐观锁拒绝过期窗口覆盖",
+      "passed": true
+    },
+    {
+      "name": "服务端限制录单员编辑商品",
+      "passed": true
+    },
+    {
+      "name": "服务端限制录单员确认订单",
+      "passed": true
+    },
+    {
+      "name": "复核员可确认完整订单",
+      "passed": true
+    },
+    {
+      "name": "接口进件需要令牌",
+      "passed": true
+    },
+    {
+      "name": "接口真实接收进件",
+      "passed": true
+    },
+    {
+      "name": "接口重复消息去重",
+      "passed": true
+    },
+    {
+      "name": "同步返回接口进件",
+      "passed": true
+    },
+    {
+      "name": "未配置识别服务不会伪造结果",
+      "passed": true
+    },
+    {
+      "name": "识别适配器转发附件并接收真实返回",
+      "passed": true
+    },
+    {
+      "name": "静态服务不暴露服务脚本和数据库",
+      "passed": true
+    },
+    {
+      "name": "退出使会话失效",
+      "passed": true
+    },
+    {
+      "name": "关闭服务后SQLite数据仍保留",
+      "passed": true
+    }
+  ]
+}

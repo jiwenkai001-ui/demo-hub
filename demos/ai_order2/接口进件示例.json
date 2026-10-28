@@ -1,0 +1,20 @@
+[
+  {
+    "industry": "fresh",
+    "externalId": "sample-fresh-20261022-001",
+    "customer": "接口测试餐厅",
+    "sender": "采购员",
+    "source": "JSON导入演示",
+    "type": "text",
+    "content": "西红柿10斤，洋芋20斤，鸡蛋2箱"
+  },
+  {
+    "industry": "food",
+    "externalId": "sample-food-20261022-001",
+    "customer": "接口测试后厨",
+    "sender": "后厨主管",
+    "source": "JSON导入演示",
+    "type": "text",
+    "content": "牛腩15公斤，基围虾8斤，嫩豆腐3箱"
+  }
+]

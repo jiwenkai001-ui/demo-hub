@@ -1,0 +1,74 @@
+{
+  "passed": 17,
+  "total": 17,
+  "results": [
+    {
+      "name": "真实表单接收文字并生成明细",
+      "passed": true
+    },
+    {
+      "name": "实际按钮完成草稿到正式确认",
+      "passed": true
+    },
+    {
+      "name": "数量失焦后下一次修正点击不会被吞",
+      "passed": true
+    },
+    {
+      "name": "修改数量后卡片即时回草稿",
+      "passed": true
+    },
+    {
+      "name": "单价失焦后的溯源点击仍有效",
+      "passed": true
+    },
+    {
+      "name": "改价同步小计与待复核入口",
+      "passed": true
+    },
+    {
+      "name": "实际下载CSV含客户单价小计及溯源",
+      "passed": true
+    },
+    {
+      "name": "刷新后订单与确认状态保留",
+      "passed": true
+    },
+    {
+      "name": "候选商品绑定后要求核实不同维度数量",
+      "passed": true
+    },
+    {
+      "name": "真实新品建档表单增加目录并闭合复核",
+      "passed": true
+    },
+    {
+      "name": "真实图片上传预览与人工转写进入同一流程",
+      "passed": true
+    },
+    {
+      "name": "键鼠操作期间无未捕获脚本异常",
+      "passed": true
+    },
+    {
+      "name": "服务模式登录前不能关闭登录层修改数据",
+      "passed": true
+    },
+    {
+      "name": "浏览器登录后真实同步SQLite",
+      "passed": true
+    },
+    {
+      "name": "服务模式刷新恢复订单与行业",
+      "passed": true
+    },
+    {
+      "name": "录单员正式订单只读且变更按钮不可用",
+      "passed": true
+    },
+    {
+      "name": "录单员修改正式订单被拦截且输入回退",
+      "passed": true
+    }
+  ]
+}

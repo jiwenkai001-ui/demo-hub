@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-22",
+  "passed": 8,
+  "total": 8,
+  "results": [
+    {
+      "name": "双窗口冲突明确提示并保留窗口二本机数据",
+      "passed": true
+    },
+    {
+      "name": "冲突未覆盖已提交的共享数据",
+      "passed": true
+    },
+    {
+      "name": "临时断网仍保留本机副本与待同步标志",
+      "passed": true
+    },
+    {
+      "name": "网络恢复自动补同步且清除失败提示",
+      "passed": true
+    },
+    {
+      "name": "会话过期停止重试且保留未同步进件",
+      "passed": true
+    },
+    {
+      "name": "重新登录前自动下载未提交数据恢复副本",
+      "passed": true
+    },
+    {
+      "name": "重新登录可继续共享工作区且不残留冲突锁",
+      "passed": true
+    },
+    {
+      "name": "服务异常恢复过程无脚本错误",
+      "passed": true
+    }
+  ]
+}
