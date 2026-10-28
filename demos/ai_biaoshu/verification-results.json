@@ -1,0 +1,17 @@
+{
+  "passed": [
+    "Dashboard, local assets, desktop layout",
+    "Project global search and status filtering",
+    "File selection, project creation, simulated analysis and tabs",
+    "Chapter editing, preservation during AI optimization, Word export, reload persistence",
+    "Risk evidence requirement, resolution record, and linked chapter correction",
+    "Material upload validation, search, details and local metadata",
+    "Templates, JSON backup and confirmed demo reset",
+    "Mobile navigation, seven responsive views, modal fit and no page overflow",
+    "No JavaScript errors and no external network dependency"
+  ],
+  "count": 9,
+  "errors": [],
+  "url": "http://127.0.0.1:8765/",
+  "external_requests": []
+}
