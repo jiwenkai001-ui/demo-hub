@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>宠物医院管理系统</title>
+<link rel="stylesheet" href="assets/app.css?v=20261026-responsive">
+</head>
+<body>
+<div id="app-shell">
+  <aside id="sidebar"></aside>
+  <main>
+    <header id="topbar">
+      <h1>工作台</h1>
+      <span class="crumb"></span>
+      <div class="topbar-right">
+        <a class="btn btn-sm" href="../client/index.html" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M12 18h.01"/><path d="M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z"/></svg>
+          客户端小程序
+        </a>
+        <div class="who"><span class="avatar">管</span><span>admin · 店长</span></div>
+      </div>
+    </header>
+    <div id="view"><div class="skeleton">加载中…</div></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="../demo/vendor/sql-asm.js?v=20261026-responsive"></script>
+<script src="../demo/seed.js?v=20261026-responsive"></script>
+<script src="../demo/store.js?v=20261026-responsive"></script>
+<script src="../demo/emr.js?v=20261026-responsive"></script>
+<script src="../demo/management.js?v=20261026-responsive"></script>
+<script src="../demo/diagnostics.js?v=20261026-responsive"></script>
+<script src="../demo/replies.js?v=20261026-responsive"></script>
+<script src="../demo/portal.js?v=20261026-responsive"></script>
+<script src="../demo/stats.js?v=20261026-responsive"></script>
+<script src="assets/app.js?v=20261026-responsive"></script>
+<script src="views/dashboard.js?v=20261026-responsive"></script>
+<script src="views/patients.js?v=20261026-responsive"></script>
+<script src="views/appointments.js?v=20261026-responsive"></script>
+<script src="views/visits.js?v=20261026-responsive"></script>
+<script src="views/lis.js?v=20261026-responsive"></script>
+<script src="views/imaging.js?v=20261026-responsive"></script>
+<script src="views/crm.js?v=20261026-responsive"></script>
+<script src="views/inventory.js?v=20261026-responsive"></script>
+<script src="views/billing.js?v=20261026-responsive"></script>
+<script src="views/consult.js?v=20261026-responsive"></script>
+<script>App.start();</script>
+</body>
+</html>
