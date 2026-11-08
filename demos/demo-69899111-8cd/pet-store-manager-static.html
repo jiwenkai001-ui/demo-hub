@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>宠物门店 · 店长端</title>
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --orange:#55B57F;--orange2:#92DAB0;--cream:#F5FBF7;--card:#fff;
+  --ink:#22322A;--muted:#8A9B92;--line:#E6F4EA;--soft:#EAF7EE;
+  --gold:#A9E6C0;--dark:#1A3528;--green:#2FB37D;--blue:#2E9E93;--red:#FF4D4F;
+  --shadow:0 8px 22px rgba(64,140,100,.09);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{background:#E6F1E9;color:var(--ink);font-size:14px;line-height:1.45;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+img{display:block}
+.phone{position:relative;max-width:430px;margin:0 auto;min-height:100vh;background:
+  radial-gradient(1200px 300px at 50% -80px,#DCF3E3 0%,rgba(245,251,247,0) 60%),var(--cream)}
+.sprite{display:none}
+svg.ico{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- 顶部 ---------- */
+.topbar{position:sticky;top:0;z-index:25;color:#fff;border-radius:0 0 24px 24px;
+  background:linear-gradient(135deg,#79CE9C 0%,#55B57F 62%,#3F9E6A 100%);
+  box-shadow:0 10px 24px rgba(85,181,127,.22);overflow:hidden;padding-bottom:20px}
+.topbar::before{content:"";position:absolute;right:-40px;top:-60px;width:190px;height:190px;
+  border-radius:50%;background:rgba(255,255,255,.13)}
+.topbar::after{content:"";position:absolute;left:-50px;bottom:-90px;width:170px;height:170px;
+  border-radius:50%;background:rgba(255,255,255,.09)}
+.statusbar{height:26px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;font-size:11px;letter-spacing:.4px;opacity:.88;position:relative;z-index:2}
+.statusbar .sys{display:flex;align-items:center;gap:6px;font-size:10px}
+.signal{display:inline-flex;align-items:flex-end;gap:1.5px}
+.signal i{width:2.5px;border-radius:1px;background:#fff}
+.signal i:nth-child(1){height:4px}.signal i:nth-child(2){height:6px}
+.signal i:nth-child(3){height:8px}.signal i:nth-child(4){height:10px}
+.battery{width:20px;height:10px;border:1px solid rgba(255,255,255,.8);border-radius:3px;
+  position:relative;padding:1.5px}
+.battery::before{content:"";display:block;width:80%;height:100%;border-radius:1.5px;background:#fff}
+.battery::after{content:"";position:absolute;right:-4px;top:2.5px;width:2px;height:4px;
+  border-radius:0 2px 2px 0;background:rgba(255,255,255,.8)}
+.topbar-row{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  padding:6px 18px 0}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;flex:none;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.brand-logo svg{width:24px;height:24px;stroke:#fff;stroke-width:1.6;fill:none;stroke-linecap:round}
+.brand h1{margin:0;font-size:17px;font-weight:600;letter-spacing:.4px;white-space:nowrap}
+.brand p{margin:2px 0 0;font-size:11px;opacity:.85;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:220px}
+.top-actions{display:flex;gap:8px;flex:none}
+.conn{display:inline-flex;align-items:center;gap:4px;height:15px;padding:0 7px;border-radius:999px;
+  font-size:10px;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);
+  white-space:nowrap;position:relative;z-index:2}
+.conn i{width:5px;height:5px;border-radius:50%;background:#7FE3B2;box-shadow:0 0 6px rgba(127,227,178,.9)}
+.conn.off i{background:#A9CDB8;box-shadow:none}
+.icon-btn{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);position:relative}
+.icon-btn .ico{width:18px;height:18px;stroke:#fff}
+.icon-btn .dot{position:absolute;top:7px;right:8px;width:6px;height:6px;border-radius:50%;
+  background:#C9EFD6;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+
+/* ---------- 页面 ---------- */
+.page{display:none;padding:14px 14px 104px}
+.page.active{display:block;animation:pop .26s ease}
+@keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:18px;padding:15px;margin-top:12px;
+  border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-head h3{margin:0;font-size:15px;font-weight:600;letter-spacing:.2px;
+  display:flex;align-items:center;gap:7px}
+.section-head h3::before{content:"";width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,#89D6A8,#55B57F)}
+.section-head .hint{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:2px}
+.section-head .hint .ico{width:12px;height:12px;stroke:var(--muted)}
+.mt8{margin-top:8px}
+.foot-note{text-align:center;font-size:11px;color:#9DB6A7;padding:20px 0 4px}
+
+/* ---------- 按钮/标签 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  height:34px;padding:0 15px;border-radius:11px;font-size:12px;font-weight:500;
+  background:linear-gradient(135deg,#89D6A8,#55B57F);color:#fff;
+  box-shadow:0 6px 14px rgba(85,181,127,.26)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:#fff;color:var(--orange);border:1px solid #BFEBD1;box-shadow:none}
+.btn.gray{background:#EFF7F1;color:#6D8577;box-shadow:none}
+.btn.mini{height:29px;padding:0 11px;font-size:11px;border-radius:9px}
+.btn.block{display:flex;width:100%;height:44px;border-radius:14px;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--orange);white-space:nowrap}
+.badge.blue{background:#E7F6F4;color:#2E9E93}
+.badge.green{background:#E9F8EF;color:#1F9C63}
+.badge.red{background:#FFF0F0;color:#E5484D}
+.badge.gray{background:#F0F7F2;color:#7C9486}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;
+  border-radius:999px;color:var(--orange);border:1px solid #C9EEDA;background:#F5FBF8}
+
+/* ---------- 工作台 ---------- */
+.hero-card{position:relative;overflow:hidden;border-radius:20px;padding:18px 18px 14px;color:#fff;
+  background:linear-gradient(135deg,#1B4530 0%,#12362A 55%,#0E2A1E 100%);
+  border:1px solid rgba(169,230,192,.42);box-shadow:0 12px 26px rgba(20,60,42,.22)}
+.hero-card::before{content:"";position:absolute;right:-46px;top:-56px;width:170px;height:170px;
+  border-radius:50%;background:radial-gradient(circle,rgba(137,215,175,.26),transparent 68%)}
+.hero-card::after{content:"";position:absolute;left:18px;bottom:-30px;width:120px;height:80px;
+  border-radius:50%;background:rgba(130,205,160,.20);filter:blur(18px)}
+.hero-head{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.hero-label{margin:0;font-size:11px;color:#A9CDB6;letter-spacing:.8px}
+.hero-amount{margin:3px 0 2px;font-size:31px;font-weight:600;color:#D8F4E2;letter-spacing:.3px;line-height:1.15}
+.hero-amount i{font-style:normal;font-size:15px;font-weight:400;opacity:.7}
+.hero-trend{margin:0;font-size:11px;color:#8BD5AE}
+.hero-link{height:27px;padding:0 11px;border-radius:999px;font-size:10px;
+  color:#C8EEDA;border:1px solid rgba(169,230,192,.45);background:rgba(255,255,255,.06);white-space:nowrap}
+.hero-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
+  margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);text-align:center}
+.hero-stats div + div{border-left:1px solid rgba(255,255,255,.08)}
+.hero-stats b{display:block;font-size:17px;font-weight:600;color:#fff;letter-spacing:.4px}
+.hero-stats span{font-size:10px;color:#A5CBB3}
+
+.todo-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.todo-item{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:13px;
+  background:linear-gradient(135deg,#F3FBF6,#EDF8F0);border:1px solid #E1F4E8;text-align:left}
+.todo-item:active{transform:scale(.98)}
+.todo-ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;
+  background:#fff;color:var(--orange);border:1px solid #DCF3E3}
+.todo-ico .ico{width:16px;height:16px}
+.todo-item b{display:block;font-size:16px;font-weight:600;line-height:1.2;color:var(--orange)}
+.todo-item em{font-style:normal;font-size:10.5px;color:#768F81}
+.todo-item .chev{margin-left:auto;width:12px;height:12px;stroke:#CBE2D6}
+
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px}
+.quick-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;
+  color:#4E6658;line-height:1.2}
+.quick-ico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;
+  color:var(--orange);background:linear-gradient(145deg,#F2FBF5,#E4F6EA);
+  border:1px solid #D7F0DF;box-shadow:inset 0 1px 0 #fff}
+.quick-ico .ico{width:20px;height:20px}
+.quick-ico.money{font-family:"DIN Alternate",-apple-system,sans-serif;font-size:19px;font-weight:600}
+.quick-item:active .quick-ico{transform:scale(.94)}
+
+.tl{position:relative}
+.tl-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.tl-item:last-child{border-bottom:0;padding-bottom:2px}
+.tl-time{width:44px;flex:none;text-align:center}
+.tl-time b{display:block;font-size:13px;font-weight:600;letter-spacing:.3px}
+.tl-time span{font-size:9px;color:var(--muted)}
+.tl-line{width:2px;align-self:stretch;margin:2px 0;border-radius:2px;background:#E3F5E9;flex:none}
+.tl-av{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;
+  background:#EEF9F1;font-size:17px;border:1px solid #E3F5E8}
+.tl-main{flex:1;min-width:0}
+.tl-main p{margin:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-main span{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;display:block}
+
+.hot-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.hot-row:last-child{border-bottom:0}
+.thumb{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;
+  font-size:21px;background:linear-gradient(145deg,#F1FBF5,#E4F6EA);border:1px solid #DFF3E5}
+.hot-main{flex:1;min-width:0}
+.hot-main p{margin:0;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hot-main span{font-size:10px;color:var(--muted)}
+.bar{height:4px;border-radius:3px;background:#EAF6EE;margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;
+  background:linear-gradient(90deg,#A6E3BF,#62C18C)}
+.hot-price{font-size:13px;font-weight:600;color:var(--orange);flex:none}
+
+/* ---------- 底部 Tab ---------- */
+.tabbar{position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:35;
+  width:100%;max-width:430px;display:flex;padding:7px 4px calc(7px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.96);backdrop-filter:blur(14px);
+  border-top:1px solid #E6F3EA;box-shadow:0 -6px 18px rgba(60,120,85,.06)}
+.tab-item{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:3px 0;font-size:10.5px;color:#93A89A;border-radius:10px}
+.tab-item .ico{width:22px;height:22px;stroke:#93A89A;stroke-width:1.6}
+.tab-item.on{color:var(--orange);font-weight:600}
+.tab-item.on .ico{stroke:var(--orange)}
+.tab-item.on::after{content:"";position:absolute;bottom:-3px;width:14px;height:3px;
+  border-radius:2px;background:var(--orange);opacity:.85}
+.tab-badge{position:absolute;top:-1px;left:calc(50% + 5px);min-width:15px;height:15px;
+  padding:0 4px;border-radius:8px;background:var(--red);color:#fff;font-size:9px;
+  display:flex;align-items:center;justify-content:center;font-weight:500;line-height:1}
+
+/* ---------- 通用底部弹层 / Toast ---------- */
+.mask{position:fixed;inset:0;background:rgba(22,50,40,.42);opacity:0;visibility:hidden;
+  transition:.24s;z-index:60}
+.mask.on{opacity:1;visibility:visible}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,102%);width:100%;max-width:430px;
+  max-height:86vh;overflow:auto;background:#FBFEFC;border-radius:22px 22px 0 0;z-index:70;
+  box-shadow:0 -10px 40px rgba(30,80,55,.16);transition:transform .3s cubic-bezier(.3,.9,.3,1);
+  padding:0 18px calc(20px + env(safe-area-inset-bottom))}
+.sheet.on{transform:translate(-50%,0)}
+.sheet-grab{width:38px;height:4px;border-radius:3px;background:#DEF2E6;margin:9px auto 0}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;position:sticky;top:0;background:#FBFEFC;z-index:2}
+.sheet-head h3{margin:0;font-size:17px;font-weight:600}
+.sheet-close{width:30px;height:30px;border-radius:50%;background:#EDF7EF;display:grid;place-items:center;color:#7C9486;font-size:14px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,14px);z-index:90;
+  background:rgba(30,55,42,.92);color:#fff;font-size:12.5px;padding:10px 16px;border-radius:12px;
+  opacity:0;visibility:hidden;transition:.24s;max-width:80%;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+/* ---------- 订单页 ---------- */
+.page-stats{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#fff;
+  border:1px solid #E9F5EC;border-radius:16px;box-shadow:var(--shadow);font-size:11px;color:var(--muted)}
+.page-stats b{color:var(--ink);font-size:13px;font-weight:600}
+.page-stats .sep{flex:1}
+.filter-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none}
+.filter-tabs::-webkit-scrollbar{display:none}
+.chip{flex:none;height:32px;padding:0 14px;border-radius:999px;font-size:12px;color:#5E7466;
+  background:#fff;border:1px solid #E3F4E9;display:flex;align-items:center;transition:.2s}
+.chip.on{background:linear-gradient(135deg,#89D6A8,#55B57F);color:#fff;border-color:transparent;
+  font-weight:600;box-shadow:0 6px 14px rgba(85,181,127,.24)}
+.order-card{background:#fff;border-radius:18px;padding:14px;margin-top:11px;
+  border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.order-top{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.order-no{font-size:10.5px;color:var(--muted);letter-spacing:.3px}
+.order-user{display:flex;align-items:center;gap:9px;padding:11px 0 9px}
+.user-av{width:32px;height:32px;border-radius:50%;background:#EDF8F0;display:grid;
+  place-items:center;font-size:16px;flex:none}
+.user-meta{flex:1;min-width:0}
+.user-meta p{margin:0;font-size:13px;font-weight:600}
+.user-meta span{font-size:10.5px;color:var(--muted)}
+.order-items{background:#F7FCF9;border-radius:12px;padding:9px 10px}
+.order-item{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:3px 0}
+.order-item .n{color:#42594C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.order-item .p{flex:none;font-size:11px;color:#97ACA0}
+.order-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.order-amt{font-size:11px;color:var(--muted);flex:none}
+.order-amt b{font-size:17px;font-weight:600;color:#3F9E6A;margin-left:2px}
+.order-amt b i{font-style:normal;font-size:11px}
+.order-actions{display:flex;gap:7px;flex:none}
+.empty{text-align:center;padding:36px 0;color:#9DB6A7;font-size:12px}
+.empty .e{display:block;font-size:32px;margin-bottom:8px;opacity:.8}
+
+/* ---------- 预约页 ---------- */
+.date-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.date-strip::-webkit-scrollbar{display:none}
+.date-chip{flex:none;width:62px;padding:8px 0;border-radius:14px;background:#fff;
+  border:1px solid #E3F4E9;text-align:center;transition:.2s}
+.date-chip b{display:block;font-size:12px;font-weight:600}
+.date-chip span{font-size:10px;color:var(--muted)}
+.date-chip.on{background:linear-gradient(160deg,#89D6A8,#55B57F);border-color:transparent;
+  color:#fff;box-shadow:0 6px 16px rgba(85,181,127,.25)}
+.date-chip.on span{color:rgba(255,255,255,.85)}
+.staff-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+.staff-strip::-webkit-scrollbar{display:none}
+.staff-chip{flex:none;display:flex;align-items:center;gap:5px;height:30px;padding:0 10px 0 5px;
+  border-radius:999px;background:#fff;border:1px solid #E3F4E9;font-size:11px}
+.staff-chip .av{width:22px;height:22px;border-radius:50%;background:#E4F6EA;display:grid;
+  place-items:center;font-size:11px}
+.staff-chip.on{border-color:#B7E8C9;background:#EBF8EF;color:var(--orange);font-weight:600}
+.sched-sum{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-radius:16px;
+  padding:11px;border:1px solid #E9F5EC;margin-top:10px;text-align:center;box-shadow:var(--shadow)}
+.sched-sum b{display:block;font-size:16px}
+.sched-sum span{font-size:10px;color:var(--muted)}
+.sched-sum .c b{color:var(--orange)}
+.appt-card{display:flex;gap:11px;background:#fff;border-radius:16px;padding:12px;margin-top:10px;
+  border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.appt-time{flex:none;width:50px;text-align:center;padding-top:2px}
+.appt-time b{display:block;font-size:14px;letter-spacing:.3px}
+.appt-time span{font-size:10px;color:var(--muted)}
+.appt-body{flex:1;min-width:0}
+.appt-body .row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.appt-body .row1 p{margin:0;font-size:13px;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.appt-body .pet{font-size:11px;color:var(--muted);margin:2px 0 7px}
+.appt-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.staff-mini{display:flex;align-items:center;gap:4px;font-size:10px;color:#778F82}
+.staff-mini .av{width:20px;height:20px;border-radius:50%;background:#E4F6EA;display:grid;
+  place-items:center;font-size:10px}
+.fab{position:fixed;right:max(18px,calc(50% - 197px));bottom:88px;z-index:40;height:42px;
+  padding:0 16px;border-radius:999px;display:flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#89D6A8,#55B57F);color:#fff;font-size:12.5px;font-weight:600;
+  box-shadow:0 10px 22px rgba(85,181,127,.35)}
+.fab .ico{width:15px;height:15px;stroke:#fff}
+
+/* ---------- 商品库存页 ---------- */
+.search{display:flex;align-items:center;gap:8px;height:41px;background:#fff;
+  border:1px solid #E3F4E9;border-radius:13px;padding:0 12px;box-shadow:var(--shadow)}
+.search .ico{width:16px;height:16px;stroke:#A9CDB8}
+.search input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:12.5px;color:var(--ink)}
+.search input::placeholder{color:#AFCDBC}
+.warn-banner{display:flex;align-items:center;gap:8px;margin-top:11px;padding:10px 12px;
+  border-radius:13px;background:#EFFAF3;border:1px solid #CFF0DB;font-size:11.5px;color:#3E7F5F}
+.warn-banner .ico{width:16px;height:16px;stroke:#55B57F}
+.warn-banner b{color:#2F8B5C}
+.goods-sum{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;padding:2px 0}
+.goods-sum b{display:block;font-size:17px}
+.goods-sum b.c{color:var(--orange)}
+.goods-sum span{font-size:10px;color:var(--muted)}
+.g-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line)}
+.g-item:last-child{border-bottom:0;padding-bottom:2px}
+.g-thumb{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex:none;
+  font-size:23px;background:linear-gradient(145deg,#F1FBF5,#E4F6EA);border:1px solid #DFF3E5}
+.g-main{flex:1;min-width:0}
+.g-main p{margin:0;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-main span{font-size:10px;color:var(--muted)}
+.g-meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:10.5px}
+.stock{font-weight:600}
+.stock.ok{color:#7E9F8F}
+.stock.low{color:#E5484D}
+.g-right{flex:none;text-align:right}
+.g-price{font-size:13px;font-weight:600;color:var(--orange)}
+.restock{margin-top:5px}
+
+/* ---------- 店铺页 ---------- */
+.store-card{position:relative;overflow:hidden;border-radius:20px;padding:16px;background:#fff;
+  border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.store-card::before{content:"";position:absolute;right:-34px;top:-44px;width:150px;height:150px;
+  border-radius:50%;background:radial-gradient(circle,#DFF3E6,transparent 70%)}
+.store-head{display:flex;gap:11px;align-items:center;position:relative;z-index:1}
+.store-av{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;flex:none;
+  font-size:26px;background:linear-gradient(145deg,#EAF8EE,#D8F0E0);border:1px solid #CDF0DC}
+.store-head h2{margin:0;font-size:16px;font-weight:600}
+.store-head p{margin:1px 0 0;font-size:10.5px;color:var(--muted)}
+.open-toggle{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;
+  color:#1F9C63;flex:none}
+.switch{width:36px;height:20px;border-radius:12px;background:#33BE86;position:relative;
+  transition:.22s;flex:none}
+.switch::after{content:"";position:absolute;top:2px;left:18px;width:16px;height:16px;
+  border-radius:50%;background:#fff;transition:.22s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.switch.off{background:#CFE4D8}
+.switch.off::after{left:2px}
+.store-lines{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);
+  font-size:11.5px;color:#6C8476;display:flex;flex-direction:column;gap:6px}
+.store-lines div{display:flex;gap:6px;align-items:center}
+.store-lines .ico{width:13px;height:13px;stroke:#AECDC0}
+.store-stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;background:#fff;
+  border-radius:16px;padding:12px;margin-top:11px;border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.store-stats b{display:block;font-size:16px;color:var(--orange)}
+.store-stats span{font-size:10px;color:var(--muted)}
+.menu{background:#fff;border-radius:18px;margin-top:12px;overflow:hidden;
+  border:1px solid #E9F5EC;box-shadow:var(--shadow)}
+.menu-item{display:flex;align-items:center;gap:11px;padding:13px 14px;width:100%;text-align:left;
+  border-bottom:1px solid #EAF5ED}
+.menu-item:last-child{border-bottom:0}
+.menu-item:active{background:#F7FCF9}
+.menu-ico{width:36px;height:36px;border-radius:11px;background:#EDF8F0;color:var(--orange);
+  display:grid;place-items:center;flex:none;border:1px solid #E0F4E6}
+.menu-ico .ico{width:17px;height:17px}
+.menu-main{flex:1;min-width:0}
+.menu-main b{display:block;font-size:13px;font-weight:500}
+.menu-main span{font-size:10.5px;color:var(--muted)}
+.menu-item em{font-style:normal;font-size:11px;color:var(--muted);margin-right:3px}
+.menu-item .chev{width:13px;height:13px;stroke:#C6E1D2}
+.logout{width:100%;height:44px;margin-top:14px;border-radius:14px;background:#fff;
+  border:1px solid #E3F4E9;color:#8FA89A;font-size:13px}
+
+/* ---------- 弹层表单 ---------- */
+.form-label{font-size:11.5px;color:#5E7466;margin:13px 0 7px;font-weight:500}
+.opt-row{display:flex;flex-wrap:wrap;gap:7px}
+.opt{height:32px;padding:0 12px;border-radius:10px;background:#F5FBF7;border:1px solid #E3F4E9;
+  font-size:11.5px;display:flex;align-items:center;gap:4px}
+.opt.on{background:#E8F6EC;border-color:#B2E6C4;color:var(--orange);font-weight:600}
+.field{height:41px;border-radius:12px;border:1px solid #E3F4E9;background:#FBFEFC;
+  display:flex;align-items:center;padding:0 12px;font-size:12.5px}
+.field input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:12.5px;color:var(--ink)}
+.field input::placeholder{color:#AFCDBC}
+.sheet-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;
+  padding-top:11px;border-top:1px dashed var(--line)}
+.sheet-total span{font-size:11.5px;color:var(--muted)}
+.sheet-total b{font-size:20px;color:#3F9E6A;font-weight:600}
+.sheet .btn.block{margin-top:12px}
+.pay-row{display:flex;gap:8px;margin-top:8px}
+.pay-opt{flex:1;height:38px;border-radius:11px;border:1px solid #E3F4E9;background:#FBFEFC;
+  display:flex;align-items:center;justify-content:center;gap:5px;font-size:11.5px;color:#6C8476}
+.pay-opt.on{border-color:#A5E2BD;background:#EEF9F1;color:var(--orange);font-weight:600}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="7" cy="7.5" r="2.1"/><circle cx="12" cy="5.4" r="2.1"/><circle cx="17" cy="7.5" r="2.1"/><path d="M12 10.8c3 0 5 2.7 5 4.7a2.6 2.6 0 01-4.2 1.9 1.4 1.4 0 00-1.6 0A2.6 2.6 0 017 15.5c0-2 2-4.7 5-4.7z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.2 9.5a5.8 5.8 0 0111.6 0c0 4.4 1.6 5.6 1.6 5.6H4.6s1.6-1.2 1.6-5.6z"/><path d="M10 18.6a2 2 0 004 0"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-order" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M9 10h6M9 14h4"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7.5 13.5h2M14.5 13.5h2M7.5 17h2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7.6l9-4.5 9 4.5v8.8l-9 4.5-9-4.5z"/><path d="M3 7.6l9 4.6 9-4.6M12 12.2v8.7"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9h16l-2-5H6z"/><path d="M4 9v11h16V9"/><path d="M9.5 20v-6h5v6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.2"/><path d="M15.3 15.3L20.5 20.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 6.5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2h.01"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.5v5l3 2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.4-3 2.8-4.8 5.5-4.8s5.1 1.8 5.5 4.8"/><circle cx="17" cy="9" r="2.1"/><path d="M15.5 14.4c2.6.2 4.4 1.9 5 4.4"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V11M9.3 20V5.5M14.7 20v-6.4M20 20H3"/></symbol>
+  <symbol id="i-money" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M9 8l3 4.2 3-4.2M12 12.2v5M9.6 13.6h4.8"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12V4.5h7.5l9.5 9.5-7 7z"/><circle cx="8" cy="9" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-staff" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.2"/><circle cx="9" cy="10.6" r="2.2"/><path d="M6 16c.6-2 1.9-2.8 3-2.8s2.4.8 3 2.8M14 10h4M14 14h3"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 24 24"><path d="M4 10.5v3.4l11 4.6V6z"/><path d="M15 8.6h3.4v6.2H15"/><path d="M7 14.4v3.4h3v-2.4"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="statusbar">
+    <span>9:41</span>
+    <button class="conn off" id="connChip" title="静态演示：数据保存在本地"><i></i><span id="connTxt">静态演示</span></button>
+    <span class="sys">
+      <span class="signal"><i></i><i></i><i></i><i></i></span>
+      <span>5G</span>
+      <span class="battery"></span>
+    </span>
+  </div>
+  <div class="topbar-row">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><use href="#i-paw"/></svg>
+      </div>
+      <div>
+        <h1 id="pageTitle">工作台</h1>
+        <p id="pageSub">宠物门店 · 营业中 09:00-21:00</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" onclick="toast('今日有 3 条新消息：2 个预约、1 条评价')">
+        <svg class="ico"><use href="#i-bell"/></svg><i class="dot"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="pages">
+  <section class="page active" id="page-dashboard"><div class="hero-card">
+  <div class="hero-head">
+    <div>
+      <p class="hero-label">今日营业额</p>
+      <h2 class="hero-amount">¥<span id="revenueTxt">6,820</span><i>.00</i></h2>
+      <p class="hero-trend" id="revenueTrend">↑ 12.6% 较昨日 · 客单价 ¥162</p>
+    </div>
+    <button class="hero-link" onclick="toast('经营日报已生成，可在「店铺」中查看')">经营日报 ›</button>
+  </div>
+  <div class="hero-stats">
+    <div><b id="statOrders">42</b><span>今日订单</span></div>
+    <div><b id="statAppts">18</b><span>今日预约</span></div>
+    <div><b>6</b><span>新增会员</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h3>待办事项</h3><span class="hint">点击直达处理</span></div>
+  <div class="todo-grid">
+    <button class="todo-item" onclick="navTo('orders','待服务')">
+      <i class="todo-ico"><svg class="ico"><use href="#i-clock"/></svg></i>
+      <div><b id="todoService">0</b><em>待服务预约</em></div>
+      <svg class="ico chev"><use href="#i-chev"/></svg>
+    </button>
+    <button class="todo-item" onclick="navTo('orders','待发货')">
+      <i class="todo-ico"><svg class="ico" style="stroke:var(--blue)"><use href="#i-box"/></svg></i>
+      <div><b id="todoShip" style="color:var(--blue)">0</b><em>待发货订单</em></div>
+      <svg class="ico chev"><use href="#i-chev"/></svg>
+    </button>
+    <button class="todo-item" onclick="navTo('orders','待付款')">
+      <i class="todo-ico"><svg class="ico" style="stroke:var(--red)"><use href="#i-money"/></svg></i>
+      <div><b id="todoPay" style="color:var(--red)">0</b><em>待收款订单</em></div>
+      <svg class="ico chev"><use href="#i-chev"/></svg>
+    </button>
+    <button class="todo-item" onclick="navTo('goods')">
+      <i class="todo-ico"><svg class="ico" style="stroke:#55B57F"><use href="#i-warn"/></svg></i>
+      <div><b id="todoStock" style="color:#55B57F">0</b><em>库存预警商品</em></div>
+      <svg class="ico chev"><use href="#i-chev"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h3>快捷功能</h3><span class="hint">店长专用</span></div>
+  <div class="quick-grid">
+    <button class="quick-item" onclick="openCheckout()">
+      <span class="quick-ico money">¥</span><span>开单收银</span>
+    </button>
+    <button class="quick-item" onclick="navTo('appts')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-cal"/></svg></span><span>预约排班</span>
+    </button>
+    <button class="quick-item" onclick="navTo('goods')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-box"/></svg></span><span>商品库存</span>
+    </button>
+    <button class="quick-item" onclick="toast('会员管理 · 现有会员 1,286 位')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-users"/></svg></span><span>会员管理</span>
+    </button>
+    <button class="quick-item" onclick="toast('宠物档案 · 已建档 892 份')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-paw"/></svg></span><span>宠物档案</span>
+    </button>
+    <button class="quick-item" onclick="toast('营销活动 · 进行中 2 个（撸宠体验、储值有礼）')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-mega"/></svg></span><span>营销活动</span>
+    </button>
+    <button class="quick-item" onclick="toast('员工管理 · 今日在岗 6 人')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-staff"/></svg></span><span>员工管理</span>
+    </button>
+    <button class="quick-item" onclick="toast('数据报表 · 本月营收 ¥68,200，环比 +9.8%')">
+      <span class="quick-ico"><svg class="ico"><use href="#i-chart"/></svg></span><span>数据报表</span>
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h3>今日预约</h3><span class="hint" onclick="navTo('appts')">排班表
+    <svg class="ico"><use href="#i-chev"/></svg></span></div>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-time"><b>09:30</b><span>已到店</span></div>
+      <i class="tl-line"></i>
+      <div class="tl-av">🐶</div>
+      <div class="tl-main"><p>徐嘉 · 布丁（比熊）</p><span>全身造型精剪 · 美容师 Amy</span></div>
+      <span class="badge green">已完成</span>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time"><b>11:00</b><span>服务中</span></div>
+      <i class="tl-line" style="background:#A6E3BF"></i>
+      <div class="tl-av">🐱</div>
+      <div class="tl-main"><p>陈一诺 · 毛毛（英短）</p><span>猫咪专属美容 · 美容师 小林</span></div>
+      <span class="badge">服务中</span>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time"><b>14:30</b><span>待服务</span></div>
+      <i class="tl-line"></i>
+      <div class="tl-av">🐕</div>
+      <div class="tl-main"><p>林小满 · 豆豆（金毛）</p><span>全身造型精剪 · 美容师 Amy</span></div>
+      <span class="badge blue">已确认</span>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time"><b>16:10</b><span>待服务</span></div>
+      <i class="tl-line"></i>
+      <div class="tl-av">🐩</div>
+      <div class="tl-main"><p>周雨桐 · 团子（贵宾）</p><span>宠物深层洗护 · 美容师 阿杰</span></div>
+      <span class="badge gray">待确认</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head"><h3>热销商品</h3><span class="hint" onclick="navTo('goods')">库存管理
+    <svg class="ico"><use href="#i-chev"/></svg></span></div>
+  <div class="hot-row">
+    <div class="thumb">🦴</div>
+    <div class="hot-main">
+      <p>冻干鸡胸肉粒 100g</p>
+      <span>今日售出 12 件 · 库存 25</span>
+      <div class="bar"><i style="width:78%"></i></div>
+    </div>
+    <div class="hot-price">¥39</div>
+  </div>
+  <div class="hot-row">
+    <div class="thumb">🥩</div>
+    <div class="hot-main">
+      <p>鲜肉冻干全价猫粮 1.8kg</p>
+      <span>今日售出 8 件 · 库存 9</span>
+      <div class="bar"><i style="width:62%"></i></div>
+    </div>
+    <div class="hot-price">¥168</div>
+  </div>
+  <div class="hot-row">
+    <div class="thumb">🧴</div>
+    <div class="hot-main">
+      <p>宠物香波 温和型 500ml</p>
+      <span>今日售出 6 件 · 库存 32</span>
+      <div class="bar"><i style="width:45%"></i></div>
+    </div>
+    <div class="hot-price">¥60</div>
+  </div>
+</div>
+
+<p class="foot-note">数据更新于 <span class="sync-time">09:41</span> · 宠物门店店长端</p></section>
+  <section class="page" id="page-orders"><div class="page-stats">
+  <span>今日 <b id="todayOrderCount">42</b> 单</span>
+  <span>待处理 <b id="pendingCount">0</b></span>
+  <span class="sep"></span>
+  <span>退款 <b>0</b></span>
+</div>
+<div class="filter-tabs" id="orderTabs">
+  <button class="chip on" data-status="全部" onclick="setOrderFilter('全部')">全部</button>
+  <button class="chip" data-status="待服务" onclick="setOrderFilter('待服务')">待服务</button>
+  <button class="chip" data-status="待发货" onclick="setOrderFilter('待发货')">待发货</button>
+  <button class="chip" data-status="待付款" onclick="setOrderFilter('待付款')">待付款</button>
+  <button class="chip" data-status="已完成" onclick="setOrderFilter('已完成')">已完成</button>
+</div>
+<div id="orderList"></div>
+<p class="foot-note">仅展示今日订单 · 共 <span id="footOrderCount">7</span> 条</p></section>
+  <section class="page" id="page-appts"><div class="date-strip" id="dateStrip"></div>
+<div class="staff-strip" id="staffStrip">
+  <button class="staff-chip on" onclick="setStaff('全部')"><span class="av">全</span>全部美容师</button>
+  <button class="staff-chip" onclick="setStaff('Amy')"><span class="av">A</span>Amy</button>
+  <button class="staff-chip" onclick="setStaff('小林')"><span class="av">林</span>小林</button>
+  <button class="staff-chip" onclick="setStaff('阿杰')"><span class="av">杰</span>阿杰</button>
+</div>
+<div class="sched-sum">
+  <div><b id="sumTotal">0</b><span>预约总数</span></div>
+  <div class="c"><b id="sumDone">0</b><span>已完成</span></div>
+  <div class="c"><b id="sumPending">0</b><span>待服务</span></div>
+</div>
+<div id="apptList"></div>
+<button class="fab" id="fabBook" style="display:none" onclick="openBooking()">
+  <svg class="ico"><use href="#i-plus"/></svg>新建预约
+</button>
+<p class="foot-note">营业时间 09:00-21:00 · 每单服务间隔 30 分钟</p></section>
+  <section class="page" id="page-goods"><div class="search">
+  <svg class="ico"><use href="#i-search"/></svg>
+  <input id="goodsSearch" placeholder="搜索商品名称 / 规格" oninput="renderGoods()">
+</div>
+<div class="filter-tabs" id="goodsCats">
+  <button class="chip on" onclick="setGoodsCat('全部')">全部</button>
+  <button class="chip" onclick="setGoodsCat('主粮')">主粮</button>
+  <button class="chip" onclick="setGoodsCat('零食')">零食</button>
+  <button class="chip" onclick="setGoodsCat('玩具')">玩具</button>
+  <button class="chip" onclick="setGoodsCat('护理')">护理</button>
+  <button class="chip" onclick="setGoodsCat('清洁')">清洁</button>
+</div>
+<div class="warn-banner" id="warnBanner" onclick="navTo('goods')">
+  <svg class="ico"><use href="#i-warn"/></svg>
+  <span><b id="warnCount">4</b> 件商品库存低于预警线，建议今日补货</span>
+</div>
+<div class="card">
+  <div class="goods-sum">
+    <div><b>126</b><span>在售商品</span></div>
+    <div><b class="c" id="sumLow">4</b><span>低库存</span></div>
+    <div><b>38</b><span>今日售出</span></div>
+  </div>
+</div>
+<div class="card" id="goodsCard"><div id="goodsList"></div></div>
+<p class="foot-note">库存数据同步自收银系统 · <span class="sync-time">09:41</span></p></section>
+  <section class="page" id="page-store"><div class="store-card">
+  <div class="store-head">
+    <div class="store-av">🐾</div>
+    <div>
+      <h2>宠物门店</h2>
+      <p>店长 陈森田 · 门店编号 ST-0286</p>
+    </div>
+    <button class="open-toggle" onclick="toggleOpen()">
+      <span id="openTxt">营业中</span><span class="switch" id="openSwitch"></span>
+    </button>
+  </div>
+  <div class="store-lines">
+    <div><svg class="ico"><use href="#i-tag"/></svg>4.9 分 · 1,286 条顾客评价</div>
+    <div><svg class="ico"><use href="#i-clock"/></svg>每日 09:00-21:00 · 全年无休</div>
+    <div><svg class="ico"><use href="#i-paw"/></svg>幸福路 128 号 阳光里购物中心 1F-08</div>
+  </div>
+</div>
+
+<div class="store-stats">
+  <div><b>1,286</b><span>会员总数</span></div>
+  <div><b>892</b><span>宠物档案</span></div>
+  <div><b>¥68,200</b><span>本月营收</span></div>
+</div>
+
+<div class="menu">
+  <button class="menu-item" onclick="toast('员工管理 · 共 8 名员工，今日在岗 6 人')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-staff"/></svg></span>
+    <span class="menu-main"><b>员工管理</b><span>今日在岗 6 人 · 排班与绩效</span></span>
+    <em>6 人</em><svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('会员与权益 · 储值余额 ¥32,860，金卡会员 128 位')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-users"/></svg></span>
+    <span class="menu-main"><b>会员与权益</b><span>储值余额 ¥32,860 · 等级规则</span></span>
+    <em>L2</em><svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('营销活动 · 进行中 2 个：农场撸宠体验、储值有礼')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-mega"/></svg></span>
+    <span class="menu-main"><b>营销活动</b><span>农场撸宠体验 · 储值有礼</span></span>
+    <em>2 个进行中</em><svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="navTo('goods')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-box"/></svg></span>
+    <span class="menu-main"><b>商品与分类</b><span>在售 126 件 · <span id="storeLowTxt">4</span> 件库存偏低</span></span>
+    <em>126</em><svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('评价管理 · 4.9 分，待回复 3 条')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-tag"/></svg></span>
+    <span class="menu-main"><b>评价管理</b><span>4.9 分 · 待回复 3 条</span></span>
+    <em>4.9</em><svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('数据报表 · 本月营收 ¥68,200，环比 +9.8%')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-chart"/></svg></span>
+    <span class="menu-main"><b>数据报表</b><span>营收、客流、转化分析</span></span>
+    <svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('门店信息 · 修改地址、电话与营业时间')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-store"/></svg></span>
+    <span class="menu-main"><b>门店信息</b><span>地址、电话、营业时间</span></span>
+    <svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+  <button class="menu-item" onclick="toast('系统设置 · 账号与权限、小票打印')">
+    <span class="menu-ico"><svg class="ico"><use href="#i-set"/></svg></span>
+    <span class="menu-main"><b>系统设置</b><span>账号与权限 · 小票打印</span></span>
+    <svg class="ico chev"><use href="#i-chev"/></svg>
+  </button>
+</div>
+<button class="logout" onclick="toast('已退出登录（演示环境）')">退出登录</button>
+<p class="foot-note">宠物门店管理系统 · 店长端 v1.0</p></section>
+</main>
+
+<nav class="tabbar">
+  <button class="tab-item on" data-tab="dashboard" onclick="navTo('dashboard')">
+    <svg class="ico"><use href="#i-grid"/></svg><span>工作台</span>
+  </button>
+  <button class="tab-item" data-tab="orders" onclick="navTo('orders')">
+    <svg class="ico"><use href="#i-order"/></svg><span>订单</span><i class="tab-badge" id="tabOrderBadge">4</i>
+  </button>
+  <button class="tab-item" data-tab="appts" onclick="navTo('appts')">
+    <svg class="ico"><use href="#i-cal"/></svg><span>预约</span>
+  </button>
+  <button class="tab-item" data-tab="goods" onclick="navTo('goods')">
+    <svg class="ico"><use href="#i-box"/></svg><span>商品</span>
+  </button>
+  <button class="tab-item" data-tab="store" onclick="navTo('store')">
+    <svg class="ico"><use href="#i-store"/></svg><span>店铺</span>
+  </button>
+</nav>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="mask" id="mask" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3 id="sheetTitle">快捷操作</h3>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+  </div>
+  <div id="sheetBody"></div>
+</div>
+
+<script>
+const TITLES={dashboard:'工作台',orders:'订单管理',appts:'预约排班',goods:'商品库存',store:'店铺管理'};
+const SUBS={dashboard:'宠物门店 · 营业中 09:00-21:00',orders:'今日订单 · 待办实时提醒',appts:'排班与到店预约管理',goods:'库存、补货与销量跟踪',store:'门店信息与经营设置'};
+
+let today={revenue:6820,orders:42,appts:18,members:6};
+let orderFilter='全部',apptDay=0,staffFilter='全部',goodsCat='全部',orderSeq=15,isOpen=true;
+
+const apptDays=[
+  {label:'今天',date:'11/07',weekday:'周六'},
+  {label:'明天',date:'11/08',weekday:'周日'},
+  {label:'后天',date:'11/09',weekday:'周一'},
+  {label:'周四',date:'11/10',weekday:'周二'}
+];
+
+let orders=[
+  {no:'#2026110714',type:'服务',avatar:'🐕',name:'林小满',phone:'138****6621',pet:'豆豆 · 金毛 28.5kg',
+   items:[{n:'全身造型精剪',q:1,p:268},{n:'宠物香波 温和型',q:1,p:60}],amount:328,
+   pay:'已付款 · 微信',time:'11-07 14:20',status:'待服务',staff:'Amy'},
+  {no:'#2026110713',type:'商品',avatar:'🐩',name:'周雨桐',phone:'139****8802',pet:'团子 · 贵宾',
+   items:[{n:'渴望无谷六种鱼成犬粮 1.4kg',q:1,p:568}],amount:568,
+   pay:'已付款 · 支付宝',time:'11-07 13:52',status:'待发货',staff:''},
+  {no:'#2026110712',type:'服务',avatar:'🐱',name:'陈一诺',phone:'137****2049',pet:'毛毛 · 英短 4.2kg',
+   items:[{n:'猫咪专属美容',q:1,p:328}],amount:328,
+   pay:'已付款 · 微信',time:'11-07 15:30',status:'待服务',staff:'小林'},
+  {no:'#2026110711',type:'商品',avatar:'🐕',name:'吴思远',phone:'150****3316',pet:'暂无宠物档案',
+   items:[{n:'皇家金毛幼犬粮 15kg',q:2,p:299}],amount:598,
+   pay:'待付款',time:'11-07 13:05',status:'待付款',staff:''},
+  {no:'#2026110710',type:'服务',avatar:'🐱',name:'何雨',phone:'136****7788',pet:'奶糖 · 布偶',
+   items:[{n:'局部修剪（垫/脚/臀）',q:1,p:88}],amount:88,
+   pay:'已付款 · 微信',time:'11-07 11:40',status:'已完成',staff:'小林'},
+  {no:'#2026110709',type:'商品',avatar:'🐈',name:'张宁',phone:'158****9021',pet:'团子 · 英短',
+   items:[{n:'逗猫棒套装',q:2,p:39}],amount:78,
+   pay:'已付款 · 微信',time:'11-07 10:58',status:'已完成',staff:''},
+  {no:'#2026110708',type:'服务',avatar:'🐶',name:'徐嘉',phone:'135****4432',pet:'布丁 · 比熊 6kg',
+   items:[{n:'宠物寄养（3 天）',q:1,p:240}],amount:240,
+   pay:'已付款 · 储值卡',time:'11-07 10:20',status:'已完成',staff:'Amy'}
+];
+
+let appts={
+  0:[
+    {time:'09:30',end:'10:30',name:'徐嘉',pet:'布丁 · 比熊',svc:'全身造型精剪',price:268,staff:'Amy',status:'已完成'},
+    {time:'11:00',end:'12:30',name:'陈一诺',pet:'毛毛 · 英短',svc:'猫咪专属美容',price:328,staff:'小林',status:'服务中'},
+    {time:'14:30',end:'15:30',name:'林小满',pet:'豆豆 · 金毛',svc:'全身造型精剪',price:268,staff:'Amy',status:'已确认'},
+    {time:'15:30',end:'16:20',name:'周雨桐',pet:'团子 · 贵宾',svc:'宠物深层洗护',price:158,staff:'阿杰',status:'待确认'},
+    {time:'17:00',end:'17:40',name:'何雨',pet:'奶糖 · 布偶',svc:'局部修剪',price:88,staff:'小林',status:'已确认'}
+  ],
+  1:[
+    {time:'10:00',end:'11:00',name:'沈心怡',pet:'可乐 · 泰迪',svc:'全身造型精剪',price:268,staff:'Amy',status:'已确认'},
+    {time:'13:30',end:'14:40',name:'赵一鸣',pet:'大福 · 边牧',svc:'宠物深层洗护',price:158,staff:'阿杰',status:'已确认'},
+    {time:'16:00',end:'17:00',name:'钱多多',pet:'雪球 · 布偶',svc:'猫咪专属美容',price:328,staff:'小林',status:'待确认'}
+  ],
+  2:[
+    {time:'09:30',end:'10:30',name:'孙悦',pet:'年糕 · 英短',svc:'猫咪专属美容',price:328,staff:'小林',status:'已确认'},
+    {time:'11:00',end:'12:00',name:'李想',pet:'奥利奥 · 金毛',svc:'局部修剪',price:88,staff:'Amy',status:'已确认'},
+    {time:'14:00',end:'15:10',name:'周舟',pet:'奶昔 · 比熊',svc:'宠物深层洗护',price:158,staff:'阿杰',status:'已确认'},
+    {time:'18:00',end:'19:00',name:'林恬',pet:'布丁 · 贵宾',svc:'全身造型精剪',price:268,staff:'Amy',status:'待确认'}
+  ],
+  3:[
+    {time:'10:30',end:'11:30',name:'徐嘉',pet:'布丁 · 比熊',svc:'局部修剪',price:88,staff:'Amy',status:'已确认'},
+    {time:'15:00',end:'16:10',name:'陈一诺',pet:'毛毛 · 英短',svc:'宠物深层洗护',price:158,staff:'小林',status:'待确认'}
+  ]
+};
+
+let goods=[
+  {id:1,emoji:'🍚',name:'皇家金毛幼犬粮',spec:'15kg / 幼犬',cat:'主粮',stock:6,min:10,price:299,sold:68},
+  {id:2,emoji:'🐟',name:'渴望无谷六种鱼成犬粮',spec:'1.4kg / 成犬',cat:'主粮',stock:18,min:8,price:568,sold:42},
+  {id:3,emoji:'🍼',name:'幼猫奶粉',spec:'1kg / 幼猫',cat:'主粮',stock:3,min:6,price:98,sold:35},
+  {id:4,emoji:'🥩',name:'鲜肉冻干全价猫粮',spec:'1.8kg / 成猫',cat:'主粮',stock:9,min:10,price:168,sold:96},
+  {id:5,emoji:'🦴',name:'冻干鸡胸肉粒',spec:'100g / 零食',cat:'零食',stock:25,min:10,price:39,sold:120},
+  {id:6,emoji:'🧴',name:'宠物香波 温和型',spec:'500ml',cat:'清洁',stock:32,min:10,price:60,sold:54},
+  {id:7,emoji:'🧸',name:'逗猫棒套装',spec:'3 件套',cat:'玩具',stock:2,min:5,price:39,sold:88},
+  {id:8,emoji:'🪮',name:'宠物按摩梳',spec:'去浮毛',cat:'护理',stock:14,min:6,price:45,sold:61}
+];
+
+const SERVICES=[
+  {n:'全身造型精剪',p:268},{n:'猫咪专属美容',p:328},{n:'局部修剪',p:88},
+  {n:'宠物深层洗护',p:158},{n:'宠物寄养',p:240}
+];
+const CHECK_ITEMS=[
+  {n:'全身造型精剪',p:268,type:'服务'},{n:'猫咪专属美容',p:328,type:'服务'},
+  {n:'宠物深层洗护',p:158,type:'服务'},{n:'冻干鸡胸肉粒',p:39,type:'商品'},
+  {n:'皇家金毛幼犬粮',p:299,type:'商品'},{n:'宠物香波',p:60,type:'商品'}
+];
+
+/* ---------- 接口层 ---------- */
+const API_BASE=(location.protocol==='http:'||location.protocol==='https:')?location.origin:'http://localhost:8787';
+let apiOnline=false;
+async function api(path,method,body){
+  const res=await fetch(API_BASE+path,{
+    method:method||'GET',
+    headers:{'Content-Type':'application/json'},
+    body:body?JSON.stringify(body):undefined,
+    cache:'no-store'
+  });
+  let data=null;
+  try{data=await res.json()}catch(e){}
+  if(!res.ok)throw new Error((data&&data.error)||('HTTP '+res.status));
+  return data||{};
+}
+function setConn(ok){
+  apiOnline=ok;
+  const chip=document.getElementById('connChip');
+  if(!chip)return;
+  chip.classList.toggle('off',!ok);
+  document.getElementById('connTxt').textContent=ok?'已连接':'离线演示';
+  chip.title=ok?'数据来自本地接口 '+API_BASE:'接口未连接，当前为离线演示数据，点击重试';
+}
+function applySync(updatedAt){
+  if(!updatedAt)return;
+  const t=(updatedAt.split(' ')[1]||updatedAt).slice(0,5);
+  document.querySelectorAll('.sync-time').forEach(el=>el.textContent=t);
+}
+function renderStore(){
+  document.getElementById('openSwitch').classList.toggle('off',!isOpen);
+  document.getElementById('openTxt').textContent=isOpen?'营业中':'已打烊';
+  document.querySelector('.open-toggle').style.color=isOpen?'#1F9C63':'#8A9B92';
+  SUBS.dashboard='宠物门店 · '+(isOpen?'营业中':'已打烊')+' 09:00-21:00';
+  if(document.getElementById('page-dashboard').classList.contains('active'))
+    document.getElementById('pageSub').textContent=SUBS.dashboard;
+}
+function renderAll(){
+  renderDashboard();renderOrders();renderDates();renderAppts();renderGoods();renderStore();
+}
+async function loadBootstrap(quiet){
+  try{
+    const d=await api('/api/bootstrap');
+    today=d.today;orders=d.orders;appts=d.appts;goods=d.goods;
+    orderSeq=d.seq;isOpen=d.store.open;
+    applySync(d.updatedAt);setConn(true);renderAll();
+    if(!quiet)toast('已同步门店实时数据');
+    return true;
+  }catch(e){
+    setConn(false);renderAll();
+    if(!quiet)toast('接口未连接，已切换为离线演示数据');
+    return false;
+  }
+}
+function reconnect(){loadBootstrap(false);}
+
+/* ---------- 工具 ---------- */
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('on'),1900);
+}
+function fmt(n){return n.toLocaleString('zh-CN')}
+function openSheet(title,html){
+  document.getElementById('sheetTitle').textContent=title;
+  document.getElementById('sheetBody').innerHTML=html;
+  document.getElementById('mask').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  document.getElementById('mask').classList.remove('on');
+  document.getElementById('sheet').classList.remove('on');
+  document.body.style.overflow='';
+}
+function markOpts(id,btn){
+  document.querySelectorAll('#'+id+' .opt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+/* ---------- 页面切换 ---------- */
+function navTo(tab,filter){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page=document.getElementById('page-'+tab);
+  if(page)page.classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  document.getElementById('pageTitle').textContent=TITLES[tab];
+  document.getElementById('pageSub').textContent=SUBS[tab];
+  document.getElementById('fabBook').style.display=tab==='appts'?'flex':'none';
+  if(tab==='orders'){if(filter)orderFilter=filter;setOrderFilter(orderFilter);}
+  if(tab==='appts'){renderDates();renderAppts();}
+  if(tab==='goods'){renderGoods();}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- 工作台统计 ---------- */
+function renderDashboard(){
+  document.getElementById('revenueTxt').textContent=fmt(today.revenue);
+  document.getElementById('statOrders').textContent=today.orders;
+  document.getElementById('statAppts').textContent=today.appts;
+  document.getElementById('todayOrderCount').textContent=today.orders;
+  renderPending();
+}
+function renderPending(){
+  const service=orders.filter(o=>o.status==='待服务').length;
+  const ship=orders.filter(o=>o.status==='待发货').length;
+  const pay=orders.filter(o=>o.status==='待付款').length;
+  const low=goods.filter(g=>g.stock<g.min).length;
+  document.getElementById('todoService').textContent=service;
+  document.getElementById('todoShip').textContent=ship;
+  document.getElementById('todoPay').textContent=pay;
+  document.getElementById('todoStock').textContent=low;
+  document.getElementById('warnCount').textContent=low;
+  document.getElementById('sumLow').textContent=low;
+  document.getElementById('storeLowTxt').textContent=low;
+  document.getElementById('warnBanner').style.display=low?'flex':'none';
+  const pending=service+ship+pay;
+  document.getElementById('pendingCount').textContent=pending;
+  const badge=document.getElementById('tabOrderBadge');
+  badge.textContent=pending;
+  badge.style.display=pending?'flex':'none';
+}
+/* ---------- 订单管理 ---------- */
+const ORDER_CLS={'待服务':'','待发货':'blue','待付款':'red','已完成':'green'};
+function setOrderFilter(status){
+  orderFilter=status;
+  document.querySelectorAll('#orderTabs .chip').forEach(c=>c.classList.toggle('on',c.dataset.status===status));
+  renderOrders();
+}
+function orderButtons(o){
+  if(o.status==='待服务')return `<button class="btn ghost mini" onclick="toast('已呼叫顾客 ${o.phone}')">联系顾客</button><button class="btn mini" onclick="orderAction('${o.no}','done')">完成服务</button>`;
+  if(o.status==='待发货')return `<button class="btn ghost mini" onclick="toast('电子面单已发送至打印机')">打印面单</button><button class="btn mini" onclick="orderAction('${o.no}','ship')">立即发货</button>`;
+  if(o.status==='待付款')return `<button class="btn ghost mini" onclick="toast('演示环境暂不支持取消订单')">取消订单</button><button class="btn mini" onclick="orderAction('${o.no}','bill')">发送账单</button>`;
+  return `<button class="btn ghost mini" onclick="toast('${o.no} 订单详情开发中')">查看详情</button>`;
+}
+function orderCard(o){
+  const items=o.items.map(i=>`<div class="order-item"><span class="n">${i.n} ×${i.q}</span><span class="p">¥${i.p*i.q}</span></div>`).join('');
+  return `<div class="order-card">
+    <div class="order-top">
+      <span class="order-no">${o.no} · ${o.time}</span>
+      <span class="badge ${ORDER_CLS[o.status]}">${o.status}</span>
+    </div>
+    <div class="order-user">
+      <div class="user-av">${o.avatar}</div>
+      <div class="user-meta">
+        <p>${o.name}<span class="badge gray" style="margin-left:6px">${o.type}</span></p>
+        <span>${o.pet} · ${o.phone}</span>
+      </div>
+    </div>
+    <div class="order-items">${items}</div>
+    <div class="order-bottom">
+      <span class="order-amt">合计<b>¥${o.amount}</b> · ${o.pay}</span>
+      <div class="order-actions">${orderButtons(o)}</div>
+    </div>
+  </div>`;
+}
+function renderOrders(){
+  const list=orderFilter==='全部'?orders:orders.filter(o=>o.status===orderFilter);
+  const box=document.getElementById('orderList');
+  box.innerHTML=list.length
+    ? list.map(orderCard).join('')
+    : '<div class="empty"><span class="e">🐾</span>该状态下暂无订单</div>';
+  document.getElementById('footOrderCount').textContent=orders.length;
+}
+async function orderAction(no,act){
+  const o=orders.find(x=>x.no===no);
+  if(!o)return;
+  if(apiOnline){
+    try{
+      const d=await api('/api/orders?no='+encodeURIComponent(no),'PATCH',{action:act});
+      orders=d.orders;applySync(d.updatedAt);today=d.today;
+      if(act==='done')toast('服务已完成，已通知顾客到前台取宠');
+      if(act==='ship')toast('已发货 · 顺丰 SF1027662188');
+      if(act==='bill')toast('账单已发送至顾客微信，等待付款');
+      renderOrders();renderPending();renderDashboard();
+      return;
+    }catch(e){
+      setConn(false);toast('接口异常，已本地更新订单');
+    }
+  }
+  if(act==='done'){o.status='已完成';toast('服务已完成（本地演示）');}
+  if(act==='ship'){o.status='已完成';toast('已发货（本地演示）');}
+  if(act==='bill'){toast('账单已发送（本地演示）');}
+  renderOrders();renderPending();renderDashboard();
+}
+
+/* ---------- 预约排班 ---------- */
+const APPT_CLS={'已完成':'green','服务中':'','已确认':'blue','待确认':'gray'};
+function renderDates(){
+  document.getElementById('dateStrip').innerHTML=apptDays.map((d,i)=>
+    `<button class="date-chip ${i===apptDay?'on':''}" onclick="setDay(${i})"><b>${d.label}</b><span>${d.date} ${d.weekday}</span></button>`
+  ).join('');
+}
+function setDay(i){apptDay=i;renderDates();renderAppts();}
+function setStaff(name){
+  staffFilter=name;
+  document.querySelectorAll('#staffStrip .staff-chip').forEach(c=>c.classList.toggle('on',c.textContent.includes(name)));
+  renderAppts();
+}
+function renderAppts(){
+  const dayAll=(appts[apptDay]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+  const list=dayAll.filter(a=>staffFilter==='全部'||a.staff===staffFilter);
+  const box=document.getElementById('apptList');
+  if(!list.length){
+    box.innerHTML='<div class="empty"><span class="e">📅</span>该美容师当日暂无预约</div>';
+  }else{
+    box.innerHTML=list.map(a=>{
+      const act=a.status==='已完成'
+        ? `<button class="btn gray mini" onclick="toast('服务记录：${a.svc} · ¥${a.price}')">服务记录</button>`
+        : `<button class="btn ghost mini" onclick="toast('已向 ${a.name} 发送到店提醒')">提醒到店</button>`;
+      return `<div class="appt-card">
+        <div class="appt-time"><b>${a.time}</b><span>${a.end?('至 '+a.end):'待定'}</span></div>
+        <div class="appt-body">
+          <div class="row1"><p>${a.name} · ${a.pet}</p><span class="badge ${APPT_CLS[a.status]}">${a.status}</span></div>
+          <p class="pet">${a.svc} · ¥${a.price}</p>
+          <div class="appt-foot">
+            <span class="staff-mini"><span class="av">${a.staff.slice(0,1)}</span>${a.staff}</span>
+            ${act}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('sumTotal').textContent=dayAll.length;
+  document.getElementById('sumDone').textContent=dayAll.filter(a=>a.status==='已完成').length;
+  document.getElementById('sumPending').textContent=dayAll.filter(a=>a.status!=='已完成').length;
+}
+
+/* ---------- 新建预约 ---------- */
+const BOOK_TIMES=['10:00','11:30','14:00','15:30','17:00','18:30'];
+const BOOK_STAFF=['Amy','小林','阿杰'];
+let bookingDraft=null;
+function openBooking(){
+  bookingDraft={svc:SERVICES[0].n,price:SERVICES[0].p,staff:'Amy',time:'10:00'};
+  openSheet('新建预约',`
+    <div class="form-label">客户与宠物</div>
+    <div class="field"><input id="bkName" placeholder="客户姓名，如：林小满"></div>
+    <div class="field" style="margin-top:8px"><input id="bkPet" placeholder="宠物昵称与品种，如：豆豆 · 金毛"></div>
+    <div class="form-label">服务项目</div>
+    <div class="opt-row" id="bkSvc">${SERVICES.map((s,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickSvc(${i},this)">${s.n} ¥${s.p}</button>`).join('')}</div>
+    <div class="form-label">到店时段</div>
+    <div class="opt-row" id="bkTime">${BOOK_TIMES.map((t,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickTime('${t}',this)">${t}</button>`).join('')}</div>
+    <div class="form-label">指定美容师</div>
+    <div class="opt-row" id="bkStaff">${BOOK_STAFF.map((s,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickStaff('${s}',this)">${s}</button>`).join('')}</div>
+    <button class="btn block" onclick="saveBooking()">确认预约</button>
+  `);
+}
+function pickSvc(i,btn){const s=SERVICES[i];bookingDraft.svc=s.n;bookingDraft.price=s.p;markOpts('bkSvc',btn);}
+function pickTime(t,btn){bookingDraft.time=t;markOpts('bkTime',btn);}
+function pickStaff(s,btn){bookingDraft.staff=s;markOpts('bkStaff',btn);}
+async function saveBooking(){
+  const name=(document.getElementById('bkName').value||'').trim();
+  if(!name){toast('请先填写客户姓名');return;}
+  const pet=(document.getElementById('bkPet').value||'').trim()||'宠物信息待补充';
+  const d=bookingDraft;
+  if(apiOnline){
+    try{
+      const r=await api('/api/appointments','POST',{day:apptDay,time:d.time,end:'',name,pet,svc:d.svc,price:d.price,staff:d.staff});
+      appts[apptDay]=r.appointments||[];today=r.today;
+      closeSheet();renderAppts();renderDashboard();renderPending();
+      toast(`已为 ${name} 创建 ${d.time} 的预约，并发送确认短信`);
+      return;
+    }catch(e){
+      closeSheet();setConn(false);toast('接口异常，已本地创建预约（未同步）');
+    }
+  }
+  if(!appts[apptDay])appts[apptDay]=[];
+  appts[apptDay].push({time:d.time,end:'',name,pet,svc:d.svc,price:d.price,staff:d.staff,status:'已确认'});
+  appts[apptDay].sort((a,b)=>a.time.localeCompare(b.time));
+  closeSheet();renderAppts();today.appts++;renderDashboard();
+  toast(`已为 ${name} 创建 ${d.time} 的预约，并发送确认短信`);
+}
+
+/* ---------- 快速开单 ---------- */
+let checkoutDraft=null;
+function openCheckout(){
+  checkoutDraft={item:CHECK_ITEMS[0],pay:'微信'};
+  openSheet('快速开单',`
+    <div class="form-label">选择服务 / 商品</div>
+    <div class="opt-row" id="ckItems">${CHECK_ITEMS.map((it,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickCheckout(${i},this)">${it.n} ¥${it.p}</button>`).join('')}</div>
+    <div class="form-label">顾客姓名（选填）</div>
+    <div class="field"><input id="ckName" placeholder="不填则记为「到店散客」"></div>
+    <div class="form-label">收款方式</div>
+    <div class="pay-row" id="ckPay">
+      <button class="pay-opt on" onclick="pickPay('微信',this)">微信</button>
+      <button class="pay-opt" onclick="pickPay('支付宝',this)">支付宝</button>
+      <button class="pay-opt" onclick="pickPay('储值卡',this)">储值卡</button>
+    </div>
+    <div class="sheet-total"><span>应收金额</span><b id="ckTotal">¥${CHECK_ITEMS[0].p}</b></div>
+    <button class="btn block" onclick="saveCheckout()">确认收款</button>
+  `);
+}
+function pickCheckout(i,btn){
+  checkoutDraft.item=CHECK_ITEMS[i];markOpts('ckItems',btn);
+  document.getElementById('ckTotal').textContent='¥'+CHECK_ITEMS[i].p;
+}
+function pickPay(p,btn){
+  checkoutDraft.pay=p;
+  document.querySelectorAll('#ckPay .pay-opt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+async function saveCheckout(){
+  const d=checkoutDraft;
+  const name=(document.getElementById('ckName').value||'').trim()||'到店散客';
+  const amount=d.item.p;
+  if(apiOnline){
+    try{
+      const r=await api('/api/checkout','POST',{name,type:d.item.type,itemName:d.item.n,amount,pay:d.pay});
+      orders.unshift(r.order);today=r.today;orderSeq=r.seq;applySync(r.updatedAt);
+      closeSheet();renderDashboard();renderOrders();renderPending();
+      toast(`收款成功 ¥${amount}，订单 ${r.order.no} 已生成`);
+      return;
+    }catch(e){
+      closeSheet();setConn(false);toast('接口异常，已本地开单（未同步）');
+    }
+  }
+  const no='#20261107'+String(++orderSeq);
+  orders.unshift({
+    no,type:d.item.type,avatar:d.item.type==='服务'?'🐾':'📦',name,phone:'到店顾客',
+    pet:d.item.type==='服务'?'现场登记宠物':'门店自提',
+    items:[{n:d.item.n,q:1,p:amount}],amount,pay:'已收款 · '+d.pay,
+    time:'11-07 09:41',status:'已完成',staff:'店长'
+  });
+  closeSheet();today.revenue+=amount;today.orders+=1;
+  renderDashboard();renderOrders();
+  toast(`收款成功 ¥${amount}，订单已生成`);
+}
+
+/* ---------- 商品库存 ---------- */
+function setGoodsCat(cat){
+  goodsCat=cat;
+  document.querySelectorAll('#goodsCats .chip').forEach(c=>c.classList.toggle('on',c.textContent===cat));
+  renderGoods();
+}
+function renderGoods(){
+  const input=document.getElementById('goodsSearch');
+  const q=(input?input.value:'').trim();
+  const list=goods.filter(g=>
+    (goodsCat==='全部'||g.cat===goodsCat)&&(q===''||g.name.includes(q)||g.spec.includes(q))
+  );
+  const box=document.getElementById('goodsList');
+  if(!list.length){
+    box.innerHTML='<div class="empty"><span class="e">📦</span>没有找到相关商品</div>';
+  }else{
+    box.innerHTML=list.map(g=>`<div class="g-item">
+      <div class="g-thumb">${g.emoji}</div>
+      <div class="g-main">
+        <p>${g.name}</p>
+        <span>${g.spec} · 已售 ${g.sold}</span>
+        <div class="g-meta">
+          <span class="stock ${g.stock<g.min?'low':'ok'}">库存 ${g.stock}</span>
+          <span style="color:#AFCDBC">预警线 ${g.min}</span>
+        </div>
+      </div>
+      <div class="g-right">
+        <div class="g-price">¥${g.price}</div>
+        <button class="btn ghost mini restock" onclick="restock(${g.id})">补货</button>
+      </div>
+    </div>`).join('');
+  }
+}
+async function restock(id){
+  const g=goods.find(x=>x.id===id);
+  if(!g)return;
+  if(apiOnline){
+    try{
+      const r=await api('/api/goods/'+id+'/restock','POST',{qty:20});
+      goods=r.goods;applySync(r.updatedAt);renderGoods();renderPending();renderDashboard();
+      const cur=goods.find(x=>x.id===id)||g;
+      toast(`「${g.name}」已补货 20 件，当前库存 ${cur.stock}`);
+      return;
+    }catch(e){
+      setConn(false);toast('接口异常，已本地补货（未同步）');
+    }
+  }
+  g.stock+=20;
+  renderGoods();renderPending();renderDashboard();
+  toast(`「${g.name}」已补货 20 件，当前库存 ${g.stock}`);
+}
+
+/* ---------- 店铺设置 ---------- */
+async function toggleOpen(){
+  const next=!isOpen;
+  if(apiOnline){
+    try{
+      const r=await api('/api/store','PATCH',{open:next});
+      isOpen=r.store.open;applySync(r.updatedAt);renderStore();
+      toast(isOpen?'门店已恢复营业，线上预约正常接单':'门店已打烊，线上预约将自动关闭');
+      return;
+    }catch(e){
+      setConn(false);toast('接口异常，已本地切换营业状态');
+    }
+  }
+  isOpen=next;renderStore();
+  toast(isOpen?'门店已恢复营业，线上预约正常接单':'门店已打烊，线上预约将自动关闭');
+}
+
+/* ---------- 初始化 ---------- */
+renderAll();
+</script>
+</body>
+</html>
