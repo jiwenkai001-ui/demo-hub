@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>零星工具采购比价系统</title>
+<link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<div class="layout">
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🛠️</div>
+      <div>
+        <div class="logo-name">零星采购比价</div>
+        <div class="logo-sub">Procurement Compare</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">功能菜单</div>
+      <div class="nav-item active" data-page="compare" onclick="switchPage('compare')"><span class="icon">📋</span>清单比价</div>
+      <div class="nav-item" data-page="price" onclick="switchPage('price')"><span class="icon">🏷️</span>价格库管理</div>
+      <div class="nav-item" data-page="help" onclick="switchPage('help')"><span class="icon">📖</span>使用说明</div>
+    </div>
+    <div class="foot">价格来源：京东自营参考价<br>数据保存在本机浏览器</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ==================== 清单比价 ==================== -->
+    <div id="page-compare" class="page active">
+      <div class="header">
+        <div>
+          <h2>清单比价</h2>
+          <div class="sub">导入采购清单，自动匹配价格库并生成比价结果</div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-outline btn-sm" onclick="clearCompare()">清空清单</button>
+          <button class="btn btn-primary btn-sm" onclick="exportResults()">导出比价结果</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card">
+          <div class="stat-card-title">清单条目</div>
+          <div class="stat-card-value" id="st-lines">0</div>
+          <div class="stat-card-change">已导入的采购清单行数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">成功匹配</div>
+          <div class="stat-card-value" id="st-matched" style="color:var(--success)">0</div>
+          <div class="stat-card-change">含精确与相似匹配</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">未匹配</div>
+          <div class="stat-card-value" id="st-unmatched" style="color:var(--danger)">0</div>
+          <div class="stat-card-change">可在价格库中补充后重新比价</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">京东自营参考总额</div>
+          <div class="stat-card-value"><span id="st-total">0.00</span><span class="unit">元</span></div>
+          <div class="stat-card-change" id="st-save">较市场价节省 0.00 元</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>① 导入采购清单</h3>
+          <span class="hint">每行一条，支持"名称 数量"、"名称×数量"，也可直接粘贴 Excel 表格或 CSV</span>
+        </div>
+        <div class="card-body">
+          <textarea id="list-input" rows="7" placeholder="示例：&#10;螺丝刀套装 ×3&#10;活动扳手 12寸 2把&#10;生料带，20卷&#10;LED灯泡 9W 50个&#10;钢卷尺 5&#10;安全帽 10"></textarea>
+          <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
+            <button class="btn btn-primary btn-sm" onclick="runCompare()">⚡ 开始比价</button>
+            <button class="btn btn-outline btn-sm" onclick="loadExample()">填入示例清单</button>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-input').click()">📁 上传 CSV/TXT 文件</button>
+            <input type="file" id="file-input" accept=".csv,.txt" style="display:none" onchange="handleFile(event)">
+            <span style="font-size:12px;color:var(--text-sub);">价格库共 <b id="db-count-inline">0</b> 件商品</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="result-card" style="display:none;">
+        <div class="card-head">
+          <h3>② 比价结果</h3>
+          <span class="hint">可点击"改选"为未匹配/匹配不理想的条目手动指定商品</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1050px;">
+            <thead>
+              <tr>
+                <th style="width:44px;">#</th>
+                <th style="width:200px;">清单原文</th>
+                <th>匹配商品</th>
+                <th style="width:86px;">匹配状态</th>
+                <th style="width:56px;">单位</th>
+                <th style="width:64px;">数量</th>
+                <th class="th-right" style="width:110px;">京东自营参考价</th>
+                <th class="th-right" style="width:96px;">市场参考价</th>
+                <th class="th-right" style="width:96px;">小计（京东）</th>
+                <th style="width:70px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="result-body"></tbody>
+            <tfoot>
+              <tr style="background:var(--gray-bg);font-weight:600;">
+                <td colspan="8" style="text-align:right;">合计（京东自营参考 / 市场参考）：</td>
+                <td class="td-right num" id="sum-cell">—</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" id="result-empty" style="display:none;">
+        <div class="empty">
+          <div class="icon">🔍</div>
+          <p>暂无比价结果，请在上方导入清单后点击"开始比价"。<br>若大量条目未匹配，请先在"价格库管理"中补充商品，再回来重新比价。</p>
+        </div>
+      </div>
+
+      <!-- 手动改选商品弹窗 -->
+      <div class="modal-mask" id="modal-pick">
+        <div class="modal-box wide">
+          <div class="modal-head">
+            <h3>改选匹配商品</h3>
+            <button class="modal-close" onclick="closeModal('modal-pick')">×</button>
+          </div>
+          <div class="modal-body">
+            <input class="form-input" id="pick-search" placeholder="输入关键词搜索价格库商品" oninput="renderPickList(this.value)" style="margin-bottom:14px;">
+            <div id="pick-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 价格库管理 ==================== -->
+    <div id="page-price" class="page">
+      <div class="header">
+        <div>
+          <h2>价格库管理</h2>
+          <div class="sub">维护商品名称、别名、规格与价格；修改实时保存并用于比价</div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-outline btn-sm" onclick="exportPriceDB()">导出价格库</button>
+          <button class="btn btn-outline btn-sm" onclick="openImportPriceModal()">批量导入</button>
+          <button class="btn btn-outline btn-sm" onclick="confirmResetDB()">恢复默认库</button>
+          <button class="btn btn-primary btn-sm" onclick="openEditModal()">＋ 新增商品</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card">
+          <div class="stat-card-title">商品总数</div>
+          <div class="stat-card-value" id="st-db-total">0</div>
+          <div class="stat-card-change">含别名关键词，用于自动匹配</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">类目数</div>
+          <div class="stat-card-value" id="st-db-cats">0</div>
+          <div class="stat-card-change">五金工具 / 电动工具 / 水暖管件 等</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">最近更新</div>
+          <div class="stat-card-value" id="st-db-updated" style="font-size:18px;">—</div>
+          <div class="stat-card-change">最后一次价格修改时间</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-filters">
+          <span class="filter-label">关键词</span>
+          <input class="filter-input" id="f-keyword" placeholder="商品名 / 别名 / 规格" style="min-width:200px;">
+          <span class="filter-label">类目</span>
+          <select class="filter-select" id="f-cat"><option value="">全部类目</option></select>
+          <button class="btn btn-outline btn-sm" onclick="resetPriceFilters()">重置</button>
+          <button class="btn btn-primary btn-sm" onclick="renderPriceTable()">查询</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="min-width:1050px;">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th style="width:150px;">商品名称</th>
+                <th>别名 / 匹配关键词</th>
+                <th style="width:92px;">类目</th>
+                <th style="width:170px;">规格</th>
+                <th style="width:52px;">单位</th>
+                <th class="th-right" style="width:110px;">京东自营参考价</th>
+                <th class="th-right" style="width:92px;">市场参考价</th>
+                <th style="width:96px;">更新时间</th>
+                <th style="width:104px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="price-body"></tbody>
+          </table>
+        </div>
+        <div style="padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);">
+          <span style="font-size:12.5px;color:var(--text-sub);" id="price-page-info">—</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-mini" onclick="pricePage(-1)">上一页</button>
+            <button class="btn btn-outline btn-mini" onclick="pricePage(1)">下一页</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增/编辑商品弹窗（必须在页面 div 内部） -->
+      <div class="modal-mask" id="modal-edit">
+        <div class="modal-box">
+          <div class="modal-head">
+            <h3 id="edit-title">新增商品</h3>
+            <button class="modal-close" onclick="closeModal('modal-edit')">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-row">
+              <div>
+                <label class="form-label">商品名称 <span class="req">*</span></label>
+                <input class="form-input" id="ed-name" placeholder="如：活动扳手">
+              </div>
+              <div>
+                <label class="form-label">类目</label>
+                <select class="form-select" id="ed-cat"></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label class="form-label">规格 / 型号</label>
+                <input class="form-input" id="ed-spec" placeholder="如：8寸 200mm">
+              </div>
+              <div>
+                <label class="form-label">单位</label>
+                <input class="form-input" id="ed-unit" placeholder="如：把 / 套 / 卷">
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label class="form-label">京东自营参考价（元） <span class="req">*</span></label>
+                <input class="form-input" id="ed-jd" type="number" step="0.01" min="0" placeholder="如：12.90">
+              </div>
+              <div>
+                <label class="form-label">市场综合参考价（元）</label>
+                <input class="form-input" id="ed-mkt" type="number" step="0.01" min="0" placeholder="如：15.00">
+              </div>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label class="form-label">别名 / 匹配关键词（用顿号或逗号分隔）</label>
+              <input class="form-input" id="ed-alias" placeholder="如：活扳手、活络扳手">
+            </div>
+            <div class="form-tip">别名用于清单自动匹配：写上清单里常见的叫法，匹配准确率会更高。价格请在核对京东自营页面后更新。</div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-outline btn-sm" onclick="closeModal('modal-edit')">取消</button>
+            <button class="btn btn-primary btn-sm" onclick="saveEdit()">保存</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 批量导入价格弹窗 -->
+      <div class="modal-mask" id="modal-import-price">
+        <div class="modal-box wide">
+          <div class="modal-head">
+            <h3>批量导入 / 更新价格</h3>
+            <button class="modal-close" onclick="closeModal('modal-import-price')">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-tip" style="margin:0 0 12px;">
+              每行一条，格式：<code>名称,京东自营价,市场价,规格,单位,别名(可空)</code>。<br>
+              名称与价格库已有商品一致（含别名）时，将<b>覆盖更新</b>该商品价格；否则<b>新增</b>。示例：<br>
+              <code>活动扳手,13.5,15,8寸,把,活扳手</code>
+            </div>
+            <textarea id="import-price-text" rows="8" placeholder="名称,京东自营价,市场价,规格,单位,别名"></textarea>
+            <div style="margin-top:12px;">
+              <button class="btn btn-outline btn-sm" onclick="document.getElementById('price-file-input').click()">📁 上传 CSV 文件</button>
+              <input type="file" id="price-file-input" accept=".csv,.txt" style="display:none" onchange="handlePriceFile(event)">
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-outline btn-sm" onclick="closeModal('modal-import-price')">取消</button>
+            <button class="btn btn-primary btn-sm" onclick="doImportPrices()">导入并保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 使用说明 ==================== -->
+    <div id="page-help" class="page">
+      <div class="header">
+        <div>
+          <h2>使用说明</h2>
+          <div class="sub">三步完成零星采购比价</div>
+        </div>
+      </div>
+      <div class="help-grid">
+        <div class="help-item">
+          <h4>① 导入清单</h4>
+          <p>把要采购的物品粘贴到"清单比价"输入框，每行一条。数量支持多种写法：<code>螺丝刀套装 ×3</code>、<code>活动扳手 2把</code>、<code>生料带，20卷</code>，直接从 Excel 复制多列文本或上传 CSV 文件也可以（识别"名称/数量"表头）。</p>
+        </div>
+        <div class="help-item">
+          <h4>② 自动匹配比价</h4>
+          <p>系统按 商品名 + 别名关键词 自动匹配价格库，给出匹配状态：精确匹配 / 相似匹配 / 未匹配。未匹配的条目可点击"改选"手动指定商品，或先去价格库补充。</p>
+        </div>
+        <div class="help-item">
+          <h4>③ 导出结果</h4>
+          <p>比价结果一键导出 CSV（Excel 可直接打开），包含京东自营参考价、市场参考价、数量与小计、合计，方便报批和留档。</p>
+        </div>
+        <div class="help-item">
+          <h4>维护价格库</h4>
+          <p>价格库预置 <b>593</b> 件五金工具、电动工具、水暖管件、门窗五金、劳保防护、安防监控、空调制冷等常用商品，以及 <b>92</b> 件来自实际工程采购清单的"工程物料"（西安工程部/北线工程采购单导入，含实际成交价）。价格随行情变动，建议定期在"价格库管理"中核对京东自营页面后更新，或用"批量导入"整表刷新。所有数据保存在本机浏览器中，导出 CSV 可作为备份。</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <div class="card-head"><h3>价格说明</h3></div>
+        <div class="card-body" style="font-size:13px;color:var(--text-sub);line-height:2;">
+          · 内置价格为常见规格的<b>参考值</b>（编辑时间：2026-11），实际成交价以京东自营采购时点页面价为准；<br>
+          · 同一商品不同规格价格差异较大，比价时请结合"规格"列核对；<br>
+          · 批量采购、企业采购通常另有协议价 / 优惠券，实际到手价可能低于参考价。
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="scripts/seed-data.js"></script>
+<script src="scripts/main.js"></script>
+</body>
+</html>
