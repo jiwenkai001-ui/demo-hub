@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鲜源供应链 投研智脑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --soy-deep: #1B4332;
+  --soy-mid: #2D6A4F;
+  --soy-light: #40916C;
+  --gold-mid: #D4A017;
+  --gold-deep: #B8860B;
+  --gold-soft: #E8C86A;
+  --paper: #F7F4EC;
+  --paper-dark: #EFEAE0;
+  --line: #E4E0D5;
+  --ink: #1C2A22;
+  --ink-soft: #4A5A50;
+  --white: #FFFFFF;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --font-serif: 'Noto Serif SC', serif;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-sans: 'Noto Sans SC', system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--paper);font-family:var(--font-sans);color:var(--ink);font-size:14px;line-height:1.6}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;background:var(--soy-deep);color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.12);font-family:var(--font-serif);font-size:17px;font-weight:700;line-height:1.5;letter-spacing:.5px}
+.sidebar-brand .brand-sub{display:block;font-family:var(--font-sans);font-size:11px;font-weight:400;color:var(--gold-soft);margin-top:6px;letter-spacing:2px}
+.sidebar nav{padding:12px 0;flex:1;overflow-y:auto}
+.nav-item{padding:11px 20px;cursor:pointer;font-size:13.5px;border-left:3px solid transparent;color:rgba(255,255,255,.78);display:flex;align-items:center;gap:10px;transition:all .2s}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.1);border-left-color:var(--gold-mid);color:#fff;font-weight:500}
+.nav-item .ni-icon{width:18px;text-align:center;font-size:15px}
+.nav-item .ni-badge{margin-left:auto;background:var(--gold-mid);color:var(--soy-deep);font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--paper)}
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);padding:0 28px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.topbar .tb-title{font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--ink)}
+.topbar .tb-sub{font-size:12px;color:var(--ink-soft)}
+.topbar .tb-spacer{flex:1}
+.topbar .tb-btn{padding:8px 16px;border-radius:var(--radius-md);font-size:13px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);transition:all .2s}
+.topbar .tb-btn:hover{border-color:var(--soy-mid);color:var(--soy-mid)}
+.topbar .tb-btn-primary{background:var(--soy-deep);color:#fff;border-color:var(--soy-deep)}
+.topbar .tb-btn-primary:hover{background:var(--soy-mid);color:#fff}
+.view{display:none;flex:1;overflow-y:auto;padding:24px 28px}
+.view.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:var(--radius-lg);padding:18px 20px;border:1px solid var(--line);position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--soy-mid)}
+.kpi-card.gold::before{background:var(--gold-mid)}
+.kpi-card .kpi-label{font-size:12px;color:var(--ink-soft);margin-bottom:6px}
+.kpi-card .kpi-value{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--ink);letter-spacing:-.5px}
+.kpi-card .kpi-unit{font-size:13px;color:var(--ink-soft);margin-left:4px;font-family:var(--font-sans)}
+.kpi-card .kpi-delta{font-size:11px;margin-top:4px;color:var(--soy-mid)}
+.kpi-card .kpi-delta.down{color:#C0392B}
+.section{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);margin-bottom:20px}
+.section-header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.section-header .sh-title{font-family:var(--font-serif);font-size:15px;font-weight:700;color:var(--ink)}
+.section-header .sh-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--paper);color:var(--ink-soft)}
+.section-body{padding:20px}
+.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+.progress-item{margin-bottom:14px}
+.progress-item:last-child{margin-bottom:0}
+.progress-label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink);margin-bottom:6px}
+.progress-label .pl-val{color:var(--soy-mid);font-weight:500}
+.progress-bar{height:8px;background:var(--paper-dark);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--soy-mid),var(--soy-light));border-radius:4px;transition:width .6s ease}
+.progress-fill.gold{background:linear-gradient(90deg,var(--gold-deep),var(--gold-mid))}
+.progress-fill.shimmer{position:relative;overflow:hidden}
+.progress-fill.shimmer::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+table.data-table{width:100%;border-collapse:collapse;font-size:13px}
+table.data-table th{text-align:left;padding:10px 12px;font-weight:500;color:var(--ink-soft);font-size:12px;border-bottom:1px solid var(--line);background:var(--paper)}
+table.data-table td{padding:12px;border-bottom:1px solid var(--line)}
+table.data-table tr:hover td{background:#FAF8F2}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.tag-red{background:#FDECEC;color:#C0392B}
+.tag-green{background:#E8F5E9;color:var(--soy-mid)}
+.tag-gold{background:#FCF3D8;color:var(--gold-deep)}
+.tag-blue{background:#E3F2FD;color:#1976D2}
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.todo-item:last-child{border-bottom:none}
+.todo-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.todo-dot.red{background:#C0392B;box-shadow:0 0 0 3px rgba(192,57,43,.18)}
+.todo-dot.gold{background:var(--gold-mid);box-shadow:0 0 0 3px rgba(212,160,23,.18)}
+.todo-dot.green{background:var(--soy-mid);box-shadow:0 0 0 3px rgba(45,106,79,.18)}
+.todo-content .tc-title{font-size:13.5px;color:var(--ink)}
+.todo-content .tc-meta{font-size:11px;color:var(--ink-soft);margin-top:3px}
+.radar-platform-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:20px;margin-bottom:16px}
+.rpc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.rpc-name{font-family:var(--font-serif);font-size:15px;font-weight:700}
+.rpc-meta{font-size:11px;color:var(--ink-soft)}
+.rpc-score{display:flex;align-items:center;gap:14px}
+.rpc-score .score-big{font-family:var(--font-display);font-size:38px;font-weight:700;color:var(--soy-mid)}
+.upload-dropzone{border:2px dashed var(--soy-light);border-radius:var(--radius-lg);padding:40px;text-align:center;background:#fff;cursor:pointer;transition:all .2s}
+.upload-dropzone:hover{border-color:var(--soy-mid);background:#F0F7F3}
+.upload-dropzone .ud-icon{font-size:42px;margin-bottom:12px}
+.upload-dropzone .ud-title{font-family:var(--font-serif);font-size:16px;font-weight:700;color:var(--soy-deep);margin-bottom:6px}
+.upload-dropzone .ud-hint{font-size:12px;color:var(--ink-soft)}
+.parse-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.pr-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:18px 20px}
+.pr-card .pr-title{font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:12px;color:var(--soy-deep);display:flex;align-items:center;gap:8px}
+.pr-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.pr-row:last-child{border-bottom:none}
+.pr-row .pr-key{color:var(--ink-soft)}
+.qual-top{display:grid;grid-template-columns:280px 1fr;gap:24px;margin-bottom:24px}
+.score-circle-wrap{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:28px;text-align:center}
+.score-circle-wrap .score-big{font-family:var(--font-display);font-size:56px;font-weight:700;color:var(--soy-deep);line-height:1}
+.score-circle-wrap .score-label{font-size:12px;color:var(--ink-soft);margin-top:8px}
+.score-circle-wrap .score-ring{position:relative;width:160px;height:160px;margin:0 auto 18px}
+.score-circle-wrap .score-ring svg{transform:rotate(-90deg)}
+.score-circle-wrap .score-ring .ring-bg{fill:none;stroke:var(--paper-dark);stroke-width:10}
+.score-circle-wrap .score-ring .ring-fg{fill:none;stroke:url(#goldGrad);stroke-width:10;stroke-linecap:round}
+.qual-grid{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:20px}
+.qg-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.qg-item:last-child{border-bottom:none}
+.qg-icon{width:32px;height:32px;border-radius:8px;background:#FDECEC;display:flex;align-items:center;justify-content:center;color:#C0392B;font-size:16px;flex-shrink:0}
+.qg-content{flex:1}
+.qg-title{font-size:13.5px;color:var(--ink);font-weight:500}
+.qg-desc{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.writing-hero{background:linear-gradient(135deg,var(--soy-deep) 0%,var(--soy-mid) 60%,var(--soy-light) 100%);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.writing-hero::before{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(232,200,106,.2),transparent)}
+.wh-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-mid);color:var(--soy-deep);padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:600;margin-bottom:10px}
+.wh-title{font-family:var(--font-serif);font-size:22px;font-weight:700;margin-bottom:8px}
+.wh-meta{display:flex;gap:24px;font-size:12.5px;opacity:.9;margin-bottom:16px}
+.wh-meta span strong{opacity:1;color:var(--gold-soft)}
+.wh-progress-wrap{margin-bottom:16px}
+.wh-progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;opacity:.9}
+.wh-progress-bar{height:10px;background:rgba(255,255,255,.15);border-radius:5px;overflow:hidden}
+.wh-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-mid),var(--gold-soft));border-radius:5px;position:relative;overflow:hidden}
+.wh-progress-fill::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 2s infinite}
+.wh-stats{display:flex;gap:12px;position:relative;z-index:1}
+.wh-stat-card{flex:1;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);border-radius:var(--radius-md);padding:12px 16px;border:1px solid rgba(255,255,255,.2)}
+.wh-stat-card.highlight{border-color:var(--gold-mid);background:rgba(212,160,23,.2)}
+.wh-stat-card .ws-label{font-size:11px;opacity:.8;margin-bottom:4px}
+.wh-stat-card .ws-val{font-family:var(--font-display);font-size:24px;font-weight:700}
+.writing-body{display:grid;grid-template-columns:260px 1fr 340px;gap:16px}
+.wb-outline{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px;align-self:start;position:sticky;top:0}
+.wb-outline .outline-title{font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:14px;color:var(--soy-deep)}
+.ol-chapter{padding:10px 12px;border-radius:6px;margin-bottom:4px;border-left:3px solid transparent}
+.ol-chapter.active{border-left-color:var(--gold-mid);background:#FFFBEF}
+.ol-chapter .oc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ol-chapter .oc-num{font-size:12px;color:var(--ink-soft);font-weight:500}
+.ol-chapter .oc-title{font-size:13px;font-weight:500;color:var(--ink);flex:1}
+.ol-chapter .oc-pulse{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--soy-mid);background:#E8F5E9;padding:2px 6px;border-radius:10px}
+.ai-dot{width:7px;height:7px;background:var(--soy-mid);border-radius:50%;animation:livePulse 1.2s infinite}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(45,106,79,.6)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(45,106,79,0)}}
+.ol-chapter .oc-mini-bar{height:3px;background:var(--paper-dark);border-radius:2px;margin-top:4px;overflow:hidden}
+.ol-chapter .oc-mini-bar>div{height:100%;background:var(--soy-mid);border-radius:2px}
+.ol-chapter.active .oc-mini-bar>div{background:var(--gold-mid)}
+.ol-sub{padding:6px 0 2px 14px;font-size:11.5px;color:var(--ink-soft);border-left:2px solid var(--line);margin-left:5px;margin-top:4px}
+.ol-sub.done{color:var(--soy-mid)}
+.ol-sub.done::before{content:'✓ '}
+.wb-editor{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:32px;min-height:600px}
+.ed-dropcap{font-family:var(--font-serif);font-size:44px;float:left;line-height:.95;margin:4px 10px 0 0;color:var(--soy-deep);font-weight:700}
+.ed-para{font-size:14.5px;line-height:1.95;color:var(--ink);margin-bottom:18px;text-align:justify}
+.ed-para strong{color:var(--soy-deep);font-weight:600}
+.ed-score-tag{display:inline-block;background:#E8F5E9;color:var(--soy-mid);font-size:11px;padding:4px 10px;border-radius:4px;margin-left:4px;font-weight:500;border:1px solid #C8E6C9}
+.ed-ai-suggest{border:1px dashed var(--gold-mid);background:#FFFBF0;padding:14px 18px;border-radius:var(--radius-md);margin:18px 0;position:relative}
+.ed-ai-suggest::before{content:'💡';position:absolute;top:-10px;left:14px;background:#fff;padding:0 6px}
+.ed-ai-suggest .eas-title{font-size:12px;color:var(--gold-deep);font-weight:600;margin-bottom:6px}
+.ed-ai-suggest .eas-text{font-size:13px;color:var(--ink);line-height:1.7}
+.ed-ai-suggest .eas-actions{margin-top:10px;display:flex;gap:8px}
+.ed-ai-suggest .eas-btn{padding:4px 12px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:#fff}
+.ed-ai-suggest .eas-btn.primary{background:var(--soy-deep);color:#fff;border-color:var(--soy-deep)}
+.ed-quote{border-left:3px solid;border-image:linear-gradient(180deg,var(--soy-deep),var(--gold-mid)) 1;background:var(--paper);padding:14px 18px;margin:18px 0;font-size:13.5px;line-height:1.8;border-radius:0 var(--radius-md) var(--radius-md) 0}
+.ed-quote .eq-source{font-size:11px;color:var(--ink-soft);margin-top:8px;font-style:italic}
+.ed-team-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+.ed-team-table th{background:var(--paper-dark);padding:10px 14px;text-align:left;font-weight:500;font-size:12px;color:var(--ink-soft);border:1px solid var(--line)}
+.ed-team-table td{padding:11px 14px;border:1px solid var(--line)}
+.ed-team-table tr:hover td{background:#FAF8F2}
+.ed-project-list{margin:18px 0}
+.ed-project-item{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.ed-project-item:last-child{border-bottom:none}
+.ep-year{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--gold-deep);min-width:68px}
+.ep-info{flex:1}
+.ep-name{font-size:14px;font-weight:500;color:var(--ink)}
+.ep-meta{font-size:11.5px;color:var(--ink-soft);margin-top:3px}
+.ep-status{font-size:11px;padding:3px 10px;border-radius:10px;background:#E8F5E9;color:var(--soy-mid)}
+.ed-ai-continue{margin-top:20px}
+.ed-ai-cursor{display:inline-block;animation:aiCursor .9s infinite;color:var(--soy-deep);font-weight:bold}
+@keyframes aiCursor{0%,50%{opacity:1}51%,100%{opacity:0}}
+.ed-ai-badge{display:inline-flex;align-items:center;gap:6px;background:#E8F5E9;color:var(--soy-mid);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:10px}
+.ed-cta-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.ed-cta{padding:10px 18px;border-radius:var(--radius-md);border:none;font-size:13px;font-weight:500;cursor:pointer}
+.ed-cta.primary{background:var(--soy-deep);color:#fff}
+.ed-cta.primary:hover{background:var(--soy-mid)}
+.ed-cta.gold{background:var(--gold-mid);color:var(--soy-deep)}
+.ed-cta.gold:hover{background:var(--gold-deep);color:#fff}
+.ed-cta.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.ed-statusbar{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:22px;font-size:11.5px;color:var(--ink-soft)}
+.ed-statusbar span strong{color:var(--ink)}
+.wb-copilot{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px;align-self:start;position:sticky;top:0}
+.copilot-card{margin-bottom:16px}
+.copilot-card:last-child{margin-bottom:0}
+.cc-title{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.cc-insight{background:linear-gradient(135deg,#E8F5E9,#FFFBEF);border-radius:var(--radius-md);padding:14px;border-left:3px solid var(--soy-mid)}
+.cc-insight .cci-text{font-size:12.5px;line-height:1.7;color:var(--ink)}
+.cc-suggest-list .cc-suggest-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:6px;border:1px solid var(--line);margin-bottom:6px}
+.cc-suggest-item .csi-text{font-size:12.5px;flex:1;margin-right:8px}
+.cc-suggest-item .csi-btn{font-size:11px;padding:3px 10px;border-radius:4px;background:var(--soy-deep);color:#fff;border:none;cursor:pointer}
+.cc-compliance .ccc-row{display:flex;align-items:center;gap:8px;padding:7px 0;font-size:12.5px}
+.cc-compliance .ccc-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.cc-compliance .ccc-icon.ok{background:#E8F5E9;color:var(--soy-mid)}
+.cc-compliance .ccc-icon.warn{background:#FFF3E0;color:#E65100}
+.cc-templates{display:flex;flex-direction:column;gap:8px}
+.cc-template{padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-md);cursor:pointer;transition:all .2s}
+.cc-template:hover{border-color:var(--soy-mid);background:#F0F7F3}
+.cc-template .ct-name{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.cc-template .ct-desc{font-size:11px;color:var(--ink-soft)}
+.cc-template .ct-fill{font-size:11px;color:var(--soy-mid);margin-top:6px;font-weight:500}
+.cc-matrix{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cc-matrix-item{background:var(--paper);border-radius:var(--radius-sm);padding:10px 12px;font-size:11.5px;color:var(--ink-soft);text-align:center}
+.cc-matrix-item:hover{background:var(--soy-mid);color:#fff;cursor:pointer}
+.pricing-hero{background:linear-gradient(135deg,var(--soy-deep),var(--soy-mid));border-radius:var(--radius-lg);padding:22px 28px;margin-bottom:20px;color:#fff;display:flex;gap:30px;align-items:stretch}
+.pricing-hero .ph-info{flex:1}
+.pricing-hero .ph-title{font-family:var(--font-serif);font-size:20px;font-weight:700;margin-bottom:8px}
+.pricing-hero .ph-meta{font-size:12.5px;opacity:.9;display:flex;gap:20px}
+.pricing-hero .ph-recommend{border:2px solid var(--gold-mid);border-radius:var(--radius-md);padding:14px 20px;background:rgba(0,0,0,.1);min-width:200px;text-align:center}
+.pricing-hero .pr-badge{background:var(--gold-mid);color:var(--soy-deep);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px;display:inline-block}
+.pricing-hero .pr-offer{font-family:var(--font-display);font-size:40px;font-weight:700;color:var(--gold-soft)}
+.pricing-hero .pr-offer small{font-size:16px}
+.pricing-hero .pr-likely{font-size:12px;opacity:.85;margin-top:4px}
+.pricing-hero .pr-likely strong{color:var(--gold-soft);font-size:16px;font-family:var(--font-display)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.pricing-main{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+.food-table-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:18px}
+.food-table-card .ft-title{font-family:var(--font-serif);font-size:15px;font-weight:700;margin-bottom:14px;color:var(--soy-deep);display:flex;justify-content:space-between;align-items:center}
+.food-table-card .ft-summary{font-size:11px;color:var(--ink-soft)}
+table.food-table{width:100%;border-collapse:collapse;font-size:12.5px}
+table.food-table th{text-align:left;padding:9px 10px;font-size:11px;color:var(--ink-soft);font-weight:500;background:var(--paper);border-bottom:1px solid var(--line);white-space:nowrap}
+table.food-table td{padding:9px 10px;border-bottom:1px solid var(--line)}
+table.food-table tr:hover td{background:#FAF8F2}
+table.food-table td.ai-advice{background:#E8F5E9;border-left:3px solid var(--soy-mid);font-weight:600;color:var(--soy-deep)}
+.up{color:#C0392B}
+.down{color:var(--soy-mid)}
+.ai-strategy{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:18px}
+.ai-strategy .as-title{font-family:var(--font-serif);font-size:15px;font-weight:700;margin-bottom:14px;color:var(--soy-deep)}
+.strategy-bar{margin-bottom:10px}
+.strategy-bar .sb-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.strategy-bar .sb-name{display:flex;align-items:center;gap:6px}
+.strategy-bar .sb-track{height:8px;background:var(--paper-dark);border-radius:4px;overflow:hidden}
+.strategy-bar .sb-fill{height:100%;border-radius:4px}
+.as-text{font-size:12.5px;line-height:1.8;color:var(--ink);padding:12px;background:var(--paper);border-radius:6px;margin:14px 0}
+.as-warning{background:#FFF3E0;border-left:3px solid #E65100;padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;color:#5D4037;margin-bottom:14px}
+.as-btns{display:flex;gap:8px}
+.as-btn{flex:1;padding:9px;border-radius:6px;border:none;font-size:12px;cursor:pointer;text-align:center}
+.as-btn.primary{background:var(--soy-deep);color:#fff}
+.as-btn.gold{background:var(--gold-mid);color:var(--soy-deep)}
+.trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.trend-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px}
+.trend-card .tc-name{font-size:13px;font-weight:500;margin-bottom:8px}
+.trend-card .tc-svg{width:100%;height:70px}
+.trend-card .tc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px}
+.trend-card .tc-price{font-family:var(--font-display);font-size:18px;font-weight:700}
+.calendar-wrap{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.cal-main{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:20px}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cal-head h3{font-family:var(--font-serif);font-size:17px;font-weight:700}
+.cal-head button{padding:6px 14px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+.cal-weekdays div{text-align:center;font-size:11px;color:var(--ink-soft);padding:6px;font-weight:500}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;padding:4px;font-size:12px;cursor:pointer;position:relative;background:#fff}
+.cal-day.empty{background:transparent;border:none;cursor:default}
+.cal-day.today{background:var(--soy-deep);color:#fff;border-color:var(--soy-deep)}
+.cal-day.tender{background:#FDECEC;border-color:#F5C6C6}
+.cal-day.tender .cd-num{color:#C0392B;font-weight:700}
+.cal-day .cd-num{font-weight:500}
+.cal-day .cd-dot{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%}
+.cal-day .cd-dot.red{background:#C0392B}
+.cal-day .cd-dot.green{background:var(--soy-mid)}
+.oe-header-bar{background:linear-gradient(135deg,#2C2C2C,#4A4A4A);color:#fff;border-radius:var(--radius-lg);padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:30px}
+.oe-header-bar .oe-label{font-size:13px;opacity:.85;margin-bottom:2px}
+.oe-header-bar .oe-val{font-family:var(--font-display);font-size:26px;font-weight:700}
+.oe-header-bar .oe-sub{font-size:11px;opacity:.7}
+.oe-header-bar .oe-bar-spacer{flex:1}
+.oe-body{display:grid;grid-template-columns:260px 1fr 340px;gap:16px}
+.oe-groups{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:12px;align-self:start;position:sticky;top:0}
+.oe-group{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:3px solid transparent;margin-bottom:4px}
+.oe-group.active{background:#E8F5E9;border-left-color:var(--soy-mid)}
+.oe-group .og-avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.oe-group .og-name{font-size:13px;flex:1}
+.oe-group .og-count{font-size:11px;color:var(--ink-soft)}
+.oe-chat{background:#EDEDED;border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;min-height:620px}
+.oe-chat-head{background:#ededed;padding:12px 20px;border-bottom:1px solid #D5D5D5;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.oe-chat-head .online-dot{width:7px;height:7px;background:var(--soy-mid);border-radius:50%;animation:livePulse 1.5s infinite}
+.oe-chat-head .online-label{font-size:11px;color:var(--ink-soft);margin-left:auto}
+.oe-wx-messages{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.oe-msg{display:flex;align-items:flex-start;gap:10px;max-width:80%;animation:slideIn .4s ease}
+.oe-msg .avatar{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.oe-msg.me{flex-direction:row-reverse;margin-left:auto}
+.oe-bubble{padding:10px 14px;border-radius:6px;font-size:13.5px;line-height:1.6;word-break:break-word;position:relative}
+.oe-msg.them .oe-bubble{background:#fff;color:#333;border-top-left-radius:2px}
+.oe-msg.me .oe-bubble{background:#95EC69;color:#000;border-top-right-radius:2px}
+.oe-msg .oe-time{font-size:10px;color:#999;margin-top:4px}
+.oe-msg.me .oe-time{text-align:right}
+.oe-system-hint{text-align:center;font-size:11px;color:#999;padding:4px 0;animation:slideIn .4s ease}
+.oe-system-hint span{background:#D9D9D9;padding:2px 10px;border-radius:10px}
+.oe-ai-thinking{display:flex;align-items:center;gap:8px;padding:8px 14px}
+.oe-ai-thinking .thinking-dots{display:flex;gap:3px}
+.thinking-dots span{width:6px;height:6px;background:#666;border-radius:50%;animation:aiThinking 1.2s infinite}
+.thinking-dots span:nth-child(2){animation-delay:.15s}
+.thinking-dots span:nth-child(3){animation-delay:.3s}
+@keyframes aiThinking{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.oe-bubble .order-preview{background:rgba(0,0,0,.05);padding:8px;border-radius:4px;margin-top:6px;font-size:11.5px}
+.oe-msg.me .oe-bubble .order-preview{background:rgba(0,0,0,.08)}
+.oe-right{display:flex;flex-direction:column;gap:14px;align-self:start;position:sticky;top:0}
+.oe-status{background:linear-gradient(135deg,#F7F4EC,#FFF);border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px}
+.oe-status .os-title{font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:12px;color:var(--soy-deep)}
+.oe-status-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px}
+.oe-status-row .os-key{color:var(--ink-soft)}
+.oe-status-row .os-val{font-weight:500}
+.oe-feed{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px}
+.oe-feed .of-title{font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:12px;color:var(--soy-deep)}
+.oe-feed-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12px;animation:slideInRight .4s ease}
+.oe-feed-item:last-child{border-bottom:none}
+.oe-feed-item .ofi-icon{width:24px;height:24px;border-radius:6px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.oe-feed-item .ofi-content{flex:1}
+.oe-feed-item .ofi-text{color:var(--ink);line-height:1.5}
+.oe-feed-item .ofi-time{font-size:10px;color:var(--ink-soft);margin-top:2px}
+.oe-access{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--line);padding:16px}
+.oe-access .oa-title{font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:12px;color:var(--soy-deep)}
+.oe-access-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.oe-access-row:last-child{border-bottom:none}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#CCC;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#999}
+
+
+/* ============ AI 录单演示动画 Keyframes ============ */
+@keyframes aiDot {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1.1); }
+}
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRightIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scanLight {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes typingBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@keyframes wavePlay {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.4); }
+}
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+.ai-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:#6b7280; margin:0 2px; animation:aiDot 1.2s infinite ease-in-out; }
+.ai-dot:nth-child(2){ animation-delay:0.15s; }
+.ai-dot:nth-child(3){ animation-delay:0.3s; }
+.anim-slidefadein { animation:slideFadeIn 0.4s ease-out both; }
+.anim-sliderightin { animation:slideRightIn 0.4s ease-out both; }
+.wave-bar span { display:inline-block; width:3px; margin:0 1px; background:#2563EB; border-radius:2px; animation:wavePlay 0.6s infinite ease-in-out; transform-origin:center; }
+.wave-bar span:nth-child(1){ animation-delay:0s; }
+.wave-bar span:nth-child(2){ animation-delay:0.1s; }
+.wave-bar span:nth-child(3){ animation-delay:0.2s; }
+.wave-bar span:nth-child(4){ animation-delay:0.3s; }
+.wave-bar span:nth-child(5){ animation-delay:0.4s; }
+.wave-bar span:nth-child(6){ animation-delay:0.5s; }
+.wave-bar span:nth-child(7){ animation-delay:0.55s; }
+.typing-caret::after { content:'▍'; color:#6b7280; margin-left:2px; animation:typingBlink 0.8s infinite; }
+.pulse-glow { animation:pulseGlow 1.6s infinite; }
+/* 扫描光覆盖层 */
+.photo-card-wrap { position:relative; overflow:hidden; border-radius:10px; }
+.scan-overlay { position:absolute; left:0; right:0; height:40%; pointer-events:none;
+  background:linear-gradient(180deg, rgba(59,130,246,0) 0%, rgba(59,130,246,0.35) 50%, rgba(59,130,246,0) 100%);
+  animation:scanLight 1.6s ease-in-out forwards; }
+/* ============ END AI 录单演示 Keyframes ============ */
+</style>
+
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">鲜源供应链<br>投研智脑<span class="brand-sub">PRO · AI AGENT</span></div>
+    <nav>
+      <div class="nav-item active" data-view="home"><span class="ni-icon">📊</span> 工作台</div>
+      <div class="nav-item" data-view="radar"><span class="ni-icon">📡</span> 投标雷达</div>
+      <div class="nav-item" data-view="document"><span class="ni-icon">📄</span> 标书解析</div>
+      <div class="nav-item" data-view="qualification"><span class="ni-icon">🩺</span> 资质体检</div>
+      <div class="nav-item" data-view="writing"><span class="ni-icon">✍️</span> 标书撰写 <span class="ni-badge">AI</span></div>
+      <div class="nav-item" data-view="pricing"><span class="ni-icon">💰</span> 报价策略</div>
+      <div class="nav-item" data-view="calendar"><span class="ni-icon">📅</span> 日程管家</div>
+      <div class="nav-item" data-view="order-entry"><span class="ni-icon">🤖</span> AI 录单中心</div>
+    </nav>
+  </aside>
+  <main class="content">
+    <header class="topbar">
+      <div>
+        <div class="tb-title" id="tb-title">工作台仪表盘</div>
+        <div class="tb-sub" id="tb-sub">鲜源供应链 · 2026.11 · 投研智能体</div>
+      </div>
+      <div class="tb-spacer"></div>
+      <button class="tb-btn">📤 导出报告</button>
+      <button class="tb-btn tb-btn-primary">+ 新建投标</button>
+    </header>
+
+    <!-- VIEW HOME -->
+    <div class="view active" id="view-home">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">本月投标项目</div><div class="kpi-value">47<span class="kpi-unit">个</span></div><div class="kpi-delta">↑ 较上月 +12%</div></div>
+        <div class="kpi-card gold"><div class="kpi-label">AI 撰写覆盖</div><div class="kpi-value">32<span class="kpi-unit">份</span></div><div class="kpi-delta">⚡ 平均产出 28min/份</div></div>
+        <div class="kpi-card"><div class="kpi-label">中标总金额</div><div class="kpi-value">¥2.86<span class="kpi-unit">亿</span></div><div class="kpi-delta">↑ 年度累计</div></div>
+        <div class="kpi-card gold"><div class="kpi-label">平均投标周期</div><div class="kpi-value">6.4<span class="kpi-unit">天</span></div><div class="kpi-delta down">↓ AI 加速 42%</div></div>
+      </div>
+      <div class="two-col">
+        <div class="section">
+          <div class="section-header"><div class="sh-title">⚡ AI 撰写进度</div><span class="sh-badge">3 份并行生成中</span></div>
+          <div class="section-body">
+            <div class="progress-item"><div class="progress-label"><span>3.2 公司概况 · 核心资质声明段</span><span class="pl-val">68%</span></div><div class="progress-bar"><div class="progress-fill gold shimmer" style="width:68%"></div></div></div>
+            <div class="progress-item"><div class="progress-label"><span>4.1 技术方案 · 系统架构</span><span class="pl-val">92%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div></div>
+            <div class="progress-item"><div class="progress-label"><span>5.2 实施方案 · 里程碑计划</span><span class="pl-val">45%</span></div><div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div></div>
+            <div class="progress-item"><div class="progress-label"><span>6.1 服务承诺 · 质量保证</span><span class="pl-val">23%</span></div><div class="progress-bar"><div class="progress-fill gold" style="width:23%"></div></div></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><div class="sh-title">📋 今日待办</div><span class="sh-badge">5 项</span></div>
+          <div class="section-body" style="padding:8px 20px">
+            <div class="todo-item"><div class="todo-dot red"></div><div class="todo-content"><div class="tc-title">市三院投标截止前资质文件盖章</div><div class="tc-meta">紧急 · 今日 17:00 前</div></div></div>
+            <div class="todo-item"><div class="todo-dot red"></div><div class="todo-content"><div class="tc-title">复核 AI 报价策略中鸡蛋品类单价</div><div class="tc-meta">价格波动大 · 需人工确认</div></div></div>
+            <div class="todo-item"><div class="todo-dot gold"></div><div class="todo-content"><div class="tc-title">提交绿联商超年度框架标书终稿</div><div class="tc-meta">截止 11.13 · 待法务审</div></div></div>
+            <div class="todo-item"><div class="todo-dot gold"></div><div class="todo-content"><div class="tc-title">AI 录单异常告警处理（3 条待人工）</div><div class="tc-meta">市一医院群聊 · 图片解析失败</div></div></div>
+            <div class="todo-item"><div class="todo-dot green"></div><div class="todo-content"><div class="tc-title">月度投标复盘会（AI 自动生成数据）</div><div class="tc-meta">下午 14:00 · 会议室 A</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="sh-title">🎯 活跃投标项目</div><span class="sh-badge">12 个进行中</span></div>
+        <div class="section-body" style="padding:0">
+          <table class="data-table">
+            <thead><tr><th>项目名称</th><th>招标单位</th><th>编号</th><th>截止</th><th>匹配度</th><th>预估金额</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>市一医院食材配送 2027</td><td>市第一人民医院</td><td>SY-2026-087</td><td>11-15</td><td><span class="tag tag-green">94%</span></td><td>¥ 3,200 万/年</td><td><span class="tag tag-green">撰写中</span></td></tr>
+              <tr><td>绿联商超全国年采框架</td><td>绿联商超集团</td><td>LL-2026-F03</td><td>11-18</td><td><span class="tag tag-green">91%</span></td><td>¥ 1.8 亿/年</td><td><span class="tag tag-gold">待提交</span></td></tr>
+              <tr><td>区机关食堂物资供应</td><td>区机关事务中心</td><td>QG-2026-112</td><td>11-20</td><td><span class="tag tag-blue">87%</span></td><td>¥ 680 万/年</td><td><span class="tag tag-gold">解析中</span></td></tr>
+              <tr><td>师大后勤食品供应</td><td>师范大学</td><td>SD-2026-045</td><td>11-22</td><td><span class="tag tag-blue">82%</span></td><td>¥ 1,500 万/年</td><td><span class="tag tag-green">撰写中</span></td></tr>
+              <tr><td>市三院营养科专供</td><td>市第三人民医院</td><td>SSY-2026-019</td><td>11-14</td><td><span class="tag tag-red">76%</span></td><td>¥ 420 万/年</td><td><span class="tag tag-red">紧急</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW RADAR -->
+    <div class="view" id="view-radar">
+      <div class="section" style="padding:20px;display:flex;gap:20px;align-items:center">
+        <div style="font-family:var(--font-display);font-size:36px;font-weight:700;color:var(--soy-deep)">42</div>
+        <div><div style="font-family:var(--font-serif);font-size:15px;font-weight:700;margin-bottom:4px">🎯 全国招标平台实时监控</div><div style="font-size:12.5px;color:var(--ink-soft)">覆盖政府采购网、公共资源交易中心、电子招投标平台等 42 家主流来源，AI 每 3 小时自动扫描匹配</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div class="radar-platform-card">
+          <div class="rpc-head"><div><div class="rpc-name">🥬 食材 · 医疗系统</div><div class="rpc-meta">近 30 天新发布 18 条</div></div></div>
+          <div class="rpc-score"><div><div class="score-big">94</div><div class="score-label">匹配度 %</div></div><div style="flex:1"><div class="progress-bar"><div class="progress-fill gold" style="width:94%"></div></div><div style="font-size:11px;color:var(--ink-soft);margin-top:6px">已命中：市一医院、市三院、妇幼保健院</div></div></div>
+        </div>
+        <div class="radar-platform-card">
+          <div class="rpc-head"><div><div class="rpc-name">🛒 商超 · 全国连锁</div><div class="rpc-meta">近 30 天新发布 9 条</div></div></div>
+          <div class="rpc-score"><div><div class="score-big">91</div><div class="score-label">匹配度 %</div></div><div style="flex:1"><div class="progress-bar"><div class="progress-fill gold" style="width:91%"></div></div><div style="font-size:11px;color:var(--ink-soft);margin-top:6px">已命中：绿联、永辉、物美华东</div></div></div>
+        </div>
+        <div class="radar-platform-card">
+          <div class="rpc-head"><div><div class="rpc-name">🏛️ 政企 · 机关院校</div><div class="rpc-meta">近 30 天新发布 23 条</div></div></div>
+          <div class="rpc-score"><div><div class="score-big">87</div><div class="score-label">匹配度 %</div></div><div style="flex:1"><div class="progress-bar"><div class="progress-fill" style="width:87%"></div></div><div style="font-size:11px;color:var(--ink-soft);margin-top:6px">已命中：区机关、师范大学、职业技术学院</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW DOCUMENT -->
+    <div class="view" id="view-document">
+      <div class="upload-dropzone"><div class="ud-icon">📁</div><div class="ud-title">拖拽招标文件到此处，或点击选择文件</div><div class="ud-hint">支持 PDF / Word / 扫描件图片，最大 100MB · AI 解析约需 2-4 分钟</div></div>
+      <div class="section parse-progress">
+        <div class="section-header"><div class="sh-title">⚡ AI 解析进度 · SY-2026-087 市一医院 2027</div><span class="sh-badge">68% · 实时解析中</span></div>
+        <div class="section-body">
+          <div class="progress-item"><div class="progress-label"><span>📑 文档结构识别</span><span class="pl-val">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+          <div class="progress-item"><div class="progress-label"><span>📌 关键条款提取</span><span class="pl-val">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+          <div class="progress-item"><div class="progress-label"><span>🏷️ 评分点定位</span><span class="pl-val">82%</span></div><div class="progress-bar"><div class="progress-fill gold shimmer" style="width:82%"></div></div></div>
+          <div class="progress-item"><div class="progress-label"><span>📊 资质要求匹配</span><span class="pl-val">45%</span></div><div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div></div>
+        </div>
+      </div>
+      <div class="parse-result-grid">
+        <div class="pr-card"><div class="pr-title">📋 项目信息</div>
+          <div class="pr-row"><span class="pr-key">项目名称</span><span>市第一人民医院 2027 年度食材配送服务</span></div>
+          <div class="pr-row"><span class="pr-key">招标编号</span><span>SY-2026-087</span></div>
+          <div class="pr-row"><span class="pr-key">招标单位</span><span>市第一人民医院后勤保障部</span></div>
+          <div class="pr-row"><span class="pr-key">预算金额</span><span>¥ 3,200 万元 / 年</span></div>
+          <div class="pr-row"><span class="pr-key">合同期限</span><span>2027.01.01 - 2028.12.31（2年）</span></div>
+          <div class="pr-row"><span class="pr-key">采购品类</span><span>蔬菜 / 肉禽 / 水产 / 粮油 / 调味 / 乳品</span></div></div>
+        <div class="pr-card"><div class="pr-title">🪪 资质要求</div>
+          <div class="pr-row"><span class="pr-key">必备资质</span><span class="tag tag-green">食品经营许可证 ✓</span></div>
+          <div class="pr-row"><span class="pr-key">加分资质</span><span class="tag tag-gold">ISO22000 / HACCP</span></div>
+          <div class="pr-row"><span class="pr-key">注册资金</span><span>≥ 500 万元</span></div>
+          <div class="pr-row"><span class="pr-key">业绩要求</span><span>近 3 年同类合同 ≥ 3 份</span></div>
+          <div class="pr-row"><span class="pr-key">配送能力</span><span>自有冷链车辆 ≥ 5 辆</span></div>
+          <div class="pr-row"><span class="pr-key">风险提示</span><span class="tag tag-red">需提供员工健康证台账</span></div></div>
+        <div class="pr-card"><div class="pr-title">🎯 评分标准</div>
+          <div class="pr-row"><span class="pr-key">商务部分</span><span>30 分（资质 15 / 业绩 10 / 财务 5）</span></div>
+          <div class="pr-row"><span class="pr-key">技术部分</span><span>40 分（配送方案 15 / 质量保证 15 / 应急 10）</span></div>
+          <div class="pr-row"><span class="pr-key">价格部分</span><span>30 分（最低价 30 分，阶梯扣分）</span></div>
+          <div class="pr-row"><span class="pr-key">AI 预估得分</span><span style="font-family:var(--font-display);font-size:20px;color:var(--soy-mid)">78 / 100</span></div></div>
+        <div class="pr-card"><div class="pr-title">⏰ 时间节点</div>
+          <div class="pr-row"><span class="pr-key">公告发布</span><span>2026-11-05</span></div>
+          <div class="pr-row"><span class="pr-key">报名截止</span><span class="tag tag-gold">2026-11-12 17:00</span></div>
+          <div class="pr-row"><span class="pr-key">答疑会</span><span>2026-11-13 10:00</span></div>
+          <div class="pr-row"><span class="pr-key">截标时间</span><span class="tag tag-red">2026-11-15 09:30</span></div>
+          <div class="pr-row"><span class="pr-key">开标地点</span><span>院方三楼开标室</span></div></div>
+      </div>
+    </div>
+
+    <!-- VIEW QUALIFICATION -->
+    <div class="view" id="view-qualification">
+      <div class="qual-top">
+        <div class="score-circle-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160" style="display:block;margin:0 auto">
+            <defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#D4A017"/><stop offset="100%" stop-color="#B8860B"/></linearGradient></defs>
+            <circle cx="80" cy="80" r="65" class="ring-bg"/>
+            <circle cx="80" cy="80" r="65" class="ring-fg" stroke-dasharray="408.4" stroke-dashoffset="61.2"/>
+          </svg>
+          <div class="score-big">85</div>
+          <div class="score-label">资质健康度综合得分</div>
+          <div style="font-size:11px;color:var(--soy-mid);margin-top:6px">行业均值 72 分 · 高出 13 分</div>
+        </div>
+        <div class="qual-grid">
+          <div style="font-family:var(--font-serif);font-size:15px;font-weight:700;margin-bottom:14px;color:var(--soy-deep)">🏅 核心资质概览</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div style="text-align:center;padding:14px;background:var(--paper);border-radius:8px"><div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--soy-mid)">23</div><div style="font-size:11px;color:var(--ink-soft);margin-top:4px">持有效证书</div></div>
+            <div style="text-align:center;padding:14px;background:var(--paper);border-radius:8px"><div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--soy-mid)">5</div><div style="font-size:11px;color:var(--ink-soft);margin-top:4px">ISO 体系认证</div></div>
+            <div style="text-align:center;padding:14px;background:var(--paper);border-radius:8px"><div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--gold-deep)">2</div><div style="font-size:11px;color:var(--ink-soft);margin-top:4px">3个月内到期</div></div>
+            <div style="text-align:center;padding:14px;background:var(--paper);border-radius:8px"><div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:#C0392B">4</div><div style="font-size:11px;color:var(--ink-soft);margin-top:4px">缺口项</div></div>
+          </div>
+          <div style="font-family:var(--font-serif);font-size:15px;font-weight:700;margin:20px 0 0;color:var(--soy-deep)">⚠️ 资质缺口清单</div>
+          <div class="qual-gap-list">
+            <div class="qg-item"><div class="qg-icon">📋</div><div class="qg-content"><div class="qg-title">缺少"中央厨房加工"专项资质</div><div class="qg-desc">区机关项目必查 · 预计办理周期 60 天</div></div><span class="tag tag-red">高</span></div>
+            <div class="qg-item"><div class="qg-icon">🔬</div><div class="qg-content"><div class="qg-title">HACCP 认证 3 月后到期需续期</div><div class="qg-desc">绿联商超项目加分项 · 建议本月启动续期流程</div></div><span class="tag tag-gold">中</span></div>
+            <div class="qg-item"><div class="qg-icon">📄</div><div class="qg-content"><div class="qg-title">员工健康证台账不全（缺 12 份）</div><div class="qg-desc">市一医院风险项 · 截标前必须补全上传</div></div><span class="tag tag-red">高</span></div>
+            <div class="qg-item"><div class="qg-icon">🚚</div><div class="qg-content"><div class="qg-title">冷链车辆登记仅 4 辆，低于 5 辆要求</div><div class="qg-desc">可挂靠合作方补充说明</div></div><span class="tag tag-gold">中</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW WRITING -->
+    <div class="view" id="view-writing">
+      <div class="writing-hero">
+        <div class="wh-badge">⚡ AI 实时撰写中</div>
+        <div class="wh-title">市第一人民医院 2027 年度食材配送服务项目投标书</div>
+        <div class="wh-meta">
+          <span>招标编号 <strong>SY-2026-087</strong></span>
+          <span>截止日期 <strong>2026-11-15 09:30</strong></span>
+          <span>预估年采购额 <strong>¥ 3,200 万</strong></span>
+        </div>
+        <div class="wh-progress-wrap">
+          <div class="wh-progress-label"><span>3.2 公司概况 · 核心资质声明段</span><span>68% · 正在生成...</span></div>
+          <div class="wh-progress-bar"><div class="wh-progress-fill" style="width:68%"></div></div>
+        </div>
+        <div class="wh-stats">
+          <div class="wh-stat-card"><div class="ws-label">📑 招标书解析</div><div class="ws-val">58 页</div></div>
+          <div class="wh-stat-card"><div class="ws-label">📚 参考文档</div><div class="ws-val">47 份</div></div>
+          <div class="wh-stat-card"><div class="ws-label">✓ 合规覆盖</div><div class="ws-val">92%</div></div>
+          <div class="wh-stat-card highlight"><div class="ws-label">🎯 AI 预估得分</div><div class="ws-val">78</div></div>
+        </div>
+      </div>
+      <div class="writing-body">
+        <!-- Outline -->
+        <div class="wb-outline">
+          <div class="outline-title">📖 大纲导航</div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">1.</span><span class="oc-title">投标函及投标函附录</span></div><div class="oc-mini-bar"><div style="width:100%"></div></div><div class="ol-sub done">1.1 投标函</div><div class="ol-sub done">1.2 投标函附录</div></div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">2.</span><span class="oc-title">法定代表人身份证明</span></div><div class="oc-mini-bar"><div style="width:100%"></div></div><div class="ol-sub done">2.1 身份证明书</div><div class="ol-sub done">2.2 授权委托书</div></div>
+          <div class="ol-chapter active"><div class="oc-head"><span class="oc-num">3.</span><span class="oc-title">公司概况与资质声明</span><span class="oc-pulse"><span class="ai-dot"></span>AI 撰写中</span></div><div class="oc-mini-bar"><div style="width:68%"></div></div><div class="ol-sub done">3.1 公司简介</div><div class="ol-sub">3.2 核心资质声明段 ✍️</div><div class="ol-sub">3.3 荣誉与奖项</div></div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">4.</span><span class="oc-title">核心团队与管理架构</span></div><div class="oc-mini-bar"><div style="width:0%"></div></div><div class="ol-sub">4.1 组织架构</div><div class="ol-sub">4.2 核心团队简历</div></div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">5.</span><span class="oc-title">类似项目业绩</span></div><div class="oc-mini-bar"><div style="width:0%"></div></div><div class="ol-sub">5.1 代表性合同案例</div><div class="ol-sub">5.2 业主评价与验收证明</div></div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">6.</span><span class="oc-title">配送实施方案</span></div><div class="oc-mini-bar"><div style="width:0%"></div></div></div>
+          <div class="ol-chapter"><div class="oc-head"><span class="oc-num">7.</span><span class="oc-title">报价一览表</span></div><div class="oc-mini-bar"><div style="width:0%"></div></div></div>
+        </div>
+        <!-- Editor -->
+        <div class="wb-editor">
+          <div class="ed-para"><span class="ed-dropcap">鲜</span>源供应链（以下简称"本公司"）成立于 <strong>2008 年</strong>，总部位于华东地区核心城市，是一家专注于<strong>食材全品类配送服务</strong>的综合性企业。公司注册资本 <strong>2,800 万元</strong>，拥有员工 380 余人，冷链配送车辆 18 台，在华东及华南建有 6 万平方米现代化仓储中心。本公司长期服务于医疗机构、高校、政府机关及连锁商超，累计服务客户超过 200 家，年配送额突破 <strong>5.6 亿元</strong><span class="ed-score-tag">🎯 覆盖评分点 3.2.1 · 企业实力 · 权重 15%</span>。</div>
+          <div class="ed-ai-suggest"><div class="eas-title">💡 AI 措辞建议</div><div class="eas-text">建议将"注册资本 2,800 万元"调整为<strong>"注册资本 2,800 万元（实缴）"</strong>以突出实缴资本优势，更贴合本项目 500 万注册资金门槛要求。同时"累计服务客户 200 家"可细化为"其中医疗机构 42 家、高校 31 家、政府机关 28 家"。</div><div class="eas-actions"><button class="eas-btn primary">采纳建议</button><button class="eas-btn">忽略</button><button class="eas-btn">查看对比</button></div></div>
+          <div class="ed-quote">本公司已通过 <strong>ISO 22000 食品安全管理体系认证</strong>、<strong>HACCP 危害分析与关键控制点认证</strong>、<strong>ISO 9001 质量管理体系认证</strong>，并持有有效食品经营许可证、食品生产许可证、道路运输经营许可证等 <strong>23 项</strong>核心资质证书。本公司郑重承诺，以上所有资质均在有效期内，可随时提供原件供查验。<div class="eq-source">📎 参考自 2025 年同类标书 · 资质声明段标准模板</div></div>
+          <div class="ed-para"><strong>核心管理团队</strong>均拥有 10 年以上行业经验，其中项目负责人王建国先生持有 PMP 项目管理专业人士认证，在医疗食材配送领域深耕 15 年；技术架构师张慧敏女士主导过 30+ 大型供应链系统建设。以下为核心团队成员概览：</div>
+          <table class="ed-team-table"><thead><tr><th>姓名</th><th>职务</th><th>资质证书</th><th>从业年限</th><th>分管领域</th><th>相关经验</th></tr></thead><tbody>
+            <tr><td><strong>王建国</strong></td><td>项目总监</td><td>PMP</td><td>15 年</td><td>项目管理 / 客户关系</td><td>服务三甲医院 12 家</td></tr>
+            <tr><td><strong>张慧敏</strong></td><td>技术架构师</td><td>系统架构师</td><td>12 年</td><td>冷链调度系统</td><td>主导 3 个省级平台建设</td></tr>
+            <tr><td><strong>李强</strong></td><td>安全总监</td><td>CISSP / HACCP 审核员</td><td>10 年</td><td>食品安全 / 合规</td><td>ISO22000 审核员</td></tr>
+            <tr><td><strong>陈晓东</strong></td><td>运营总监</td><td>ITSS / 物流师高级</td><td>14 年</td><td>仓储 / 配送 / 应急</td><td>日处理 200 吨食材经验</td></tr>
+          </tbody></table>
+          <div class="ed-para">本公司自 2023 年以来，累计完成类似合同 <strong>47 份</strong>，以下为代表性业绩（按时间倒序排列）：</div>
+          <div class="ed-project-list">
+            <div class="ed-project-item"><div class="ep-year">2025</div><div class="ep-info"><div class="ep-name">绿联商超集团年度全国食材框架采购</div><div class="ep-meta">合同额 ¥1.8 亿/年 · 合同期限 2025.03 - 2027.02</div></div><div class="ep-status">✓ 已验收</div></div>
+            <div class="ed-project-item"><div class="ep-year">2024</div><div class="ep-info"><div class="ep-name">市妇幼保健院食材配送服务</div><div class="ep-meta">合同额 ¥1,800 万/年 · 合同期限 2024.07 - 2026.06</div></div><div class="ep-status">✓ 已验收</div></div>
+            <div class="ed-project-item"><div class="ep-year">2024</div><div class="ep-info"><div class="ep-name">省教育厅高校后勤食品集中采购</div><div class="ep-meta">合同额 ¥4,200 万/年 · 覆盖 18 所高校</div></div><div class="ep-status">✓ 已验收</div></div>
+            <div class="ed-project-item"><div class="ep-year">2023</div><div class="ep-info"><div class="ep-name">区政府机关食堂物资供应项目</div><div class="ep-meta">合同额 ¥680 万/年 · 连续续约 3 年</div></div><div class="ep-status">✓ 已验收</div></div>
+          </div>
+          <div class="ed-ai-continue">
+            <div class="ed-ai-badge">⚡ AI 正在续写 · 实时生成中</div>
+            <div class="ed-para">在 <strong>市第一人民医院</strong> 的具体服务方案上，本公司承诺派驻专属项目组，配备专用冷链车辆 3 台、专属分拣区域 500 平方米，建立"晨 4 点"直达配送机制——每日凌晨 4 点前完成分拣，6 点前送达医院营养科，<span class="ed-ai-cursor">▍</span></div>
+          </div>
+          <div class="ed-cta-row">
+            <button class="ed-cta primary">🚀 一键生成剩余章节</button>
+            <button class="ed-cta primary">📑 插入资质附件</button>
+            <button class="ed-cta gold">📊 生成价格一览表</button>
+            <button class="ed-cta ghost">🎲 AI 随机润色</button>
+          </div>
+          <div class="ed-statusbar">
+            <span><strong>第 8 页</strong> / 共 58 页</span>
+            <span><strong>3,247</strong> 字</span>
+            <span><strong>22</strong> 段落</span>
+            <span><strong>3</strong> 表格</span>
+            <span>最后保存 <strong>刚刚</strong> · 自动保存中</span>
+          </div>
+        </div>
+        <!-- Copilot -->
+        <div class="wb-copilot">
+          <div class="copilot-card"><div class="cc-title">📢 AI 洞察</div><div class="cc-insight"><div class="cci-text">💡 招标文件评分点 <strong>3.2.1 企业实力</strong>权重 <strong>15%</strong>，当前已覆盖 4 项，建议补充：<br>· 自主知识产权 ≥ 5 项<br>· 近 3 年平均利润额 ≥ 800 万元<br>· 信息化系统专利或软件著作权</div></div></div>
+          <div class="copilot-card"><div class="cc-title">💬 AI 建议措辞</div>
+            <div class="cc-suggest-list">
+              <div class="cc-suggest-item"><span class="csi-text">"本公司具有良好的商业信誉和健全的财务会计制度..."</span><button class="csi-btn">采纳</button></div>
+              <div class="cc-suggest-item"><span class="csi-text">"凭借十余年行业深耕，本公司建立了..."</span><button class="csi-btn">采纳</button></div>
+              <div class="cc-suggest-item"><span class="csi-text">"我们承诺以最严苛的标准践行食品安全..."</span><button class="csi-btn">采纳</button></div>
+            </div></div>
+          <div class="copilot-card"><div class="cc-title">✓ 合规检查</div><div class="cc-compliance">
+            <div class="ccc-row"><div class="ccc-icon ok">✓</div><span>公司简介字数达标</span></div>
+            <div class="ccc-row"><div class="ccc-icon ok">✓</div><span>资质证书清单完整（23 项）</span></div>
+            <div class="ccc-row"><div class="ccc-icon warn">!</div><span style="color:#E65100;">项目业绩缺合同编号 ⚠️</span></div>
+            <div class="ccc-row"><div class="ccc-icon ok">✓</div><span>财务数据匹配度 OK</span></div>
+          </div></div>
+          <div class="copilot-card"><div class="cc-title">📋 快捷写作模板</div><div class="cc-templates">
+            <div class="cc-template"><div class="ct-name">🏆 企业实力模板</div><div class="ct-desc">一键填充：成立时间/注册资本/员工规模/年营收</div><div class="ct-fill">一键填充 →</div></div>
+            <div class="cc-template"><div class="ct-name">📚 同类业绩模板</div><div class="ct-desc">自动调用企业数据库中近 3 年业绩清单</div><div class="ct-fill">一键填充 →</div></div>
+            <div class="cc-template"><div class="ct-name">🪪 资质声明模板</div><div class="ct-desc">ISO / 许可证 / 荣誉 标准声明段</div><div class="ct-fill">一键填充 →</div></div>
+          </div></div>
+          <div class="copilot-card"><div class="cc-title">⚡ AI 能力矩阵</div><div class="cc-matrix">
+            <div class="cc-matrix-item">秒级续写</div><div class="cc-matrix-item">自动填充</div><div class="cc-matrix-item">实时合规</div><div class="cc-matrix-item">对准评分点</div><div class="cc-matrix-item">一键报价</div><div class="cc-matrix-item">3 种润色</div>
+          </div></div>
+          <div class="copilot-card"><div class="cc-title">🎯 合规覆盖总览</div>
+            <div class="progress-item" style="margin-bottom:8px"><div class="progress-label"><span>商务部分</span><span class="pl-val">94%</span></div><div class="progress-bar"><div class="progress-fill gold" style="width:94%"></div></div></div>
+            <div class="progress-item" style="margin-bottom:8px"><div class="progress-label"><span>技术部分</span><span class="pl-val">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%"></div></div></div>
+            <div class="progress-item" style="margin-bottom:8px"><div class="progress-label"><span>价格部分</span><span class="pl-val">0%</span></div><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div></div>
+            <div class="progress-item"><div class="progress-label"><span>格式规范</span><span class="pl-val">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW PRICING -->
+    <div class="view" id="view-pricing">
+      <div class="pricing-hero">
+        <div class="ph-info">
+          <div class="pr-badge">💰 AI 报价策略</div>
+          <div class="ph-title">市一医院 2027 年度食材配送项目 · AI 报价方案</div>
+          <div class="ph-meta"><span>招标编号 <strong>SY-2026-087</strong></span><span>合同期 <strong>2027.01 - 2028.12</strong></span><span>预估年采购额 <strong>¥ 3,200 万</strong></span></div>
+        </div>
+        <div class="ph-recommend">
+          <div style="font-size:11px;color:var(--gold-soft);margin-bottom:4px">📊 AI 推荐报价（对标市价）</div>
+          <div class="pr-offer">-4.2<small>%</small></div>
+          <div class="pr-likely">中标概率 <strong>73%</strong></div>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-label">SKU 总数</div><div class="kpi-value">1,248<span class="kpi-unit">项</span></div><div class="kpi-delta">覆盖 6 大类食材</div></div>
+        <div class="kpi-card"><div class="kpi-label">30 天价格波动</div><div class="kpi-value down">-2.1<span class="kpi-unit">%</span></div><div class="kpi-delta down">整体下行 · 报价窗口期良好</div></div>
+        <div class="kpi-card gold"><div class="kpi-label">竞品均价参考</div><div class="kpi-value down">-3.8<span class="kpi-unit">%</span></div><div class="kpi-delta">较行业中位价低</div></div>
+        <div class="kpi-card gold"><div class="kpi-label">预估毛利率</div><div class="kpi-value">12.4<span class="kpi-unit">%</span></div><div class="kpi-delta">健康区间 8-15%</div></div>
+      </div>
+      <div class="pricing-main">
+        <div class="food-table-card">
+          <div class="ft-title"><span>🍽️ 食材分类报价明细表</span><span class="ft-summary">合计 412 项 · AI 已自动填充 387 项</span></div>
+          <table class="food-table">
+            <thead><tr><th>分类</th><th>食材</th><th>规格</th><th>标准价库</th><th>30天均价</th><th>涨跌</th><th>竞品均价</th><th style="color:var(--soy-deep);font-weight:700">AI 建议报价</th><th>毛利率</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="2" style="background:#E8F5E9;font-weight:600">🥬 蔬菜</td><td>大白菜</td><td>500g/棵</td><td>¥ 1.20</td><td>¥ 1.15</td><td class="down">↓ 4.2%</td><td>¥ 1.12</td><td class="ai-advice">¥ 1.08</td><td class="down">8.3%</td></tr>
+              <tr><td>番茄</td><td>500g</td><td>¥ 4.80</td><td>¥ 5.20</td><td class="up">↑ 8.3%</td><td>¥ 4.95</td><td class="ai-advice">¥ 4.60</td><td>11.5%</td></tr>
+              <tr><td rowspan="2" style="background:#FFF3E0;font-weight:600">🥩 肉禽</td><td>猪里脊</td><td>500g</td><td>¥ 28.00</td><td>¥ 26.50</td><td class="down">↓ 5.4%</td><td>¥ 27.20</td><td class="ai-advice">¥ 25.80</td><td class="down">7.8%</td></tr>
+              <tr><td>三黄鸡</td><td>整只 1.5kg</td><td>¥ 22.00</td><td>¥ 23.50</td><td class="up">↑ 6.8%</td><td>¥ 22.80</td><td class="ai-advice">¥ 21.50</td><td>10.3%</td></tr>
+              <tr><td rowspan="1" style="background:#E3F2FD;font-weight:600">🐟 水产</td><td>草鱼</td><td>500g</td><td>¥ 12.00</td><td>¥ 12.80</td><td class="up">↑ 6.7%</td><td>¥ 12.30</td><td class="ai-advice">¥ 11.50</td><td>10.2%</td></tr>
+              <tr><td rowspan="1" style="background:#FFF8E1;font-weight:600">🌾 粮油</td><td>珍珠米</td><td>10kg/袋</td><td>¥ 62.00</td><td>¥ 63.50</td><td class="up">↑ 2.4%</td><td>¥ 61.80</td><td class="ai-advice">¥ 60.50</td><td>11.2%</td></tr>
+              <tr><td rowspan="1" style="background:#F3E5F5;font-weight:600">🧂 调味</td><td>海天酱油</td><td>1.9L/瓶</td><td>¥ 22.50</td><td>¥ 22.30</td><td class="down">↓ 0.9%</td><td>¥ 22.00</td><td class="ai-advice">¥ 21.20</td><td>12.5%</td></tr>
+              <tr><td rowspan="1" style="background:#E8EAF6;font-weight:600">🥛 乳品</td><td>伊利纯牛奶</td><td>250ml×24</td><td>¥ 68.00</td><td>¥ 67.50</td><td class="down">↓ 0.7%</td><td>¥ 67.00</td><td class="ai-advice">¥ 65.80</td><td class="down">6.8%</td></tr>
+              <tr><td colspan="2" style="background:var(--paper);font-weight:600">鸡蛋（高频品类）</td><td>10 枚/盒</td><td>¥ 15.80</td><td>¥ 16.50</td><td class="up">↑ 4.4%</td><td>¥ 15.50</td><td class="ai-advice">¥ 15.20</td><td>13.8%</td></tr>
+              <tr><td colspan="2" style="background:var(--paper);font-weight:600">五花肉（关注）</td><td>500g</td><td>¥ 21.00</td><td>¥ 22.50</td><td class="up">↑ 7.1%</td><td>¥ 21.80</td><td class="ai-advice">¥ 20.50</td><td>9.6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ai-strategy">
+          <div class="as-title">🎯 AI 策略引擎 · 四维雷达</div>
+          <div class="strategy-bar"><div class="sb-head"><span class="sb-name">📦 标准成本</span><span>85%</span></div><div class="sb-track"><div class="sb-fill" style="width:85%;background:var(--soy-mid)"></div></div></div>
+          <div class="strategy-bar"><div class="sb-head"><span class="sb-name">📈 时令波动</span><span>72%</span></div><div class="sb-track"><div class="sb-fill" style="width:72%;background:var(--gold-mid)"></div></div></div>
+          <div class="strategy-bar"><div class="sb-head"><span class="sb-name">🏆 竞品分析</span><span>68%</span></div><div class="sb-track"><div class="sb-fill" style="width:68%;background:#2196F3"></div></div></div>
+          <div class="strategy-bar"><div class="sb-head"><span class="sb-name">🎯 甲方历史</span><span>62%</span></div><div class="sb-track"><div class="sb-fill" style="width:62%;background:#9C27B0"></div></div></div>
+          <div class="as-text">📊 AI 报价分析：综合 1,248 项 SKU，基于近 30 天实时产地价、12 家竞品公开报价、甲方近 2 年实际采购价三维建模，AI 推荐整体报价低于市价 <strong>-4.2%</strong>。其中蔬菜类建议力度最大（-5.8%），肉禽类建议谨慎（仅 -2.1%），因近期猪价下行期接近尾声。</div>
+          <div class="as-warning">⚠️ <strong>风险提示</strong>：鸡蛋品类近 7 天涨幅 8.6%，建议锁定 3 个月期货价以对冲风险，报价表已预留 5% 浮动空间。</div>
+          <div class="as-btns"><button class="as-btn primary">🚀 生成完整报价表</button><button class="as-btn gold">📈 生成成本分析报告</button></div>
+        </div>
+      </div>
+      <div class="trend-grid">
+        <div class="trend-card"><div class="tc-name">🥬 大白菜 · 30 天走势</div><svg class="tc-svg" viewBox="0 0 260 70" preserveAspectRatio="none"><polyline fill="none" stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0,30 30,28 60,35 90,33 120,40 150,38 180,45 210,42 260,50"/><circle cx="260" cy="50" r="3" fill="#2D6A4F"/></svg><div class="tc-footer"><span class="tc-price">¥ 1.08</span><span class="down" style="font-weight:600">↓ -4.2%</span></div></div>
+        <div class="trend-card"><div class="tc-name">🥩 猪里脊 · 30 天走势</div><svg class="tc-svg" viewBox="0 0 260 70" preserveAspectRatio="none"><polyline fill="none" stroke="#2D6A4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0,20 30,22 60,25 90,28 120,32 150,35 180,38 210,42 260,48"/><circle cx="260" cy="48" r="3" fill="#2D6A4F"/></svg><div class="tc-footer"><span class="tc-price">¥ 25.80</span><span class="down" style="font-weight:600">↓ -5.4%</span></div></div>
+        <div class="trend-card"><div class="tc-name">🐟 草鱼 · 30 天走势</div><svg class="tc-svg" viewBox="0 0 260 70" preserveAspectRatio="none"><polyline fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0,50 30,46 60,42 90,38 120,35 150,32 180,28 210,25 260,22"/><circle cx="260" cy="22" r="3" fill="#C0392B"/></svg><div class="tc-footer"><span class="tc-price">¥ 12.80</span><span class="up" style="font-weight:600">↑ +6.7%</span></div></div>
+        <div class="trend-card"><div class="tc-name">🥩 五花肉 · 30 天走势</div><svg class="tc-svg" viewBox="0 0 260 70" preserveAspectRatio="none"><polyline fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0,48 30,44 60,40 90,36 120,33 150,30 180,26 210,23 260,20"/><circle cx="260" cy="20" r="3" fill="#C0392B"/></svg><div class="tc-footer"><span class="tc-price">¥ 22.50</span><span class="up" style="font-weight:600">↑ +7.1%</span></div></div>
+      </div>
+    </div>
+
+    <!-- VIEW CALENDAR -->
+    <div class="view" id="view-calendar">
+      <div class="calendar-wrap">
+        <div class="cal-main">
+          <div class="cal-head"><button>‹</button><h3>2026 年 11 月</h3><button>›</button></div>
+          <div class="cal-weekdays"><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div></div>
+          <div class="cal-days">
+            <div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day"><div class="cd-num">2</div></div><div class="cal-day"><div class="cd-num">3</div></div><div class="cal-day"><div class="cd-num">4</div></div><div class="cal-day"><div class="cd-num">5</div><div class="cd-dot green"></div></div><div class="cal-day"><div class="cd-num">6</div></div>
+            <div class="cal-day"><div class="cd-num">7</div></div><div class="cal-day"><div class="cd-num">8</div></div><div class="cal-day"><div class="cd-num">9</div></div><div class="cal-day"><div class="cd-num">10</div></div><div class="cal-day today"><div class="cd-num">11</div><div class="cd-dot red"></div></div><div class="cal-day"><div class="cd-num">12</div><div class="cd-dot red"></div></div><div class="cal-day"><div class="cd-num">13</div><div class="cd-dot green"></div></div>
+            <div class="cal-day tender"><div class="cd-num">14</div><div class="cd-dot red"></div></div><div class="cal-day tender"><div class="cd-num">15</div><div class="cd-dot red"></div></div><div class="cal-day"><div class="cd-num">16</div></div><div class="cal-day"><div class="cd-num">17</div></div><div class="cal-day tender"><div class="cd-num">18</div><div class="cd-dot red"></div></div><div class="cal-day"><div class="cd-num">19</div></div><div class="cal-day tender"><div class="cd-num">20</div><div class="cd-dot red"></div></div>
+            <div class="cal-day"><div class="cd-num">21</div></div><div class="cal-day tender"><div class="cd-num">22</div><div class="cd-dot red"></div></div><div class="cal-day"><div class="cd-num">23</div></div><div class="cal-day"><div class="cd-num">24</div></div><div class="cal-day"><div class="cd-num">25</div></div><div class="cal-day"><div class="cd-num">26</div><div class="cd-dot green"></div></div><div class="cal-day"><div class="cd-num">27</div></div>
+            <div class="cal-day"><div class="cd-num">28</div></div><div class="cal-day"><div class="cd-num">29</div></div><div class="cal-day"><div class="cd-num">30</div></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:20px;font-size:11.5px;color:var(--ink-soft)">
+            <div><span style="display:inline-block;width:12px;height:12px;background:#FDECEC;border:1px solid #F5C6C6;border-radius:2px;margin-right:6px;vertical-align:middle"></span>投标截止日</div>
+            <div><span style="display:inline-block;width:12px;height:12px;background:var(--soy-deep);border-radius:2px;margin-right:6px;vertical-align:middle"></span>今日</div>
+            <div><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#C0392B;margin-right:6px;vertical-align:middle"></span>紧急日程</div>
+          </div>
+        </div>
+        <div class="schedule-side">
+          <div class="section">
+            <div class="section-header"><div class="sh-title">📌 日程列表 · 本周</div></div>
+            <div class="section-body" style="padding:8px 20px">
+              <div class="todo-item"><div class="todo-dot red"></div><div class="todo-content"><div class="tc-title">市三院投标文件盖章</div><div class="tc-meta">11-14（周五）· 17:00 前截止</div></div></div>
+              <div class="todo-item"><div class="todo-dot red"></div><div class="todo-content"><div class="tc-title">市一医院投标截止</div><div class="tc-meta">11-15（周六）· 09:30</div></div></div>
+              <div class="todo-item"><div class="todo-dot gold"></div><div class="todo-content"><div class="tc-title">绿联商超标书终稿提交</div><div class="tc-meta">11-18（周二）· 17:00</div></div></div>
+              <div class="todo-item"><div class="todo-dot gold"></div><div class="todo-content"><div class="tc-title">区机关投标截止</div><div class="tc-meta">11-20（周四）· 10:00</div></div></div>
+              <div class="todo-item"><div class="todo-dot green"></div><div class="todo-content"><div class="tc-title">师大后勤投标截止</div><div class="tc-meta">11-22（周六）· 09:00</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW ORDER ENTRY -->
+    <div class="view" id="view-order-entry">
+      <div class="oe-header-bar">
+        <div><div class="oe-label">📊 今日已录单</div><div class="oe-val">147 <span style="font-size:16px;font-weight:400">单</span></div><div class="oe-sub">较昨日 +18 单 · 成功率 98%</div></div>
+        <div><div class="oe-label">⚡ 平均处理速度</div><div class="oe-val">1.8<span style="font-size:16px;font-weight:400"> 秒</span></div><div class="oe-sub">行业均值 45 秒 · <span style="color:var(--gold-soft)">快 25 倍</span></div></div>
+        <div><div class="oe-label">⏳ 异常待处理</div><div class="oe-val" style="color:var(--gold-soft)">3<span style="font-size:16px;font-weight:400"> 单</span></div><div class="oe-sub">需人工确认后放行</div></div>
+        <div class="oe-bar-spacer"></div>
+        <div style="text-align:right"><div style="font-family:var(--font-serif);font-size:16px;font-weight:700;margin-bottom:4px">🤖 企业微信群 · AI 自动录单演示</div><div style="font-size:11px;opacity:.7">AI 数字员工 7×24 值守 · 自动识别文字/Excel/拍照/语音</div></div>
+      </div>
+      <div class="oe-body">
+        <!-- Groups -->
+        <div class="oe-groups">
+          <div style="font-family:var(--font-serif);font-size:14px;font-weight:700;margin-bottom:10px;color:var(--soy-deep)">📱 业务群</div>
+          <div class="oe-group active" data-group="sy"><div class="og-avatar" style="background:linear-gradient(135deg,#1B4332,#2D6A4F)">市</div><div class="og-name">市一医院配送群</div><div class="og-count">23</div></div>
+          <div class="oe-group" data-group="ll"><div class="og-avatar" style="background:linear-gradient(135deg,#D4A017,#B8860B)">绿</div><div class="og-name">绿联商超采购群</div><div class="og-count">18</div></div>
+          <div class="oe-group" data-group="qj"><div class="og-avatar" style="background:linear-gradient(135deg,#2196F3,#1565C0)">区</div><div class="og-name">区机关后勤群</div><div class="og-count">15</div></div>
+          <div class="oe-group" data-group="sd"><div class="og-avatar" style="background:linear-gradient(135deg,#9C27B0,#7B1FA2)">师</div><div class="og-name">师大后勤群</div><div class="og-count">21</div></div>
+          <div class="oe-group" data-group="ls"><div class="og-avatar" style="background:linear-gradient(135deg,#FF5722,#D84315)">连</div><div class="og-name">连锁超市 S 店群</div><div class="og-count">9</div></div>
+          <div class="oe-group" data-group="ssy"><div class="og-avatar" style="background:linear-gradient(135deg,#607D8B,#455A64)">三</div><div class="og-name">市三院营养科群</div><div class="og-count">7</div></div>
+        </div>
+        <!-- WeChat Chat -->
+        <div class="oe-chat">
+          <div class="oe-chat-head"><span style="font-size:15px">🟢 市一医院 · 食材配送群</span><span class="online-label"><span class="online-dot"></span>AI 员工在线 · 实时值守</span></div>
+          <div class="oe-wx-messages" id="oe-wx">
+            <div class="oe-msg them"><div class="avatar" style="background:linear-gradient(135deg,#5C6BC0,#3F51B5);color:#fff">营</div><div><div class="oe-bubble">早上好！今天需要补订一批食材，请查收 Excel 📎</div><div class="oe-time">09:02</div></div></div>
+            <div class="oe-system-hint"><span>📎 识别到 Excel 文件 · AI 正在解析</span></div>
+            <div class="oe-msg me"><div class="avatar" style="background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff">AI</div><div><div class="oe-bubble">好的，已识别到 12 行订单，合计 ¥1,856.50，预计 11:30 送达。请确认：<div class="order-preview"><div>📋 订单明细：</div><div style="margin-top:4px">· 大白菜 15kg × ¥1.08 = ¥16.20</div><div>· 猪里脊 8kg × ¥25.80 = ¥206.40</div><div>· 草鱼 12kg × ¥11.50 = ¥138.00</div><div>· 海天酱油 6 瓶 × ¥21.20 = ¥127.20</div><div style="margin-top:4px;color:var(--soy-deep);font-weight:600">... 共 12 行，合计 ¥1,856.50</div></div></div><div class="oe-time">09:02</div></div></div>
+            <div class="oe-msg them"><div class="avatar" style="background:linear-gradient(135deg,#5C6BC0,#3F51B5);color:#fff">营</div><div><div class="oe-bubble">收到，没问题 👍</div><div class="oe-time">09:03</div></div></div>
+            <div class="oe-msg them"><div class="avatar" style="background:linear-gradient(135deg,#5C6BC0,#3F51B5);color:#fff">营</div><div><div class="oe-bubble">另外，早餐加餐需要再加一些水果 🍎🍊</div><div class="oe-time">10:15</div></div></div>
+          </div>
+        </div>
+        <!-- Right Panel -->
+        <div class="oe-right">
+          <div class="oe-status">
+            <div class="os-title">🤖 AI 数字员工 · 状态</div>
+            <div class="oe-status-row"><span class="os-key">运行状态</span><span class="os-val" style="color:var(--soy-mid)">● 在线</span></div>
+            <div class="oe-status-row"><span class="os-key">已值守时长</span><span class="os-val">7 小时 23 分</span></div>
+            <div class="oe-status-row"><span class="os-key">今日处理订单</span><span class="os-val">147 单</span></div>
+            <div class="oe-status-row"><span class="os-key">成功率</span><span class="os-val">98.0%</span></div>
+            <div class="oe-status-row"><span class="os-key">异常待处理</span><span class="os-val" style="color:#E65100">3 单</span></div>
+            <div class="oe-status-row"><span class="os-key">人工干预</span><span class="os-val">4 次</span></div>
+          </div>
+          <div class="oe-feed">
+            <div class="of-title">⚡ 实时抓取流</div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#E8F5E9">✓</div><div class="ofi-content"><div class="ofi-text">市一医院 · Excel 解析成功 · 12 行</div><div class="ofi-time">刚刚</div></div></div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#E8F5E9">✓</div><div class="ofi-content"><div class="ofi-text">绿联商超 · 文字识别 · 2 条订单</div><div class="ofi-time">2 分钟前</div></div></div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#FFF3E0">!</div><div class="ofi-content"><div class="ofi-text">市三院 · 图片模糊 · 转人工</div><div class="ofi-time">8 分钟前</div></div></div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#E8F5E9">✓</div><div class="ofi-content"><div class="ofi-text">区机关 · 语音转文字成功</div><div class="ofi-time">15 分钟前</div></div></div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#E8F5E9">✓</div><div class="ofi-content"><div class="ofi-text">师大 · Excel 3 份 · 108 行</div><div class="ofi-time">23 分钟前</div></div></div>
+            <div class="oe-feed-item"><div class="ofi-icon" style="background:#E8F5E9">✓</div><div class="ofi-content"><div class="ofi-text">连锁超市 · 文字订单 · 确认</div><div class="ofi-time">31 分钟前</div></div></div>
+          </div>
+          <div class="oe-access">
+            <div class="oa-title">🔌 接入方式</div>
+            <div class="oe-access-row"><span>📱 企业微信群</span><span class="tag tag-green">已接入</span></div>
+            <div class="oe-access-row"><span>📨 邮件入口</span><span class="tag tag-green">已接入</span></div>
+            <div class="oe-access-row"><span>📞 语音电话</span><span class="tag tag-green">已接入</span></div>
+            <div class="oe-access-row"><span>🤖 独立小程序</span><span class="tag tag-gold">待开启</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  const scenarios = [
+    {
+      type:'text', buyerName:'王丽', buyerDept:'市一医院采购', buyerAvatar:'王',
+      buyerAvatarBg:'linear-gradient(135deg,#EF4444,#F97316)', buyerTime:'14:52',
+      buyerMsg:'下午配送帮我配一下，白菜50斤，猪里脊30斤，草鱼20斤，下午3点前到哈',
+      aiCapture:'AI 正在识别文字中的食材...',
+      aiSteps:['提取商品名 3 项','识别数量 3 项','匹配标准 SKU 3/3','历史价核对完成'],
+      items:[['大白菜','净菜/斤','50斤','¥2.58'],['猪里脊','冷鲜/斤','30斤','¥35.80'],['草鱼','鲜活/斤','20斤','¥7.60']],
+      total:'¥1,424', eta:'3号车 15:00 前送到',
+      feedIcon:'💬', feedText:'市一医院 王丽 · 文字 · 3 项',
+    },
+    {
+      type:'voice', buyerName:'陈明', buyerDept:'师大二食堂', buyerAvatar:'陈',
+      buyerAvatarBg:'linear-gradient(135deg,#2563EB,#3B82F6)', buyerTime:'14:45', voiceSec:'4.2″',
+      aiCapture:'🎤 正在进行语音转文字 ASR...',
+      aiSteps:['加载 Whisper 模型','音频预处理','转文字中 100%','食材提取完成'],
+      asrText:'明天早餐加量，鸡架10只，豆角50斤，鸡蛋多送30盘哈',
+      items:[['鸡架','冷冻/只','10只'],['豆角','净菜/斤','50斤'],['鸡蛋','土鸡蛋/盘','30盘']],
+      total:'¥2,184', eta:'6号车 明日 06:30 送到',
+      feedIcon:'🎤', feedText:'师大 陈明 · 语音 4.2″ · 3 项',
+    },
+    {
+      type:'photo', buyerName:'刘姐', buyerDept:'区机关食堂', buyerAvatar:'刘',
+      buyerAvatarBg:'linear-gradient(135deg,#7C3AED,#8B5CF6)', buyerTime:'14:33', photoCount:3,
+      aiCapture:'📷 AI 正在调用 OCR 引擎识别图片...',
+      aiSteps:['图片加载完成','文字区域定位','手写体识别 3 张','置信度 97.8%'],
+      items:[['土豆','净菜/斤','60斤'],['青椒','净菜/斤','25斤'],['五花肉','冷鲜/斤','40斤'],['三黄鸡','整只/只','8只']],
+      total:'¥3,520', eta:'15:30 前送到',
+      feedIcon:'📷', feedText:'区机关 刘姐 · 手写单 3 张 · 4 项',
+    },
+    {
+      type:'excel', buyerName:'张磊', buyerDept:'绿联商超店长', buyerAvatar:'张',
+      buyerAvatarBg:'linear-gradient(135deg,#059669,#10B981)', buyerTime:'14:20',
+      excelName:'11-11 门店食材日配表.xlsx', excelRows:12,
+      aiCapture:'📊 AI 正在解析 Excel 结构...',
+      aiSteps:['读取表头','识别字段名','解析 12 行数据','412 项匹配完成'],
+      items:[['番茄','净菜/斤','40斤'],['茄子','净菜/斤','25斤'],['胡萝卜','净菜/斤','30斤'],['洋葱','净菜/斤','20斤'],['土豆','净菜/斤','50斤']],
+      total:'¥688', eta:'明日 06:00 前送到',
+      feedIcon:'📊', feedText:'绿联商超 张磊 · Excel · 12 行 8 项',
+    },
+  ];
+
+  let scIdx = 0, running = false, timerId = null;
+  const $ = s => document.querySelector(s);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+
+  // ===== SPA View Switch =====
+  const _viewTitles = {
+    'home':{'t':'工作台仪表盘','s':'鲜源供应链 · 2026.11 · 投研智能体'},
+    'radar':{'t':'投标雷达','s':'42 平台实时扫描 · AI 匹配度评分'},
+    'document':{'t':'标书解析','s':'上传招标文件 · AI 自动拆解'},
+    'qualification':{'t':'资质体检','s':'核心资质匹配度 · 自动缺口识别'},
+    'writing':{'t':'标书撰写','s':'AI 实时撰写 · 合规覆盖 92%'},
+    'pricing':{'t':'报价策略','s':'食材供应链四维模型 · AI 推荐'},
+    'calendar':{'t':'日程管家','s':'投标截止提醒 · 关键里程碑'},
+    'order-entry':{'t':'AI 录单中心','s':'企业微信业务群 · 7×24 自动抓单'},
+  };
+  function switchView(id){
+    document.querySelectorAll('.view').forEach(v=>v.style.display='none');
+    const v = document.getElementById('view-'+id);
+    if(v) v.style.display = 'block';
+    document.querySelectorAll('[data-view]').forEach(n=>n.classList.remove('active'));
+    const nav = document.querySelector('[data-view="'+id+'"]');
+    if(nav) nav.classList.add('active');
+    // 更新 topbar 标题
+    const title = document.querySelector('.topbar-title');
+    const sub = document.querySelector('.topbar-sub');
+    if(title && _viewTitles[id]) title.textContent = _viewTitles[id].t;
+    if(sub && _viewTitles[id]) sub.textContent = _viewTitles[id].s;
+  }
+  document.querySelectorAll('[data-view]').forEach(n=>{
+    n.addEventListener('click', ()=> switchView(n.dataset.view));
+  });
+  // 默认显示 home
+  document.addEventListener('DOMContentLoaded', ()=> switchView('home'));
+
+  function fmtTime(){
+    const d = new Date();
+    return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+
+  function locateContainers(){
+    const root = document.getElementById('view-order-entry');
+    if(!root) return { chatBox:null, feedList:null };
+    const chatBox = root.querySelector('.oe-wx-messages');
+    let feedList = root.querySelector('.oe-live-feed');
+    if(!feedList){
+      const right = root.querySelector('.oe-right');
+      if(right){
+        feedList = document.createElement('div');
+        feedList.className = 'oe-live-feed';
+        feedList.style.cssText = 'max-height:260px;overflow-y:auto;border-left:2px solid #D4A017;padding-left:10px;margin-top:10px;';
+        right.appendChild(feedList);
+      }
+    }
+    return { chatBox, feedList };
+  }
+
+  function el(tag, cls, html){
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  function animSlide(e, cls){
+    e.classList.add(cls);
+    setTimeout(() => e.classList.remove(cls), 500);
+    return e;
+  }
+
+  function appendChat(chatBox, node){
+    animSlide(node, 'anim-slidefadein');
+    chatBox.appendChild(node);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function pushFeed(feedList, sc){
+    if(!feedList) return;
+    const row = el('div', 'oe-feed-item');
+    row.style.cssText = 'padding:6px 0;border-bottom:1px dashed #E4E0D5;font-size:11px;color:#1C2A22;animation:slideRightIn 0.4s ease-out;';
+    row.innerHTML = '<span style="color:#888;margin-right:6px;">'+fmtTime()+'</span>'
+      + '<span style="margin-right:4px;">'+sc.feedIcon+'</span>'
+      + '<span style="flex:1;">'+sc.feedText+'</span>'
+      + '<span style="color:#059669;font-weight:600;">✓</span>';
+    feedList.insertBefore(row, feedList.firstChild);
+    while(feedList.children.length > 12) feedList.removeChild(feedList.lastChild);
+  }
+
+  function bubbleSystem(text){
+    const d = el('div', 'oe-system-hint');
+    d.innerHTML = '<span>'+text+'</span>';
+    d.style.cssText = 'text-align:center;font-size:11px;color:#888;margin:8px 0;';
+    return d;
+  }
+
+  function bubbleBuyer(sc){
+    const row = el('div', 'oe-msg them anim-slidefadein');
+    row.style.cssText = 'display:flex;gap:10px;margin:10px 0;align-items:flex-start;';
+
+    const av = el('div', 'avatar', sc.buyerAvatar);
+    av.style.cssText = 'width:36px;height:36px;border-radius:6px;color:white;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;';
+    av.style.background = sc.buyerAvatarBg;
+
+    const col = el('div');
+    col.style.cssText = 'flex:1;';
+
+    const who = el('div', 'oe-who', sc.buyerDept + ' · ' + sc.buyerName);
+    who.style.cssText = 'font-size:10px;color:#888;margin-bottom:4px;';
+
+    const b = el('div', 'oe-bubble');
+    b.style.cssText = 'background:white;border-radius:8px;padding:10px 14px;max-width:320px;font-size:13px;line-height:1.7;box-shadow:0 1px 2px rgba(0,0,0,0.05);position:relative;';
+
+    if(sc.type === 'voice'){
+      b.style.cssText = 'background:white;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;';
+      const icon = el('span');
+      icon.innerHTML = '🎤';
+      icon.style.cssText = 'font-size:16px;';
+      b.appendChild(icon);
+      const waveBox = el('div');
+      waveBox.style.cssText = 'display:flex;gap:2px;align-items:center;';
+      for(let i=0;i<10;i++){
+        const w = el('span');
+        w.style.cssText = 'width:3px;height:'+(8+Math.random()*12)+'px;background:#07C160;border-radius:2px;animation:wavePlay 0.6s infinite ease-in-out '+(i*0.05)+'s;';
+        waveBox.appendChild(w);
+      }
+      b.appendChild(waveBox);
+      const sec = el('span', null, sc.voiceSec);
+      sec.style.cssText = 'font-size:11px;color:#888;margin-left:6px;';
+      b.appendChild(sec);
+    } else if(sc.type === 'photo'){
+      b.style.cssText = 'background:transparent;box-shadow:none;';
+      const box = el('div');
+      box.style.cssText = 'display:flex;gap:4px;position:relative;';
+      for(let i=0;i<sc.photoCount;i++){
+        const img = el('div');
+        img.style.cssText = 'width:80px;height:100px;border-radius:6px;background:linear-gradient(135deg,#6B4423,#A0522D);display:flex;align-items:center;justify-content:center;color:white;font-size:24px;';
+        img.innerHTML = '📷';
+        box.appendChild(img);
+      }
+      // 扫描光带
+      const scan = el('div', 'scan-overlay');
+      scan.style.cssText = 'position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#D4A017,transparent);animation:scanLight 0.9s ease-out forwards;';
+      box.appendChild(scan);
+      b.appendChild(box);
+    } else if(sc.type === 'excel'){
+      const row1 = el('div');
+      row1.style.cssText = 'display:flex;gap:10px;align-items:center;';
+      const xico = el('div');
+      xico.style.cssText = 'width:36px;height:36px;border-radius:4px;background:linear-gradient(135deg,#217346,#16A085);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;';
+      xico.innerHTML = 'E';
+      const info = el('div');
+      info.style.cssText = 'flex:1;';
+      const fn = el('div', null, sc.excelName);
+      fn.style.cssText = 'font-size:12px;font-weight:500;';
+      const meta = el('div', null, 'Excel · '+sc.excelRows+' 行数据');
+      meta.style.cssText = 'font-size:10px;color:#888;margin-top:2px;';
+      info.appendChild(fn); info.appendChild(meta);
+      row1.appendChild(xico); row1.appendChild(info);
+      b.appendChild(row1);
+    } else {
+      b.innerHTML = sc.buyerMsg;
+    }
+
+    col.appendChild(who);
+    col.appendChild(b);
+    row.appendChild(av);
+    row.appendChild(col);
+    return row;
+  }
+
+  function bubbleAiThinking(sc){
+    const row = el('div', 'oe-msg me anim-slidefadein');
+    row.style.cssText = 'display:flex;gap:10px;margin:10px 0;align-items:flex-start;flex-direction:row-reverse;';
+
+    const av = el('div', 'avatar', '采');
+    av.style.cssText = 'width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;';
+
+    const b = el('div', 'oe-bubble');
+    b.style.cssText = 'background:#95EC69;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.6;';
+
+    const title = el('div', null, sc.aiCapture);
+    title.style.cssText = 'color:#1B4332;margin-bottom:6px;font-weight:500;';
+    b.appendChild(title);
+
+    const dots = el('div', 'ai-dots');
+    dots.style.cssText = 'display:flex;gap:4px;margin-top:4px;';
+    for(let i=0;i<3;i++){
+      const d = el('span');
+      d.style.cssText = 'width:6px;height:6px;border-radius:50%;background:#1B4332;animation:aiDot 1.2s infinite '+(i*0.2)+'s;';
+      dots.appendChild(d);
+    }
+    b.appendChild(dots);
+
+    row.appendChild(b);
+    row.appendChild(av);
+    return row;
+  }
+
+  function bubbleAiProgress(sc){
+    const row = el('div', 'oe-msg me anim-slidefadein');
+    row.style.cssText = 'display:flex;gap:10px;margin:10px 0;align-items:flex-start;flex-direction:row-reverse;';
+
+    const av = el('div', 'avatar', '采');
+    av.style.cssText = 'width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;';
+
+    const b = el('div', 'oe-bubble');
+    b.style.cssText = 'background:white;border:1px solid #E4E0D5;border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.7;color:#1C2A22;max-width:340px;';
+
+    // 标题
+    const h = el('div');
+    h.style.cssText = 'font-weight:600;color:#1B4332;margin-bottom:8px;';
+    const htxt = sc.type === 'voice' ? '🎤 语音 ASR 识别进度'
+              : sc.type === 'photo' ? '📷 图片 OCR 识别进度'
+              : sc.type === 'excel' ? '📊 Excel 解析进度'
+              : '💬 文字识别进度';
+    h.innerHTML = htxt + ' <span style="color:#D4A017;">●●●</span>';
+    b.appendChild(h);
+
+    // 步骤
+    const stepsBox = el('div');
+    stepsBox.style.cssText = 'border-left:2px solid #E4E0D5;padding-left:10px;';
+    sc.aiSteps.forEach((s, i) => {
+      const step = el('div');
+      step.style.cssText = 'font-size:11px;color:#555;margin:4px 0;opacity:0;animation:fadeStep 0.3s forwards;';
+      step.style.animationDelay = (i*0.25) + 's';
+      step.innerHTML = '<span style="color:#059669;margin-right:4px;">✓</span>' + s;
+      stepsBox.appendChild(step);
+    });
+    b.appendChild(stepsBox);
+
+    row.appendChild(b);
+    row.appendChild(av);
+    return row;
+  }
+
+  function bubbleAiMatched(sc){
+    const row = el('div', 'oe-msg me anim-slidefadein');
+    row.style.cssText = 'display:flex;gap:10px;margin:10px 0;align-items:flex-start;flex-direction:row-reverse;';
+    const av = el('div', 'avatar', '采');
+    av.style.cssText = 'width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;';
+
+    const b = el('div', 'oe-bubble');
+    b.style.cssText = 'background:rgba(27,67,50,0.04);border:1px solid rgba(27,67,50,0.15);border-radius:8px;padding:8px 12px;font-size:11px;color:#1B4332;max-width:280px;';
+    b.innerHTML = '✅ SKU 匹配成功 <b>'+sc.items.length+'</b>/<b>'+sc.items.length+'</b> · 历史价核对完成';
+
+    row.appendChild(b);
+    row.appendChild(av);
+    return row;
+  }
+
+  function bubbleAiFinal(sc){
+    const row = el('div', 'oe-msg me anim-slidefadein');
+    row.style.cssText = 'display:flex;gap:10px;margin:10px 0;align-items:flex-start;flex-direction:row-reverse;';
+
+    const av = el('div', 'avatar', '采');
+    av.style.cssText = 'width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;';
+
+    const b = el('div', 'oe-bubble order-preview');
+    b.style.cssText = 'background:#95EC69;border-radius:10px;padding:14px 16px;max-width:340px;font-size:12px;color:#1C2A22;line-height:1.8;box-shadow:0 2px 8px rgba(7,193,96,0.2);';
+
+    // ASR 原文引用块（仅 voice）
+    if(sc.type === 'voice'){
+      const q = el('div');
+      q.style.cssText = 'border-left:2px solid #1B4332;padding-left:8px;margin-bottom:10px;font-size:11px;font-style:italic;color:#555;background:rgba(255,255,255,0.6);padding:6px 10px;border-radius:0 4px 4px 0;';
+      q.innerHTML = '📝 转文字原文：<span id="asr-typed"></span><span style="animation:typingBlink 0.6s infinite;">▍</span>';
+      b.appendChild(q);
+      // 异步打字效果
+      setTimeout(() => {
+        let i = 0;
+        const asrEl = document.getElementById('asr-typed');
+        if(asrEl){
+          const ti = setInterval(() => {
+            if(i < sc.asrText.length){
+              asrEl.textContent += sc.asrText[i++];
+            } else clearInterval(ti);
+          }, 35);
+        }
+      }, 100);
+    }
+
+    // 订单号
+    const head = el('div');
+    head.style.cssText = 'font-weight:600;color:#1B4332;margin-bottom:8px;font-size:13px;';
+    head.innerHTML = '📦 订单 <span style="background:#1B4332;color:white;padding:2px 8px;border-radius:4px;font-family:Cormorant Garamond,serif;">#O'+Date.now().toString().slice(-6)+'</span>';
+    b.appendChild(head);
+
+    // 明细
+    const tbl = el('div');
+    tbl.style.cssText = 'background:rgba(255,255,255,0.6);border-radius:6px;padding:8px 10px;margin:8px 0;';
+    sc.items.forEach(it => {
+      const tr = el('div');
+      tr.style.cssText = 'display:flex;justify-content:space-between;padding:3px 0;font-size:11px;';
+      tr.innerHTML = '<span>'+it[0]+(it[1]?' · '+it[1]:'')+'</span>' +
+        '<span style="font-weight:600;">'+it[2]+'</span>';
+      tbl.appendChild(tr);
+    });
+    b.appendChild(tbl);
+
+    // 合计
+    const total = el('div');
+    total.style.cssText = 'display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#1B4332;margin-top:8px;padding-top:8px;border-top:1px dashed rgba(27,67,50,0.2);';
+    total.innerHTML = '<span>💰 合计</span><span>'+sc.total+'</span>';
+    b.appendChild(total);
+
+    // 配送
+    const eta = el('div');
+    eta.style.cssText = 'font-size:11px;color:#555;margin-top:6px;display:flex;gap:6px;align-items:center;';
+    eta.innerHTML = '<span>🚚</span><span>'+sc.eta+'</span>';
+    b.appendChild(eta);
+
+    // 入库确认
+    const ok = el('div');
+    ok.style.cssText = 'font-size:10px;color:#059669;margin-top:8px;padding:5px 10px;background:rgba(16,185,129,0.1);border-radius:4px;text-align:center;font-weight:600;';
+    ok.innerHTML = '✓ 已同步入库 · 配送资源已分配';
+    b.appendChild(ok);
+
+    row.appendChild(b);
+    row.appendChild(av);
+    return row;
+  }
+
+  async function runOneRound(sc){
+    const { chatBox, feedList } = locateContainers();
+    if(!chatBox){ running = false; return; }
+    appendChat(chatBox, bubbleSystem(sc.buyerDept+' '+sc.buyerName+' 发来了'+(sc.type==='text'?'一条消息':sc.type==='voice'?'一条语音':sc.type==='photo'?'3 张手写单照片':'Excel 文件')));
+    await sleep(400);
+    appendChat(chatBox, bubbleBuyer(sc));
+    pushFeed(feedList, sc);
+    await sleep(500);
+    appendChat(chatBox, bubbleAiThinking(sc));
+    await sleep(1000);
+    // 删掉 thinking
+    const last = chatBox.querySelector('.oe-msg.me:last-of-type');
+    if(last && last.textContent.indexOf('AI 正在') > -1){
+      last.style.opacity = '0';
+      last.style.height = '0';
+      last.style.overflow = 'hidden';
+      last.style.padding = '0';
+    }
+    await sleep(200);
+    appendChat(chatBox, bubbleAiProgress(sc));
+    await sleep(1400);
+    appendChat(chatBox, bubbleAiMatched(sc));
+    await sleep(500);
+    appendChat(chatBox, bubbleAiFinal(sc));
+    running = false;
+  }
+
+  function checkAndStart(){
+    const view = document.getElementById('view-order-entry');
+    if(!view) return false;
+    const visible = view.style.display !== 'none' && view.offsetParent !== null;
+    if(visible && !running){
+      running = true;
+      runOneRound(scenarios[scIdx % 4]);
+      scIdx++;
+    }
+    return visible;
+  }
+
+  function startLoop(){
+    clearInterval(timerId);
+    // 先立即尝试一次
+    checkAndStart();
+    // 然后定时检查 view 可见性
+    timerId = setInterval(() => {
+      const view = document.getElementById('view-order-entry');
+      if(!view){ running=false; return; }
+      // 如果当前不可见就允许下一次 visible 时跑
+      const visible = view.style.display !== 'none' && view.offsetParent !== null;
+      if(!visible){ running = false; return; }
+      if(!running){ running = true; runOneRound(scenarios[scIdx % 4]); scIdx++; }
+    }, 5000);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', startLoop);
+  } else {
+    startLoop();
+  }
+})();
+</script>
+</body>
+</html>
