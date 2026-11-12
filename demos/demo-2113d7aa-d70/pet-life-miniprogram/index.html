@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>森田宠物生活馆</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="phone">
+  <!-- 状态栏 -->
+  <div class="statusbar">
+    <span id="sb-time">9:41</span>
+    <span class="sb-right"><span>📶</span><span>WiFi</span><span>🔋</span></span>
+  </div>
+
+  <!-- 内容视口 -->
+  <div id="viewport">
+
+    <!-- ================= 登录页 ================= -->
+    <section class="page active" id="page-login">
+      <div class="login-wrap">
+        <div class="login-logo">🐾</div>
+        <h1>森田宠物生活馆</h1>
+        <p class="lg-sub">让每一只毛孩子都被温柔以待</p>
+
+        <div class="login-feats">
+          <div class="login-feat">
+            <div class="lf-icon" style="background:#FFF1E9">✂️</div>
+            <div>
+              <div class="lf-t">四大专业服务</div>
+              <div class="lf-s">美容 · 洗澡 · 寄养 · 用品</div>
+            </div>
+          </div>
+          <div class="login-feat">
+            <div class="lf-icon" style="background:#E8F7F1">📅</div>
+            <div>
+              <div class="lf-t">在线预约到店</div>
+              <div class="lf-s">选时段选美容师，到店即享服务</div>
+            </div>
+          </div>
+          <div class="login-feat">
+            <div class="lf-icon" style="background:#FDF4E1">💎</div>
+            <div>
+              <div class="lf-t">会员专属权益</div>
+              <div class="lf-s">等级折扣 · 积分抵现 · 生日好礼</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg-foot">
+          <button class="btn btn-primary btn-block btn-lg" data-act="login">微信一键登录</button>
+          <button class="btn btn-plain btn-block mt12" data-act="login-guest">先逛逛（游客模式）</button>
+          <p class="lg-tip">登录即代表同意《用户协议》与《隐私政策》<br>演示环境，不会获取真实微信信息</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 首页 ================= -->
+    <section class="page tabbed" id="page-home">
+      <div class="shop-card">
+        <div class="sc-top">
+          <div class="sc-logo">🐾</div>
+          <div>
+            <h2 id="shop-name">森田宠物生活馆</h2>
+            <div class="sc-slogan" id="shop-slogan"></div>
+          </div>
+          <div class="sc-badge"><span class="sc-dot"></span><span id="shop-status"></span></div>
+        </div>
+        <div class="sc-meta">
+          <span>⭐ <b id="shop-rating"></b></span>
+          <span id="shop-reviews"></span>
+          <span>🕘 <b id="shop-hours"></b></span>
+        </div>
+        <div class="sc-addr">📍 <span id="shop-addr"></span><span style="margin-left:auto;opacity:.85" id="shop-distance"></span></div>
+      </div>
+
+      <!-- 会员横幅 -->
+      <div class="member-banner" data-act="go-me">
+        <div class="mb-badge" id="mb-badge">🥇</div>
+        <div class="mb-info">
+          <div class="t" id="mb-level">金卡会员</div>
+          <div class="s" id="mb-desc">享全单 9 折 · 积分 2 倍</div>
+        </div>
+        <div class="mb-btn" id="mb-btn">查看权益</div>
+      </div>
+
+      <!-- 服务分类 -->
+      <div class="cat-grid" id="home-cats"></div>
+
+      <!-- 热门服务 -->
+      <div class="sec-head">
+        <h3>热门服务</h3>
+        <div class="more" data-act="go-cat" data-cat="grooming">全部服务 ›</div>
+      </div>
+      <div class="hscroll" id="home-services"></div>
+
+      <!-- 用品精选 -->
+      <div class="sec-head">
+        <h3>用品精选</h3>
+        <div class="more" data-act="go-tab" data-tab="mall">进入商城 ›</div>
+      </div>
+      <div class="goods-grid" id="home-goods"></div>
+
+      <!-- 门店特色 -->
+      <div class="sec-head"><h3>为什么选择我们</h3></div>
+      <div class="wrap">
+        <div class="card card-pad" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="display:flex;gap:9px;align-items:flex-start">
+            <span style="font-size:19px">🏅</span>
+            <div><div style="font-size:12.5px;font-weight:700">持证美容师</div><div style="font-size:10.5px;color:var(--text-3);margin-top:2px">全员持 C 级以上证书</div></div>
+          </div>
+          <div style="display:flex;gap:9px;align-items:flex-start">
+            <span style="font-size:19px">📹</span>
+            <div><div style="font-size:12.5px;font-weight:700">全程可视化</div><div style="font-size:10.5px;color:var(--text-3);margin-top:2px">寄养实时视频查看</div></div>
+          </div>
+          <div style="display:flex;gap:9px;align-items:flex-start">
+            <span style="font-size:19px">🧴</span>
+            <div><div style="font-size:12.5px;font-weight:700">进口低敏产品</div><div style="font-size:10.5px;color:var(--text-3);margin-top:2px">敏感肌肤也安心</div></div>
+          </div>
+          <div style="display:flex;gap:9px;align-items:flex-start">
+            <span style="font-size:19px">🛡️</span>
+            <div><div style="font-size:12.5px;font-weight:700">意外险保障</div><div style="font-size:10.5px;color:var(--text-3);margin-top:2px">服务期间全额承保</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 预约页 ================= -->
+    <section class="page tabbed" id="page-book">
+      <div class="navbar solid"><div class="nav-title">服务预约</div>
+        <div class="nav-action" data-act="go-my-book">我的预约</div>
+      </div>
+      <div class="filter-bar" id="book-filters"></div>
+      <div class="wrap">
+        <div id="book-list"></div>
+      </div>
+    </section>
+
+    <!-- ================= 服务详情 ================= -->
+    <section class="page" id="page-service-detail"></section>
+
+    <!-- ================= 预约下单 ================= -->
+    <section class="page" id="page-booking-confirm"></section>
+
+    <!-- ================= 商城 ================= -->
+    <section class="page tabbed" id="page-mall">
+      <div class="navbar solid"><div class="nav-title">宠物用品商城</div>
+        <div class="nav-action" data-act="go-cart">购物车 <span id="nav-cart-num"></span></div>
+      </div>
+      <div class="filter-bar" id="mall-filters"></div>
+      <div class="wrap" style="padding:0 16px 8px">
+        <div style="position:relative">
+          <input id="mall-search" placeholder="搜索商品名称" style="width:100%;background:#fff;border-radius:22px;padding:11px 40px 11px 38px;font-size:13px;box-shadow:var(--shadow-s)">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.45">🔍</span>
+        </div>
+      </div>
+      <div class="goods-grid" id="mall-list"></div>
+    </section>
+
+    <!-- ================= 商品详情 ================= -->
+    <section class="page" id="page-goods-detail"></section>
+
+    <!-- ================= 购物车 ================= -->
+    <section class="page" id="page-cart"></section>
+
+    <!-- ================= 结算 ================= -->
+    <section class="page" id="page-checkout"></section>
+
+    <!-- ================= 我的 ================= -->
+    <section class="page tabbed" id="page-me">
+      <div class="me-head">
+        <div class="me-user" data-act="go-member">
+          <div class="me-avatar" id="me-avatar">🐱</div>
+          <div style="flex:1;min-width:0">
+            <div class="me-name" id="me-name">森田铲屎官</div>
+            <div class="me-sub" id="me-phone">138****6688</div>
+            <div class="me-level" id="me-level">🥇 金卡会员</div>
+          </div>
+          <div class="arrow" style="color:#CFC8C1;font-size:16px">›</div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="card card-pad" style="padding:8px 4px">
+          <div class="order-nav" id="me-order-nav"></div>
+        </div>
+      </div>
+
+      <div class="stat-row" style="padding-left:16px;padding-right:16px">
+        <div class="stat-box" data-act="go-points"><div class="sb-n" id="me-points">0</div><div class="sb-l">我的积分</div></div>
+        <div class="stat-box" data-act="go-coupons"><div class="sb-n" id="me-coupons">0</div><div class="sb-l">优惠券</div></div>
+        <div class="stat-box" data-act="go-balance"><div class="sb-n" id="me-balance">0</div><div class="sb-l">储值余额</div></div>
+      </div>
+
+      <div class="sec-head"><h3>常用功能</h3></div>
+      <div class="wrap">
+        <div class="list">
+          <div class="list-item" data-act="go-pets">
+            <div class="li-icon" style="background:#FFF1E9">🐾</div>
+            <div class="li-main"><div class="li-title">我的宠物档案</div><div class="li-sub" id="me-pet-count">共 0 只</div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="list-item" data-act="go-my-book">
+            <div class="li-icon" style="background:#E8F7F1">📅</div>
+            <div class="li-main"><div class="li-title">我的预约</div><div class="li-sub" id="me-book-count">共 0 条</div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="list-item" data-act="go-orders">
+            <div class="li-icon" style="background:#EDF2FC">📦</div>
+            <div class="li-main"><div class="li-title">我的订单</div><div class="li-sub">商城订单与预约订单</div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="list-item" data-act="go-address">
+            <div class="li-icon" style="background:#FDF4E1">📍</div>
+            <div class="li-main"><div class="li-title">收货地址</div><div class="li-sub" id="me-addr-count">管理地址</div></div>
+            <div class="arrow">›</div>
+          </div>
+        </div>
+
+        <div class="list mt16">
+          <div class="list-item" data-act="call-shop">
+            <div class="li-icon" style="background:#F0FAF5">📞</div>
+            <div class="li-main"><div class="li-title">联系门店</div><div class="li-sub" id="me-shop-phone"></div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="list-item" data-act="reset-data">
+            <div class="li-icon" style="background:#FBEAE7">🔄</div>
+            <div class="li-main"><div class="li-title">重置演示数据</div><div class="li-sub">清空本地记录，恢复初始状态</div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="list-item" data-act="logout">
+            <div class="li-icon" style="background:#F2EFEC">🚪</div>
+            <div class="li-main"><div class="li-title" style="color:var(--danger)">退出登录</div><div class="li-sub">返回登录页</div></div>
+            <div class="arrow">›</div>
+          </div>
+        </div>
+
+        <p style="text-align:center;font-size:10.5px;color:var(--text-3);margin-top:22px;line-height:1.7">
+          森田宠物生活馆 · 演示原型 v1.0<br>数据仅存于本机浏览器
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= 会员中心 ================= -->
+    <section class="page" id="page-member"></section>
+    <!-- ================= 我的宠物 ================= -->
+    <section class="page" id="page-pets"></section>
+    <!-- ================= 我的预约 ================= -->
+    <section class="page" id="page-my-book"></section>
+    <!-- ================= 我的订单 ================= -->
+    <section class="page" id="page-orders"></section>
+    <!-- ================= 订单详情 ================= -->
+    <section class="page" id="page-order-detail"></section>
+    <!-- ================= 优惠券 ================= -->
+    <section class="page" id="page-coupons"></section>
+    <!-- ================= 积分 ================= -->
+    <section class="page" id="page-points"></section>
+    <!-- ================= 储值 ================= -->
+    <section class="page" id="page-balance"></section>
+    <!-- ================= 地址 ================= -->
+    <section class="page" id="page-address"></section>
+    <!-- ================= 下单成功 ================= -->
+    <section class="page" id="page-success"></section>
+
+  </div>
+
+  <!-- 底部 TabBar -->
+  <nav id="tabbar">
+    <div class="tab-item on" data-tab="home">
+      <span class="ti-icon">🏠</span><span>首页</span>
+    </div>
+    <div class="tab-item" data-tab="book">
+      <span class="ti-icon">📅</span><span>预约</span>
+    </div>
+    <div class="tab-item" data-tab="mall">
+      <span class="ti-icon">🛍️</span><span>商城</span>
+      <span class="ti-badge hidden" id="tab-cart-badge">0</span>
+    </div>
+    <div class="tab-item" data-tab="me">
+      <span class="ti-icon">👤</span><span>我的</span>
+    </div>
+  </nav>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- 通用底部弹层 -->
+<div class="mask" id="mask-sheet">
+  <div class="sheet" id="sheet-content"></div>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="mask dialog-mask" id="mask-dialog">
+  <div class="dialog">
+    <div class="dg-icon" id="dg-icon">❓</div>
+    <div class="dg-title" id="dg-title">提示</div>
+    <div class="dg-desc" id="dg-desc"></div>
+    <div class="dg-btns">
+      <button class="btn btn-plain" data-act="dialog-cancel">取消</button>
+      <button class="btn btn-primary" data-act="dialog-ok">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
