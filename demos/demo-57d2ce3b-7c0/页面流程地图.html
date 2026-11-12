@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物农场小程序 - 页面流程地图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    padding: 30px 16px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #95a5a6; font-size: 13px; margin-bottom: 30px; }
+
+  /* Tab栏 */
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 30px;
+    background: #fff;
+    border-radius: 50px;
+    padding: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #95a5a6;
+    border-radius: 40px;
+    transition: all 0.3s;
+  }
+  .tab-item.active {
+    background: #e67e22;
+    color: #fff;
+  }
+
+  /* 模块区块 */
+  .section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+  }
+  .section-title { font-size: 17px; font-weight: 700; }
+  .section-meta { font-size: 12px; color: #95a5a6; margin-left: auto; }
+
+  /* 页面流程 */
+  .flow-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .page-node {
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    text-align: center;
+    min-width: 110px;
+    max-width: 160px;
+    background: #fff;
+  }
+  .page-node .pn-id {
+    font-size: 10px;
+    opacity: 0.6;
+    font-weight: 600;
+  }
+  .page-node .pn-name {
+    font-weight: 600;
+    margin: 2px 0;
+  }
+  .page-node .pn-desc {
+    font-size: 10px;
+    color: #7f8c8d;
+    line-height: 1.4;
+  }
+  .arrow {
+    align-self: center;
+    color: #bdc3c7;
+    font-size: 18px;
+    padding: 0 6px;
+  }
+  .arrow-down-inline {
+    text-align: center;
+    color: #bdc3c7;
+    margin: 4px 0;
+  }
+
+  /* 颜色系 */
+  .c-global .section-icon, .c-global .page-node { border-color: #34495e; }
+  .c-global .section-icon { background: #34495e; }
+  .c-global .page-node { border-color: #34495e; }
+
+  .c-community .section-icon { background: #0984e3; }
+  .c-community .page-node { border-color: #0984e3; }
+
+  .c-activity .section-icon { background: #00b894; }
+  .c-activity .page-node { border-color: #00b894; }
+
+  .c-shop .section-icon { background: #e17055; }
+  .c-shop .page-node { border-color: #e17055; }
+
+  .c-member .section-icon { background: #e84393; }
+  .c-member .page-node { border-color: #e84393; }
+
+  .c-extension .section-icon { background: #636e72; }
+  .c-extension .page-node { border-color: #636e72; border-style: dashed; }
+
+  /* 入口标记 */
+  .entry-badge {
+    display: inline-block;
+    background: #e67e22;
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    margin-left: 4px;
+  }
+  .tab-badge {
+    display: inline-block;
+    background: #2d3436;
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 6px;
+  }
+
+  /* 分支说明 */
+  .branch-label {
+    font-size: 11px;
+    color: #95a5a6;
+    font-style: italic;
+    align-self: center;
+    padding: 0 4px;
+  }
+
+  /* 统计 */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #e67e22;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #95a5a6;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🗺️ 萌宠农场小程序 · 页面流程地图</h1>
+  <p class="subtitle">用户端 52 个页面导航关系总览</p>
+
+  <!-- 统计 -->
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-num">52</div>
+      <div class="stat-label">总页面数</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">底部Tab</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">核心模块</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">拓展入口</div>
+    </div>
+  </div>
+
+  <!-- Tab栏 -->
+  <div class="tab-bar">
+    <div class="tab-item active">🏠 首页</div>
+    <div class="tab-item">💬 社区</div>
+    <div class="tab-item">🛒 商城</div>
+    <div class="tab-item">👤 我的</div>
+  </div>
+
+  <!-- 全局框架 -->
+  <div class="section c-global">
+    <div class="section-header">
+      <div class="section-icon">📱</div>
+      <div class="section-title">全局框架</div>
+      <div class="section-meta">7 页 · 启动到首页</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">1-0-1</div>
+        <div class="pn-name">启动页</div>
+        <div class="pn-desc">品牌展示·2s跳转</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">1-0-2</div>
+        <div class="pn-name">授权登录</div>
+        <div class="pn-desc">微信授权·手机号</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">1-0-3</div>
+        <div class="pn-name">首页 <span class="tab-badge">Tab</span></div>
+        <div class="pn-desc">金刚位·Banner·推荐</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <span class="branch-label">首页入口跳转到：</span>
+    </div>
+    <div class="flow-group" style="margin-top:8px;">
+      <div class="page-node">
+        <div class="pn-id">1-0-4</div>
+        <div class="pn-name">个人中心 <span class="tab-badge">Tab</span></div>
+        <div class="pn-desc">会员·订单·积分</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">1-0-5</div>
+        <div class="pn-name">消息中心</div>
+        <div class="pn-desc">系统·活动·疫苗</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">1-0-6</div>
+        <div class="pn-name">全局搜索</div>
+        <div class="pn-desc">活动·商品·帖子</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">1-0-7</div>
+        <div class="pn-name">设置</div>
+        <div class="pn-desc">账号·通知·隐私</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 宠物社群 -->
+  <div class="section c-community">
+    <div class="section-header">
+      <div class="section-icon">🐕</div>
+      <div class="section-title">宠物社群板块</div>
+      <div class="section-meta">11 页 · 内容+社交+服务</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-1-1</div>
+        <div class="pn-name">社区首页 <span class="tab-badge">Tab</span></div>
+        <div class="pn-desc">关注/推荐/最新</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-2</div>
+        <div class="pn-name">帖子详情</div>
+        <div class="pn-desc">图文·评论·点赞</div>
+      </div>
+      <span class="arrow">←</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-3</div>
+        <div class="pn-name">发帖页</div>
+        <div class="pn-desc">图文/视频·话题</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-1-5</div>
+        <div class="pn-name">喂养知识专栏</div>
+        <div class="pn-desc">分类筛选·图文列表</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-6</div>
+        <div class="pn-name">知识详情</div>
+        <div class="pn-desc">图文混排·视频</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-1-7</div>
+        <div class="pn-name">我的宠物列表</div>
+        <div class="pn-desc">多只宠物管理</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-8</div>
+        <div class="pn-name">添加/编辑宠物</div>
+        <div class="pn-desc">名称·品种·生日</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-9</div>
+        <div class="pn-name">健康档案</div>
+        <div class="pn-desc">疫苗·驱虫·体检</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-1-10</div>
+        <div class="pn-name">疫苗登记</div>
+        <div class="pn-desc">类型·日期·凭证</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-1-11</div>
+        <div class="pn-name">疫苗记录详情</div>
+        <div class="pn-desc">编辑·删除·标记</div>
+      </div>
+      <span class="arrow">⏰</span>
+      <div class="page-node" style="border-style:dashed;">
+        <div class="pn-id">自动</div>
+        <div class="pn-name">疫苗到期提醒</div>
+        <div class="pn-desc">订阅消息推送</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-1-4</div>
+        <div class="pn-name">用户主页</div>
+        <div class="pn-desc">帖子·收藏·关注</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 农场活动预约 -->
+  <div class="section c-activity">
+    <div class="section-header">
+      <div class="section-icon">🎪</div>
+      <div class="section-title">农场活动预约板块</div>
+      <div class="section-meta">8 页 · 交易核心</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-2-1</div>
+        <div class="pn-name">活动列表</div>
+        <div class="pn-desc">撸宠·互动·主题</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-2</div>
+        <div class="pn-name">活动详情</div>
+        <div class="pn-desc">图文·价格·时段</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-3</div>
+        <div class="pn-name">预约下单</div>
+        <div class="pn-desc">日期·时段·人数</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-4</div>
+        <div class="pn-name">订单确认</div>
+        <div class="pn-desc">券·积分·支付</div>
+      </div>
+    </div>
+
+    <div class="arrow-down-inline">↓ 支付完成</div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-2-5</div>
+        <div class="pn-name">活动订单列表</div>
+        <div class="pn-desc">全状态筛选</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-6</div>
+        <div class="pn-name">活动订单详情</div>
+        <div class="pn-desc">券码·取消·退款</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-7</div>
+        <div class="pn-name">核销验券页</div>
+        <div class="pn-desc">出示二维码</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-2-8</div>
+        <div class="pn-name">活动评价</div>
+        <div class="pn-desc">星级·图文</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 宠物用品商城 -->
+  <div class="section c-shop">
+    <div class="section-header">
+      <div class="section-icon">🛒</div>
+      <div class="section-title">宠物用品商城板块</div>
+      <div class="section-meta">12 页 · 变现延伸</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-3-1</div>
+        <div class="pn-name">商城首页 <span class="tab-badge">Tab</span></div>
+        <div class="pn-desc">分类·Banner·推荐</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-2</div>
+        <div class="pn-name">分类浏览</div>
+        <div class="pn-desc">主粮·零食·洗护</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-3</div>
+        <div class="pn-name">商品列表</div>
+        <div class="pn-desc">筛选·排序</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-4</div>
+        <div class="pn-name">商品详情</div>
+        <div class="pn-desc">SKU·评价·加购</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-3-5</div>
+        <div class="pn-name">购物车</div>
+        <div class="pn-desc">数量·全选·结算</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-6</div>
+        <div class="pn-name">确认订单</div>
+        <div class="pn-desc">快递/自提选择</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-7</div>
+        <div class="pn-name">支付结果</div>
+        <div class="pn-desc">成功/失败</div>
+      </div>
+    </div>
+
+    <div class="arrow-down-inline">↓ 订单管理</div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-3-8</div>
+        <div class="pn-name">商城订单列表</div>
+        <div class="pn-desc">待发/待收/完成</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-9</div>
+        <div class="pn-name">商城订单详情</div>
+        <div class="pn-desc">物流·收货·评价</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-3-12</div>
+        <div class="pn-name">商品评价</div>
+        <div class="pn-desc">星级·图文·追加</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-3-10</div>
+        <div class="pn-name">收货地址管理</div>
+        <div class="pn-desc">增删改·默认</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-3-11</div>
+        <div class="pn-name">自提门店选择</div>
+        <div class="pn-desc">地图·门店列表</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 会员管理 -->
+  <div class="section c-member">
+    <div class="section-header">
+      <div class="section-icon">⭐</div>
+      <div class="section-title">会员管理板块</div>
+      <div class="section-meta">10 页 · 运营基石</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-4-1</div>
+        <div class="pn-name">会员中心</div>
+        <div class="pn-desc">卡·等级·积分</div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="page-node">
+        <div class="pn-id">2-4-2</div>
+        <div class="pn-name">等级与权益</div>
+        <div class="pn-desc">四级体系·对比</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-4-3</div>
+        <div class="pn-name">积分中心</div>
+        <div class="pn-desc">明细·规则</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-4</div>
+        <div class="pn-name">优惠券列表</div>
+        <div class="pn-desc">未用/已用/过期</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-5</div>
+        <div class="pn-name">会员档案</div>
+        <div class="pn-desc">资料·标签</div>
+      </div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-4-6</div>
+        <div class="pn-name">我的宠物</div>
+        <div class="pn-desc">复用宠物档案</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-7</div>
+        <div class="pn-name">我的订单</div>
+        <div class="pn-desc">活动+商城聚合</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-8</div>
+        <div class="pn-name">收藏夹</div>
+        <div class="pn-desc">商品·活动·文章</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-9</div>
+        <div class="pn-name">浏览记录</div>
+        <div class="pn-desc">近期浏览</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-4-10</div>
+        <div class="pn-name">邀请好友</div>
+        <div class="pn-desc">海报·奖励</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 拓展功能 -->
+  <div class="section c-extension">
+    <div class="section-header">
+      <div class="section-icon">🔧</div>
+      <div class="section-title">拓展功能入口（预留）</div>
+      <div class="section-meta">4 页 · 占位页</div>
+    </div>
+
+    <div class="flow-group">
+      <div class="page-node">
+        <div class="pn-id">2-5-1</div>
+        <div class="pn-name">寄养预约</div>
+        <div class="pn-desc">预留·敬请期待</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-5-2</div>
+        <div class="pn-name">洗护美容</div>
+        <div class="pn-desc">预留·敬请期待</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-5-3</div>
+        <div class="pn-name">宠物领养</div>
+        <div class="pn-desc">预留·敬请期待</div>
+      </div>
+      <div class="page-node">
+        <div class="pn-id">2-5-4</div>
+        <div class="pn-name">营销裂变</div>
+        <div class="pn-desc">预留·敬请期待</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
