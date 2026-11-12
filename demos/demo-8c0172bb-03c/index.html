@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物农场私域小程序 - 产品架构图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #f0f4f8;
+    color: #333;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #2c3e50;
+  }
+  .subtitle {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  /* 公域引流层 */
+  .layer {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .layer-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .layer-title .badge {
+    background: #3498db;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  /* 引流层 */
+  .traffic-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .traffic-item {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .arrow-down {
+    text-align: center;
+    font-size: 20px;
+    color: #bdc3c7;
+    margin: 8px 0;
+  }
+
+  /* 小程序主体 */
+  .miniprogram-box {
+    border: 2px solid #e67e22;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    background: #fffaf5;
+  }
+  .miniprogram-header {
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    color: #fff;
+    padding: 16px 24px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .miniprogram-body { padding: 24px; }
+
+  /* 四大模块网格 */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .module-card {
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+  }
+  .module-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .module-card .icon { font-size: 20px; }
+  .module-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .module-card li {
+    font-size: 13px;
+    padding: 5px 0;
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .module-card li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .module-community { background: linear-gradient(135deg, #0984e3, #6c5ce7); color: #fff; }
+  .module-activity { background: linear-gradient(135deg, #00b894, #00cec9); color: #fff; }
+  .module-shop { background: linear-gradient(135deg, #fd7918, #e17055); color: #fff; }
+  .module-member { background: linear-gradient(135deg, #e84393, #fd79a8); color: #fff; }
+
+  /* 会员基石 */
+  .member-base {
+    background: linear-gradient(135deg, #2d3436, #636e72);
+    color: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* 拓展功能 */
+  .extension-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .extension-item {
+    background: #fff;
+    border: 2px dashed #b2bec3;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #636e72;
+  }
+  .extension-item .ext-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+  .extension-item .ext-label { font-weight: 600; }
+  .extension-item .ext-tag {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 10px;
+    background: #dfe6e9;
+    padding: 1px 8px;
+    border-radius: 8px;
+    color: #636e72;
+  }
+
+  /* 后台管理 */
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .admin-item {
+    background: #2d3436;
+    color: #dfe6e9;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .admin-item .a-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+  .admin-item .a-label { font-weight: 600; font-size: 13px; }
+  .admin-item .a-desc { font-size: 11px; color: #95a5a6; margin-top: 4px; }
+
+  /* 运营闭环 */
+  .loop-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 16px;
+    background: linear-gradient(90deg, #e8f5e9, #fff3e0, #fce4ec);
+    border-radius: 12px;
+  }
+  .loop-step {
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .loop-arrow { color: #bdc3c7; font-size: 16px; }
+
+  /* 底部数据层 */
+  .data-layer {
+    background: #2c3e50;
+    color: #ecf0f1;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .data-layer h3 { font-size: 14px; margin-bottom: 12px; }
+  .data-items {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .data-items span {
+    font-size: 13px;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 16px;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .modules-grid { grid-template-columns: 1fr; }
+    .extension-row { grid-template-columns: 1fr 1fr; }
+    .admin-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🐾 萌宠农场 · 私域小程序产品架构</h1>
+  <p class="subtitle">宠物农场私域运营全链路 Demo 架构图</p>
+
+  <!-- 公域引流层 -->
+  <div class="layer">
+    <div class="layer-title">📡 公域引流层 <span class="badge">获客</span></div>
+    <div class="traffic-row">
+      <div class="traffic-item">抖音</div>
+      <div class="traffic-item">小红书</div>
+      <div class="traffic-item">大众点评</div>
+      <div class="traffic-item">视频号</div>
+      <div class="traffic-item">线下扫码</div>
+    </div>
+  </div>
+
+  <div class="arrow-down">↓ 扫码沉淀</div>
+
+  <!-- 小程序主体 -->
+  <div class="miniprogram-box">
+    <div class="miniprogram-header">📱 萌宠农场小程序 · 用户端</div>
+    <div class="miniprogram-body">
+
+      <!-- 会员基石 -->
+      <div class="member-base">
+        🏆 会员管理体系（基石）｜ 等级 · 权益 · 积分 · 档案 · 分层运营
+      </div>
+
+      <!-- 四大模块 -->
+      <div class="modules-grid">
+
+        <div class="module-card module-community">
+          <h3><span class="icon">🐕</span> 宠物社群</h3>
+          <ul>
+            <li>喂养知识专栏（图文/视频）</li>
+            <li>宠友交流社区（发帖/点赞/评论）</li>
+            <li>宠物健康档案（疫苗/驱虫/体检）</li>
+            <li>疫苗到期自动提醒（订阅消息）</li>
+            <li>体重曲线 · 健康趋势</li>
+          </ul>
+        </div>
+
+        <div class="module-card module-activity">
+          <h3><span class="icon">🎪</span> 农场活动预约</h3>
+          <ul>
+            <li>撸宠体验 / 萌宠互动 / 主题活动</li>
+            <li>分时段预约（容量管控）</li>
+            <li>在线下单 + 微信支付</li>
+            <li>核销券码（扫码核销）</li>
+            <li>订单全生命周期管理</li>
+          </ul>
+        </div>
+
+        <div class="module-card module-shop">
+          <h3><span class="icon">🛒</span> 宠物用品商城</h3>
+          <ul>
+            <li>主粮 / 零食 / 洗护 / 玩具</li>
+            <li>购物车 + 在线下单</li>
+            <li>快递发货（物流追踪）</li>
+            <li>到店自提（核销码取货）</li>
+            <li>依托农场场景信任带货</li>
+          </ul>
+        </div>
+
+        <div class="module-card module-member">
+          <h3><span class="icon">⭐</span> 会员管理</h3>
+          <ul>
+            <li>四级会员体系（萌新→VIP）</li>
+            <li>专属权益（折扣/礼包/客服）</li>
+            <li>积分规则（签到/消费/互动）</li>
+            <li>用户+宠物双档案管理</li>
+            <li>优惠券 · 积分商城</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- 拓展功能预留 -->
+      <div style="margin-bottom: 16px;">
+        <div class="layer-title" style="font-size:14px; color:#636e72;">
+          🔧 拓展功能入口（预留）
+        </div>
+        <div class="extension-row">
+          <div class="extension-item">
+            <span class="ext-icon">🏠</span>
+            <span class="ext-label">寄养预约</span>
+            <span class="ext-tag">预留</span>
+          </div>
+          <div class="extension-item">
+            <span class="ext-icon">✂️</span>
+            <span class="ext-label">洗护美容</span>
+            <span class="ext-tag">预留</span>
+          </div>
+          <div class="extension-item">
+            <span class="ext-icon">🐱</span>
+            <span class="ext-label">宠物领养</span>
+            <span class="ext-tag">预留</span>
+          </div>
+          <div class="extension-item">
+            <span class="ext-icon">🚀</span>
+            <span class="ext-label">营销裂变</span>
+            <span class="ext-tag">预留</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 运营闭环 -->
+      <div class="loop-flow">
+        <span class="loop-step">体验</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">沉淀</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">留存</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">复购</span>
+        <span class="loop-arrow">→</span>
+        <span class="loop-step">裂变</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrow-down">↓ 数据打通</div>
+
+  <!-- 后台管理 -->
+  <div class="layer">
+    <div class="layer-title">⚙️ 后台管理系统 <span class="badge" style="background:#2d3436;">运营支撑</span></div>
+    <div class="admin-grid">
+      <div class="admin-item">
+        <span class="a-icon">📊</span>
+        <span class="a-label">工作台</span>
+        <div class="a-desc">数据概览/待办</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">📝</span>
+        <span class="a-label">内容管理</span>
+        <div class="a-desc">知识/帖子/话题</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">🎪</span>
+        <span class="a-label">活动管理</span>
+        <div class="a-desc">活动/时段/核销</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">📦</span>
+        <span class="a-label">商品管理</span>
+        <div class="a-desc">商品/分类/库存</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">🧾</span>
+        <span class="a-label">订单管理</span>
+        <div class="a-desc">活动/商城订单</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">👥</span>
+        <span class="a-label">会员管理</span>
+        <div class="a-desc">等级/积分/档案</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">🎁</span>
+        <span class="a-label">营销管理</span>
+        <div class="a-desc">券/积分商城/推送</div>
+      </div>
+      <div class="admin-item">
+        <span class="a-icon">📈</span>
+        <span class="a-label">数据统计</span>
+        <div class="a-desc">用户/交易/内容</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据层 -->
+  <div class="data-layer">
+    <h3>💾 底层数据能力</h3>
+    <div class="data-items">
+      <span>用户数据</span>
+      <span>宠物数据</span>
+      <span>交易数据</span>
+      <span>内容数据</span>
+      <span>行为数据</span>
+      <span>标签画像</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

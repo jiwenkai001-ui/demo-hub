@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物农场小程序 - 会员体系与积分规则</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    padding: 30px 16px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #95a5a6; font-size: 13px; margin-bottom: 30px; }
+
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  /* 等级卡片 */
+  .level-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .level-card {
+    border-radius: 12px;
+    padding: 20px 16px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .level-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+  }
+  .level-card .lv-icon { font-size: 28px; margin-bottom: 8px; }
+  .level-card .lv-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .level-card .lv-range { font-size: 11px; opacity: 0.8; margin-bottom: 12px; }
+  .level-card .lv-benefits {
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .level-card .lv-benefits li {
+    list-style: none;
+    padding-left: 14px;
+    position: relative;
+  }
+  .level-card .lv-benefits li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+  }
+
+  .lv1 { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+  .lv2 { background: linear-gradient(135deg, #3498db, #2980b9); }
+  .lv3 { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+  .lv4 { background: linear-gradient(135deg, #f39c12, #e67e22); }
+
+  /* 表格 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 12px;
+  }
+  tr:hover td { background: #fafbfc; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .tag-get { background: #e8f5e9; color: #2e7d32; }
+  .tag-use { background: #fff3e0; color: #e65100; }
+
+  .section-label {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 20px 0 12px;
+    padding-left: 10px;
+    border-left: 3px solid #e67e22;
+  }
+
+  /* 成长值进度 */
+  .growth-bar {
+    background: #f0f0f0;
+    border-radius: 20px;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+    margin: 16px 0;
+  }
+  .growth-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #95a5a6, #3498db, #9b59b6, #f39c12);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .level-cards { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏆 萌宠农场小程序 · 会员体系与积分规则</h1>
+  <p class="subtitle">会员分层运营 · 积分激励闭环</p>
+
+  <!-- 会员等级卡片 -->
+  <div class="card">
+    <div class="card-title">🎖️ 会员等级体系</div>
+
+    <div class="level-cards">
+      <div class="level-card lv1">
+        <div class="lv-icon">🌱</div>
+        <div class="lv-name">L1 萌新宠友</div>
+        <div class="lv-range">成长值 0 - 499</div>
+        <ul class="lv-benefits">
+          <li>基础积分累计</li>
+          <li>活动 9.5 折</li>
+          <li>注册自动获得</li>
+        </ul>
+      </div>
+      <div class="level-card lv2">
+        <div class="lv-icon">🌿</div>
+        <div class="lv-name">L2 活跃宠友</div>
+        <div class="lv-range">成长值 500 - 1999</div>
+        <ul class="lv-benefits">
+          <li>积分 1.2 倍</li>
+          <li>活动 9 折</li>
+          <li>生日礼包</li>
+          <li>月 1 张满减券</li>
+        </ul>
+      </div>
+      <div class="level-card lv3">
+        <div class="lv-icon">🌟</div>
+        <div class="lv-name">L3 资深宠友</div>
+        <div class="lv-range">成长值 2000 - 4999</div>
+        <ul class="lv-benefits">
+          <li>积分 1.5 倍</li>
+          <li>活动 8.5 折</li>
+          <li>专属客服</li>
+          <li>月 2 张满减券</li>
+          <li>季 1 次免费体检</li>
+        </ul>
+      </div>
+      <div class="level-card lv4">
+        <div class="lv-icon">👑</div>
+        <div class="lv-name">L4 农场VIP</div>
+        <div class="lv-range">成长值 5000+</div>
+        <ul class="lv-benefits">
+          <li>积分 2 倍</li>
+          <li>活动 8 折</li>
+          <li>优先预约权</li>
+          <li>专属活动</li>
+          <li>季 2 次免费体检</li>
+          <li>生日双倍礼包</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 成长值轴 -->
+    <div class="growth-bar">
+      <div class="growth-fill">
+        <span>0</span>
+        <span>500</span>
+        <span>2000</span>
+        <span>5000+</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:11px; color:#95a5a6;">
+      <span>L1 萌新</span>
+      <span>L2 活跃</span>
+      <span>L3 资深</span>
+      <span>L4 VIP</span>
+    </div>
+  </div>
+
+  <!-- 积分获取规则 -->
+  <div class="card">
+    <div class="card-title">📈 积分获取规则</div>
+
+    <div class="section-label">日常互动</div>
+    <table>
+      <thead>
+        <tr>
+          <th>行为</th>
+          <th>积分</th>
+          <th>频率限制</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>每日签到</td>
+          <td><span class="tag tag-get">+5</span></td>
+          <td>每日 1 次</td>
+          <td>连续 7 天额外 +20</td>
+        </tr>
+        <tr>
+          <td>发布帖子</td>
+          <td><span class="tag tag-get">+10</span></td>
+          <td>每日上限 3 次</td>
+          <td>通过审核后发放</td>
+        </tr>
+        <tr>
+          <td>帖子被点赞</td>
+          <td><span class="tag tag-get">+1/赞</span></td>
+          <td>单帖上限 50 分</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>帖子被评论</td>
+          <td><span class="tag tag-get">+2/条</span></td>
+          <td>单帖上限 30 分</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>知识文章学习</td>
+          <td><span class="tag tag-get">+3</span></td>
+          <td>每日上限 5 次</td>
+          <td>阅读完文章自动发放</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">档案与服务</div>
+    <table>
+      <thead>
+        <tr>
+          <th>行为</th>
+          <th>积分</th>
+          <th>频率限制</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>完善宠物档案</td>
+          <td><span class="tag tag-get">+20/只</span></td>
+          <td>每只 1 次</td>
+          <td>填写完整信息</td>
+        </tr>
+        <tr>
+          <td>登记疫苗记录</td>
+          <td><span class="tag tag-get">+10/条</span></td>
+          <td>每条 1 次</td>
+          <td>含凭证照片</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="section-label">消费与裂变</div>
+    <table>
+      <thead>
+        <tr>
+          <th>行为</th>
+          <th>积分</th>
+          <th>频率限制</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>活动消费</td>
+          <td><span class="tag tag-get">1元=1分</span></td>
+          <td>无上限</td>
+          <td>按实际支付金额</td>
+        </tr>
+        <tr>
+          <td>商城消费</td>
+          <td><span class="tag tag-get">1元=1分</span></td>
+          <td>无上限</td>
+          <td>按实际支付金额</td>
+        </tr>
+        <tr>
+          <td>邀请好友注册</td>
+          <td><span class="tag tag-get">+50</span></td>
+          <td>无上限</td>
+          <td>好友注册成功</td>
+        </tr>
+        <tr>
+          <td>邀请好友首单</td>
+          <td><span class="tag tag-get">+100</span></td>
+          <td>无上限</td>
+          <td>好友完成首笔订单</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 积分消耗规则 -->
+  <div class="card">
+    <div class="card-title">📉 积分消耗规则</div>
+    <table>
+      <thead>
+        <tr>
+          <th>行为</th>
+          <th>消耗</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>兑换优惠券</td>
+          <td><span class="tag tag-use">按兑换比例</span></td>
+          <td>如 500 积分换 10 元券、1000 积分换 25 元券</td>
+        </tr>
+        <tr>
+          <td>积分商城兑换商品</td>
+          <td><span class="tag tag-use">按兑换比例</span></td>
+          <td>指定商品可用积分兑换，部分需积分+现金</td>
+        </tr>
+        <tr>
+          <td>下单积分抵扣</td>
+          <td><span class="tag tag-use">100积分=1元</span></td>
+          <td>单笔订单最多抵扣订单金额的 30%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 会员权益对比 -->
+  <div class="card">
+    <div class="card-title">📋 会员权益对比表</div>
+    <table>
+      <thead>
+        <tr>
+          <th>权益项</th>
+          <th>L1 萌新</th>
+          <th>L2 活跃</th>
+          <th>L3 资深</th>
+          <th>L4 VIP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>积分倍数</td>
+          <td>1.0x</td>
+          <td>1.2x</td>
+          <td>1.5x</td>
+          <td>2.0x</td>
+        </tr>
+        <tr>
+          <td>活动折扣</td>
+          <td>9.5折</td>
+          <td>9折</td>
+          <td>8.5折</td>
+          <td>8折</td>
+        </tr>
+        <tr>
+          <td>月度满减券</td>
+          <td>—</td>
+          <td>1张</td>
+          <td>2张</td>
+          <td>3张</td>
+        </tr>
+        <tr>
+          <td>生日礼包</td>
+          <td>—</td>
+          <td>基础礼包</td>
+          <td>升级礼包</td>
+          <td>双倍礼包</td>
+        </tr>
+        <tr>
+          <td>免费体检</td>
+          <td>—</td>
+          <td>—</td>
+          <td>1次/季</td>
+          <td>2次/季</td>
+        </tr>
+        <tr>
+          <td>专属客服</td>
+          <td>—</td>
+          <td>—</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>优先预约权</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>专属活动</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>✓</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
