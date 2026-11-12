@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宠物农场小程序 - 核心业务流程图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    padding: 30px 16px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 { text-align: center; font-size: 24px; margin-bottom: 6px; }
+  .subtitle { text-align: center; color: #95a5a6; font-size: 13px; margin-bottom: 30px; }
+
+  .flow-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .flow-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  .flow-title .num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* 流程步骤 */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+  }
+  .step:last-child::before { display: none; }
+  .step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    z-index: 1;
+    color: #fff;
+    font-weight: 600;
+  }
+  .step-content {
+    flex: 1;
+    padding-top: 4px;
+  }
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 12px;
+    color: #7f8c8d;
+    line-height: 1.6;
+  }
+
+  /* 颜色 */
+  .c1 .num, .c1 .step-dot { background: #e67e22; }
+  .c2 .num, .c2 .step-dot { background: #00b894; }
+  .c3 .num, .c3 .step-dot { background: #0984e3; }
+  .c4 .num, .c4 .step-dot { background: #e84393; }
+  .c5 .num, .c5 .step-dot { background: #6c5ce7; }
+
+  /* 角色标签 */
+  .role-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+  .role-user { background: #e8f5e9; color: #2e7d32; }
+  .role-system { background: #e3f2fd; color: #1565c0; }
+  .role-shop { background: #fff3e0; color: #e65100; }
+  .role-merchant { background: #fce4ec; color: #c62828; }
+
+  /* 提醒框 */
+  .note {
+    background: #fffde7;
+    border-left: 3px solid #fbc02d;
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #5d4037;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* 两列布局 */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔄 萌宠农场小程序 · 核心业务流程</h1>
+  <p class="subtitle">5 大核心流程的完整链路设计</p>
+
+  <!-- 流程1：用户注册与会员沉淀 -->
+  <div class="flow-card c1">
+    <div class="flow-title">
+      <div class="num">1</div>
+      用户注册与会员沉淀流程
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">①</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>公域触达</div>
+          <div class="step-desc">通过抖音/小红书/点评/线下扫码看到农场内容，产生兴趣</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">②</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>扫码进入小程序</div>
+          <div class="step-desc">扫描农场二维码或点击分享链接，打开小程序</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">③</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>微信授权登录</div>
+          <div class="step-desc">一键授权微信信息 + 获取手机号，首次进入引导填写基础资料</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">④</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>自动成为 L1 萌新宠友</div>
+          <div class="step-desc">注册即会员，发放新人优惠券礼包</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑤</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>引导添加宠物档案</div>
+          <div class="step-desc">填写宠物信息赠送 20 积分/只，激活健康档案功能</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑥</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>浏览首页/领取新人券</div>
+          <div class="step-desc">引导浏览热门活动、推荐商品、知识专栏</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑦</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-merchant">运营</span>后续触达</div>
+          <div class="step-desc">通过订阅消息、社群、活动推送实现长效运营</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 流程2：活动预约到核销 -->
+  <div class="flow-card c2">
+    <div class="flow-title">
+      <div class="num">2</div>
+      农场活动预约 → 核销完整流程
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">①</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>浏览活动</div>
+          <div class="step-desc">活动列表 → 活动详情，查看图文介绍、价格、可预约时段</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">②</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>选择预约信息</div>
+          <div class="step-desc">选择日期 → 时段 → 人数 → 关联宠物 → 填写联系人</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">③</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>确认订单并支付</div>
+          <div class="step-desc">使用优惠券/积分抵扣 → 微信支付 → 生成订单 + 核销券码</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">④</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>推送预约成功通知</div>
+          <div class="step-desc">订阅消息推送预约详情，提前 1 天再次提醒</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑤</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>到店出示券码</div>
+          <div class="step-desc">到达农场，打开小程序出示核销二维码</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑥</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-shop">店员</span>扫码核销</div>
+          <div class="step-desc">店员用商家端扫码，核销成功，订单标记为已完成</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑦</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>积分发放 + 评价邀请</div>
+          <div class="step-desc">消费积分入账，成长值更新，推送评价邀请</div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      💡 <b>分时预约规则：</b>每个时段有容量上限（如撸宠体验 15人/时段），约满后该时段不可选。支持提前取消退款，核销后不可退款。
+    </div>
+  </div>
+
+  <!-- 流程3：疫苗提醒自动化 -->
+  <div class="flow-card c3">
+    <div class="flow-title">
+      <div class="num">3</div>
+      疫苗到期自动提醒流程
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">①</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>添加宠物档案</div>
+          <div class="step-desc">在「我的宠物」中添加宠物基本信息</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">②</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>登记疫苗记录</div>
+          <div class="step-desc">填写疫苗类型、接种日期、<b>下次接种日期</b>、接种机构、凭证照片</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">③</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>自动创建提醒任务</div>
+          <div class="step-desc">系统根据「下次接种日期」自动生成 3 次提醒任务</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">④</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>提前 7 天 · 第 1 次提醒</div>
+          <div class="step-desc">订阅消息推送：「您家 XX 的疫苗即将到期」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑤</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>提前 3 天 · 第 2 次提醒</div>
+          <div class="step-desc">再次推送提醒，附预约接种入口</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑥</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-system">系统</span>提前 1 天 · 第 3 次提醒</div>
+          <div class="step-desc">最终提醒 + 一键跳转预约接种</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-dot">⑦</div>
+        <div class="step-content">
+          <div class="step-title"><span class="role-tag role-user">用户</span>完成接种 → 登记新记录</div>
+          <div class="step-desc">接种后登记新疫苗记录，系统重新计算下次提醒，循环生效</div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      💡 <b>提醒规则可配置：</b>后台支持配置提前天数、提醒频次、提醒渠道（订阅消息/短信）。驱虫提醒、体检提醒、生日提醒同理。
+    </div>
+  </div>
+
+  <!-- 流程4&5：商城两路并行 -->
+  <div class="two-col">
+    <div class="flow-card c4">
+      <div class="flow-title">
+        <div class="num">4</div>
+        商品购买（快递）
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">①</div>
+          <div class="step-content">
+            <div class="step-title">浏览商品 → 加购/直购</div>
+            <div class="step-desc">商品详情 → 加入购物车或立即购买</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">②</div>
+          <div class="step-content">
+            <div class="step-title">确认订单</div>
+            <div class="step-desc">选择收货地址（快递发货）</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">③</div>
+          <div class="step-content">
+            <div class="step-title">使用优惠券/积分 → 支付</div>
+            <div class="step-desc">微信支付 → 订单生成</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">④</div>
+          <div class="step-content">
+            <div class="step-title"><span class="role-tag role-merchant">运营</span>发货</div>
+            <div class="step-desc">后台填写物流单号</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">⑤</div>
+          <div class="step-content">
+            <div class="step-title">查看物流 → 确认收货</div>
+            <div class="step-desc">订单完成 → 积分发放 → 邀请评价</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-card c5">
+      <div class="flow-title">
+        <div class="num">5</div>
+        商品购买（自提）
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">①</div>
+          <div class="step-content">
+            <div class="step-title">浏览商品 → 加购/直购</div>
+            <div class="step-desc">商品详情 → 加入购物车或立即购买</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">②</div>
+          <div class="step-content">
+            <div class="step-title">确认订单</div>
+            <div class="step-desc">选择自提门店（到店自提）</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">③</div>
+          <div class="step-content">
+            <div class="step-title">使用优惠券/积分 → 支付</div>
+            <div class="step-desc">微信支付 → 订单生成 + 自提核销码</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">④</div>
+          <div class="step-content">
+            <div class="step-title"><span class="role-tag role-user">用户</span>到店取货</div>
+            <div class="step-desc">出示自提核销码</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">⑤</div>
+          <div class="step-content">
+            <div class="step-title"><span class="role-tag role-shop">店员</span>扫码核销</div>
+            <div class="step-desc">订单完成 → 积分发放 → 邀请评价</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
