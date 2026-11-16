@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鲜配云 · 仓配一体化系统（演示）</title>
+<style>
+:root{
+  --bg:#F1F4EF; --surface:#FFFFFF; --surface-2:#F7FAF6; --surface-3:#EBF1EA;
+  --line:#E2E8E0; --line-2:#D3DCD4;
+  --ink:#14231C; --ink-2:#3F5248; --ink-3:#75877D; --ink-4:#9AABA1;
+  --green-900:#082B20; --green-800:#0B3B2B; --green-700:#0E5139; --green-600:#126B4B;
+  --green-500:#15855D; --green-100:#DEF2E6; --green-50:#EDF7F1;
+  --amber-700:#B45309; --amber-600:#D97706; --amber-100:#FBEFDB;
+  --red-700:#B42318; --red-600:#D92D20; --red-100:#FCEBE8;
+  --shadow-sm:0 1px 2px rgba(12,40,28,.05);
+  --shadow-md:0 12px 32px -20px rgba(10,45,30,.38);
+  --shadow-lg:0 34px 80px -34px rgba(8,40,26,.45);
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:20px;
+  --font-sans:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  --font-num:"Bahnschrift","DIN Alternate","Segoe UI","HarmonyOS Sans SC",sans-serif;
+  --topbar-h:66px; --sidebar-w:232px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family:var(--font-sans);color:var(--ink);font-size:13px;line-height:1.55;
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(880px 480px at 6% -10%,rgba(21,133,93,.11),transparent 62%),
+    radial-gradient(720px 420px at 103% 2%,rgba(217,119,6,.08),transparent 64%),
+    radial-gradient(rgba(20,35,28,.05) 1px,transparent 1px);
+  background-size:auto,auto,22px 22px;
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,p{margin:0}
+button{font-family:inherit}
+.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.i-14{width:14px;height:14px}.i-16{width:16px;height:16px}.i-20{width:20px;height:20px}.i-24{width:24px;height:24px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+/* ============ topbar ============ */
+.topbar{
+  position:sticky;top:0;z-index:60;height:var(--topbar-h);display:flex;align-items:center;gap:22px;
+  padding:0 22px;background:rgba(255,255,255,.87);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:236px}
+.brand-mark{
+  width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,var(--green-600),var(--green-800));
+  box-shadow:0 8px 18px -10px rgba(8,43,32,.9),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.brand-name{font-size:16px;font-weight:800;letter-spacing:.01em;display:flex;align-items:baseline;gap:6px}
+.brand-name small{font-size:10.5px;font-weight:600;color:var(--green-600);background:var(--green-50);border:1px solid var(--green-100);padding:1px 6px;border-radius:5px;letter-spacing:.02em}
+.brand-sub{font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;margin-top:1px}
+.terminals{display:flex;gap:3px;padding:4px;background:var(--surface-3);border:1px solid var(--line);border-radius:12px;margin:0 auto}
+.terminals button{
+  display:flex;align-items:center;gap:7px;height:34px;padding:0 15px;border:0;border-radius:9px;
+  background:transparent;color:var(--ink-3);font-size:12.5px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap;
+}
+.terminals button .i{width:16px;height:16px}
+.terminals button:hover{color:var(--ink)}
+.terminals button.on{background:#fff;color:var(--green-700);box-shadow:0 2px 8px rgba(12,40,28,.10),0 0 0 1px rgba(12,40,28,.04)}
+.terminals button.on .i{color:var(--green-600)}
+.topbar-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+.demo-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 9px;border-radius:7px;background:var(--amber-100);color:var(--amber-700);font-size:11px;font-weight:700;border:1px solid #F3DFC0}
+.date-chip{font-size:11.5px;color:var(--ink-3);font-family:var(--font-num)}
+.who{display:flex;align-items:center;gap:8px;padding-left:12px;border-left:1px solid var(--line)}
+.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--green-100);color:var(--green-700);font-weight:700;font-size:13px}
+.who b{display:block;font-size:12.5px;font-weight:700;line-height:1.2}
+.who span{font-size:10.5px;color:var(--ink-3)}
+
+/* ============ views / admin shell ============ */
+.view{display:none}
+.view.is-on{display:block;animation:viewIn .34s ease both}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.view-admin{display:none;height:calc(100vh - var(--topbar-h))}
+.view-admin.is-on{display:flex}
+.sidebar{
+  width:var(--sidebar-w);flex:none;padding:16px 12px 14px;display:flex;flex-direction:column;gap:4px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FAFCF8 100%);border-right:1px solid var(--line);
+}
+.side-label{font-size:10.5px;letter-spacing:.14em;color:var(--ink-4);font-weight:700;padding:6px 12px 8px}
+.nav-item{
+  position:relative;display:flex;align-items:center;gap:10px;width:100%;height:42px;padding:0 12px;border:0;border-radius:10px;
+  background:transparent;color:var(--ink-2);font-size:13px;font-weight:600;cursor:pointer;text-align:left;transition:.16s;
+}
+.nav-item .i{color:var(--ink-3)}
+.nav-item:hover{background:var(--surface-2);color:var(--ink)}
+.nav-item.on{background:linear-gradient(90deg,var(--green-100),rgba(222,242,230,.35));color:var(--green-800);font-weight:700}
+.nav-item.on .i{color:var(--green-600)}
+.nav-item.on::before{content:"";position:absolute;left:-12px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--green-600)}
+.nav-item .badge{margin-left:auto;font-size:10.5px;font-weight:700;background:var(--amber-100);color:var(--amber-700);border-radius:999px;padding:1px 7px}
+.side-foot{margin-top:auto;padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.side-foot .row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-2);margin-bottom:7px}
+.side-foot .row:last-child{margin-bottom:0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green-500);box-shadow:0 0 0 3px rgba(21,133,93,.14)}
+.content{flex:1;min-width:0;overflow:auto;padding:22px 26px 44px;scroll-behavior:smooth}
+.page{display:none}
+.page.is-on{display:block;animation:pageIn .3s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:flex-end;gap:18px;margin-bottom:18px;flex-wrap:wrap}
+.page-head h1{font-size:21px;font-weight:800;letter-spacing:-.01em}
+.page-head p{font-size:12px;color:var(--ink-3);margin-top:3px}
+.page-head .acts{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ============ cards / buttons / chips / forms ============ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-h{display:flex;align-items:center;gap:10px;padding:15px 18px;border-bottom:1px solid var(--line)}
+.card-h h2{font-size:14px;font-weight:800;letter-spacing:.01em}
+.card-h .sub{font-size:11.5px;color:var(--ink-3)}
+.card-h .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.card-b{padding:16px 18px}
+.card-b.flush{padding:0}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;height:37px;padding:0 14px;
+  border:1px solid var(--line-2);border-radius:9px;background:#fff;color:var(--ink-2);
+  font-size:12.5px;font-weight:650;cursor:pointer;transition:transform .16s,background .16s,border-color .16s,box-shadow .16s;white-space:nowrap;
+}
+.btn:hover{background:var(--surface-2);border-color:#C3CFC5;transform:translateY(-1px)}
+.btn:active{transform:none;background:var(--surface-3)}
+.btn:focus-visible{outline:2px solid var(--green-500);outline-offset:2px}
+.btn-primary{background:linear-gradient(180deg,var(--green-600),var(--green-700));border-color:var(--green-700);color:#fff;box-shadow:0 8px 20px -12px rgba(14,81,57,.95)}
+.btn-primary:hover{background:linear-gradient(180deg,var(--green-500),var(--green-600));border-color:var(--green-600);box-shadow:0 10px 22px -12px rgba(14,81,57,.9)}
+.btn-primary:disabled,.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-amber{background:linear-gradient(180deg,#E58A0B,var(--amber-700));border-color:var(--amber-700);color:#fff}
+.btn-lg{height:52px;padding:0 22px;font-size:15px;border-radius:12px}
+.btn-sm{height:30px;padding:0 10px;font-size:11.5px;border-radius:7px;gap:5px}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:var(--surface-3);border-color:transparent}
+.chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:700;background:var(--surface-3);color:var(--ink-2);border:1px solid transparent;white-space:nowrap}
+.chip .i{width:12px;height:12px}
+.chip.green{background:var(--green-50);color:var(--green-700);border-color:var(--green-100)}
+.chip.amber{background:var(--amber-100);color:var(--amber-700);border-color:#F2DFC2}
+.chip.red{background:var(--red-100);color:var(--red-700);border-color:#F6D5D0}
+.chip.gray{background:var(--surface-3);color:var(--ink-3);border-color:var(--line)}
+.chip .dot{width:5px;height:5px;box-shadow:none}
+.inp{height:36px;border:1px solid var(--line-2);border-radius:8px;padding:0 10px;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fff;transition:.16s;min-width:0}
+.inp:focus{outline:none;border-color:var(--green-500);box-shadow:0 0 0 3px rgba(21,133,93,.13)}
+.inp::placeholder{color:var(--ink-4)}
+select.inp{appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2375877D' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+.inp-num{font-family:var(--font-num);font-variant-numeric:tabular-nums;text-align:right;width:82px;height:31px;padding:0 8px}
+.srch{position:relative}
+.srch .i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-4);width:15px;height:15px}
+.srch .inp{padding-left:32px;width:210px}
+/* ============ tables ============ */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{
+  font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;text-align:left;padding:10px 14px;
+  background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:11px 14px;border-bottom:1px solid #EDF1EC;color:var(--ink-2);vertical-align:middle}
+.tbl tbody tr{transition:background .14s}
+.tbl tbody tr:hover{background:#FAFCF9}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl .r{text-align:right;font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.tbl .strong{color:var(--ink);font-weight:700}
+.tbl .muted{color:var(--ink-3);font-size:11.5px}
+.tbl-wrap{overflow:auto}
+.bar{height:7px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green-500),#3FBF8F);transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:34px 20px;color:var(--ink-3);font-size:12.5px;text-align:center}
+.empty .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);border:1px dashed var(--line-2);color:var(--ink-4)}
+/* ============ animation utils ============ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(21,133,93,.4)}70%{box-shadow:0 0 0 12px rgba(21,133,93,0)}100%{box-shadow:0 0 0 0 rgba(21,133,93,0)}}
+.spin{animation:spin .8s linear infinite}
+/* ============ dashboard ============ */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.kpi{position:relative;overflow:hidden;padding:15px 17px 14px;border-radius:var(--r-lg);background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm);animation:fadeUp .5s both}
+.kpi:nth-child(2){animation-delay:.06s}.kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.18s}
+.kpi::after{content:"";position:absolute;right:-34px;top:-46px;width:118px;height:118px;border-radius:50%;background:radial-gradient(circle,rgba(21,133,93,.10),transparent 68%);pointer-events:none}
+.kpi .lab{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-3);font-weight:650}
+.kpi .lab .ic{width:25px;height:25px;border-radius:7px;display:grid;place-items:center;background:var(--green-50);color:var(--green-600)}
+.kpi .lab .ic.amber{background:var(--amber-100);color:var(--amber-600)}
+.kpi .val{font-size:29px;font-weight:700;line-height:1.1;margin-top:9px;letter-spacing:-.02em;font-family:var(--font-num)}
+.kpi .val em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:2px;font-weight:600;font-family:var(--font-sans)}
+.kpi .foot{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10.5px;color:var(--ink-3)}
+.kpi .up{color:var(--green-600);font-weight:700}
+.kpi .warn{color:var(--amber-700);font-weight:700}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(292px,.92fr);gap:14px;align-items:start}
+.dash-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.flow{display:flex;padding:20px 8px 12px;overflow:auto}
+.flow-step{flex:1;min-width:88px;text-align:center;position:relative;padding:0 3px}
+.flow-step::before{content:"";position:absolute;top:19px;right:50%;left:0;height:1px;background:repeating-linear-gradient(90deg,var(--line-2) 0 4px,transparent 4px 9px)}
+.flow-step:first-child::before{display:none}
+.flow-step .node{position:relative;z-index:2;width:38px;height:38px;margin:0 auto 7px;border-radius:11px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.flow-step.done .node{background:var(--green-600);border-color:var(--green-600);color:#fff;box-shadow:0 6px 14px -8px rgba(14,81,57,.9)}
+.flow-step.on .node{background:var(--amber-100);border-color:#F0D9B8;color:var(--amber-700)}
+.flow-step .nm{font-size:11px;font-weight:700;color:var(--ink-2)}
+.flow-step .vv{font-size:10px;color:var(--ink-3);font-family:var(--font-num);margin-top:1px}
+.chart{display:flex;align-items:flex-end;gap:10px;height:138px;padding:4px 4px 0}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%}
+.chart .bars{flex:1;display:flex;align-items:flex-end;gap:4px;justify-content:center;width:100%}
+.chart .b1{width:15px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,var(--green-500),var(--green-700))}
+.chart .b2{width:7px;border-radius:4px 4px 2px 2px;background:var(--amber-600);opacity:.8}
+.chart .lb{font-size:10px;color:var(--ink-4);font-family:var(--font-num)}
+.chart-legend{display:flex;gap:14px;font-size:10.5px;color:var(--ink-3);margin-left:auto}
+.chart-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.sell{position:relative;overflow:hidden;border-radius:12px;padding:15px 16px;background:linear-gradient(135deg,var(--green-800),#12563D 60%,#14684A);color:#fff;box-shadow:0 14px 30px -20px rgba(8,43,32,.9)}
+.sell::after{content:"";position:absolute;right:-28px;bottom:-46px;width:130px;height:130px;border-radius:50%;border:16px solid rgba(255,255,255,.06)}
+.sell h3{font-size:10.5px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.62)}
+.sell .big{font-size:25px;font-weight:700;font-family:var(--font-num);margin-top:5px;letter-spacing:-.02em}
+.sell .big em{font-style:normal;font-size:11px;font-family:var(--font-sans);opacity:.7;margin-left:3px}
+.sell p{font-size:11px;line-height:1.65;color:rgba(255,255,255,.72);margin-top:5px;max-width:92%}
+.sell.amber{background:linear-gradient(135deg,#FFF8EC,#FBEED8);color:var(--ink);box-shadow:0 10px 26px -22px rgba(180,83,9,.8);border:1px solid #F3E1C4}
+.sell.amber h3{color:var(--amber-700)}
+.sell.amber p{color:var(--ink-2);opacity:1}
+.sell.amber::after{border-color:rgba(217,119,6,.08)}
+.tl{display:flex;flex-direction:column;gap:2px;max-height:250px;overflow:auto;padding:4px 2px}
+.tl-item{display:flex;gap:9px;padding:6px 0;animation:fadeUp .35s both}
+.tl-item .t{flex:none;width:32px;font-size:10px;color:var(--ink-4);font-family:var(--font-num);padding-top:2px}
+.tl-item .b{flex:1;font-size:11.5px;color:var(--ink-2);line-height:1.55;min-width:0}
+.tl-item .b b{color:var(--ink);font-weight:700}
+.tl-item .b .chip{margin-left:5px;height:17px;font-size:9.5px;padding:0 5px}
+
+/* ============ orders ============ */
+.strips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,var(--green-50),#fff 70%);border:1px solid var(--green-100);margin-bottom:14px}
+.strips .kv{display:flex;align-items:baseline;gap:5px;font-size:11.5px;color:var(--ink-3)}
+.strips .kv b{font-family:var(--font-num);font-size:15px;color:var(--green-800)}
+.strips .sep{width:1px;height:14px;background:var(--green-100)}
+.strips .chip{margin-left:auto}
+.orders-bar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.orders-bar .grow{margin-left:auto}
+.po-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px}
+.po{padding:14px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#fff,var(--surface-2));transition:.2s;animation:fadeUp .4s both}
+.po:hover{border-color:#C9D6CC;box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.po .top{display:flex;align-items:flex-start;gap:8px}
+.po h3{font-size:12.5px;font-weight:800}
+.po .no{font-size:10px;color:var(--ink-4);font-family:var(--font-num);margin-top:1px}
+.po ul{margin:9px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink-2)}
+.po li{display:flex;justify-content:space-between;gap:8px}
+.po li b{font-family:var(--font-num);font-weight:600;color:var(--ink)}
+.po .foot{margin-top:9px;padding-top:8px;border-top:1px dashed var(--line-2);display:flex;align-items:center;gap:6px;font-size:10px;color:var(--ink-3)}
+
+/* ============ stock ============ */
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:11px 14px;border-radius:10px;background:linear-gradient(90deg,var(--green-50),#fff);border:1px dashed var(--green-100);font-size:11.5px;color:var(--ink-2);margin-bottom:14px}
+.formula code{font-family:var(--font-num);font-size:11px;background:#fff;border:1px solid var(--line);padding:2px 6px;border-radius:5px;color:var(--green-800);white-space:nowrap}
+.sum-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.sum{padding:12px 14px;border-radius:11px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm)}
+.sum .lab{font-size:10.5px;color:var(--ink-3);font-weight:650;display:flex;align-items:center;gap:5px}
+.sum .v{font-family:var(--font-num);font-size:22px;font-weight:700;margin-top:3px;letter-spacing:-.02em}
+.sum .v small{font-size:10.5px;font-family:var(--font-sans);color:var(--ink-3);font-weight:600;margin-left:3px}
+.preok{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:10px;background:var(--green-50);border:1px solid var(--green-100);color:var(--green-800);font-size:12px;font-weight:600;margin-bottom:14px}
+.tbl tr.need td{background:#FFFDF7}
+.tbl tr.need:hover td{background:#FEF9EE}
+.tbl .diffpos{color:var(--green-600);font-weight:700}
+.tbl .diffneg{color:var(--red-600);font-weight:700}
+
+/* ============ loss / tabs ============ */
+.tabs{display:inline-flex;gap:3px;padding:3px;background:var(--surface-3);border:1px solid var(--line);border-radius:9px}
+.tabs button{height:28px;padding:0 12px;border:0;border-radius:7px;background:transparent;color:var(--ink-3);font-size:11.5px;font-weight:650;cursor:pointer;transition:.15s}
+.tabs button.on{background:#fff;color:var(--green-700);box-shadow:0 1px 4px rgba(12,40,28,.12)}
+.pane{display:none}
+.pane.on{display:block}
+.tip{display:flex;gap:8px;padding:10px 13px;border-radius:9px;background:var(--amber-100);color:var(--amber-700);font-size:11.5px;line-height:1.6;border:1px solid #F3DFC0;margin-bottom:14px}
+.tip .i{margin-top:2px;flex:none}
+
+/* ============ modal / toast ============ */
+.mask{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(17,31,25,.42);backdrop-filter:blur(4px);overflow:auto}
+.mask.on{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{width:min(760px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:#fff;border-radius:18px;border:1px solid rgba(255,255,255,.5);box-shadow:var(--shadow-lg);animation:popIn .26s cubic-bezier(.2,.9,.3,1.1) both}
+.modal.narrow{width:min(432px,100%)}
+.modal.wide{width:min(900px,100%)}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.m-head{display:flex;align-items:flex-start;gap:12px;padding:19px 21px 13px}
+.m-head h2{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.m-head p{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+.m-x{margin-left:auto;width:31px;height:31px;flex:none;border:0;border-radius:8px;background:var(--surface-2);color:var(--ink-3);cursor:pointer;display:grid;place-items:center;transition:.15s}
+.m-x:hover{background:var(--surface-3);color:var(--ink)}
+.m-body{padding:0 21px 18px;overflow:auto}
+.m-foot{display:flex;gap:9px;justify-content:flex-end;align-items:center;padding:13px 21px;border-top:1px solid var(--line);background:var(--surface-2);border-radius:0 0 18px 18px}
+.m-foot .grow{margin-right:auto;font-size:11px;color:var(--ink-3)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;color:var(--ink-3);font-weight:650}
+.field label b{color:var(--red-600);margin-left:2px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.hint{font-size:10.5px;color:var(--ink-4)}
+.qty-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 11px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);font-size:11.5px;color:var(--ink-2);margin-bottom:12px}
+.qty-line b{font-family:var(--font-num);font-size:15px;color:var(--green-800)}
+.diff-line{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-radius:9px;font-size:12px;font-weight:650;border:1px solid var(--line);background:var(--surface-2)}
+.diff-line.bad{background:var(--red-100);border-color:#F5D3CE;color:var(--red-700)}
+.diff-line.good{background:var(--green-50);border-color:var(--green-100);color:var(--green-700)}
+.diff-line .v{font-family:var(--font-num);font-size:18px}
+.receipt-wrap{display:flex;gap:20px;align-items:flex-start}
+.receipt{width:300px;flex:none;background:#fff;border:1px solid var(--line-2);border-radius:4px;padding:16px 16px 12px;box-shadow:0 20px 44px -26px rgba(8,40,26,.55);position:relative}
+.receipt::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:7px;background:radial-gradient(circle at 5px 0,transparent 5px,#fff 5.5px);background-size:10px 7px;background-repeat:repeat-x}
+.receipt .r-brand{text-align:center;font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--green-800)}
+.receipt .r-title{text-align:center;font-size:10.5px;color:var(--ink-3);letter-spacing:.24em;margin-top:3px}
+.receipt .r-no{text-align:center;font-family:var(--font-num);font-size:10.5px;color:var(--ink-2);margin-top:6px}
+.dashline{height:1px;margin:10px 0;background-image:linear-gradient(90deg,var(--line-2) 0 3px,transparent 3px 7px);background-size:7px 1px;background-repeat:repeat-x}
+.receipt .r-row{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--ink-2);padding:2px 0}
+.receipt .r-row span:first-child{color:var(--ink-4)}
+.receipt .r-row b{font-family:var(--font-num);font-weight:600;color:var(--ink)}
+.receipt .qr{width:142px;height:142px;margin:6px auto 4px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:4px}
+.receipt .qr svg{width:100%;height:100%;display:block}
+.receipt .r-qr-cap{text-align:center;font-size:9.5px;color:var(--ink-4);letter-spacing:.04em}
+.receipt .r-items{font-size:10.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.receipt .r-items div{display:flex;justify-content:space-between;gap:6px}
+.receipt .r-foot{text-align:center;font-size:9.5px;color:var(--ink-4);line-height:1.7;margin-top:2px}
+.slip-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.slip-side .box{padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)}
+.slip-side h4{font-size:11px;font-weight:700;color:var(--ink-2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.slip-side ul{margin:0;padding-left:15px;font-size:11px;color:var(--ink-3);line-height:1.85}
+.toasts{position:fixed;right:22px;bottom:78px;z-index:300;display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;max-width:430px;padding:10px 13px;border-radius:11px;background:#fff;border:1px solid var(--line);box-shadow:0 18px 44px -20px rgba(8,40,26,.5);font-size:12px;color:var(--ink-2);animation:toastIn .28s cubic-bezier(.2,.9,.3,1.2) both;pointer-events:auto}
+.toast .ic{width:23px;height:23px;border-radius:7px;display:grid;place-items:center;flex:none;background:var(--green-50);color:var(--green-600)}
+.toast.warn .ic{background:var(--amber-100);color:var(--amber-600)}
+.toast.err .ic{background:var(--red-100);color:var(--red-600)}
+.toast.out{animation:toastOut .22s ease both}
+@keyframes toastIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(18px)}}
+.spot{animation:spotPulse 1.5s ease 2;border-radius:10px}
+@keyframes spotPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,0)}35%{box-shadow:0 0 0 5px rgba(217,119,6,.35)}}
+/* ============ touch picking ============ */
+.view-touch{display:none;height:calc(100vh - var(--topbar-h));flex-direction:column}
+.view-touch.is-on{display:flex}
+.touch-head{display:flex;align-items:center;gap:14px;padding:13px 22px;background:rgba(255,255,255,.8);border-bottom:1px solid var(--line);backdrop-filter:blur(10px);flex:none}
+.touch-head h1{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+.touch-head .sub{font-size:11.5px;color:var(--ink-3)}
+.touch-metrics{display:flex;gap:8px;margin-left:auto;align-items:center}
+.touch-metrics .m{display:flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:8px;background:#fff;border:1px solid var(--line);font-size:10.5px;color:var(--ink-3)}
+.touch-metrics .m b{font-family:var(--font-num);font-size:15px;color:var(--green-800)}
+.touch-head-acts{display:flex;gap:8px;align-items:center}
+.touch-head-acts .btn{height:40px;border-radius:10px}
+.touch-body{flex:1;display:grid;grid-template-columns:262px minmax(0,1fr) 288px;gap:13px;padding:13px 18px 16px;overflow:hidden}
+.batch-rail{display:flex;flex-direction:column;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:auto}
+.rail-title{display:flex;align-items:baseline;justify-content:space-between;padding:2px 4px 9px}
+.rail-title b{font-size:12px;font-weight:800}
+.rail-title span{font-size:10px;color:var(--ink-3)}
+.batch-card{display:block;width:100%;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;margin-bottom:8px;transition:.18s;font-family:inherit}
+.batch-card:hover{border-color:#C6D5C9;background:var(--surface-2)}
+.batch-card.on{border-color:var(--green-500);box-shadow:0 0 0 3px rgba(21,133,93,.10);background:linear-gradient(180deg,#fff,var(--green-50))}
+.batch-card .l1{display:flex;align-items:center;gap:6px}
+.batch-card .rt{font-size:12.5px;font-weight:800;color:var(--ink)}
+.batch-card .meta{font-size:10px;color:var(--ink-3);margin-top:3px;font-family:var(--font-num)}
+.batch-card .bar{margin-top:7px;height:5px}
+.rail-tip{margin-top:auto;padding:9px 10px;border-radius:9px;background:var(--surface-2);border:1px dashed var(--line-2);font-size:10px;color:var(--ink-3);line-height:1.6}
+.pick-main{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pick-head{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);flex:none}
+.pick-head h2{font-size:15px;font-weight:800}
+.pick-head .sub{font-size:10.5px;color:var(--ink-3);margin-top:1px}
+.pick-head .prog{margin-left:auto;width:190px}
+.pick-head .prog .top{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-bottom:5px}
+.pick-head .prog .top b{font-family:var(--font-num);color:var(--green-700);font-size:12px}
+.pick-grid{flex:1;overflow:auto;padding:11px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start;background:var(--surface-2)}
+.pick-item{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;text-align:left;transition:.16s;font-family:inherit;min-height:62px}
+.pick-item:hover{border-color:#C6D5C9;transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.pick-item .ck{width:23px;height:23px;border-radius:7px;border:1.6px solid var(--line-2);display:grid;place-items:center;color:#fff;flex:none;transition:.16s}
+.pick-item .ck .i{width:14px;height:14px;stroke-width:2.6;opacity:0}
+.pick-item .nm{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.3}
+.pick-item .sp{font-size:10px;color:var(--ink-3);margin-top:1px}
+.pick-item .q{margin-left:auto;text-align:right;flex:none}
+.pick-item .q b{display:block;font-family:var(--font-num);font-size:19px;font-weight:700;line-height:1.1;color:var(--ink)}
+.pick-item .q small{font-size:9.5px;color:var(--ink-3);font-weight:600}
+.pick-item.done{background:linear-gradient(180deg,var(--green-50),#F7FCF9);border-color:var(--green-100)}
+.pick-item.done .ck{background:var(--green-600);border-color:var(--green-600)}
+.pick-item.done .ck .i{opacity:1}
+.pick-item.done .nm{color:var(--green-800)}
+.pick-item.locked{cursor:default;opacity:.75}
+.pick-item.locked:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.pick-foot{flex:none;display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--line);background:#fff}
+.pick-foot .hint{font-size:11px;color:var(--ink-3)}
+.pick-foot .hint b{color:var(--amber-700);font-family:var(--font-num)}
+.pick-side{display:flex;flex-direction:column;gap:10px;overflow:auto;min-width:0}
+.mini-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;flex:none}
+.mini-card h3{font-size:10.5px;font-weight:700;color:var(--ink-3);display:flex;align-items:center;gap:6px;margin-bottom:7px;letter-spacing:.03em}
+.mini-row{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:2.5px 0;color:var(--ink-3)}
+.mini-row b{font-family:var(--font-num);color:var(--ink);font-weight:600}
+.loss-mini{display:flex;align-items:center;gap:7px;font-size:10.5px;padding:5px 0;border-bottom:1px dashed var(--line);color:var(--ink-2)}
+.loss-mini:last-child{border-bottom:0}
+.loss-mini .t{font-family:var(--font-num);color:var(--ink-4);width:28px;flex:none}
+.loss-mini .amt{margin-left:auto;color:var(--red-600);font-family:var(--font-num);font-weight:600}
+.loss-mini .ok{color:var(--green-600)}
+
+/* ============ phone stages ============ */
+.view-phone{display:none;min-height:calc(100vh - var(--topbar-h));padding:22px 30px}
+.view-phone.is-on{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
+.stage-copy{max-width:352px}
+.stage-copy .tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:6px;background:var(--green-50);border:1px solid var(--green-100);color:var(--green-700);font-size:10.5px;font-weight:700;letter-spacing:.06em}
+.stage-copy h2{font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.32;margin:11px 0 9px}
+.stage-copy>p{font-size:12px;color:var(--ink-2);line-height:1.85}
+.stage-copy ul{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.stage-copy li{display:flex;gap:9px;font-size:11.5px;color:var(--ink-2);line-height:1.6}
+.stage-copy li .n{flex:none;width:20px;height:20px;border-radius:6px;background:#fff;border:1px solid var(--line);color:var(--green-700);display:grid;place-items:center;font-size:10px;font-weight:700;font-family:var(--font-num)}
+.phone{position:relative;width:372px;height:min(740px,calc(100vh - 116px));flex:none;border-radius:44px;padding:9px;background:linear-gradient(165deg,#2A4137,#0B1712 60%);box-shadow:0 56px 110px -54px rgba(5,25,16,.9),0 0 0 1px rgba(255,255,255,.07)}
+.phone::after{content:"";position:absolute;left:-2px;top:120px;width:2px;height:46px;border-radius:2px;background:#31463C}
+.phone-notch{position:absolute;top:15px;left:50%;transform:translateX(-50%);width:100px;height:22px;border-radius:999px;background:#08120E;z-index:8}
+.phone-screen{position:relative;display:flex;flex-direction:column;width:100%;height:100%;border-radius:36px;overflow:hidden;background:#F6F9F5}
+.p-status{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 0;font-family:var(--font-num);font-size:10.5px;font-weight:700;color:var(--green-900);flex:none}
+.p-status .icons{display:flex;align-items:center;gap:5px}
+.p-status .icons .i{width:12px;height:12px;stroke-width:2.2}
+.p-head{padding:13px 16px 11px;background:#fff;border-bottom:1px solid var(--line);flex:none}
+.p-head .t1{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:800}
+.p-head .t1 .ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--green-50);color:var(--green-600);flex:none}
+.p-head .t2{font-size:10.5px;color:var(--ink-3);margin-top:3px;padding-left:36px}
+.p-chips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.seg{display:flex;gap:3px;padding:3px;background:var(--surface-3);border:1px solid var(--line);border-radius:9px;margin-bottom:9px}
+.seg button{flex:1;height:27px;border:0;border-radius:7px;background:transparent;color:var(--ink-3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:.16s}
+.seg button.on{background:#fff;color:var(--green-700);box-shadow:0 1px 4px rgba(12,40,28,.12)}
+.p-body{position:relative;flex:1;overflow:auto;padding:11px 13px 16px;background:linear-gradient(180deg,#F7FAF6,#F1F5F0)}
+.p-foot{flex:none;display:flex;gap:8px;padding:10px 13px 14px;background:#fff;border-top:1px solid var(--line)}
+.p-foot .btn{height:43px;flex:1;font-size:13px;border-radius:10px}
+.p-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 11px;margin-bottom:9px}
+.p-card .k{font-size:10px;color:var(--ink-3)}
+.p-card .v{font-size:12px;font-weight:700;margin-top:1px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.scan-box{position:relative;overflow:hidden;border:1.5px dashed var(--green-100);border-radius:12px;background:linear-gradient(180deg,var(--green-50),#fff);padding:16px 12px;text-align:center;margin-bottom:10px}
+.scan-box .ic{width:38px;height:38px;border-radius:11px;margin:0 auto 7px;display:grid;place-items:center;background:#fff;border:1px solid var(--green-100);color:var(--green-600)}
+.scan-box .t{font-size:11.5px;font-weight:700;color:var(--green-800)}
+.scan-box .s{font-size:9.5px;color:var(--ink-3);margin-top:2px}
+.scan-laser{position:absolute;left:14px;right:14px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--green-500),transparent);animation:scanMove 1.4s ease-in-out infinite}
+@keyframes scanMove{0%{top:22%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:82%;opacity:0}}
+.r-item{display:flex;align-items:center;gap:9px;padding:8px 10px;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;transition:.2s}
+.r-item .ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-4);flex:none}
+.r-item.ok .ic{background:var(--green-50);color:var(--green-600)}
+.r-item.short{border-color:#F0D9B8;background:#FFFCF5;animation:fadeUp .3s both}
+.r-item.short .ic{background:var(--amber-100);color:var(--amber-600)}
+.r-item .nm{font-size:11.5px;font-weight:700;color:var(--ink);line-height:1.3}
+.r-item .sp{font-size:9.5px;color:var(--ink-3);margin-top:1px}
+.r-item .q{margin-left:auto;text-align:right;font-family:var(--font-num);font-size:14px;font-weight:700;color:var(--ink);line-height:1.2;flex:none}
+.r-item .q small{display:block;font-size:9px;color:var(--ink-3);font-weight:600}
+.r-item.short .q b{color:var(--amber-700)}
+.r-actions{display:flex;gap:6px;margin:2px 0 9px}
+.r-actions .btn{height:30px;font-size:10.5px;flex:1;padding:0 8px}
+.scan-overlay{position:absolute;inset:0;z-index:12;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:24px;background:rgba(247,250,246,.95);backdrop-filter:blur(3px);text-align:center}
+.scan-overlay.on{display:flex}
+.scan-ring{position:relative;width:112px;height:112px;border-radius:28px;border:2px solid var(--green-100);background:#fff;display:grid;place-items:center;color:var(--green-600);overflow:hidden}
+.scan-ring::after{content:"";position:absolute;left:9px;right:9px;height:2px;background:linear-gradient(90deg,transparent,var(--green-600),transparent);animation:scanMove 1.1s ease-in-out infinite}
+.scan-overlay .t{font-size:12.5px;font-weight:800;color:var(--green-800)}
+.scan-overlay .s{font-size:10px;color:var(--ink-3);line-height:1.6}
+.alert-bar{display:none;gap:8px;padding:9px 10px;border-radius:10px;background:linear-gradient(135deg,#FDECEA,#FBDCD7);border:1px solid #F2C4BE;color:var(--red-700);font-size:10.5px;line-height:1.55;margin-bottom:9px;animation:fadeUp .3s both}
+.alert-bar.on{display:flex}
+.alert-bar .i{margin-top:1px;flex:none}
+.alert-bar b{display:block;font-size:11px}
+.d-item{display:flex;align-items:center;gap:8px;padding:8px 9px;background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;transition:.2s}
+.d-item .ck{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--line-2);display:grid;place-items:center;color:#fff;flex:none}
+.d-item .ck .i{width:12px;height:12px;stroke-width:3;opacity:0}
+.d-item.ok{background:linear-gradient(180deg,#fff,var(--green-50));border-color:var(--green-100)}
+.d-item.ok .ck{background:var(--green-600);border-color:var(--green-600)}
+.d-item.ok .ck .i{opacity:1}
+.d-item .store{font-size:10px;color:var(--ink-3)}
+.d-item .nm{font-size:11.5px;font-weight:700;color:var(--ink);line-height:1.3}
+.d-item .q{margin-left:auto;font-family:var(--font-num);font-size:12.5px;font-weight:700;flex:none}
+.rt-tag{flex:none;font-size:8.5px;font-weight:700;padding:1px 4px;border-radius:4px;background:var(--surface-3);border:1px solid var(--line);color:var(--ink-3);font-family:var(--font-num)}
+.d-item.bad{border-color:#F0B9B3;background:#FFF6F4;animation:shake .5s ease}
+.d-item.bad .nm{color:var(--red-700)}
+.d-item.bad .rt-tag{background:var(--red-100);border-color:#F1C7C1;color:var(--red-700)}
+.d-item.resolved{opacity:.55;background:var(--surface-2)}
+.p-success{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;height:100%;padding:24px}
+.p-success .ic{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:var(--green-50);border:1px solid var(--green-100);color:var(--green-600);animation:pulseRing 1.6s ease 2}
+.p-success h3{font-size:17px;font-weight:800}
+.p-success p{font-size:11px;color:var(--ink-3);line-height:1.7}
+
+/* ============ tour dock ============ */
+.tour{position:fixed;right:20px;bottom:20px;z-index:150;display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.tour-btn{display:inline-flex;align-items:center;gap:8px;height:41px;padding:0 15px;border-radius:999px;border:1px solid var(--green-700);background:linear-gradient(180deg,var(--green-700),var(--green-800));color:#fff;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 20px 40px -20px rgba(8,43,32,.95);transition:.18s}
+.tour-btn:hover{transform:translateY(-2px);box-shadow:0 24px 44px -20px rgba(8,43,32,.95)}
+.tour-panel{display:none;width:322px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden;animation:popIn .2s both}
+.tour-panel.on{display:block}
+.tour-panel .th{display:flex;align-items:center;gap:7px;padding:11px 13px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--green-50),#fff)}
+.tour-panel .th b{font-size:12px;font-weight:800}
+.tour-panel .th span{font-size:10px;color:var(--ink-3);margin-left:auto}
+.tour-list{padding:6px;max-height:min(330px,60vh);overflow:auto}
+.tour-step{display:flex;gap:9px;width:100%;text-align:left;padding:8px;border:0;border-radius:9px;background:transparent;cursor:pointer;transition:.15s;font-family:inherit}
+.tour-step:hover{background:var(--surface-2)}
+.tour-step .n{flex:none;width:20px;height:20px;border-radius:6px;background:var(--surface-3);color:var(--ink-3);display:grid;place-items:center;font-size:10px;font-weight:700;font-family:var(--font-num);margin-top:1px;transition:.15s}
+.tour-step .x b{display:block;font-size:11.5px;font-weight:700;color:var(--ink)}
+.tour-step .x span{display:block;font-size:10px;color:var(--ink-3);line-height:1.5;margin-top:1px}
+.tour-step.cur .n{background:var(--green-600);color:#fff}
+.tour-step.cur .x b{color:var(--green-800)}
+
+/* ============ utils / responsive ============ */
+.grow{flex:1;min-width:0}
+.muted{color:var(--ink-3)}
+.small{font-size:11px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt14{margin-top:14px}
+.hr{height:1px;background:var(--line);margin:12px 0}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+@media (max-width:1280px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dash-grid{grid-template-columns:minmax(0,1fr)}
+  .touch-body{grid-template-columns:238px minmax(0,1fr)}
+  .pick-side{display:none}
+  .po-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .view-phone.is-on{gap:26px}
+  .stage-copy{max-width:640px;order:2}
+}
+@media (max-width:1024px){
+  .sidebar{display:none}
+  .sum-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .terminals button{padding:0 10px}
+  .terminals button span{display:none}
+  .po-grid{grid-template-columns:minmax(0,1fr)}
+  .receipt-wrap{flex-direction:column;align-items:center}
+  .slip-side{width:100%}
+}
+@media (max-width:760px){
+  .brand-sub{display:none}
+  .topbar{gap:10px;padding:0 12px}
+  .brand{min-width:0}
+  .brand-name small{display:none}
+  .date-chip,.demo-chip{display:none}
+  .content{padding:16px 14px 40px}
+  .pick-grid{grid-template-columns:minmax(0,1fr)}
+  .touch-body{grid-template-columns:minmax(0,1fr)}
+  .batch-rail{display:none}
+  .phone{width:100%;max-width:372px}
+  .view-phone{padding:14px}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+<defs>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/><path d="m7.5 4.27 9 5.15"/></symbol>
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol>
+  <symbol id="i-orders" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+  <symbol id="i-tablet" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M21.8 10A10 10 0 1 1 17 3.34"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3h12v6"/><rect width="12" height="8" x="6" y="14" rx="1"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M2 8.8a15 15 0 0 1 20 0"/><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8.5 16.2a5 5 0 0 1 7 0"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect width="16" height="10" x="2" y="7" rx="2"/><path d="M22 11v2"/><path d="M6 11v2"/><path d="M10 11v2"/></symbol>
+  <symbol id="i-signal" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M9 20V4"/><path d="M14 20v-7"/><path d="M19 20V8"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+</defs>
+</svg>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark"><svg class="i i-24"><use href="#i-box"/></svg></div>
+    <div>
+      <div class="brand-name">鲜配云 <small>仓配一体</small></div>
+      <div class="brand-sub">生鲜 B2B · 从订单到司机全链路</div>
+    </div>
+  </div>
+  <nav class="terminals" id="terminals" aria-label="终端切换">
+    <button data-t="admin" class="on"><svg class="i"><use href="#i-monitor"/></svg><span>后台管理</span></button>
+    <button data-t="touch"><svg class="i"><use href="#i-tablet"/></svg><span>分拣触屏</span></button>
+    <button data-t="wh"><svg class="i"><use href="#i-scan"/></svg><span>库房 PDA</span></button>
+    <button data-t="driver"><svg class="i"><use href="#i-truck"/></svg><span>司机 PDA</span></button>
+  </nav>
+  <div class="topbar-right">
+    <button class="btn btn-sm" id="btnReset" title="把所有终端恢复到 04:36 的初始演示状态"><svg class="i i-14"><use href="#i-rotate"/></svg>重置演示</button>
+    <span class="demo-chip"><svg class="i i-14"><use href="#i-shield"/></svg>演示数据</span>
+    <span class="date-chip">2026-11-16 周一 · 04:36</span>
+    <div class="who">
+      <span class="avatar">王</span>
+      <div><b>王芳</b><span>分拣主管</span></div>
+    </div>
+  </div>
+</header>
+<div class="view view-admin is-on" data-view="admin">
+  <aside class="sidebar">
+    <div class="side-label">运营中心</div>
+    <button class="nav-item on" data-page="dashboard"><svg class="i"><use href="#i-dashboard"/></svg>工作台</button>
+    <button class="nav-item" data-page="orders"><svg class="i"><use href="#i-orders"/></svg>订单汇总<span class="badge" id="navOrderBadge">12</span></button>
+    <button class="nav-item" data-page="stock"><svg class="i"><use href="#i-box"/></svg>安全库存 · 预采<span class="badge">10</span></button>
+    <button class="nav-item" data-page="loss"><svg class="i"><use href="#i-scale"/></svg>报损 · 盘点 · 库亏</button>
+    <div class="side-foot">
+      <div class="row"><span class="dot"></span>4 台终端在线同步</div>
+      <div class="row"><span class="dot" style="background:var(--amber-600)"></span>每日 23:00 自动计算预采</div>
+      <div class="row" style="color:var(--ink-4)"><svg class="i i-14"><use href="#i-shield"/></svg>数据仅用于产品演示</div>
+    </div>
+  </aside>
+  <main class="content">
+    <section class="page is-on" data-panel="dashboard">
+      <div class="page-head">
+        <div>
+          <h1>工作台</h1>
+          <p>2026-11-16 04:36 · 城东中心仓 · 早班分拣进行中</p>
+        </div>
+        <div class="acts">
+          <span class="chip green"><span class="dot"></span>系统运行正常</span>
+          <button class="btn" id="btnExportDash"><svg class="i i-16"><use href="#i-download"/></svg>导出日报</button>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="kpi">
+          <div class="lab"><span class="ic"><svg class="i i-14"><use href="#i-orders"/></svg></span>今日门店订单</div>
+          <div class="val" id="kpiOrders">12<em>张</em></div>
+          <div class="foot"><span class="up">↑ 3 张</span>较昨日 · 4 条线路</div>
+        </div>
+        <div class="kpi">
+          <div class="lab"><span class="ic amber"><svg class="i i-14"><use href="#i-box"/></svg></span>待补货 SKU</div>
+          <div class="val" id="kpiStock">10<em>个</em></div>
+          <div class="foot">今日预采金额 <span class="warn" id="kpiStockAmt">¥17,826</span></div>
+        </div>
+        <div class="kpi">
+          <div class="lab"><span class="ic"><svg class="i i-14"><use href="#i-tablet"/></svg></span>分拣进度</div>
+          <div class="val" id="kpiPick">70<em>%</em></div>
+          <div class="foot">城东03 批次 · 分拣员 王芳</div>
+        </div>
+        <div class="kpi">
+          <div class="lab"><span class="ic amber"><svg class="i i-14"><use href="#i-scale"/></svg></span>今日库亏差异</div>
+          <div class="val" id="kpiLoss">¥274</div>
+          <div class="foot"><span class="warn">报损 4 笔</span> · 差异率 0.8%</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-col">
+          <div class="card">
+            <div class="card-h">
+              <h2>全链路履约进度</h2>
+              <span class="sub">订单 → 采购 → 分拣 → 收货 → 装车 → 盘点</span>
+              <div class="right"><span class="chip amber" id="flowChip">待生成采购单</span></div>
+            </div>
+            <div class="flow" id="flow"></div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>近 7 日分拣量与报损</h2>
+              <div class="chart-legend"><span><i style="background:var(--green-600)"></i>分拣件数</span><span><i style="background:var(--amber-600)"></i>报损件数</span></div>
+            </div>
+            <div class="card-b">
+              <div class="chart">
+                <div class="col"><div class="bars"><span class="b1" style="height:62%"></span><span class="b2" style="height:22%"></span></div><span class="lb">11-10</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:73%"></span><span class="b2" style="height:30%"></span></div><span class="lb">11-11</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:67%"></span><span class="b2" style="height:25%"></span></div><span class="lb">11-12</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:84%"></span><span class="b2" style="height:38%"></span></div><span class="lb">11-13</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:80%"></span><span class="b2" style="height:33%"></span></div><span class="lb">11-14</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:94%"></span><span class="b2" style="height:42%"></span></div><span class="lb">11-15</span></div>
+                <div class="col"><div class="bars"><span class="b1" style="height:77%"></span><span class="b2" style="height:31%"></span></div><span class="lb">今日</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-col">
+          <div class="sell">
+            <h3>分拣效率 · 本次重点</h3>
+            <div class="big">2.4<em>秒 / 件</em></div>
+            <p>触屏大按钮勾选分拣，完成后即时生成带二维码的小票贴实物，扫码即可追溯批次、门店与分拣员。</p>
+          </div>
+          <div class="sell amber">
+            <h3>触屏报损 · 盘点</h3>
+            <div class="big" id="sellLossRate">0.8<em>% 库亏率</em></div>
+            <p>直接在触屏录入损耗与实盘数，系统自动比对账面库存，差异即时汇总为库亏，减少二次人工录入。</p>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>今日动态</h2><span class="sub">四端联动</span></div>
+            <div class="card-b"><div class="tl" id="timeline"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="page" data-panel="orders">
+      <div class="page-head">
+        <div>
+          <h1>订单汇总 → 采购单</h1>
+          <p>门店订单自动聚合，按供货商拆分采购单，并同步对应分拣员</p>
+        </div>
+        <div class="acts">
+          <button class="btn" id="btnExportOrders"><svg class="i i-16"><use href="#i-download"/></svg>导出 Excel</button>
+          <button class="btn btn-primary" id="btnGenPurchase"><svg class="i i-16"><use href="#i-orders"/></svg>汇总生成采购单</button>
+        </div>
+      </div>
+      <div class="strips" id="orderStrip"></div>
+      <div class="card">
+        <div class="orders-bar">
+          <div class="srch">
+            <svg class="i"><use href="#i-search"/></svg>
+            <input class="inp" id="orderSearch" placeholder="搜索订单号 / 门店">
+          </div>
+          <select class="inp" id="orderRoute">
+            <option value="">全部线路</option>
+            <option>城东03</option><option>城南02</option><option>城西01</option><option>城北01</option>
+          </select>
+          <span class="chip gray" id="orderCount">共 12 张</span>
+          <span class="grow"></span>
+          <span class="small muted">下单截止 04:30 · 供货商截单 05:00</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>订单号</th><th>门店客户</th><th>线路</th><th class="r">品类</th><th class="r">件数</th><th class="r">金额</th><th>下单时间</th><th>状态</th></tr></thead>
+            <tbody id="orderRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card mt14">
+        <div class="card-h">
+          <h2>采购单下发结果</h2>
+          <span class="sub">按供货商拆单 · 自动同步分拣员与到货时间</span>
+          <div class="right" id="poChip"></div>
+        </div>
+        <div id="poResult">
+          <div class="empty">
+            <span class="ic"><svg class="i i-20"><use href="#i-file"/></svg></span>
+            尚未生成采购单，点击右上角「汇总生成采购单」体验完整流程
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" data-panel="stock">
+      <div class="page-head">
+        <div>
+          <h1>安全库存 · 每日预采</h1>
+          <p>按商品设置安全库存与补货参数，系统每日自动计算建议预采量</p>
+        </div>
+        <div class="acts">
+          <button class="btn" id="btnResetStock"><svg class="i i-16"><use href="#i-rotate"/></svg>恢复默认</button>
+          <button class="btn btn-primary" id="btnGenPreorder"><svg class="i i-16"><use href="#i-box"/></svg>生成今日预采单</button>
+        </div>
+      </div>
+      <div class="formula">
+        <svg class="i i-16" style="color:var(--green-600)"><use href="#i-chart"/></svg>
+        <b>计算规则</b>
+        <code>建议预采量 = 安全库存 + 日均销量 × 补货周期 − 当前库存 − 在途</code>
+        <span class="muted">结果小于 0 时取 0；每日 23:00 自动跑批，04:00 推送供货商</span>
+      </div>
+      <div class="sum-row" id="stockSummary"></div>
+      <div class="card">
+        <div class="card-h">
+          <h2>安全库存与预采建议</h2>
+          <span class="sub">安全库存 / 日均销量 / 补货周期 可直接修改，预采量实时重算</span>
+          <div class="right"><span class="chip gray">数量单位：件</span></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>商品</th><th>供货商</th><th class="r">当前库存</th><th class="r">在途</th><th class="r">安全库存</th><th class="r">日均销量</th><th class="r">周期(天)</th><th class="r">建议预采</th><th class="r">预估金额</th></tr></thead>
+            <tbody id="stockRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="preorderNote"></div>
+    </section>
+
+    <section class="page" data-panel="loss">
+      <div class="page-head">
+        <div>
+          <h1>报损 · 盘点 · 库亏</h1>
+          <p>触屏录入损耗与实盘数据，系统自动比对账面库存并输出库亏差异</p>
+        </div>
+        <div class="acts">
+          <button class="btn" id="btnNewCount"><svg class="i i-16"><use href="#i-scale"/></svg>开始盘点</button>
+          <button class="btn btn-primary" id="btnNewLoss"><svg class="i i-16"><use href="#i-plus"/></svg>录入报损</button>
+        </div>
+      </div>
+      <div class="sum-row" id="lossSummary"></div>
+      <div class="tip">
+        <svg class="i i-16"><use href="#i-alert"/></svg>
+        <span>差异 = 实盘数量 − 账面库存：负数即库亏，正数为盘盈；结果自动进入当日成本核算，无需二次录入。</span>
+      </div>
+      <div class="card">
+        <div class="card-h">
+          <div class="tabs" id="lossTabs">
+            <button class="on" data-tab="loss">报损记录</button>
+            <button data-tab="count">盘点差异</button>
+          </div>
+          <div class="right">
+            <span class="small muted" id="lossHint">今日 4 笔 · 合计 ¥542</span>
+            <button class="btn btn-sm" id="btnExportLoss"><svg class="i i-14"><use href="#i-download"/></svg>导出</button>
+          </div>
+        </div>
+        <div class="pane on" data-pane="loss">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>报损单号</th><th>商品</th><th class="r">数量</th><th>原因</th><th class="r">金额</th><th>经办人</th><th>时间</th></tr></thead>
+              <tbody id="lossRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="pane" data-pane="count">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>盘点单号</th><th>商品</th><th class="r">账面库存</th><th class="r">实盘数量</th><th class="r">差异</th><th class="r">差异金额</th><th>经办人</th><th>时间</th></tr></thead>
+              <tbody id="countRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="view view-touch" data-view="touch">
+  <div class="touch-head">
+    <h1><svg class="i i-20"><use href="#i-tablet"/></svg>分拣触屏<span class="sub">A 台 · 城东中心仓 · 04:36</span></h1>
+    <div class="touch-metrics">
+      <div class="m">待分拣批次 <b id="tBatchCnt">4</b></div>
+      <div class="m">待分拣件数 <b id="tTodoCnt">216</b></div>
+      <div class="m">今日报损 <b id="tLossCnt">4</b> 笔</div>
+    </div>
+    <div class="touch-head-acts">
+      <button class="btn" id="btnTallyLoss"><svg class="i i-16"><use href="#i-scale"/></svg>称重报损</button>
+      <button class="btn" id="btnTallyCount"><svg class="i i-16"><use href="#i-box"/></svg>库存盘点</button>
+    </div>
+  </div>
+  <div class="touch-body">
+    <div class="batch-rail">
+      <div class="rail-title"><b>分拣批次</b><span>按线路自动生成</span></div>
+      <div id="batchRail"></div>
+      <div class="rail-tip">点击切换批次 · 大按钮勾选分拣，称重报损与盘点无需切后台，平均 2.4 秒/件。</div>
+    </div>
+    <div class="pick-main">
+      <div class="pick-head">
+        <div>
+          <h2 id="pickTitle">PK-20261116-01</h2>
+          <div class="sub" id="pickSub">城东03 · 3 家门店 · 分拣员 王芳</div>
+        </div>
+        <div class="prog">
+          <div class="top"><span>分拣进度</span><b id="pickProgTxt">70%</b></div>
+          <div class="bar"><i id="pickBar" style="width:70%"></i></div>
+        </div>
+      </div>
+      <div class="pick-grid" id="pickGrid"></div>
+      <div class="pick-foot">
+        <span class="hint">已勾选 <b id="pickDone">7</b> / <span id="pickTotal">10</span> 项 · 剩余 <b id="pickRest">3</b> 项</span>
+        <span class="grow"></span>
+        <button class="btn" id="btnPickLoss"><svg class="i i-16"><use href="#i-scale"/></svg>称重报损</button>
+        <button class="btn btn-primary btn-lg" id="btnPickDone"><svg class="i i-16"><use href="#i-printer"/></svg>完成分拣 · 打小票</button>
+      </div>
+    </div>
+    <div class="pick-side">
+      <div class="mini-card">
+        <h3><svg class="i i-14"><use href="#i-file"/></svg>批次摘要</h3>
+        <div id="pickSummary"></div>
+      </div>
+      <div class="mini-card">
+        <h3><svg class="i i-14"><use href="#i-scale"/></svg>今日报损（称重台）</h3>
+        <div id="lossMini"></div>
+      </div>
+      <div class="mini-card">
+        <h3><svg class="i i-14"><use href="#i-box"/></svg>最近盘点 · 库亏</h3>
+        <div id="countMini"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="view view-phone" data-view="wh">
+  <div class="stage-copy">
+    <span class="tag"><svg class="i i-14"><use href="#i-scan"/></svg>库房 PDA</span>
+    <h2>送货单、分拣小票<br>两条通道都能扫入库</h2>
+    <p>供货商送达扫采购送货单带出应收；分拣完成的周转筐扫小票二维码，带出批次明细直接入库，两条通道共用同一套库存台账。</p>
+    <ul>
+      <li><span class="n">1</span>扫送货单 → 带出 6 项应收，短缺行一键补货</li>
+      <li><span class="n">2</span>扫分拣小票 → 带出批次 10 项 93 件，整筐核对</li>
+      <li><span class="n">3</span>确认入库后库存实时回写，分拣端与司机端同步</li>
+    </ul>
+  </div>
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+      <div class="p-status"><span>04:36</span><div class="icons"><svg class="i"><use href="#i-signal"/></svg><svg class="i"><use href="#i-wifi"/></svg><svg class="i"><use href="#i-battery"/></svg></div></div>
+      <div class="p-head">
+        <div class="t1"><span class="ic"><svg class="i i-16"><use href="#i-scan"/></svg></span>扫码入库</div>
+        <div class="t2" id="whSub">PO-20261116-01 · 绿源蔬菜基地</div>
+        <div class="p-chips"><span class="chip green" id="whChipA">应收 232 件</span><span class="chip gray" id="whChipB">6 项</span><span class="chip gray" id="whChipC">到货 05:10</span></div>
+      </div>
+      <div class="p-body">
+        <div class="seg" id="whSeg"><button class="on" data-m="po">扫送货单</button><button data-m="batch">扫分拣小票</button></div>
+        <button class="scan-box" id="whScan" style="width:100%;font-family:inherit;cursor:pointer">
+          <span class="scan-laser"></span>
+          <span class="ic"><svg class="i i-20"><use href="#i-qr"/></svg></span>
+          <span class="t" id="whScanT" style="display:block">扫描采购送货单</span>
+          <span class="s" id="whScanS" style="display:block">对准条码 · 点击模拟扫码</span>
+        </button>
+        <div id="whRows"></div>
+      </div>
+      <div class="p-foot">
+        <button class="btn" id="btnWhShort"><svg class="i i-16"><use href="#i-alert"/></svg><span id="whLeftTxt">缺货补货</span></button>
+        <button class="btn btn-primary" id="btnWhConfirm"><svg class="i i-16"><use href="#i-check"/></svg>确认入库</button>
+      </div>
+      <div class="scan-overlay" id="whOverlay">
+        <div class="scan-ring"><svg class="i i-24"><use href="#i-qr"/></svg></div>
+        <div class="t" id="whOvT">正在识别送货单…</div>
+        <div class="s" id="whOvS">PO-20261116-01<br>匹配供货商与应收明细</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view view-phone" data-view="driver">
+  <div class="stage-copy">
+    <span class="tag"><svg class="i i-14"><use href="#i-truck"/></svg>司机 PDA</span>
+    <h2>装车点货自动校验线路<br>窜线商品当场标红报警</h2>
+    <p>司机按线路领取装车任务，逐件点货；系统比对订单线路，发现非本线路商品立即标红并抖动提示，杜绝错装、漏装。</p>
+    <ul>
+      <li><span class="n">1</span>装车任务按线路下发，件数与门店数一目了然</li>
+      <li><span class="n">2</span>点货即校验：非本线路商品标红 + 报警提示</li>
+      <li><span class="n">3</span>异常商品退回后才允许发车，责任可追溯</li>
+    </ul>
+  </div>
+  <div class="phone">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+      <div class="p-status"><span>04:36</span><div class="icons"><svg class="i"><use href="#i-signal"/></svg><svg class="i"><use href="#i-wifi"/></svg><svg class="i"><use href="#i-battery"/></svg></div></div>
+      <div class="p-head">
+        <div class="t1"><span class="ic"><svg class="i i-16"><use href="#i-truck"/></svg></span>装车点货</div>
+        <div class="t2">城东03 · 司机 陈默 · 冷链车 A-07</div>
+        <div class="p-chips"><span class="chip green">3 门店</span><span class="chip gray" id="drvChip">待装 28 件</span><span class="chip gray">发车 05:20</span></div>
+      </div>
+      <div class="p-body">
+        <div class="alert-bar" id="drvAlert">
+          <svg class="i i-16"><use href="#i-alert"/></svg>
+          <span><b>线路校验异常</b><span id="drvAlertTxt">鲜鸡蛋 2 箱属于城北01，不在本线路</span></span>
+        </div>
+        <div id="drvRows"></div>
+      </div>
+      <div class="p-foot">
+        <button class="btn" id="btnDrvAll"><svg class="i i-16"><use href="#i-check-circle"/></svg>一键点货</button>
+        <button class="btn btn-primary" id="btnDrvGo"><svg class="i i-16"><use href="#i-truck"/></svg>确认发车</button>
+      </div>
+      <div class="scan-overlay" id="drvDone">
+        <div class="p-success">
+          <div class="ic"><svg class="i i-24"><use href="#i-check"/></svg></div>
+          <h3>装车完成 · 已发车</h3>
+          <p>城东03 · 3 门店 · 28 件<br>异常商品 2 件已退回，全程可追溯</p>
+          <button class="btn btn-sm" id="btnDrvReset" style="margin-top:6px"><svg class="i i-14"><use href="#i-rotate"/></svg>重新演示</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tour" id="tour">
+  <div class="tour-panel" id="tourPanel">
+    <div class="th"><svg class="i i-14" style="color:var(--green-600)"><use href="#i-flag"/></svg><b>推荐演示动线</b><span>8 步 · 约 5 分钟</span></div>
+    <div class="tour-list" id="tourList"></div>
+  </div>
+  <button class="tour-btn" id="tourBtn"><svg class="i i-16"><use href="#i-flag"/></svg>演示动线</button>
+</div>
+
+<div class="mask" id="mask"><div class="modal" id="modal"></div></div>
+<div class="toasts" id="toasts"></div>
+<div id="qrBank" hidden>
+  <div data-qr="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" shape-rendering="crispEdges" role="img" aria-label="分拣批次二维码"><rect width="140" height="140" fill="#fff"/><path d="M12 12h28v4h-28zM56 12h16v4h-16zM76 12h4v4h-4zM88 12h4v4h-4zM100 12h28v4h-28zM12 16h4v4h-4zM36 16h4v4h-4zM60 16h4v4h-4zM68 16h20v4h-20zM100 16h4v4h-4zM124 16h4v4h-4zM12 20h4v4h-4zM20 20h12v4h-12zM36 20h4v4h-4zM44 20h4v4h-4zM56 20h4v4h-4zM100 20h4v4h-4zM108 20h12v4h-12zM124 20h4v4h-4zM12 24h4v4h-4zM20 24h12v4h-12zM36 24h4v4h-4zM44 24h4v4h-4zM52 24h8v4h-8zM64 24h4v4h-4zM72 24h12v4h-12zM92 24h4v4h-4zM100 24h4v4h-4zM108 24h12v4h-12zM124 24h4v4h-4zM12 28h4v4h-4zM20 28h12v4h-12zM36 28h4v4h-4zM44 28h4v4h-4zM52 28h8v4h-8zM68 28h4v4h-4zM80 28h4v4h-4zM88 28h4v4h-4zM100 28h4v4h-4zM108 28h12v4h-12zM124 28h4v4h-4zM12 32h4v4h-4zM36 32h4v4h-4zM44 32h4v4h-4zM100 32h4v4h-4zM124 32h4v4h-4zM12 36h28v4h-28zM44 36h4v4h-4zM52 36h4v4h-4zM60 36h4v4h-4zM68 36h4v4h-4zM76 36h4v4h-4zM84 36h4v4h-4zM92 36h4v4h-4zM100 36h28v4h-28zM44 40h4v4h-4zM52 40h4v4h-4zM60 40h4v4h-4zM84 40h4v4h-4zM92 40h4v4h-4zM12 44h4v4h-4zM20 44h20v4h-20zM52 44h4v4h-4zM60 44h8v4h-8zM80 44h16v4h-16zM100 44h20v4h-20zM16 48h4v4h-4zM24 48h12v4h-12zM40 48h4v4h-4zM56 48h8v4h-8zM68 48h8v4h-8zM80 48h4v4h-4zM100 48h4v4h-4zM108 48h4v4h-4zM124 48h4v4h-4zM20 52h4v4h-4zM28 52h4v4h-4zM36 52h16v4h-16zM56 52h8v4h-8zM68 52h4v4h-4zM84 52h8v4h-8zM96 52h4v4h-4zM104 52h8v4h-8zM116 52h8v4h-8zM32 56h4v4h-4zM48 56h8v4h-8zM60 56h4v4h-4zM72 56h4v4h-4zM96 56h4v4h-4zM104 56h4v4h-4zM12 60h4v4h-4zM20 60h4v4h-4zM36 60h8v4h-8zM52 60h4v4h-4zM60 60h8v4h-8zM80 60h20v4h-20zM112 60h8v4h-8zM124 60h4v4h-4zM20 64h8v4h-8zM32 64h4v4h-4zM44 64h8v4h-8zM56 64h16v4h-16zM76 64h4v4h-4zM88 64h4v4h-4zM100 64h4v4h-4zM108 64h4v4h-4zM120 64h8v4h-8zM20 68h20v4h-20zM44 68h4v4h-4zM60 68h8v4h-8zM76 68h16v4h-16zM96 68h4v4h-4zM120 68h4v4h-4zM12 72h12v4h-12zM28 72h8v4h-8zM40 72h4v4h-4zM56 72h8v4h-8zM80 72h4v4h-4zM92 72h4v4h-4zM104 72h8v4h-8zM124 72h4v4h-4zM12 76h4v4h-4zM20 76h4v4h-4zM28 76h4v4h-4zM36 76h8v4h-8zM48 76h8v4h-8zM64 76h4v4h-4zM80 76h4v4h-4zM104 76h4v4h-4zM112 76h16v4h-16zM12 80h12v4h-12zM28 80h8v4h-8zM40 80h12v4h-12zM56 80h4v4h-4zM68 80h8v4h-8zM84 80h12v4h-12zM100 80h4v4h-4zM108 80h4v4h-4zM120 80h4v4h-4zM12 84h4v4h-4zM20 84h4v4h-4zM28 84h4v4h-4zM36 84h4v4h-4zM44 84h8v4h-8zM56 84h12v4h-12zM88 84h4v4h-4zM100 84h12v4h-12zM116 84h4v4h-4zM12 88h4v4h-4zM20 88h8v4h-8zM44 88h20v4h-20zM68 88h4v4h-4zM76 88h24v4h-24zM108 88h4v4h-4zM120 88h4v4h-4zM12 92h4v4h-4zM28 92h16v4h-16zM52 92h8v4h-8zM64 92h4v4h-4zM80 92h44v4h-44zM44 96h12v4h-12zM60 96h4v4h-4zM68 96h8v4h-8zM80 96h4v4h-4zM92 96h4v4h-4zM108 96h8v4h-8zM12 100h28v4h-28zM60 100h12v4h-12zM76 100h12v4h-12zM92 100h4v4h-4zM100 100h4v4h-4zM108 100h4v4h-4zM116 100h4v4h-4zM12 104h4v4h-4zM36 104h4v4h-4zM44 104h16v4h-16zM76 104h8v4h-8zM92 104h4v4h-4zM108 104h4v4h-4zM120 104h8v4h-8zM12 108h4v4h-4zM20 108h12v4h-12zM36 108h4v4h-4zM44 108h8v4h-8zM56 108h4v4h-4zM72 108h4v4h-4zM80 108h48v4h-48zM12 112h4v4h-4zM20 112h12v4h-12zM36 112h4v4h-4zM44 112h16v4h-16zM76 112h4v4h-4zM88 112h8v4h-8zM100 112h8v4h-8zM120 112h8v4h-8zM12 116h4v4h-4zM20 116h12v4h-12zM36 116h4v4h-4zM44 116h4v4h-4zM52 116h12v4h-12zM80 116h4v4h-4zM88 116h16v4h-16zM108 116h8v4h-8zM120 116h4v4h-4zM12 120h4v4h-4zM36 120h4v4h-4zM48 120h4v4h-4zM56 120h4v4h-4zM64 120h4v4h-4zM72 120h8v4h-8zM84 120h8v4h-8zM104 120h8v4h-8zM120 120h4v4h-4zM12 124h28v4h-28zM44 124h12v4h-12zM64 124h4v4h-4zM76 124h8v4h-8zM92 124h4v4h-4zM108 124h12v4h-12z" fill="#0B1F16"/></svg></div>
+  <div data-qr="1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" shape-rendering="crispEdges" role="img" aria-label="分拣批次二维码"><rect width="140" height="140" fill="#fff"/><path d="M12 12h28v4h-28zM48 12h4v4h-4zM56 12h16v4h-16zM76 12h4v4h-4zM88 12h4v4h-4zM100 12h28v4h-28zM12 16h4v4h-4zM36 16h4v4h-4zM52 16h8v4h-8zM68 16h20v4h-20zM100 16h4v4h-4zM124 16h4v4h-4zM12 20h4v4h-4zM20 20h12v4h-12zM36 20h4v4h-4zM44 20h12v4h-12zM84 20h4v4h-4zM100 20h4v4h-4zM108 20h12v4h-12zM124 20h4v4h-4zM12 24h4v4h-4zM20 24h12v4h-12zM36 24h4v4h-4zM44 24h4v4h-4zM60 24h8v4h-8zM72 24h12v4h-12zM92 24h4v4h-4zM100 24h4v4h-4zM108 24h12v4h-12zM124 24h4v4h-4zM12 28h4v4h-4zM20 28h12v4h-12zM36 28h4v4h-4zM44 28h8v4h-8zM56 28h8v4h-8zM68 28h4v4h-4zM80 28h4v4h-4zM88 28h4v4h-4zM100 28h4v4h-4zM108 28h12v4h-12zM124 28h4v4h-4zM12 32h4v4h-4zM36 32h4v4h-4zM44 32h4v4h-4zM56 32h8v4h-8zM92 32h4v4h-4zM100 32h4v4h-4zM124 32h4v4h-4zM12 36h28v4h-28zM44 36h4v4h-4zM52 36h4v4h-4zM60 36h4v4h-4zM68 36h4v4h-4zM76 36h4v4h-4zM84 36h4v4h-4zM92 36h4v4h-4zM100 36h28v4h-28zM44 40h8v4h-8zM56 40h8v4h-8zM84 40h12v4h-12zM12 44h4v4h-4zM20 44h20v4h-20zM64 44h4v4h-4zM80 44h8v4h-8zM92 44h4v4h-4zM100 44h20v4h-20zM16 48h4v4h-4zM24 48h4v4h-4zM48 48h4v4h-4zM56 48h8v4h-8zM68 48h8v4h-8zM100 48h4v4h-4zM108 48h4v4h-4zM124 48h4v4h-4zM12 52h20v4h-20zM36 52h8v4h-8zM48 52h8v4h-8zM60 52h4v4h-4zM68 52h4v4h-4zM88 52h12v4h-12zM104 52h8v4h-8zM116 52h8v4h-8zM16 56h12v4h-12zM32 56h4v4h-4zM52 56h4v4h-4zM60 56h4v4h-4zM72 56h4v4h-4zM84 56h4v4h-4zM92 56h8v4h-8zM104 56h4v4h-4zM12 60h4v4h-4zM24 60h4v4h-4zM36 60h8v4h-8zM48 60h8v4h-8zM64 60h4v4h-4zM80 60h12v4h-12zM96 60h4v4h-4zM112 60h8v4h-8zM124 60h4v4h-4zM16 64h8v4h-8zM40 64h4v4h-4zM56 64h4v4h-4zM64 64h8v4h-8zM76 64h8v4h-8zM100 64h4v4h-4zM108 64h4v4h-4zM120 64h8v4h-8zM16 68h4v4h-4zM36 68h12v4h-12zM64 68h4v4h-4zM76 68h4v4h-4zM84 68h16v4h-16zM120 68h4v4h-4zM16 72h16v4h-16zM44 72h4v4h-4zM56 72h8v4h-8zM80 72h4v4h-4zM92 72h20v4h-20zM124 72h4v4h-4zM12 76h4v4h-4zM20 76h4v4h-4zM36 76h4v4h-4zM48 76h12v4h-12zM64 76h4v4h-4zM80 76h4v4h-4zM104 76h4v4h-4zM112 76h16v4h-16zM12 80h12v4h-12zM28 80h8v4h-8zM44 80h4v4h-4zM68 80h8v4h-8zM84 80h12v4h-12zM100 80h4v4h-4zM108 80h4v4h-4zM120 80h4v4h-4zM12 84h4v4h-4zM20 84h20v4h-20zM44 84h8v4h-8zM64 84h4v4h-4zM88 84h4v4h-4zM100 84h12v4h-12zM116 84h4v4h-4zM12 88h4v4h-4zM20 88h4v4h-4zM44 88h4v4h-4zM52 88h8v4h-8zM68 88h4v4h-4zM76 88h24v4h-24zM108 88h4v4h-4zM120 88h4v4h-4zM12 92h4v4h-4zM20 92h4v4h-4zM28 92h16v4h-16zM60 92h8v4h-8zM80 92h44v4h-44zM44 96h4v4h-4zM52 96h4v4h-4zM68 96h8v4h-8zM80 96h4v4h-4zM92 96h4v4h-4zM108 96h8v4h-8zM12 100h28v4h-28zM60 100h12v4h-12zM76 100h12v4h-12zM92 100h4v4h-4zM100 100h4v4h-4zM108 100h4v4h-4zM116 100h4v4h-4zM12 104h4v4h-4zM36 104h4v4h-4zM44 104h4v4h-4zM56 104h8v4h-8zM76 104h8v4h-8zM92 104h4v4h-4zM108 104h4v4h-4zM120 104h8v4h-8zM12 108h4v4h-4zM20 108h12v4h-12zM36 108h4v4h-4zM44 108h12v4h-12zM60 108h4v4h-4zM72 108h4v4h-4zM80 108h48v4h-48zM12 112h4v4h-4zM20 112h12v4h-12zM36 112h4v4h-4zM44 112h8v4h-8zM56 112h4v4h-4zM64 112h4v4h-4zM76 112h4v4h-4zM88 112h8v4h-8zM100 112h8v4h-8zM120 112h8v4h-8zM12 116h4v4h-4zM20 116h12v4h-12zM36 116h4v4h-4zM44 116h16v4h-16zM64 116h4v4h-4zM80 116h4v4h-4zM88 116h16v4h-16zM108 116h8v4h-8zM120 116h4v4h-4zM12 120h4v4h-4zM36 120h4v4h-4zM48 120h8v4h-8zM64 120h16v4h-16zM84 120h8v4h-8zM104 120h8v4h-8zM120 120h4v4h-4zM12 124h28v4h-28zM44 124h8v4h-8zM76 124h8v4h-8zM92 124h4v4h-4zM108 124h12v4h-12z" fill="#0B1F16"/></svg></div>
+  <div data-qr="2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" shape-rendering="crispEdges" role="img" aria-label="分拣批次二维码"><rect width="140" height="140" fill="#fff"/><path d="M12 12h28v4h-28zM44 12h16v4h-16zM72 12h8v4h-8zM92 12h4v4h-4zM100 12h28v4h-28zM12 16h4v4h-4zM36 16h4v4h-4zM48 16h4v4h-4zM60 16h8v4h-8zM84 16h12v4h-12zM100 16h4v4h-4zM124 16h4v4h-4zM12 20h4v4h-4zM20 20h12v4h-12zM36 20h4v4h-4zM48 20h4v4h-4zM60 20h4v4h-4zM76 20h12v4h-12zM100 20h4v4h-4zM108 20h12v4h-12zM124 20h4v4h-4zM12 24h4v4h-4zM20 24h12v4h-12zM36 24h4v4h-4zM44 24h8v4h-8zM56 24h4v4h-4zM64 24h4v4h-4zM84 24h4v4h-4zM92 24h4v4h-4zM100 24h4v4h-4zM108 24h12v4h-12zM124 24h4v4h-4zM12 28h4v4h-4zM20 28h12v4h-12zM36 28h4v4h-4zM44 28h8v4h-8zM56 28h4v4h-4zM64 28h4v4h-4zM72 28h4v4h-4zM80 28h4v4h-4zM92 28h4v4h-4zM100 28h4v4h-4zM108 28h12v4h-12zM124 28h4v4h-4zM12 32h4v4h-4zM36 32h4v4h-4zM44 32h4v4h-4zM52 32h24v4h-24zM88 32h4v4h-4zM100 32h4v4h-4zM124 32h4v4h-4zM12 36h28v4h-28zM44 36h4v4h-4zM52 36h4v4h-4zM60 36h4v4h-4zM68 36h4v4h-4zM76 36h4v4h-4zM84 36h4v4h-4zM92 36h4v4h-4zM100 36h28v4h-28zM44 40h4v4h-4zM56 40h4v4h-4zM72 40h4v4h-4zM80 40h4v4h-4zM88 40h8v4h-8zM12 44h4v4h-4zM28 44h4v4h-4zM36 44h12v4h-12zM52 44h4v4h-4zM60 44h4v4h-4zM68 44h20v4h-20zM96 44h20v4h-20zM124 44h4v4h-4zM12 48h16v4h-16zM32 48h4v4h-4zM40 48h4v4h-4zM64 48h4v4h-4zM72 48h4v4h-4zM92 48h12v4h-12zM108 48h20v4h-20zM20 52h20v4h-20zM44 52h12v4h-12zM68 52h4v4h-4zM80 52h24v4h-24zM116 52h12v4h-12zM12 56h4v4h-4zM24 56h4v4h-4zM32 56h4v4h-4zM44 56h4v4h-4zM60 56h4v4h-4zM72 56h4v4h-4zM80 56h4v4h-4zM92 56h12v4h-12zM108 56h4v4h-4zM124 56h4v4h-4zM16 60h12v4h-12zM36 60h4v4h-4zM44 60h4v4h-4zM52 60h4v4h-4zM68 60h4v4h-4zM80 60h16v4h-16zM120 60h8v4h-8zM16 64h16v4h-16zM52 64h8v4h-8zM72 64h8v4h-8zM92 64h12v4h-12zM108 64h12v4h-12zM124 64h4v4h-4zM12 68h4v4h-4zM28 68h24v4h-24zM56 68h12v4h-12zM76 68h4v4h-4zM84 68h8v4h-8zM96 68h16v4h-16zM120 68h8v4h-8zM16 72h8v4h-8zM28 72h8v4h-8zM44 72h8v4h-8zM56 72h8v4h-8zM84 72h4v4h-4zM12 76h12v4h-12zM28 76h4v4h-4zM36 76h4v4h-4zM44 76h4v4h-4zM68 76h8v4h-8zM80 76h4v4h-4zM92 76h8v4h-8zM104 76h4v4h-4zM124 76h4v4h-4zM12 80h12v4h-12zM40 80h4v4h-4zM52 80h16v4h-16zM84 80h4v4h-4zM96 80h8v4h-8zM108 80h12v4h-12zM24 84h8v4h-8zM36 84h20v4h-20zM64 84h4v4h-4zM80 84h12v4h-12zM116 84h4v4h-4zM124 84h4v4h-4zM24 88h4v4h-4zM32 88h4v4h-4zM44 88h16v4h-16zM68 88h8v4h-8zM88 88h20v4h-20zM120 88h8v4h-8zM12 92h16v4h-16zM36 92h16v4h-16zM56 92h8v4h-8zM68 92h20v4h-20zM92 92h20v4h-20zM44 96h24v4h-24zM80 96h4v4h-4zM88 96h8v4h-8zM108 96h4v4h-4zM116 96h8v4h-8zM12 100h28v4h-28zM44 100h8v4h-8zM60 100h12v4h-12zM76 100h4v4h-4zM92 100h4v4h-4zM100 100h4v4h-4zM108 100h4v4h-4zM116 100h4v4h-4zM124 100h4v4h-4zM12 104h4v4h-4zM36 104h4v4h-4zM56 104h4v4h-4zM84 104h4v4h-4zM92 104h4v4h-4zM108 104h4v4h-4zM120 104h4v4h-4zM12 108h4v4h-4zM20 108h12v4h-12zM36 108h4v4h-4zM44 108h4v4h-4zM52 108h8v4h-8zM64 108h8v4h-8zM80 108h8v4h-8zM92 108h20v4h-20zM124 108h4v4h-4zM12 112h4v4h-4zM20 112h12v4h-12zM36 112h4v4h-4zM52 112h4v4h-4zM60 112h20v4h-20zM96 112h12v4h-12zM112 112h8v4h-8zM124 112h4v4h-4zM12 116h4v4h-4zM20 116h12v4h-12zM36 116h4v4h-4zM48 116h4v4h-4zM60 116h4v4h-4zM76 116h4v4h-4zM84 116h16v4h-16zM104 116h4v4h-4zM112 116h4v4h-4zM120 116h8v4h-8zM12 120h4v4h-4zM36 120h4v4h-4zM48 120h4v4h-4zM56 120h20v4h-20zM80 120h4v4h-4zM88 120h4v4h-4zM100 120h4v4h-4zM120 120h8v4h-8zM12 124h28v4h-28zM44 124h20v4h-20zM72 124h12v4h-12zM88 124h4v4h-4zM96 124h4v4h-4zM108 124h4v4h-4zM120 124h4v4h-4z" fill="#0B1F16"/></svg></div>
+  <div data-qr="3"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" shape-rendering="crispEdges" role="img" aria-label="分拣批次二维码"><rect width="140" height="140" fill="#fff"/><path d="M12 12h28v4h-28zM48 12h8v4h-8zM64 12h8v4h-8zM76 12h4v4h-4zM88 12h4v4h-4zM100 12h28v4h-28zM12 16h4v4h-4zM36 16h4v4h-4zM52 16h4v4h-4zM60 16h4v4h-4zM68 16h12v4h-12zM84 16h4v4h-4zM100 16h4v4h-4zM124 16h4v4h-4zM12 20h4v4h-4zM20 20h12v4h-12zM36 20h4v4h-4zM44 20h12v4h-12zM60 20h4v4h-4zM76 20h4v4h-4zM100 20h4v4h-4zM108 20h12v4h-12zM124 20h4v4h-4zM12 24h4v4h-4zM20 24h12v4h-12zM36 24h4v4h-4zM44 24h8v4h-8zM56 24h4v4h-4zM64 24h4v4h-4zM80 24h4v4h-4zM92 24h4v4h-4zM100 24h4v4h-4zM108 24h12v4h-12zM124 24h4v4h-4zM12 28h4v4h-4zM20 28h12v4h-12zM36 28h4v4h-4zM44 28h8v4h-8zM56 28h8v4h-8zM68 28h8v4h-8zM80 28h4v4h-4zM88 28h4v4h-4zM100 28h4v4h-4zM108 28h12v4h-12zM124 28h4v4h-4zM12 32h4v4h-4zM36 32h4v4h-4zM44 32h12v4h-12zM76 32h4v4h-4zM92 32h4v4h-4zM100 32h4v4h-4zM124 32h4v4h-4zM12 36h28v4h-28zM44 36h4v4h-4zM52 36h4v4h-4zM60 36h4v4h-4zM68 36h4v4h-4zM76 36h4v4h-4zM84 36h4v4h-4zM92 36h4v4h-4zM100 36h28v4h-28zM44 40h4v4h-4zM52 40h8v4h-8zM72 40h8v4h-8zM84 40h12v4h-12zM12 44h4v4h-4zM20 44h20v4h-20zM48 44h12v4h-12zM64 44h4v4h-4zM72 44h16v4h-16zM92 44h4v4h-4zM100 44h20v4h-20zM16 48h4v4h-4zM24 48h4v4h-4zM56 48h8v4h-8zM68 48h8v4h-8zM100 48h4v4h-4zM108 48h4v4h-4zM124 48h4v4h-4zM16 52h4v4h-4zM28 52h12v4h-12zM44 52h8v4h-8zM60 52h4v4h-4zM68 52h4v4h-4zM80 52h12v4h-12zM96 52h4v4h-4zM104 52h8v4h-8zM116 52h8v4h-8zM12 56h4v4h-4zM52 56h4v4h-4zM60 56h4v4h-4zM76 56h4v4h-4zM92 56h8v4h-8zM104 56h4v4h-4zM16 60h12v4h-12zM32 60h8v4h-8zM56 60h4v4h-4zM64 60h4v4h-4zM72 60h4v4h-4zM80 60h12v4h-12zM96 60h4v4h-4zM112 60h8v4h-8zM124 60h4v4h-4zM20 64h4v4h-4zM28 64h4v4h-4zM44 64h4v4h-4zM56 64h16v4h-16zM76 64h4v4h-4zM100 64h4v4h-4zM108 64h4v4h-4zM120 64h8v4h-8zM20 68h4v4h-4zM32 68h12v4h-12zM52 68h4v4h-4zM60 68h8v4h-8zM76 68h8v4h-8zM88 68h8v4h-8zM120 68h4v4h-4zM16 72h4v4h-4zM24 72h4v4h-4zM32 72h4v4h-4zM44 72h4v4h-4zM56 72h8v4h-8zM72 72h12v4h-12zM92 72h8v4h-8zM104 72h8v4h-8zM124 72h4v4h-4zM24 76h16v4h-16zM44 76h16v4h-16zM64 76h4v4h-4zM72 76h12v4h-12zM104 76h4v4h-4zM112 76h16v4h-16zM12 80h4v4h-4zM24 80h12v4h-12zM48 80h12v4h-12zM68 80h4v4h-4zM84 80h12v4h-12zM100 80h4v4h-4zM108 80h4v4h-4zM120 80h4v4h-4zM12 84h4v4h-4zM20 84h4v4h-4zM28 84h4v4h-4zM36 84h4v4h-4zM56 84h4v4h-4zM64 84h4v4h-4zM76 84h4v4h-4zM88 84h4v4h-4zM100 84h12v4h-12zM116 84h4v4h-4zM12 88h4v4h-4zM60 88h4v4h-4zM68 88h32v4h-32zM108 88h4v4h-4zM120 88h4v4h-4zM12 92h4v4h-4zM20 92h24v4h-24zM48 92h20v4h-20zM72 92h52v4h-52zM44 96h16v4h-16zM68 96h4v4h-4zM80 96h4v4h-4zM92 96h4v4h-4zM108 96h8v4h-8zM12 100h28v4h-28zM56 100h16v4h-16zM80 100h8v4h-8zM92 100h4v4h-4zM100 100h4v4h-4zM108 100h4v4h-4zM116 100h4v4h-4zM12 104h4v4h-4zM36 104h4v4h-4zM44 104h16v4h-16zM72 104h4v4h-4zM80 104h4v4h-4zM92 104h4v4h-4zM108 104h4v4h-4zM120 104h8v4h-8zM12 108h4v4h-4zM20 108h12v4h-12zM36 108h4v4h-4zM44 108h20v4h-20zM80 108h48v4h-48zM12 112h4v4h-4zM20 112h12v4h-12zM36 112h4v4h-4zM44 112h4v4h-4zM56 112h12v4h-12zM76 112h4v4h-4zM88 112h8v4h-8zM100 112h8v4h-8zM120 112h8v4h-8zM12 116h4v4h-4zM20 116h12v4h-12zM36 116h4v4h-4zM44 116h16v4h-16zM80 116h4v4h-4zM88 116h16v4h-16zM108 116h8v4h-8zM120 116h4v4h-4zM12 120h4v4h-4zM36 120h4v4h-4zM56 120h12v4h-12zM72 120h8v4h-8zM84 120h8v4h-8zM104 120h8v4h-8zM120 120h4v4h-4zM12 124h28v4h-28zM44 124h4v4h-4zM76 124h8v4h-8zM92 124h4v4h-4zM108 124h12v4h-12z" fill="#0B1F16"/></svg></div>
+</div>
+<script>
+(function(){
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const money = n => (n < 0 ? '-¥' : '¥') + Math.abs(Math.round(n)).toLocaleString('zh-CN');
+  const ic = (id, cls = 'i i-14') => '<svg class="' + cls + '"><use href="#' + id + '"/></svg>';
+
+  /* ================= 数据（四端共用） ================= */
+  const SUPPLIERS = [
+    { id: 'SUP1', name: '绿源蔬菜基地', picker: '王芳', tel: '138****2210' },
+    { id: 'SUP2', name: '牧原肉联', picker: '李强', tel: '139****8832' },
+    { id: 'SUP3', name: '正大蛋品', picker: '赵敏', tel: '137****5519' }
+  ];
+
+  const SKU_DEF = [
+    { id: 'V01', name: '土豆', cat: '根茎类', sup: 'SUP1', stock: 86, transit: 20, safe: 100, avg: 26, cyc: 2, price: 32 },
+    { id: 'V02', name: '西红柿', cat: '茄果类', sup: 'SUP1', stock: 42, transit: 0, safe: 60, avg: 18, cyc: 2, price: 36 },
+    { id: 'V03', name: '黄瓜', cat: '茄果类', sup: 'SUP1', stock: 35, transit: 0, safe: 50, avg: 15, cyc: 2, price: 28 },
+    { id: 'V04', name: '大白菜', cat: '叶菜类', sup: 'SUP1', stock: 28, transit: 0, safe: 45, avg: 12, cyc: 2, price: 22 },
+    { id: 'V05', name: '西兰花', cat: '叶菜类', sup: 'SUP1', stock: 18, transit: 8, safe: 30, avg: 9, cyc: 2, price: 46 },
+    { id: 'M01', name: '五花肉', cat: '猪肉类', sup: 'SUP2', stock: 12, transit: 0, safe: 24, avg: 7, cyc: 2, price: 128 },
+    { id: 'M02', name: '猪前腿肉', cat: '猪肉类', sup: 'SUP2', stock: 9, transit: 0, safe: 18, avg: 5, cyc: 2, price: 108 },
+    { id: 'E01', name: '鲜鸡蛋', cat: '蛋品', sup: 'SUP3', stock: 22, transit: 0, safe: 36, avg: 11, cyc: 2, price: 96 },
+    { id: 'E02', name: '老豆腐', cat: '豆制品', sup: 'SUP3', stock: 16, transit: 0, safe: 24, avg: 8, cyc: 2, price: 42 },
+    { id: 'V06', name: '香菇', cat: '菌菇类', sup: 'SUP1', stock: 7, transit: 0, safe: 19, avg: 6, cyc: 2, price: 58 }
+  ];
+  const SKUS = SKU_DEF.map(o => Object.assign({}, o));
+  const SKU = {};
+  SKUS.forEach(s => { SKU[s.id] = s; });
+  const supOf = id => SUPPLIERS.find(s => s.id === id);
+
+  const ORDERS = [
+    { no: 'SO-20261116-001', store: '面点王（城东店）', route: '城东03', cat: 3, qty: 32, amt: 2860, time: '03:41', st: '待采购' },
+    { no: 'SO-20261116-002', store: '老碗面（高新店）', route: '城东03', cat: 4, qty: 31, amt: 2740, time: '03:48', st: '待采购' },
+    { no: 'SO-20261116-003', store: '川味小馆（城东店）', route: '城东03', cat: 5, qty: 30, amt: 2580, time: '03:55', st: '待采购' },
+    { no: 'SO-20261116-004', store: '城南职工食堂', route: '城南02', cat: 3, qty: 17, amt: 1520, time: '03:52', st: '待采购' },
+    { no: 'SO-20261116-005', store: '幸福里餐厅', route: '城南02', cat: 3, qty: 16, amt: 1480, time: '04:02', st: '待采购' },
+    { no: 'SO-20261116-006', store: '鲜味小厨', route: '城南02', cat: 3, qty: 16, amt: 1460, time: '04:06', st: '待采购' },
+    { no: 'SO-20261116-007', store: '西城幼儿园', route: '城西01', cat: 4, qty: 16, amt: 1460, time: '03:58', st: '待采购' },
+    { no: 'SO-20261116-008', store: '老灶台', route: '城西01', cat: 3, qty: 16, amt: 1420, time: '04:09', st: '待采购' },
+    { no: 'SO-20261116-009', store: '家宴酒楼', route: '城西01', cat: 4, qty: 15, amt: 1380, time: '04:14', st: '待采购' },
+    { no: 'SO-20261116-010', store: '北苑小学', route: '城北01', cat: 3, qty: 13, amt: 1180, time: '04:05', st: '待采购' },
+    { no: 'SO-20261116-011', store: '面点王（城北店）', route: '城北01', cat: 3, qty: 12, amt: 1120, time: '04:18', st: '待采购' },
+    { no: 'SO-20261116-012', store: '川北饭堂', route: '城北01', cat: 3, qty: 12, amt: 1080, time: '04:22', st: '待采购' }
+  ];
+
+  const BATCHES = [
+    {
+      no: 'PK-20261116-01', route: '城东03', picker: '王芳', stores: 3, qr: 0, done: false,
+      items: [
+        { id: 'V01', q: 22, d: true }, { id: 'V02', q: 14, d: true }, { id: 'V03', q: 12, d: true },
+        { id: 'V04', q: 10, d: true }, { id: 'V05', q: 8, d: true }, { id: 'M01', q: 9, d: true },
+        { id: 'M02', q: 6, d: true }, { id: 'E01', q: 5, d: false }, { id: 'E02', q: 4, d: false },
+        { id: 'V06', q: 3, d: false }
+      ]
+    },
+    {
+      no: 'PK-20261116-02', route: '城南02', picker: '王芳', stores: 3, qr: 1, done: false,
+      items: [
+        { id: 'V01', q: 14, d: false }, { id: 'V02', q: 10, d: false }, { id: 'V03', q: 8, d: false },
+        { id: 'V04', q: 6, d: false }, { id: 'M01', q: 5, d: false }, { id: 'M02', q: 4, d: false },
+        { id: 'E01', q: 2, d: false }
+      ]
+    },
+    {
+      no: 'PK-20261116-03', route: '城西01', picker: '李强', stores: 3, qr: 2, done: false,
+      items: [
+        { id: 'V01', q: 12, d: false }, { id: 'V02', q: 9, d: false }, { id: 'V03', q: 6, d: false },
+        { id: 'V04', q: 5, d: false }, { id: 'V05', q: 4, d: false }, { id: 'M01', q: 4, d: false },
+        { id: 'E01', q: 4, d: false }, { id: 'E02', q: 3, d: false }
+      ]
+    },
+    {
+      no: 'PK-20261116-04', route: '城北01', picker: '赵敏', stores: 3, qr: 3, done: false,
+      items: [
+        { id: 'V01', q: 9, d: false }, { id: 'V02', q: 7, d: false }, { id: 'V03', q: 6, d: false },
+        { id: 'V04', q: 5, d: false }, { id: 'M02', q: 4, d: false }, { id: 'E01', q: 6, d: false }
+      ]
+    }
+  ];
+
+  const LOSSES = [
+    { no: 'BS-20261116-001', id: 'M01', qty: 3, unit: 'kg', reason: '修割损耗', amt: 96, by: '王芳', t: '04:12' },
+    { no: 'BS-20261116-002', id: 'V05', qty: 6, unit: '件', reason: '萎蔫失水', amt: 132, by: '王芳', t: '04:20' },
+    { no: 'BS-20261116-003', id: 'E01', qty: 1, unit: '箱', reason: '运输破损', amt: 98, by: '李强', t: '03:55' },
+    { no: 'BS-20261116-004', id: 'E02', qty: 5, unit: '盒', reason: '临期报废', amt: 216, by: '赵敏', t: '04:05' }
+  ];
+
+  const COUNTS = [
+    { no: 'PD-20261116-001', id: 'V01', book: 86, real: 85, by: '王芳', t: '04:02' },
+    { no: 'PD-20261116-002', id: 'V02', book: 42, real: 40, by: '王芳', t: '04:05' },
+    { no: 'PD-20261116-003', id: 'M01', book: 12, real: 11, by: '李强', t: '04:08' },
+    { no: 'PD-20261116-004', id: 'E02', book: 16, real: 15, by: '赵敏', t: '04:14' }
+  ];
+
+  const RECEIVE = [
+    { id: 'V01', q: 46, real: 46 }, { id: 'V02', q: 54, real: 54 }, { id: 'V03', q: 45, real: 40 },
+    { id: 'V04', q: 41, real: 41 }, { id: 'V05', q: 22, real: 22 }, { id: 'V06', q: 24, real: 24 }
+  ];
+
+  const DRIVE = [
+    { store: '面点王（城东店）', id: 'V01', q: 10, route: '城东03' },
+    { store: '老碗面（高新店）', id: 'V03', q: 8, route: '城东03' },
+    { store: '川味小馆（城东店）', id: 'M01', q: 6, route: '城东03' },
+    { store: '川味小馆（城东店）', id: 'V05', q: 4, route: '城东03' },
+    { store: '面点王（城北店）', id: 'E01', q: 2, route: '城北01' }
+  ];
+
+  const TL = [
+    { t: '04:28', b: '安全库存跑批完成：<b>10 个 SKU</b> 低于安全线，今日建议预采 <b>337 件</b>', chip: { txt: '待生成采购单', cls: 'amber' } },
+    { t: '04:20', b: '城东03 分拣批次已勾选 <b>7 / 10 项</b>，分拣员 <b>王芳</b>', chip: { txt: '分拣中', cls: 'green' } },
+    { t: '04:12', b: '称重台报损：<b>五花肉 3kg</b> 修割损耗，金额 ¥96', chip: { txt: '已计提', cls: 'gray' } },
+    { t: '04:05', b: '盘点完成：<b>老豆腐</b> 实盘 15 盒，账面 16 盒，库亏 ¥42', chip: { txt: '库亏', cls: 'red' } },
+    { t: '03:41', b: '门店订单汇总完成：<b>12 张订单</b> · 4 条线路 · 226 件', chip: { txt: '已汇总', cls: 'green' } }
+  ];
+
+  /* 初始快照：用于一键重置演示数据 */
+  const SNAP = {
+    tl: TL.map(function (x) { return { t: x.t, b: x.b, chip: { txt: x.chip.txt, cls: x.chip.cls } }; }),
+    batches: BATCHES.map(function (b) { return { done: b.done, d: b.items.map(function (i) { return i.d; }) }; }),
+    orders: ORDERS.map(function (o) { return o.st; }),
+    losses: LOSSES.map(function (l) { return Object.assign({}, l); }),
+    counts: COUNTS.map(function (c) { return Object.assign({}, c); }),
+    stock: SKUS.map(function (s) { return s.stock; })
+  };
+
+  const freshState = () => ({
+    terminal: 'admin', page: 'dashboard', batchNo: 'PK-20261116-01',
+    poGenerated: false, preorderDone: false,
+    scanned: false, whDone: false, shortHandled: false,
+    whMode: 'po', whBatch: {},
+    drvChecked: new Set(), drvBad: false, drvResolved: false, drvDone: false,
+    tourStep: -1, tick: 0
+  });
+  const state = freshState();
+  const curBatch = () => BATCHES.find(b => b.no === state.batchNo);
+  const whB = () => state.whBatch[state.batchNo] || (state.whBatch[state.batchNo] = { scanned: false, done: false, checked: new Set() });
+  const preOf = s => Math.max(0, s.safe + Math.round(s.avg * s.cyc) - s.stock - s.transit);
+  const nextTime = () => '04:' + String(36 + (++state.tick)).padStart(2, '0');
+  /* ================= 通用 UI ================= */
+  const OUT_AMT = 34250;
+
+  function countRowsData() {
+    return COUNTS.map(function (c) {
+      const diff = c.real - c.book;
+      return { c: c, diff: diff, amt: diff * SKU[c.id].price };
+    });
+  }
+  function countAmt() { return countRowsData().reduce(function (a, r) { return a + r.amt; }, 0); }
+  function lossRate() { return (Math.abs(countAmt()) / OUT_AMT * 100).toFixed(1); }
+
+  /* 可被“重置演示”统一取消的延时任务 */
+  const timers = new Set();
+  function later(fn, ms) {
+    const id = setTimeout(function () { timers.delete(id); fn(); }, ms);
+    timers.add(id);
+  }
+
+  function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast' + (type ? ' ' + type : '');
+    const icon = type === 'warn' ? 'i-alert' : type === 'err' ? 'i-alert' : 'i-check';
+    el.innerHTML = '<span class="ic">' + ic(icon) + '</span><span>' + msg + '</span>';
+    $('#toasts').appendChild(el);
+    setTimeout(function () {
+      el.classList.add('out');
+      setTimeout(function () { el.remove(); }, 280);
+    }, 2600);
+  }
+
+  function openModal(html, cls) {
+    const m = $('#modal');
+    m.className = 'modal ' + (cls || '');
+    m.innerHTML = html;
+    $('#mask').classList.add('on');
+  }
+  function closeModal() { $('#mask').classList.remove('on'); }
+
+  function addTl(text, chip) {
+    TL.unshift({ t: nextTime(), b: text, chip: chip || { txt: '已同步', cls: 'green' } });
+    renderTimeline();
+  }
+
+  /* ================= 终端 / 页面切换 ================= */
+  function showTerminal(t) {
+    state.terminal = t;
+    $$('#terminals button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === t); });
+    $$('.view').forEach(function (v) { v.classList.toggle('is-on', v.dataset.view === t); });
+    if (t === 'admin') renderAll();
+    if (t === 'touch') renderTouch();
+    if (t === 'wh') renderWh();
+    if (t === 'driver') renderDriver();
+  }
+  function showPage(p) {
+    state.page = p;
+    $$('.nav-item').forEach(function (b) { b.classList.toggle('on', b.dataset.page === p); });
+    $$('.page').forEach(function (s) { s.classList.toggle('is-on', s.dataset.panel === p); });
+  }
+
+  /* ================= 工作台 ================= */
+  function pickStats(b) {
+    const total = b.items.reduce(function (a, i) { return a + i.q; }, 0);
+    const doneQty = b.items.filter(function (i) { return i.d; }).reduce(function (a, i) { return a + i.q; }, 0);
+    const doneCnt = b.items.filter(function (i) { return i.d; }).length;
+    return { total: total, doneQty: doneQty, doneCnt: doneCnt, pct: Math.round(doneCnt / b.items.length * 100) };
+  }
+
+  function renderKpi() {
+    const need = SKUS.filter(function (s) { return preOf(s) > 0; });
+    const amt = need.reduce(function (a, s) { return a + preOf(s) * s.price; }, 0);
+    const st = pickStats(BATCHES[0]);
+    $('#kpiOrders').innerHTML = ORDERS.length + '<em>张</em>';
+    $('#kpiStock').innerHTML = need.length + '<em>个</em>';
+    $('#kpiStockAmt').textContent = money(amt);
+    $('#kpiPick').innerHTML = st.pct + '<em>%</em>';
+    $('#kpiLoss').textContent = money(Math.abs(countAmt()));
+    $('#sellLossRate').innerHTML = lossRate() + '<em>% 库亏率</em>';
+  }
+
+  function renderFlow() {
+    const st1 = pickStats(BATCHES[0]);
+    const steps = [
+      { n: '订单汇总', v: ORDERS.length + ' 张', done: true, icon: 'i-orders' },
+      { n: '采购下单', v: state.poGenerated ? '3 张' : '待生成', done: state.poGenerated, on: !state.poGenerated, icon: 'i-file' },
+      { n: '分拣打包', v: st1.pct + '%', done: st1.pct === 100, on: st1.pct < 100, icon: 'i-tablet' },
+      { n: '库房收货', v: (state.whDone || whB().done) ? (state.whDone ? '227 件' : '93 件') : '待收货', done: state.whDone || whB().done, on: (state.scanned || whB().scanned) && !state.whDone && !whB().done, icon: 'i-scan' },
+      { n: '装车点货', v: state.drvDone ? '30 件' : '待装车', done: state.drvDone, on: false, icon: 'i-truck' },
+      { n: '司机配送', v: state.drvDone ? '已发车' : '待发车', done: state.drvDone, icon: 'i-pin' }
+    ];
+    $('#flow').innerHTML = steps.map(function (s) {
+      return '<div class="flow-step ' + (s.done ? 'done' : s.on ? 'on' : '') + '"><div class="node">' +
+        ic(s.icon, 'i i-16') + '</div><div class="nm">' + s.n + '</div><div class="vv">' + s.v + '</div></div>';
+    }).join('');
+    const chip = $('#flowChip');
+    if (state.drvDone) { chip.className = 'chip green'; chip.textContent = '今日履约已闭环'; }
+    else if (state.whDone || whB().done) { chip.className = 'chip green'; chip.textContent = '已收货 · 待装车'; }
+    else if (state.poGenerated) { chip.className = 'chip green'; chip.textContent = '采购已下发 · 分拣中'; }
+    else { chip.className = 'chip amber'; chip.textContent = '待生成采购单'; }
+  }
+
+  function renderTimeline() {
+    $('#timeline').innerHTML = TL.map(function (e) {
+      const chip = e.chip ? '<span class="chip ' + e.chip.cls + '">' + e.chip.txt + '</span>' : '';
+      return '<div class="tl-item"><span class="t">' + e.t + '</span><div class="b">' + e.b + chip + '</div></div>';
+    }).join('');
+  }
+
+  /* ================= 订单 → 采购单 ================= */
+  function statusChip(st) {
+    const cls = st === '待采购' ? 'amber' : 'green';
+    return '<span class="chip ' + cls + '">' + st + '</span>';
+  }
+
+  function renderStrips() {
+    const qty = ORDERS.reduce(function (a, o) { return a + o.qty; }, 0);
+    const amt = ORDERS.reduce(function (a, o) { return a + o.amt; }, 0);
+    $('#orderStrip').innerHTML =
+      '<div class="kv">门店订单 <b>' + ORDERS.length + '</b> 张</div><span class="sep"></span>' +
+      '<div class="kv">配送线路 <b>4</b> 条</div><span class="sep"></span>' +
+      '<div class="kv">商品件数 <b>' + qty + '</b> 件</div><span class="sep"></span>' +
+      '<div class="kv">订单金额 <b>' + money(amt) + '</b></div>' +
+      '<span class="chip green">' + ic('i-check-circle') + '04:30 已截止汇总</span>';
+  }
+
+  function renderOrders() {
+    const kw = ($('#orderSearch').value || '').trim();
+    const rt = $('#orderRoute').value;
+    const list = ORDERS.filter(function (o) {
+      const okKw = !kw || o.no.indexOf(kw) > -1 || o.store.indexOf(kw) > -1;
+      return okKw && (!rt || o.route === rt);
+    });
+    $('#orderRows').innerHTML = list.length ? list.map(function (o) {
+      return '<tr><td class="num">' + o.no + '</td><td><b>' + o.store + '</b></td>' +
+        '<td><span class="chip gray">' + o.route + '</span></td><td class="r">' + o.cat + '</td>' +
+        '<td class="r">' + o.qty + '</td><td class="r">' + money(o.amt) + '</td>' +
+        '<td class="num">' + o.time + '</td><td>' + statusChip(o.st) + '</td></tr>';
+    }).join('') : '<tr><td colspan="8"><div class="empty">没有匹配的订单</div></td></tr>';
+    $('#orderCount').textContent = '共 ' + list.length + ' 张';
+  }
+
+  function poGroups() {
+    const map = {};
+    SKUS.forEach(function (s) {
+      const q = preOf(s);
+      if (q <= 0) return;
+      if (!map[s.sup]) map[s.sup] = { sup: supOf(s.sup), items: [], qty: 0, amt: 0 };
+      map[s.sup].items.push({ s: s, q: q });
+      map[s.sup].qty += q;
+      map[s.sup].amt += q * s.price;
+    });
+    return Object.keys(map).map(function (k) { return map[k]; });
+  }
+
+  function renderPO() {
+    const box = $('#poResult');
+    if (!state.poGenerated) {
+      box.innerHTML = '<div class="empty"><span class="ic">' + ic('i-file', 'i i-20') +
+        '</span>尚未生成采购单，点击右上角「汇总生成采购单」体验完整流程</div>';
+      return;
+    }
+    const groups = poGroups();
+    box.innerHTML = '<div class="po-grid">' + groups.map(function (g, i) {
+      const items = g.items.slice(0, 4).map(function (it) {
+        return '<li><span>' + it.s.name + '</span><b>' + it.q + ' 件</b></li>';
+      }).join('');
+      const more = g.items.length > 4 ? '<li><span class="muted">等 ' + g.items.length + ' 项</span><b></b></li>' : '';
+      return '<div class="po"><div class="top"><div><h3>' + g.sup.name + '</h3><div class="no">PO-20261116-0' +
+        (i + 1) + '</div></div><span class="chip green" style="margin-left:auto">' + ic('i-check') + '已接收</span></div>' +
+        '<ul>' + items + more + '</ul><div class="hr" style="margin:10px 0"></div>' +
+        '<div class="row-between small"><span class="muted">合计 ' + g.qty + ' 件</span><b>' + money(g.amt) + '</b></div>' +
+        '<div class="p-chips" style="margin-top:8px"><span class="chip gray">' + ic('i-user') + '分拣员 ' + g.sup.picker +
+        '</span><span class="chip amber">到货 05:10</span></div></div>';
+    }).join('') + '</div>';
+    $('#poChip').innerHTML = '<span class="chip green">' + ic('i-check-circle') + '已下发 ' + groups.length + ' 张采购单</span>';
+  }
+
+  function genPurchase(silent) {
+    if (state.poGenerated) {
+      if (!silent) toast('今日采购单已生成，无需重复下发', 'warn');
+      return;
+    }
+    const btn = $('#btnGenPurchase');
+    btn.disabled = true;
+    btn.innerHTML = ic('i-rotate', 'i i-16') + '汇总中…';
+    later(function () {
+      state.poGenerated = true;
+      ORDERS.forEach(function (o) { o.st = '已生成采购'; });
+      renderPO();
+      renderOrders();
+      btn.disabled = false;
+      btn.innerHTML = ic('i-check-circle', 'i i-16') + '今日已汇总';
+      addTl('采购单已按供货商拆分下发：<b>绿源 / 牧原 / 正大</b>，同步分拣员 <b>王芳、李强、赵敏</b>', { txt: '已同步', cls: 'green' });
+      renderKpi();
+      renderFlow();
+      toast('已生成 3 张采购单，供货商与分拣员同步完成');
+    }, 850);
+  }
+
+  /* ================= 安全库存 · 预采 ================= */
+  function renderStockSummary() {
+    const need = SKUS.filter(function (s) { return preOf(s) > 0; });
+    const qty = need.reduce(function (a, s) { return a + preOf(s); }, 0);
+    const amt = need.reduce(function (a, s) { return a + preOf(s) * s.price; }, 0);
+    const cards = [
+      { lab: '待补货 SKU', v: need.length, u: '个', icon: 'i-box' },
+      { lab: '今日建议预采', v: qty, u: '件', icon: 'i-orders' },
+      { lab: '预估采购金额', v: money(amt), u: '', icon: 'i-chart' },
+      { lab: '平均补货周期', v: '2', u: '天', icon: 'i-clock' }
+    ];
+    $('#stockSummary').innerHTML = cards.map(function (c) {
+      return '<div class="sum"><div class="lab">' + ic(c.icon) + c.lab + '</div><div class="v">' + c.v +
+        (c.u ? '<small>' + c.u + '</small>' : '') + '</div></div>';
+    }).join('');
+  }
+
+  function renderStock() {
+    renderStockSummary();
+    $('#stockRows').innerHTML = SKUS.map(function (s) {
+      const pre = preOf(s);
+      return '<tr data-sku="' + s.id + '" class="' + (pre > 0 ? 'need' : '') + '">' +
+        '<td><b>' + s.name + '</b><div class="small muted">' + s.cat + ' · ' + s.id + '</div></td>' +
+        '<td>' + supOf(s.sup).name + '</td>' +
+        '<td class="r">' + s.stock + '</td><td class="r">' + (s.transit || '—') + '</td>' +
+        '<td class="r"><input class="inp inp-num" data-sku="' + s.id + '" data-f="safe" type="number" value="' + s.safe + '"></td>' +
+        '<td class="r"><input class="inp inp-num" data-sku="' + s.id + '" data-f="avg" type="number" value="' + s.avg + '"></td>' +
+        '<td class="r"><input class="inp inp-num" data-sku="' + s.id + '" data-f="cyc" type="number" value="' + s.cyc + '"></td>' +
+        '<td class="r" data-pre="' + s.id + '">' + (pre > 0 ? '<b>' + pre + '</b> <small class="muted">件</small>' : '<span class="muted">—</span>') + '</td>' +
+        '<td class="r" data-amt="' + s.id + '">' + (pre > 0 ? money(pre * s.price) : '—') + '</td></tr>';
+    }).join('');
+  }
+
+  function updateStockDerived() {
+    SKUS.forEach(function (s) {
+      const pre = preOf(s);
+      const cell = $('[data-pre="' + s.id + '"]');
+      const amt = $('[data-amt="' + s.id + '"]');
+      const tr = $('tr[data-sku="' + s.id + '"]');
+      if (cell) cell.innerHTML = pre > 0 ? '<b>' + pre + '</b> <small class="muted">件</small>' : '<span class="muted">—</span>';
+      if (amt) amt.textContent = pre > 0 ? money(pre * s.price) : '—';
+      if (tr) tr.classList.toggle('need', pre > 0);
+    });
+    renderStockSummary();
+    renderKpi();
+  }
+
+  /* ================= 报损 · 盘点 ================= */
+  function renderLoss() {
+    const lAmt = LOSSES.reduce(function (a, l) { return a + l.amt; }, 0);
+    const cards = [
+      { lab: '今日报损金额', v: money(lAmt), u: '', icon: 'i-scale' },
+      { lab: '报损笔数', v: LOSSES.length, u: '笔', icon: 'i-file' },
+      { lab: '盘点差异单', v: COUNTS.length, u: '笔', icon: 'i-box' },
+      { lab: '库亏金额', v: money(Math.abs(countAmt())), u: '差异率 ' + lossRate() + '%', icon: 'i-alert' }
+    ];
+    $('#lossSummary').innerHTML = cards.map(function (c) {
+      return '<div class="sum"><div class="lab">' + ic(c.icon) + c.lab + '</div><div class="v">' + c.v +
+        (c.u ? '<small>' + c.u + '</small>' : '') + '</div></div>';
+    }).join('');
+    $('#lossRows').innerHTML = LOSSES.map(function (l) {
+      const s = SKU[l.id];
+      return '<tr><td class="num">' + l.no + '</td><td><b>' + s.name + '</b><div class="small muted">' + s.cat + '</div></td>' +
+        '<td class="r">' + l.qty + ' ' + l.unit + '</td><td><span class="chip amber">' + l.reason + '</span></td>' +
+        '<td class="r">' + money(l.amt) + '</td><td>' + l.by + '</td><td class="num">' + l.t + '</td></tr>';
+    }).join('');
+    $('#countRows').innerHTML = countRowsData().map(function (r) {
+      const cls = r.amt < 0 ? 'diffneg' : 'diffpos';
+      return '<tr><td class="num">' + r.c.no + '</td><td><b>' + SKU[r.c.id].name + '</b></td>' +
+        '<td class="r">' + r.c.book + '</td><td class="r">' + r.c.real + '</td>' +
+        '<td class="r ' + cls + '">' + (r.diff > 0 ? '+' : '') + r.diff + '</td>' +
+        '<td class="r ' + cls + '">' + money(r.amt) + '</td><td>' + r.c.by + '</td><td class="num">' + r.c.t + '</td></tr>';
+    }).join('');
+    $('#lossHint').textContent = '今日 ' + LOSSES.length + ' 笔 · 合计 ' + money(lAmt);
+  }
+
+  /* ================= 分拣触屏 ================= */
+  function renderTouch() {
+    const b = curBatch();
+    const st = pickStats(b);
+    $('#batchRail').innerHTML = BATCHES.map(function (x) {
+      const s = pickStats(x);
+      const cls = x.done ? 'green' : s.doneCnt ? 'amber' : 'gray';
+      const txt = x.done ? '已完成' : s.doneCnt ? '分拣中' : '待分拣';
+      return '<button class="batch-card ' + (x.no === b.no ? 'on' : '') + '" data-batch="' + x.no + '">' +
+        '<div class="l1"><span class="rt">' + x.route + '</span><span class="chip ' + cls + '" style="margin-left:auto">' + txt + '</span></div>' +
+        '<div class="meta">' + x.no + ' · ' + x.items.length + ' 项 / ' + s.total + ' 件</div>' +
+        '<div class="bar"><i style="width:' + s.pct + '%"></i></div></button>';
+    }).join('');
+    $('#pickTitle').textContent = b.no;
+    $('#pickSub').textContent = b.route + ' · ' + b.stores + ' 家门店 · 分拣员 ' + b.picker;
+    $('#pickProgTxt').textContent = st.pct + '%';
+    $('#pickBar').style.width = st.pct + '%';
+    $('#pickDone').textContent = st.doneCnt;
+    $('#pickTotal').textContent = b.items.length;
+    $('#pickRest').textContent = b.items.length - st.doneCnt;
+    $('#pickGrid').innerHTML = b.items.map(function (it, i) {
+      const s = SKU[it.id];
+      return '<button class="pick-item ' + (it.d ? 'done' : '') + '" data-i="' + i + '">' +
+        '<span class="ck">' + ic('i-check', 'i') + '</span>' +
+        '<div><div class="nm">' + s.name + '</div><div class="sp">' + s.cat + ' · ' + s.id + '</div></div>' +
+        '<div class="q"><b>' + it.q + '</b><small>件</small></div></button>';
+    }).join('');
+    $('#pickSummary').innerHTML =
+      '<div class="mini-row"><span>线路</span><b>' + b.route + '</b></div>' +
+      '<div class="mini-row"><span>门店数</span><b>' + b.stores + ' 家</b></div>' +
+      '<div class="mini-row"><span>品项 / 件数</span><b>' + b.items.length + ' / ' + st.total + '</b></div>' +
+      '<div class="mini-row"><span>分拣员</span><b>' + b.picker + '</b></div>' +
+      '<div class="mini-row"><span>已完成</span><b>' + st.doneQty + ' 件 · ' + st.pct + '%</b></div>';
+
+    const lAmt = LOSSES.reduce(function (a, l) { return a + l.amt; }, 0);
+    $('#lossMini').innerHTML = LOSSES.slice(0, 3).map(function (l) {
+      return '<div class="loss-mini"><span class="t">' + l.t + '</span><span>' + SKU[l.id].name + ' ' + l.qty + l.unit +
+        '</span><span class="amt">-¥' + l.amt + '</span></div>';
+    }).join('') + '<div class="mini-row" style="padding-top:7px"><span>今日合计</span><b>' + money(lAmt) + '</b></div>';
+
+    $('#countMini').innerHTML = countRowsData().slice(0, 3).map(function (r) {
+      return '<div class="loss-mini"><span class="t">' + r.c.t + '</span><span>' + SKU[r.c.id].name + '</span>' +
+        '<span class="amt">' + (r.diff > 0 ? '+' : '') + r.diff + ' 件</span></div>';
+    }).join('') + '<div class="mini-row" style="padding-top:7px"><span>今日库亏</span><b>' + money(Math.abs(countAmt())) + '</b></div>';
+
+    const pending = BATCHES.filter(function (x) { return !x.done; }).length;
+    const todoQty = BATCHES.reduce(function (a, x) {
+      return a + x.items.filter(function (i) { return !i.d; }).reduce(function (c, i) { return c + i.q; }, 0);
+    }, 0);
+    $('#tBatchCnt').textContent = pending;
+    $('#tTodoCnt').textContent = todoQty;
+    $('#tLossCnt').textContent = LOSSES.length;
+  }
+
+  /* ================= 库房 PDA ================= */
+  function renderWh() {
+    const box = $('#whRows');
+    const isBatch = state.whMode === 'batch';
+    const b = curBatch();
+    const bst = pickStats(b);
+    /* 扫码方式切换 */
+    $$('#whSeg button').forEach(function (x) { x.classList.toggle('on', x.dataset.m === state.whMode); });
+    $('#whScanT').textContent = isBatch ? '扫描分拣小票二维码' : '扫描采购送货单';
+    $('#whScanS').textContent = isBatch ? '对准小票二维码 · 点击模拟扫码' : '对准条码 · 点击模拟扫码';
+    $('#whOvT').textContent = isBatch ? '正在识别分拣小票…' : '正在识别送货单…';
+    $('#whOvS').innerHTML = isBatch
+      ? b.no + '<br>匹配分拣批次与实物明细'
+      : 'PO-20261116-01<br>匹配供货商与应收明细';
+    $('#whLeftTxt').textContent = isBatch ? '小票详情' : '缺货补货';
+    $('#btnWhShort').querySelector('svg').innerHTML = '<use href="#' + (isBatch ? 'i-printer' : 'i-alert') + '"/>';
+
+    /* 头部信息与 chip */
+    if (isBatch) {
+      $('#whSub').textContent = b.no + ' · ' + b.route + ' · ' + b.picker;
+      $('#whChipA').className = 'chip green';
+      $('#whChipA').textContent = whB().done ? '已入库 ' + bst.total + ' 件'
+        : (whB().scanned ? '批次 ' + bst.total + ' 件' : '待扫小票');
+      $('#whChipB').className = 'chip ' + (whB().scanned ? 'green' : 'gray');
+      $('#whChipB').textContent = whB().scanned ? b.items.length + ' 项 · 核 ' + whB().checked.size : '—';
+      $('#whChipC').className = 'chip ' + (whB().done ? 'green' : (b.done ? 'green' : 'amber'));
+      $('#whChipC').textContent = whB().done ? '已转待装车' : (b.done ? '分拣已完成' : '分拣 ' + bst.doneCnt + '/' + b.items.length);
+    } else {
+      $('#whSub').textContent = 'PO-20261116-01 · 绿源蔬菜基地';
+      $('#whChipA').className = 'chip green';
+      $('#whChipA').textContent = state.whDone ? '已入库 227 件' : (state.scanned ? '实收 227 / 应收 232' : '应收 232 件');
+      $('#whChipB').className = 'chip ' + (state.whDone ? 'green' : 'gray');
+      $('#whChipB').textContent = state.whDone ? '6 项已入账' : '6 项';
+      $('#whChipC').className = 'chip ' + (state.whDone ? 'green' : (state.shortHandled ? 'amber' : (state.scanned ? 'amber' : 'gray')));
+      $('#whChipC').textContent = state.whDone ? '待装车' : (state.shortHandled ? '补货中 5 件' : (state.scanned ? '缺 5 件' : '到货 05:10'));
+    }
+
+    /* 分拣小票通道 */
+    if (isBatch) {
+      if (!whB().scanned) {
+        box.innerHTML = '<div class="empty" style="padding:18px 8px;font-size:11px"><span class="ic">' + ic('i-qr', 'i i-20') +
+          '</span><span>扫小票二维码后带出批次明细</span></div>';
+        return;
+      }
+      let head = '';
+      if (!b.done) {
+        head += '<div class="alert-bar on" style="background:linear-gradient(135deg,#FEF6E7,#FCEBCF);border-color:#F0D9B8;color:var(--amber-700)">' +
+          ic('i-alert', 'i i-16') + '<span><b>批次分拣中</b><span>' + bst.doneCnt + '/' + b.items.length +
+          ' 项已完成，分拣完成后才可入库</span></span></div>';
+      }
+      box.innerHTML = head + b.items.map(function (it, i) {
+        const s = SKU[it.id];
+        const ck = whB().checked.has(i);
+        return '<div class="r-item' + (ck ? ' ok' : '') + '" data-b="' + i + '" style="cursor:pointer">' +
+          '<span class="ic">' + ic(ck ? 'i-check' : 'i-box', 'i i-14') + '</span>' +
+          '<div class="grow"><div class="nm">' + s.name + '</div><div class="sp">批次 ' + it.q + ' 件 · ' +
+          (ck ? '已核对' : '待核对（点击勾选）') + '</div></div>' +
+          '<div class="q"><b>' + it.q + '</b><small>件</small></div></div>';
+      }).join('');
+      return;
+    }
+
+    /* 送货单通道 */
+    if (!state.scanned) {
+      box.innerHTML = '<div class="empty" style="padding:18px 8px;font-size:11px"><span class="ic">' + ic('i-scan', 'i i-20') +
+        '</span><span>扫码后自动带出应收明细</span></div>';
+      return;
+    }
+    box.innerHTML = RECEIVE.map(function (r) {
+      const s = SKU[r.id];
+      const short = r.q - r.real;
+      const cls = short > 0 ? (state.shortHandled ? 'ok' : 'short') : 'ok';
+      const icon = short > 0 && !state.shortHandled ? 'i-alert' : 'i-check';
+      let html = '<div class="r-item ' + cls + '"><span class="ic">' + ic(icon, 'i i-14') + '</span>' +
+        '<div class="grow"><div class="nm">' + s.name + '</div><div class="sp">应收 ' + r.q + ' 件 · 实收 ' + r.real + ' 件' +
+        (short > 0 ? ' · <b style="color:var(--amber-700)">缺 ' + short + ' 件</b>' : '') + '</div></div>' +
+        '<div class="q"><b>' + r.real + '</b><small>件</small></div></div>';
+      if (short > 0) {
+        html += '<div class="r-actions">' + (state.shortHandled
+          ? '<span class="chip green" style="height:28px;width:100%;justify-content:center">' + ic('i-check') + '补货单 BH-20261116-01 已通知绿源</span>'
+          : '<button class="btn btn-amber" data-short="' + s.id + '">' + ic('i-alert') + '缺 ' + short + ' 件 · 发起补货</button>') + '</div>';
+      }
+      return html;
+    }).join('');
+  }
+
+  /* ================= 司机 PDA ================= */
+  function renderDriver() {
+    $('#drvRows').innerHTML = DRIVE.map(function (d, i) {
+      const s = SKU[d.id];
+      const bad = d.route !== '城东03';
+      const checked = state.drvChecked.has(i);
+      const cls = 'd-item' + (checked ? ' ok' : '') + (bad && state.drvBad ? ' bad' : '') + (bad && state.drvResolved ? ' resolved' : '');
+      let html = '<div class="' + cls + '" data-i="' + i + '">' +
+        '<span class="ck">' + ic('i-check', 'i') + '</span>' +
+        '<div class="grow"><div class="store">' + d.store + '</div><div class="nm">' + s.name + '</div></div>' +
+        '<span class="rt-tag">' + d.route + '</span>' +
+        '<div class="q">' + d.q + ' 件</div>';
+      if (bad && state.drvBad && !state.drvResolved) {
+        html += '<button class="btn btn-sm" data-return="' + i + '" style="margin-left:6px;height:24px;font-size:10px;border-color:#F0B9B3;color:var(--red-700)">退回</button>';
+      }
+      return html + '</div>';
+    }).join('');
+    const left = DRIVE.filter(function (d, i) { return d.route === '城东03' && !state.drvChecked.has(i); }).length;
+    $('#drvChip').textContent = state.drvDone ? '已发车' : (left > 0 ? '待装 ' + left + ' 项' : '可发车');
+    $('#drvAlert').classList.toggle('on', state.drvBad && !state.drvResolved);
+    $('#drvDone').classList.toggle('on', state.drvDone);
+  }
+
+  /* ================= 总渲染 ================= */
+  function renderAll() {
+    renderKpi();
+    renderFlow();
+    renderTimeline();
+    renderStrips();
+    renderOrders();
+    renderPO();
+    renderStock();
+    renderLoss();
+  }
+  /* ================= 弹窗：报损 / 盘点 ================= */
+  function skuOptions(selected) {
+    return SKUS.map(function (s) {
+      return '<option value="' + s.id + '"' + (s.id === selected ? ' selected' : '') + '>' + s.name + '（' + s.cat + '）</option>';
+    }).join('');
+  }
+
+  function updateLossAmt() {
+    const sel = $('#mLossSku'), qtyEl = $('#mLossQty');
+    if (!sel || !qtyEl) return;
+    const qty = Math.max(0, Number(qtyEl.value) || 0);
+    $('#mLossAmt').value = money(qty * SKU[sel.value].price);
+  }
+
+  function openLossModal() {
+    openModal(
+      '<div class="m-head"><div><h2>录入报损</h2><p>称重台直接录入损耗，系统自动计价并扣减账面库存</p></div>' +
+      '<button class="m-x" data-act="close">' + ic('i-x', 'i i-16') + '</button></div>' +
+      '<div class="m-body"><div class="frow">' +
+      '<div class="field"><label>报损商品<b>*</b></label><select class="inp" id="mLossSku">' + skuOptions('M01') + '</select></div>' +
+      '<div class="field"><label>报损数量<b>*</b></label><input class="inp" id="mLossQty" type="number" value="2" min="0.1" step="0.5"></div>' +
+      '</div><div class="frow">' +
+      '<div class="field"><label>报损原因</label><select class="inp" id="mLossReason"><option>修割损耗</option><option>萎蔫失水</option><option>运输破损</option><option>临期报废</option><option>分拣报废</option></select></div>' +
+      '<div class="field"><label>报损金额（自动计算）</label><input class="inp" id="mLossAmt" readonly></div>' +
+      '</div><div class="tip" style="margin:0"><span>提交后自动计入今日报损与库亏，无需再回办公室二次录入 Excel。</span></div></div>' +
+      '<div class="m-foot"><span class="grow">经办人：王芳 · 分拣台 A</span><button class="btn" data-act="close">取消</button>' +
+      '<button class="btn btn-primary" data-act="loss-submit">' + ic('i-check') + '提交报损</button></div>', 'narrow');
+    updateLossAmt();
+  }
+
+  function updateCountDiff() {
+    const sel = $('#mCountSku');
+    if (!sel) return;
+    const s = SKU[sel.value];
+    const real = Math.round(Number($('#mCountReal').value) || 0);
+    const diff = real - s.stock;
+    $('#mCountBook').value = s.stock + ' 件';
+    const el = $('#mCountDiff');
+    el.textContent = (diff > 0 ? '+' : '') + diff + ' 件 · ' + money(diff * s.price);
+    el.style.color = diff < 0 ? 'var(--red-600)' : diff > 0 ? 'var(--green-600)' : 'var(--ink-3)';
+  }
+
+  function openCountModal() {
+    const first = SKUS[0];
+    openModal(
+      '<div class="m-head"><div><h2>库存盘点</h2><p>录入实盘数量，系统自动比对账面库存并输出库亏差异</p></div>' +
+      '<button class="m-x" data-act="close">' + ic('i-x', 'i i-16') + '</button></div>' +
+      '<div class="m-body"><div class="frow">' +
+      '<div class="field"><label>盘点商品<b>*</b></label><select class="inp" id="mCountSku">' + skuOptions(first.id) + '</select></div>' +
+      '<div class="field"><label>实盘数量<b>*</b></label><input class="inp" id="mCountReal" type="number" value="' + (first.stock - 1) + '" min="0"></div>' +
+      '</div><div class="frow">' +
+      '<div class="field"><label>账面库存</label><input class="inp" id="mCountBook" readonly></div>' +
+      '<div class="field"><label>差异（实盘 − 账面）</label><div id="mCountDiff" style="font-family:var(--font-num);font-size:15px;font-weight:700;padding-top:8px"></div></div>' +
+      '</div><div class="tip" style="margin:0"><span>负数即库亏，正数为盘盈；提交后自动生成盘点单并更新库存。</span></div></div>' +
+      '<div class="m-foot"><span class="grow">经办人：王芳 · 分拣台 A</span><button class="btn" data-act="close">取消</button>' +
+      '<button class="btn btn-primary" data-act="count-submit">' + ic('i-check') + '提交盘点</button></div>', 'narrow');
+    updateCountDiff();
+  }
+
+  function submitLoss() {
+    const id = $('#mLossSku').value;
+    const qty = Math.max(0.1, Number($('#mLossQty').value) || 0);
+    const reason = $('#mLossReason').value;
+    const amt = Math.round(qty * SKU[id].price);
+    LOSSES.unshift({
+      no: 'BS-20261116-' + String(LOSSES.length + 1).padStart(3, '0'),
+      id: id, qty: qty, unit: '件', reason: reason, amt: amt, by: '王芳', t: '04:38'
+    });
+    closeModal();
+    renderLoss();
+    renderTouch();
+    renderKpi();
+    toast('报损已提交：' + SKU[id].name + ' ' + qty + ' 件 / ' + money(amt) + '，库存已扣减', 'warn');
+    addTl('称重台新增报损：<b>' + SKU[id].name + ' ' + qty + ' 件</b> ' + reason + '，' + money(amt), { txt: '已计提', cls: 'red' });
+  }
+
+  function submitCount() {
+    const id = $('#mCountSku').value;
+    const s = SKU[id];
+    const real = Math.max(0, Math.round(Number($('#mCountReal').value) || 0));
+    const diff = real - s.stock;
+    COUNTS.unshift({
+      no: 'PD-20261116-' + String(COUNTS.length + 1).padStart(3, '0'),
+      id: id, book: s.stock, real: real, by: '王芳', t: '04:38'
+    });
+    s.stock = real;
+    closeModal();
+    renderLoss();
+    renderStock();
+    renderKpi();
+    renderTouch();
+    toast('盘点已提交：' + s.name + ' 差异 ' + (diff > 0 ? '+' : '') + diff + ' 件，库亏 ' + money(Math.abs(diff * s.price)), 'warn');
+    addTl('盘点完成：<b>' + s.name + '</b> 实盘 ' + real + ' 件，差异 ' + (diff > 0 ? '+' : '') + diff + ' 件', { txt: '库亏', cls: 'red' });
+  }
+
+  /* ================= 弹窗：预采单 ================= */
+  function openPreorderModal() {
+    const need = SKUS.filter(function (s) { return preOf(s) > 0; });
+    const qty = need.reduce(function (a, s) { return a + preOf(s); }, 0);
+    const amt = need.reduce(function (a, s) { return a + preOf(s) * s.price; }, 0);
+    const rows = need.map(function (s) {
+      return '<tr><td><b>' + s.name + '</b></td><td>' + supOf(s.sup).name + '</td><td class="r">' + s.stock +
+        ' 件</td><td class="r">' + preOf(s) + ' 件</td><td class="r">' + money(preOf(s) * s.price) + '</td></tr>';
+    }).join('');
+    openModal(
+      '<div class="m-head"><div><h2>今日预采单 CG-20261116-A</h2><p>每日 23:00 自动跑批 · 04:00 推送供货商</p></div>' +
+      '<button class="m-x" data-act="close">' + ic('i-x', 'i i-16') + '</button></div>' +
+      '<div class="m-body"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>商品</th><th>供货商</th><th class="r">当前库存</th><th class="r">建议预采</th><th class="r">预估金额</th></tr></thead><tbody>' +
+      rows + '</tbody></table></div><div class="tip" style="margin:12px 0 0"><span>预采量 = 安全库存 + 日均销量 × 补货周期 − 当前库存 − 在途，结果小于 0 取 0。</span></div></div>' +
+      '<div class="m-foot"><span class="grow">合计 ' + qty + ' 件 · ' + money(amt) + ' · 3 家供货商</span>' +
+      '<button class="btn" data-act="close">关闭</button>' +
+      '<button class="btn btn-primary" data-act="preorder-push">' + ic('i-check') + '推送供货商</button></div>', 'wide');
+  }
+
+  /* ================= 弹窗：缺货补货 ================= */
+  function openShortModal() {
+    const r = RECEIVE.find(function (x) { return x.id === 'V03'; });
+    const short = r.q - r.real;
+    openModal(
+      '<div class="m-head"><div><h2>缺货补货</h2><p>黄瓜 应收 ' + r.q + ' 件 · 实收 ' + r.real + ' 件 · 短缺 ' + short + ' 件</p></div>' +
+      '<button class="m-x" data-act="close">' + ic('i-x', 'i i-16') + '</button></div>' +
+      '<div class="m-body"><div class="frow">' +
+      '<div class="field"><label>商品</label><input class="inp" value="黄瓜（V03）" readonly></div>' +
+      '<div class="field"><label>短缺数量</label><input class="inp" value="' + short + ' 件" readonly></div>' +
+      '</div><div class="frow">' +
+      '<div class="field"><label>补货数量</label><input class="inp" id="mShortQty" type="number" value="' + short + '" min="1"></div>' +
+      '<div class="field"><label>期望到货</label><select class="inp" id="mShortEta"><option>今日 06:30（同城急送）</option><option>今日 09:00</option><option>明日 05:00</option></select></div>' +
+      '</div><div class="tip" style="margin:0"><span>补货申请同步采购员与分拣台；本单先按实收 227 件入库，缺货到货后追加。</span></div></div>' +
+      '<div class="m-foot"><span class="grow">供货商：绿源蔬菜基地 · 138****2210</span><button class="btn" data-act="close">取消</button>' +
+      '<button class="btn btn-primary" data-act="short-submit">提交补货申请</button></div>', 'narrow');
+  }
+
+  function submitShort() {
+    state.shortHandled = true;
+    closeModal();
+    renderWh();
+    toast('补货申请已推送绿源蔬菜基地，预计 06:30 送达', 'warn');
+    addTl('库房发起缺货补货：<b>黄瓜 5 件</b>，补货单 BH-20261116-01 已推送绿源', { txt: '补货中', cls: 'amber' });
+  }
+
+  /* ================= 弹窗：分拣小票 ================= */
+  function openReceipt(no) {
+    const b = BATCHES.find(function (x) { return x.no === no; });
+    const st = pickStats(b);
+    const qrBox = $('#qrBank [data-qr="' + b.qr + '"]');
+    const qrSvg = qrBox ? qrBox.innerHTML : '';
+    const items = b.items.map(function (it) {
+      return '<div><span>' + SKU[it.id].name + '</span><span>' + it.q + ' 件</span></div>';
+    }).join('');
+    openModal(
+      '<div class="m-head"><div><h2>分拣完成 · 交接小票</h2><p>' + b.no + ' · ' + b.route + ' · 已自动打印并贴实物</p></div>' +
+      '<button class="m-x" data-act="close">' + ic('i-x', 'i i-16') + '</button></div>' +
+      '<div class="m-body"><div class="receipt-wrap"><div class="receipt">' +
+      '<div class="r-brand">鲜配云 · 城东中心仓</div><div class="r-title">分拣交接小票</div>' +
+      '<div class="r-no">' + b.no + '</div><div class="dashline"></div>' +
+      '<div class="r-row"><span>配送线路</span><b>' + b.route + '</b></div>' +
+      '<div class="r-row"><span>门店数</span><b>' + b.stores + ' 家</b></div>' +
+      '<div class="r-row"><span>品项</span><b>' + b.items.length + ' 项</b></div>' +
+      '<div class="r-row"><span>合计件数</span><b>' + st.total + ' 件</b></div>' +
+      '<div class="r-row"><span>分拣员</span><b>' + b.picker + '</b></div>' +
+      '<div class="r-row"><span>打印时间</span><b>2026-11-16 04:38</b></div>' +
+      '<div class="dashline"></div><div class="r-items">' + items + '</div><div class="dashline"></div>' +
+      '<div class="qr">' + qrSvg + '</div>' +
+      '<div class="r-qr-cap">扫码追溯 · 批次 / 门店 / 分拣员</div>' +
+      '<div class="r-foot">鲜配云仓配一体 · 演示小票<br>如有差异请 2 小时内联系分拣主管</div>' +
+      '</div><div class="slip-side">' +
+      '<div class="box"><h4>' + ic('i-printer') + '落地方式</h4><ul><li>分拣完成即刻打印 80mm 标签小票</li><li>小票随周转筐张贴，扫码即可回溯</li><li>出现差异按批次快速定位责任人</li></ul></div>' +
+      '<div class="box"><h4>' + ic('i-check-circle') + '四端已同步</h4><div class="p-chips"><span class="chip green">库房收货</span><span class="chip green">司机装车</span><span class="chip green">门店签收</span><span class="chip green">批次追溯</span></div></div>' +
+      '</div></div></div>' +
+      '<div class="m-foot"><span class="grow">二维码内容：' + b.no + ' | ' + b.route + ' | ' + st.total + ' 件 | ' + b.picker + '</span>' +
+      '<button class="btn" data-act="close">关闭</button>' +
+      '<button class="btn" data-act="print">' + ic('i-printer') + '打印小票</button>' +
+      '<button class="btn btn-primary" data-act="receipt-done">完成交接并归档</button></div>');
+  }
+
+  /* ================= 交互：后台 ================= */
+  $('#terminals').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-t]');
+    if (b) showTerminal(b.dataset.t);
+  });
+
+  $('.sidebar').addEventListener('click', function (e) {
+    const b = e.target.closest('.nav-item[data-page]');
+    if (b) showPage(b.dataset.page);
+  });
+
+  $('#btnGenPurchase').addEventListener('click', function () { genPurchase(false); });
+  $('#btnExportOrders').addEventListener('click', function () { toast('订单汇总已导出 Excel（演示）'); });
+  $('#btnExportDash').addEventListener('click', function () { toast('今日履约日报已生成（演示）'); });
+  $('#btnExportLoss').addEventListener('click', function () { toast('报损与盘点明细已导出（演示）'); });
+  $('#orderSearch').addEventListener('input', renderOrders);
+  $('#orderRoute').addEventListener('change', renderOrders);
+
+  $('#stockRows').addEventListener('input', function (e) {
+    const inp = e.target.closest('input[data-sku]');
+    if (!inp) return;
+    SKU[inp.dataset.sku][inp.dataset.f] = Math.max(0, Number(inp.value) || 0);
+    updateStockDerived();
+  });
+  $('#btnResetStock').addEventListener('click', function () {
+    SKU_DEF.forEach(function (d) {
+      const s = SKU[d.id];
+      s.safe = d.safe; s.avg = d.avg; s.cyc = d.cyc;
+    });
+    renderStock();
+    renderKpi();
+    toast('已恢复默认安全库存参数');
+  });
+  $('#btnGenPreorder').addEventListener('click', function () {
+    state.preorderDone = true;
+    openPreorderModal();
+  });
+
+  $('#lossTabs').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-tab]');
+    if (!b) return;
+    $$('#lossTabs button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    $$('.pane').forEach(function (p) { p.classList.toggle('on', p.dataset.pane === b.dataset.tab); });
+  });
+  $('#btnNewLoss').addEventListener('click', openLossModal);
+  $('#btnNewCount').addEventListener('click', openCountModal);
+
+  /* ================= 交互：触屏分拣 ================= */
+  $('#batchRail').addEventListener('click', function (e) {
+    const b = e.target.closest('.batch-card');
+    if (!b) return;
+    state.batchNo = b.dataset.batch;
+    renderTouch();
+  });
+
+  $('#pickGrid').addEventListener('click', function (e) {
+    const el = e.target.closest('.pick-item');
+    if (!el) return;
+    const b = curBatch();
+    const it = b.items[Number(el.dataset.i)];
+    it.d = !it.d;
+    renderTouch();
+  });
+
+  function finishPick() {
+    const b = curBatch();
+    const st = pickStats(b);
+    if (st.pct < 100) {
+      b.items.forEach(function (i) { i.d = true; });
+      toast('剩余 ' + (b.items.length - st.doneCnt) + ' 项已自动补全（演示）', 'warn');
+    }
+    b.done = true;
+    renderTouch();
+    renderWh();
+    renderKpi();
+    renderFlow();
+    renderTimeline();
+    openReceipt(b.no);
+    addTl(b.route + ' 批次 <b>' + b.no + '</b> 分拣完成，已打印二维码小票贴实物', { txt: '已交接', cls: 'green' });
+  }
+  $('#btnPickDone').addEventListener('click', finishPick);
+  $('#btnPickLoss').addEventListener('click', openLossModal);
+  $('#btnTallyLoss').addEventListener('click', openLossModal);
+  $('#btnTallyCount').addEventListener('click', openCountModal);
+
+  /* ================= 交互：库房 PDA ================= */
+  const isBatchMode = () => state.whMode === 'batch';
+
+  $('#whSeg').addEventListener('click', function (e) {
+    const b = e.target.closest('button[data-m]');
+    if (!b || b.dataset.m === state.whMode) return;
+    state.whMode = b.dataset.m;
+    renderWh();
+  });
+
+  $('#whScan').addEventListener('click', function () {
+    if (isBatchMode()) {
+      const b = curBatch();
+      if (whB().scanned) { toast('该批次小票已扫码，明细已带出', 'warn'); return; }
+      $('#whOverlay').classList.add('on');
+      later(function () {
+        $('#whOverlay').classList.remove('on');
+        whB().scanned = true;
+        renderWh();
+        renderFlow();
+        const st = pickStats(b);
+        toast('已识别分拣小票 ' + b.no + ' · ' + b.items.length + ' 项 ' + st.total + ' 件', b.done ? '' : 'warn');
+        addTl('库房扫分拣小票：<b>' + b.no + '</b> ' + b.route + ' ' + b.items.length + ' 项 ' + st.total + ' 件，整筐核对中', { txt: '扫码入库', cls: 'green' });
+      }, 1100);
+      return;
+    }
+    if (state.scanned) { toast('该送货单已扫码，明细已带出', 'warn'); return; }
+    $('#whOverlay').classList.add('on');
+    setTimeout(function () {
+      $('#whOverlay').classList.remove('on');
+      state.scanned = true;
+      renderWh();
+      renderFlow();
+      toast('已识别 PO-20261116-01 · 6 项应收，黄瓜缺 5 件', 'warn');
+      addTl('库房扫码收货：<b>PO-20261116-01</b> 绿源 6 项，黄瓜短缺 5 件', { txt: '待补货', cls: 'amber' });
+    }, 1100);
+  });
+
+  $('#whRows').addEventListener('click', function (e) {
+    if (e.target.closest('[data-short]')) { openShortModal(); return; }
+    const row = e.target.closest('.r-item[data-b]');
+    if (!row || whB().done) return;
+    const i = Number(row.dataset.b);
+    if (whB().checked.has(i)) whB().checked.delete(i);
+    else whB().checked.add(i);
+    renderWh();
+  });
+
+  $('#btnWhShort').addEventListener('click', function () {
+    if (isBatchMode()) {
+      if (!whB().scanned) { toast('请先扫描分拣小票二维码', 'warn'); return; }
+      openReceipt(curBatch().no);
+      return;
+    }
+    if (!state.scanned) { toast('请先扫描送货单条码', 'warn'); return; }
+    if (state.shortHandled) { toast('补货申请已提交，等待供货商送达', 'warn'); return; }
+    openShortModal();
+  });
+
+  $('#btnWhConfirm').addEventListener('click', function () {
+    if (isBatchMode()) {
+      const b = curBatch();
+      const st = pickStats(b);
+      if (!whB().scanned) { toast('请先扫描分拣小票二维码', 'warn'); return; }
+      if (whB().done) { toast('该批次已入库', 'warn'); return; }
+      if (!b.done) { toast('批次仍在分拣（' + st.doneCnt + '/' + b.items.length + ' 项），完成后才能入库', 'err'); return; }
+      if (whB().checked.size < b.items.length) {
+        const miss = b.items.length - whB().checked.size;
+        b.items.forEach(function (_, i) { whB().checked.add(i); });
+        toast('剩余 ' + miss + ' 项已自动核对（演示）', 'warn');
+      }
+      whB().done = true;
+      renderWh();
+      renderFlow();
+      renderKpi();
+      toast('批次 ' + b.no + ' 已入库 ' + st.total + ' 件，转入待装车区');
+      addTl('库房扫小票入库 <b>' + b.no + '</b> ' + st.total + ' 件 → 待装车区，司机可领装车任务', { txt: '已入库', cls: 'green' });
+      return;
+    }
+    if (!state.scanned) { toast('请先扫描送货单条码', 'warn'); return; }
+    if (state.whDone) { toast('本单已确认入库', 'warn'); return; }
+    if (!state.shortHandled) { toast('存在短缺 5 件，请先发起补货', 'err'); return; }
+    state.whDone = true;
+    renderWh();
+    renderFlow();
+    renderKpi();
+    toast('已确认入库 227 件，库存实时回写分拣端');
+    addTl('库房确认入库 <b>227 件</b>，黄瓜短缺 5 件已转补货单 BH-20261116-01', { txt: '已入库', cls: 'green' });
+  });
+
+  /* ================= 交互：司机 PDA ================= */
+  $('#drvRows').addEventListener('click', function (e) {
+    const ret = e.target.closest('[data-return]');
+    if (ret) {
+      state.drvResolved = true;
+      state.drvBad = false;
+      renderDriver();
+      toast('异常商品已退回库房，线路校验通过');
+      addTl('司机装车校验：<b>鲜鸡蛋 2 箱</b> 非城东03线路，已退回库房', { txt: '已拦截', cls: 'red' });
+      return;
+    }
+    const row = e.target.closest('.d-item');
+    if (!row || state.drvDone) return;
+    const i = Number(row.dataset.i);
+    const d = DRIVE[i];
+    if (d.route !== '城东03') {
+      if (state.drvResolved) return;
+      state.drvBad = true;
+      renderDriver();
+      $('#drvAlertTxt').textContent = SKU[d.id].name + ' ' + d.q + ' 件属于 ' + d.route + '，不在本线路';
+      toast('线路校验失败：' + SKU[d.id].name + ' 属于 ' + d.route, 'err');
+      return;
+    }
+    if (state.drvChecked.has(i)) state.drvChecked.delete(i);
+    else state.drvChecked.add(i);
+    renderDriver();
+  });
+
+  $('#btnDrvAll').addEventListener('click', function () {
+    if (state.drvDone) return;
+    DRIVE.forEach(function (d, i) { if (d.route === '城东03') state.drvChecked.add(i); });
+    if (!state.drvResolved) {
+      state.drvBad = true;
+      renderDriver();
+      const bad = DRIVE.find(function (d) { return d.route !== '城东03'; });
+      $('#drvAlertTxt').textContent = SKU[bad.id].name + ' ' + bad.q + ' 件属于 ' + bad.route + '，不在本线路';
+      toast('发现 1 件非本线路商品，已标红锁定', 'err');
+    } else {
+      renderDriver();
+      toast('本线路 28 件已全部点货');
+    }
+  });
+
+  $('#btnDrvGo').addEventListener('click', function () {
+    if (state.drvDone) return;
+    if (!state.drvResolved) {
+      state.drvBad = true;
+      renderDriver();
+      toast('存在非本线路商品，请先退回异常商品', 'err');
+      return;
+    }
+    if (state.drvChecked.size < 4) { toast('还有商品未点货，请先完成点货', 'warn'); return; }
+    state.drvDone = true;
+    renderDriver();
+    renderFlow();
+    renderKpi();
+    toast('装车完成，28 件已发车（演示）');
+    addTl('城东03 装车完成 <b>28 件</b>，异常商品退回，04:52 发车', { txt: '已发车', cls: 'green' });
+  });
+
+  $('#btnDrvReset').addEventListener('click', function () {
+    state.drvChecked = new Set();
+    state.drvBad = false;
+    state.drvResolved = false;
+    state.drvDone = false;
+    renderDriver();
+    renderFlow();
+    toast('已重置装车演示');
+  });
+
+  /* ================= 弹窗通用交互 ================= */
+  $('#modal').addEventListener('click', function (e) {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === 'close') closeModal();
+    if (act === 'print') toast('小票已发送至分拣台标签打印机（演示）');
+    if (act === 'receipt-done') { closeModal(); toast('小票已归档，可扫码追溯批次'); }
+    if (act === 'loss-submit') submitLoss();
+    if (act === 'count-submit') submitCount();
+    if (act === 'short-submit') submitShort();
+    if (act === 'preorder-push') {
+      state.preorderDone = true;
+      closeModal();
+      toast('预采单已推送 3 家供货商（演示）');
+      addTl('预采单 <b>CG-20261116-A</b> 已推送供货商，到货 05:10—06:30', { txt: '已推送', cls: 'green' });
+    }
+  });
+  function onFieldChange(e) {
+    if (e.target.id === 'mCountReal' || e.target.id === 'mCountSku') updateCountDiff();
+    if (e.target.id === 'mLossSku' || e.target.id === 'mLossQty') updateLossAmt();
+  }
+  $('#modal').addEventListener('input', onFieldChange);
+  $('#modal').addEventListener('change', onFieldChange);
+
+  $('#mask').addEventListener('click', function (e) { if (e.target === $('#mask')) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  /* ================= 演示动线 ================= */
+  const TOUR = [
+    { t: 'admin', p: 'dashboard', sel: '.kpis', title: '全链路总览', desc: '四端共用一套数据，先看今日 12 张订单与履约进度' },
+    { t: 'admin', p: 'orders', sel: '#btnGenPurchase', title: '订单汇总', desc: '12 张门店订单按线路自动聚合，04:30 截止' },
+    { t: 'admin', p: 'orders', sel: '#poResult', title: '生成采购单', desc: '按供货商拆单，同步采购员、分拣员与到货时间', pre: function () { if (!state.poGenerated) genPurchase(true); } },
+    { t: 'touch', sel: '#pickGrid', title: '触屏分拣', desc: '大按钮勾选，完成即打印二维码小票贴实物' },
+    { t: 'wh', sel: '#whScan', title: '库房扫码入库', desc: '送货单、分拣小票都能扫，短缺当场发起补货' },
+    { t: 'driver', sel: '#drvRows', title: '司机装车点货', desc: '非本线路商品标红报警，退回后才可发车' },
+    { t: 'admin', p: 'stock', sel: '#stockRows', title: '安全库存预采', desc: '每日自动跑批，实时计算建议预采量' },
+    { t: 'admin', p: 'loss', sel: '#lossSummary', title: '报损盘点库亏', desc: '称重台录损耗与实盘，自动输出库亏差异' }
+  ];
+
+  function renderTour() {
+    $('#tourList').innerHTML = TOUR.map(function (s, i) {
+      return '<button class="tour-step ' + (state.tourStep === i ? 'cur' : '') + '" data-step="' + i + '">' +
+        '<span class="n">' + (i + 1) + '</span><span class="x"><b>' + s.title + '</b><span>' + s.desc + '</span></span></button>';
+    }).join('');
+  }
+
+  function gotoStep(i) {
+    const s = TOUR[i];
+    if (!s) return;
+    state.tourStep = i;
+    $('#tourPanel').classList.remove('on');
+    showTerminal(s.t);
+    if (s.p) showPage(s.p);
+    if (s.pre) s.pre();
+    renderTour();
+    later(function () {
+      const el = $(s.sel);
+      if (!el) return;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      el.classList.add('spot');
+      setTimeout(function () { el.classList.remove('spot'); }, 3200);
+    }, 360);
+  }
+
+  $('#tourBtn').addEventListener('click', function () {
+    $('#tourPanel').classList.toggle('on');
+  });
+  $('#tourList').addEventListener('click', function (e) {
+    const b = e.target.closest('[data-step]');
+    if (b) gotoStep(Number(b.dataset.step));
+  });
+
+  /* ================= 重置演示数据 ================= */
+  function resetDemo() {
+    timers.forEach(function (id) { clearTimeout(id); });
+    timers.clear();
+    BATCHES.forEach(function (b, i) {
+      b.done = SNAP.batches[i].done;
+      b.items.forEach(function (it, j) { it.d = SNAP.batches[i].d[j]; });
+    });
+    ORDERS.forEach(function (o, i) { o.st = SNAP.orders[i]; });
+    LOSSES.length = 0;
+    SNAP.losses.forEach(function (l) { LOSSES.push(Object.assign({}, l)); });
+    COUNTS.length = 0;
+    SNAP.counts.forEach(function (c) { COUNTS.push(Object.assign({}, c)); });
+    SKUS.forEach(function (s, i) { s.stock = SNAP.stock[i]; });
+    TL.length = 0;
+    SNAP.tl.forEach(function (t) { TL.push({ t: t.t, b: t.b, chip: { txt: t.chip.txt, cls: t.chip.cls } }); });
+    Object.assign(state, freshState());
+    closeModal();
+    $('#toasts').innerHTML = '';
+    $('#whOverlay').classList.remove('on');
+    $('#tourPanel').classList.remove('on');
+    $$('.spot').forEach(function (el) { el.classList.remove('spot'); });
+    renderAll();
+    renderTouch();
+    renderWh();
+    renderDriver();
+    renderTour();
+    $('#btnGenPurchase').disabled = false;
+    $('#btnGenPurchase').innerHTML = ic('i-orders', 'i i-16') + '汇总生成采购单';
+    $('#btnGenPreorder').disabled = false;
+    $('#btnGenPreorder').innerHTML = ic('i-box', 'i i-16') + '生成今日预采单';
+    showTerminal('admin');
+    showPage('dashboard');
+    toast('演示数据已重置到初始状态');
+  }
+  $('#btnReset').addEventListener('click', resetDemo);
+
+  /* ================= 启动 ================= */
+  function init() {
+    renderAll();
+    renderTouch();
+    renderWh();
+    renderDriver();
+    renderTour();
+    showTerminal('admin');
+    showPage('dashboard');
+  }
+  init();
+})();
+</script>
+</body>
+</html>
