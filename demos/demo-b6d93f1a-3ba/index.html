@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>京麦源 · AI定制软件演示系统</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pri:#2563eb;--pri-l:#eff6ff;--ok:#16a34a;--ok-l:#f0fdf4;
+  --warn:#e8890c;--warn-l:#fff7ed;--dan:#e5484d;--dan-l:#fef2f2;--pur:#7c3aed;--pur-l:#f5f3ff;
+  --ink:#0f172a;--ink2:#475569;--ink3:#94a3b8;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff;
+}
+html,body{height:100%}
+body{font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;font-size:13px;color:var(--ink);background:var(--bg);overflow:hidden;-webkit-text-size-adjust:100%}
+.app{height:100dvh;display:flex;background:var(--bg)}
+
+/* ---------- sidebar ---------- */
+.side{width:218px;flex:0 0 218px;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:30}
+.brand{height:58px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--line)}
+.logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex:0 0 32px}
+.brand-t b{display:block;font-size:14px;letter-spacing:.2px}
+.brand-t span{display:block;font-size:10.5px;color:var(--ink3);margin-top:1px}
+.nav{flex:1;overflow-y:auto;padding:12px 10px 26px}
+.nav-g{font-size:10.5px;color:var(--ink3);padding:12px 8px 6px;letter-spacing:1px;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--ink2);margin-bottom:2px;transition:.15s;white-space:nowrap}
+.nav-i:hover{background:var(--bg)}
+.nav-i.on{background:var(--pri-l);color:var(--pri);font-weight:600}
+.nav-i .ic{width:20px;text-align:center;font-size:15px;flex:0 0 20px}
+.nav-i .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.nav-i .pd{font-size:10px;color:var(--pur);background:var(--pur-l);padding:1px 5px;border-radius:5px;flex:0 0 auto}
+.side-f{padding:10px 14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--ink3);line-height:1.6}
+
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:58px;flex:0 0 58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px}
+.burger{display:none;border:1px solid var(--line);background:#fff;border-radius:8px;width:34px;height:34px;font-size:17px;cursor:pointer;color:var(--ink2)}
+.crumb{font-size:12px;color:var(--ink3);min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb b{color:var(--ink);font-weight:600}
+.demo-flag{font-size:10.5px;color:var(--warn);background:var(--warn-l);border:1px solid #fed7aa;padding:4px 9px;border-radius:20px;white-space:nowrap}
+.phone-btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:11.5px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.phone-btn:hover{border-color:var(--pri);color:var(--pri)}
+.view{flex:1;overflow:auto;padding:18px 20px 46px;min-width:0}
+
+/* ---------- shared ---------- */
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.page-head h2{font-size:19px;font-weight:700;letter-spacing:.2px}
+.page-head p{font-size:12px;color:var(--ink2);margin-top:5px;line-height:1.6;max-width:760px}
+.pain{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--pur);background:var(--pur-l);border:1px solid #e9e2ff;padding:5px 10px;border-radius:20px;max-width:430px;line-height:1.5}
+.grid{display:grid;gap:13px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px 17px;box-shadow:0 1px 2px rgba(15,23,42,.03);min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px;min-width:0}
+.card-h h3{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:7px;min-width:0}
+.card-h h3 .dot{width:7px;height:7px;border-radius:2px;background:var(--pri);flex:0 0 7px}
+.card-h .sub{font-size:11px;color:var(--ink3);white-space:nowrap}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:11px;padding:15px 16px;box-shadow:0 1px 2px rgba(15,23,42,.03);min-width:0}
+.kpi .lb{font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.kpi .lb i{width:8px;height:8px;border-radius:3px;display:inline-block;flex:0 0 8px}
+.kpi .vl{font-size:23px;font-weight:800;margin:9px 0 4px;letter-spacing:-.5px;white-space:nowrap}
+.kpi .ex{font-size:10.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.t-ok{background:var(--ok-l);color:var(--ok)}
+.t-warn{background:var(--warn-l);color:var(--warn)}
+.t-dan{background:var(--dan-l);color:var(--dan)}
+.t-pri{background:var(--pri-l);color:var(--pri)}
+.t-pur{background:var(--pur-l);color:var(--pur)}
+.t-gray{background:#f1f5f9;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-weight:600;color:var(--ink2);background:#f8fafc;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafbfe}
+.num{font-variant-numeric:tabular-nums}
+.r{text-align:right}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.tb-wrap{overflow-x:auto}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{font-size:11px;color:var(--ink2);font-weight:600}
+.field select,.field input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.5px;background:#fff;color:var(--ink);min-width:0;width:100%;height:34px}
+.field select:focus,.field input:focus{outline:none;border-color:var(--pri)}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.controls .field{min-width:150px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--pri);color:var(--pri)}
+.btn-pri{border-color:var(--pri);background:var(--pri);color:#fff;font-weight:600}
+.btn-pri:hover{background:#1d4ed8;color:#fff}
+.btn-dan{border-color:#fecaca;background:var(--dan-l);color:var(--dan)}
+.hint{font-size:11px;color:var(--ink3);line-height:1.7}
+.note{background:var(--pri-l);border:1px solid #dbeafe;border-radius:9px;padding:11px 13px;font-size:11.5px;color:#1e40af;line-height:1.7}
+.note.warn{background:var(--warn-l);border-color:#fed7aa;color:#9a3412}
+.bar-track{height:7px;background:#f1f5f9;border-radius:6px;overflow:hidden;min-width:60px}
+.bar-fill{height:100%;border-radius:6px}
+.lg{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink2);margin-bottom:7px}
+.lg i{width:9px;height:9px;border-radius:3px;flex:0 0 9px}
+.lg b{margin-left:auto;color:var(--ink);font-variant-numeric:tabular-nums}
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.legends{flex:1;min-width:132px}
+.flow-step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.flow-step:last-child{border-bottom:none}
+.flow-step .no{width:20px;height:20px;flex:0 0 20px;border-radius:50%;background:var(--pri-l);color:var(--pri);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.flow-step .tx{font-size:11.5px;line-height:1.6;color:var(--ink2)}
+.flow-step .tx b{color:var(--ink)}
+.flow-step .go{font-size:10.5px;color:var(--pri);cursor:pointer;margin-left:4px}
+.alert{padding:11px 13px;border-radius:9px;font-size:12px;line-height:1.6;margin-top:12px;display:none}
+.alert.show{display:block}
+.alert.err{background:var(--dan-l);border:1px solid #fecaca;color:#b91c1c}
+.alert.ok{background:var(--ok-l);border:1px solid #bbf7d0;color:#15803d}
+.mini-badge{font-size:10px;color:var(--ink3);background:#f8fafc;border:1px solid var(--line);padding:2px 6px;border-radius:5px}
+.line-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+.line-item:last-child{border-bottom:none}
+.line-item .p{flex:1;min-width:0}
+.line-item .p b{display:block;font-size:12px}
+.line-item .p span{font-size:10.5px;color:var(--ink3)}
+.qty-in{width:74px;height:30px;border:1px solid var(--line);border-radius:7px;padding:0 7px;font-size:12.5px;text-align:right}
+.qty-in.bad{border-color:var(--dan);background:var(--dan-l);color:var(--dan)}
+.link{color:var(--pri);cursor:pointer}
+.link:hover{text-decoration:underline}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;background:#f8fafc;border:1px solid var(--line);color:var(--ink2)}
+
+/* ---------- overlay ---------- */
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.42);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+.mask.on{opacity:1;pointer-events:auto}
+.toast{position:fixed;left:50%;top:22px;transform:translate(-50%,-16px);background:#0f172a;color:#fff;padding:10px 18px;border-radius:10px;font-size:12.5px;z-index:90;opacity:0;pointer-events:none;transition:.22s;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(15,23,42,.25)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:#b91c1c}
+.toast.ok{background:#15803d}
+
+/* ---------- phone shell ---------- */
+.phone-shell{display:contents}
+.phone-top{display:none}
+body.phone-mode{background:#334155}
+body.phone-mode .phone-shell{display:block;width:412px;margin:14px auto;position:relative}
+body.phone-mode .phone-top{display:flex;align-items:center;justify-content:space-between;background:#0f172a;color:#fff;border-radius:22px 22px 0 0;padding:10px 16px;font-size:12px}
+body.phone-mode .phone-top button{background:#334155;color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:11px;cursor:pointer}
+body.phone-mode .app{width:412px;height:820px;border-radius:0 0 22px 22px;overflow:hidden;transform:translateZ(0);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+
+/* ================= COMPACT ================= */
+body.compact .side{position:fixed;left:0;top:0;bottom:0;width:262px;transform:translateX(-102%);transition:transform .24s;box-shadow:8px 0 30px rgba(15,23,42,.14)}
+body.compact.nav-open .side{transform:translateX(0)}
+body.compact .burger{display:flex;align-items:center;justify-content:center}
+body.compact .top{padding:0 12px;height:52px;flex:0 0 52px;gap:8px}
+body.compact .demo-flag{display:none}
+body.compact .phone-btn{padding:5px 7px;font-size:10.5px}
+body.compact .view{padding:14px 12px 40px}
+body.compact .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.compact .g3,body.compact .g2{grid-template-columns:minmax(0,1fr)}
+body.compact .grid>*,body.compact .g2>*,body.compact .g3>*,body.compact .g4>*{min-width:0}
+body.compact .card,body.compact .kpi{min-width:0;max-width:100%}
+body.compact .card{padding:14px}
+body.compact .card-h>*{min-width:0}
+body.compact .kpi .vl{font-size:20px}
+body.compact .page-head h2{font-size:17px}
+body.compact .pain{max-width:100%}
+body.compact .bar-track{min-width:0}
+body.compact .field input,body.compact .field select{min-width:0;max-width:100%}
+body.compact .controls .field{min-width:0;flex:1 1 44%}
+body.compact .donut-wrap{gap:12px}
+body.compact table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+body.compact th,body.compact td{white-space:nowrap}
+body.compact .tb-wrap table{display:table;width:100%}
+body.compact .tb-wrap.allow table{display:block}
+body.phone-mode .app .side{width:230px;flex-basis:230px}
+body.phone-mode .app{height:820px}
+</style>
+</head>
+<body>
+<div class="phone-shell" id="phoneShell">
+  <div class="phone-top"><span>📱 手机版预览 · 京麦源演示</span><button onclick="togglePhone()">退出预览</button></div>
+  <div class="app" id="app">
+    <aside class="side" id="side">
+      <div class="brand">
+        <div class="logo">麦</div>
+        <div class="brand-t"><b>京麦源 · 数智中枢</b><span>AI 定制软件演示系统</span></div>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-f">西安京麦源食品有限公司<br>演示数据 · 非真实经营数据</div>
+    </aside>
+    <div class="main">
+      <header class="top">
+        <button class="burger" onclick="toggleNav()">☰</button>
+        <div class="crumb" id="crumb"></div>
+        <span class="demo-flag">● 演示数据 · 非真实经营数据</span>
+        <button class="phone-btn" onclick="togglePhone()">📱 手机版</button>
+      </header>
+      <div class="view" id="view"></div>
+    </div>
+    <div class="mask" id="mask" onclick="toggleNav(false)"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DB —— 京麦源行业仿真数据（集中放置，便于按客户真实数据替换）
+   ============================================================ */
+const DISCOUNT = {A:0.85, B:0.90, C:0.95, D:1.00};
+const LEVELNAME = {A:'A类·战略', B:'B类·核心', C:'C类·普通', D:'D类·零散'};
+
+const DB = {
+  company:'西安京麦源食品有限公司',
+  // 产品：展示14个重点SKU（实际 40+）
+  products:[
+    {id:'P01',name:'龙须挂面',cat:'挂面类',spec:'500g/袋',unit:'袋',base:4.5,cost:3.10,stock:820,sold:1240,min:200},
+    {id:'P02',name:'鸡蛋挂面',cat:'挂面类',spec:'500g/袋',unit:'袋',base:5.2,cost:3.60,stock:640,sold:980,min:200},
+    {id:'P03',name:'手擀面',cat:'挂面类',spec:'500g/袋',unit:'袋',base:5.8,cost:4.00,stock:310,sold:1120,min:200},
+    {id:'P04',name:'鲜切面',cat:'鲜面类',spec:'500g/袋',unit:'袋',base:4.0,cost:2.80,stock:0,  sold:2400,min:300},
+    {id:'P05',name:'宽面',cat:'鲜面类',spec:'500g/袋',unit:'袋',base:4.2,cost:2.90,stock:560,sold:1350,min:200},
+    {id:'P06',name:'细面',cat:'鲜面类',spec:'500g/袋',unit:'袋',base:4.0,cost:2.80,stock:480,sold:1180,min:200},
+    {id:'P07',name:'高筋小麦粉',cat:'面粉类',spec:'25kg/袋',unit:'袋',base:78, cost:66.0,stock:145,sold:320, min:50},
+    {id:'P08',name:'中筋面粉',cat:'面粉类',spec:'25kg/袋',unit:'袋',base:72, cost:61.0,stock:210,sold:405, min:50},
+    {id:'P09',name:'东北大米',cat:'米类',spec:'5kg/袋',unit:'袋',base:32, cost:27.0,stock:380,sold:690, min:100},
+    {id:'P10',name:'香米',cat:'米类',spec:'5kg/袋',unit:'袋',base:38, cost:32.0,stock:165,sold:300, min:100},
+    {id:'P11',name:'白面馒头',cat:'面点类',spec:'个',unit:'个',base:1.0,cost:0.62,stock:2400,sold:8600,min:500},
+    {id:'P12',name:'花卷',cat:'面点类',spec:'个',unit:'个',base:1.2,cost:0.75,stock:1800,sold:5200,min:500},
+    {id:'P13',name:'玉米面',cat:'杂粮类',spec:'1kg/袋',unit:'袋',base:6.5,cost:4.60,stock:290,sold:540, min:100},
+    {id:'P14',name:'荞麦面',cat:'杂粮类',spec:'500g/袋',unit:'袋',base:9.8,cost:7.10,stock:95, sold:260, min:100}
+  ],
+  // 客户：12家（演示样本，实际 400+）
+  customers:[
+    {id:'C01',name:'华润万家',type:'商超',level:'A',region:'城东',staff:'王建国',route:'城东线',ar:128000,month:46000,ytd:512000,credit:200000,factor:1.00},
+    {id:'C02',name:'永辉超市',type:'商超',level:'B',region:'城东',staff:'王建国',route:'城东线',ar:96000, month:38000,ytd:430000,credit:150000,factor:1.00},
+    {id:'C03',name:'人人乐',type:'商超',level:'B',region:'城南',staff:'张海涛',route:'城南线',ar:74000, month:29000,ytd:320000,credit:120000,factor:1.00},
+    {id:'C04',name:'碑林张记鲜面',type:'鲜面店',level:'C',region:'城东',staff:'王建国',route:'城东线',ar:32000,month:18000,ytd:198000,credit:60000, factor:1.00},
+    {id:'C05',name:'老字号面馆连锁',type:'餐饮店',level:'B',region:'城西',staff:'李秀芳',route:'城西线',ar:88000,month:41000,ytd:455000,credit:140000,factor:1.00},
+    {id:'C06',name:'西安交大后勤',type:'企事业单位',level:'A',region:'城南',staff:'张海涛',route:'城南线',ar:156000,month:52000,ytd:588000,credit:250000,factor:1.00},
+    {id:'C07',name:'雁塔小学食堂',type:'企事业单位',level:'C',region:'城南',staff:'张海涛',route:'城南线',ar:27000,month:15000,ytd:165000,credit:50000, factor:1.00},
+    {id:'C08',name:'长远便利店',type:'连锁门店',level:'C',region:'城西',staff:'李秀芳',route:'城西线',ar:45000,month:22000,ytd:245000,credit:80000, factor:1.00},
+    {id:'C09',name:'灞桥农贸市场·刘摊',type:'农贸市场',level:'D',region:'城北',staff:'陈晓明',route:'城北线',ar:18000,month:12000,ytd:132000,credit:40000, factor:1.00},
+    {id:'C10',name:'未央鲜面批发',type:'鲜面店',level:'B',region:'城北',staff:'陈晓明',route:'城北线',ar:67000,month:33000,ytd:366000,credit:110000,factor:1.00},
+    {id:'C11',name:'曲江餐饮集团',type:'餐饮店',level:'A',region:'城南',staff:'张海涛',route:'城南线',ar:118000,month:49000,ytd:540000,credit:190000,factor:1.00},
+    {id:'C12',name:'高新白领食堂',type:'企事业单位',level:'B',region:'城西',staff:'李秀芳',route:'城西线',ar:53000,month:26000,ytd:286000,credit:90000, factor:1.00}
+  ],
+  // 业务员（ytd 由名下客户累计消费汇总得出，保证口径一致）
+  staff:[
+    {name:'王建国',region:'城东',target:2000000},
+    {name:'李秀芳',region:'城西',target:1800000},
+    {name:'张海涛',region:'城南',target:1600000},
+    {name:'陈晓明',region:'城北',target:1500000}
+  ],
+  regions:['城东','城西','城南','城北'],
+  routes:['城东线','城西线','城南线','城北线'],
+  // 账龄分桶（合计 = 应收合计 902000）
+  aging:[
+    {k:'30天内',v:386000,c:'#16a34a'},
+    {k:'31-60天',v:275000,c:'#2563eb'},
+    {k:'61-90天',v:156000,c:'#e8890c'},
+    {k:'90天以上',v:85000,c:'#e5484d'}
+  ],
+  // 近6个月销售趋势（万元口径，合计=累计业绩423.7万）
+  trend:[{m:'6月',v:620000},{m:'7月',v:650000},{m:'8月',v:680000},{m:'9月',v:730000},{m:'10月',v:770000},{m:'11月',v:787000}],
+  // 原料批次与溯源
+  batches:[
+    {id:'M-2401',mat:'高筋小麦粉',supplier:'西安面粉厂',in:'2026-10-12',qty:2000,used:1640,to:'P07/P01/P03'},
+    {id:'M-2402',mat:'鲜鸡蛋',supplier:'渭南蛋业',in:'2026-10-28',qty:520, used:410, to:'P02/P11'},
+    {id:'M-2403',mat:'东北稻谷',supplier:'东北粮贸',in:'2026-11-02',qty:3000,used:2210,to:'P09/P10'},
+    {id:'M-2404',mat:'中筋小麦粉',supplier:'西安面粉厂',in:'2026-11-06',qty:1800,used:1220,to:'P08/P05/P06'},
+    {id:'M-2405',mat:'玉米糁',supplier:'本地杂粮合作社',in:'2026-11-09',qty:600, used:480, to:'P13'},
+    {id:'M-2406',mat:'荞麦',supplier:'本地杂粮合作社',in:'2026-11-11',qty:400, used:310, to:'P14'}
+  ],
+  // 分次入库登记
+  inbounds:[
+    {no:'RK-1128',mat:'高筋小麦粉',batch:'M-2401',qty:1200,time:'2026-10-12 09:20',by:'赵仓管',times:'第1次'},
+    {no:'RK-1135',mat:'高筋小麦粉',batch:'M-2401',qty:800, time:'2026-10-16 14:05',by:'赵仓管',times:'第2次'},
+    {no:'RK-1142',mat:'东北稻谷',batch:'M-2403',qty:1800,time:'2026-11-02 08:40',by:'钱库管',times:'第1次'},
+    {no:'RK-1147',mat:'东北稻谷',batch:'M-2403',qty:1200,time:'2026-11-04 16:30',by:'钱库管',times:'第2次'},
+    {no:'RK-1151',mat:'中筋小麦粉',batch:'M-2404',qty:1800,time:'2026-11-06 10:15',by:'赵仓管',times:'第1次'}
+  ],
+  // 库存损耗与差异
+  stockDiff:[
+    {mat:'高筋小麦粉',book:1450,real:1422,diff:-28,type:'折损',reason:'装卸破包'},
+    {mat:'鲜鸡蛋',book:110, real:104, diff:-6, type:'报损',reason:'运输破损'},
+    {mat:'东北稻谷',book:790, real:793, diff:3, type:'溢余',reason:'称重误差'},
+    {mat:'中筋小麦粉',book:580, real:568, diff:-12,type:'折损',reason:'受潮结块'}
+  ],
+  // 生产倍率 / 成本分摊（针对重点成品）
+  costRows:[
+    {pid:'P01',matIn:1640,out:1790,costMat:3.10,aux:0.28,mfg:0.42},
+    {pid:'P02',matIn:410, out:462, costMat:3.60,aux:0.34,mfg:0.46},
+    {pid:'P07',matIn:2000,out:1810,costMat:66.0,aux:2.40,mfg:4.10},
+    {pid:'P09',matIn:2210,out:2010,costMat:27.0,aux:1.10,mfg:2.30},
+    {pid:'P11',matIn:410, out:3860,costMat:0.62,aux:0.06,mfg:0.10}
+  ],
+  // 送货单演示订单（按线路）
+  routeOrders:[
+    {route:'城东线',region:'城东',pid:'P01',qty:120},
+    {route:'城东线',region:'城东',pid:'P04',qty:80},
+    {route:'城东线',region:'城东',pid:'P05',qty:60},
+    {route:'城西线',region:'城西',pid:'P02',qty:95},
+    {route:'城西线',region:'城西',pid:'P09',qty:40},
+    {route:'城南线',region:'城南',pid:'P03',qty:70},
+    {route:'城南线',region:'城南',pid:'P06',qty:110},
+    {route:'城南线',region:'城南',pid:'P11',qty:500},
+    {route:'城北线',region:'城北',pid:'P07',qty:25},
+    {route:'城北线',region:'城北',pid:'P10',qty:30}
+  ],
+  // 双向对账记录
+  recon:[
+    {no:'DZ-1031',cust:'华润万家',period:'2026-10',amt:128000,status:'已确认',way:'客户端自助'},
+    {no:'DZ-1028',cust:'永辉超市',period:'2026-10',amt:96000, status:'待确认',way:'客户端自助'},
+    {no:'DZ-1026',cust:'西安交大后勤',period:'2026-10',amt:156000,status:'已确认',way:'后台导出'},
+    {no:'DZ-1022',cust:'曲江餐饮集团',period:'2026-10',amt:118000,status:'已确认',way:'后台导出'},
+    {no:'DZ-1019',cust:'老字号面馆连锁',period:'2026-10',amt:88000, status:'待确认',way:'客户端自助'}
+  ],
+  timeCash:342000, periodAr:902000, monthEnd:968000
+};
+
+/* ---------- derived helpers ---------- */
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const p2=n=>Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=n=>'¥'+Number(n).toLocaleString('zh-CN');
+const wan=n=>(n/10000).toFixed(1)+'万';
+const staffYtd=name=>sum(DB.customers.filter(c=>c.staff===name),c=>c.ytd);
+const totalYtd=sum(DB.customers,c=>c.ytd);
+const totalAr=sum(DB.customers,c=>c.ar);
+const totalTarget=sum(DB.staff,s=>s.target);
+const prodById=id=>DB.products.find(p=>p.id===id);
+const custById=id=>DB.customers.find(c=>c.id===id);
+const priceFor=(pid,level,factor)=>+(prodById(pid).base*DISCOUNT[level]*(factor||1)).toFixed(2);
+
+/* ---------- page registry ---------- */
+const PAGES=[
+  {id:'dash',name:'经营驾驶舱',icon:'▦',group:'总览',pain:''},
+  {id:'customer',name:'客户专属价格',icon:'◈',group:'客户经营',pain:'#1 #4'},
+  {id:'billing',name:'账单与欠款',icon:'▤',group:'客户经营',pain:'#2'},
+  {id:'credit',name:'信用额度管控',icon:'⛨',group:'客户经营',pain:'#3'},
+  {id:'order',name:'AI 智慧录单',icon:'✎',group:'订单流转',pain:'#5 #6 #7 #8'},
+  {id:'delivery',name:'单据与送货单',icon:'▣',group:'订单流转',pain:'#9 #10 #11'},
+  {id:'inventory',name:'出入库与溯源',icon:'▥',group:'供应链',pain:'#12 #13 #14'},
+  {id:'cost',name:'成本核算',icon:'∑',group:'供应链',pain:'#15'},
+  {id:'finance',name:'财务对账',icon:'⇄',group:'财务闭环',pain:'#16 #17 #18'}
+];
+const PAINS={
+  1:'一客一价、专属价防泄露',2:'欠款不透明、对账难',3:'超额下单无管控',4:'区域业绩/欠款难汇总',
+  5:'客户下单慢、复购繁琐',6:'改单补单与多规格录入难',7:'超库存接单',8:'损耗无记录',
+  9:'按路线/区域筛选难',10:'线路汇总打印难',11:'送货单含无货产品',12:'分次入库难',
+  13:'库存差异与损耗不可追溯',14:'原料与成品无关联',15:'生产倍率与成本不清',
+  16:'日/月/账期账单统计难',17:'区域欠款与坏账难控',18:'双向对账难'
+};
+function painTag(nums){
+  if(!nums) return '';
+  const t=nums.split(' ').map(n=>n.replace('#','')+' '+PAINS[n.replace('#','')]).join('；');
+  return '<span class="pain">🎯 解决痛点：'+t+'</span>';
+}
+function head(id){
+  const p=PAGES.find(x=>x.id===id);
+  const desc={
+    dash:'一屏掌握客户、订单、库存、财务与风控核心指标。右侧为建议的售前演示动线，按顺序点击即可完整讲一遍客户痛点。',
+    customer:'为每位客户预设专属成交价，客户端仅可见自身价格，杜绝价格泄露。切换客户或等级，单价与毛利实时重算。',
+    billing:'客户可自助查看单批次欠款、欠款总额、月度消费与历史对账记录，账目全程透明可查。',
+    credit:'按客户设置信用额度，超额自动锁定下单；业务经理可自定义解锁时长与临时额度，兼顾风控与灵活。',
+    order:'客户自主下单 +「再来一单」，内勤代单改单；AI 智慧录单自动识别规格，实时联动库存并登记损耗。',
+    delivery:'按司机路线 / 业务员区域双维度筛选，自动生成线路汇总单；送货单只印有现货产品，可自定义模板。',
+    inventory:'原料与成品支持分次入库，自动统计报损折损与账实差异，并将每批原料用量绑定至对应成品，全程可溯源。',
+    cost:'基于原料实际用量自动核算生产倍率与损耗倍率，分摊出每款产品的原辅料综合成本，为定价与利润提供支撑。',
+    finance:'每日 / 账期 / 月底多层级账单汇总，区域欠款自动归集，支持客户端自助对账与后台一键导出。'
+  };
+  return '<div class="page-head"><div><h2>'+p.name+'</h2><p>'+desc[id]+'</p></div>'+painTag(p.pain)+'</div>';
+}
+
+/* ---------- SVG charts ---------- */
+function donut(items,totalText){
+  const size=172,cx=86,cy=86,r=58,c=2*Math.PI*r;
+  const total=items.reduce((s,i)=>s+i.v,0)||1;
+  let off=0;
+  const segs=items.map(it=>{
+    const len=it.v/total*c;
+    const s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+it.c+'" stroke-width="22" stroke-dasharray="'+(len-2)+' '+(c-len+2)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    off+=len; return s;
+  }).join('');
+  const lg=items.map(it=>'<div class="lg"><i style="background:'+it.c+'"></i><span>'+it.k+'</span><b>'+(it.v/total*100).toFixed(1)+'%</b></div>').join('');
+  return '<div class="donut-wrap"><svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="flex:0 0 '+size+'px">'+segs+
+    '<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="12" fill="#94a3b8">累计消费</text>'+
+    '<text x="'+cx+'" y="'+(cy+17)+'" text-anchor="middle" font-size="18" font-weight="800" fill="#0f172a">'+(totalText||wan(total))+'</text></svg>'+
+    '<div class="legends">'+lg+'</div></div>';
+}
+function barChart(items,fmt){
+  const w=480,h=176,padL=48,padB=26,padT=10;
+  const max=Math.max.apply(null,items.map(i=>i.v))*1.12||1;
+  const rowH=(h-padT-padB)/items.length;
+  let out='';
+  items.forEach((it,i)=>{
+    const bw=(it.v/max)*(w-padL-16);
+    const y=padT+i*rowH+rowH*0.18;
+    const bh=rowH*0.6;
+    out+='<text x="'+(padL-8)+'" y="'+(y+bh*0.72)+'" text-anchor="end" font-size="11" fill="#475569">'+it.k+'</text>';
+    out+='<rect x="'+padL+'" y="'+y+'" width="'+(w-padL-16)+'" height="'+bh+'" rx="4" fill="#f1f5f9"/>';
+    out+='<rect x="'+padL+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="4" fill="'+(it.c||'#2563eb')+'"/>';
+    out+='<text x="'+(padL+bw+6)+'" y="'+(y+bh*0.74)+'" font-size="10.5" fill="#475569">'+(fmt?fmt(it.v):it.v)+'</text>';
+  });
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block">'+out+'</svg>';
+}
+function lineChart(items){
+  const w=480,h=176,padL=40,padB=24,padT=12;
+  const max=Math.max.apply(null,items.map(i=>i.v))*1.15;
+  const min=Math.min.apply(null,items.map(i=>i.v))*0.85;
+  const pts=items.map((it,i)=>{
+    const x=padL+i*(w-padL-14)/(items.length-1);
+    const y=padT+(1-(it.v-min)/(max-min))*(h-padT-padB);
+    return {x:x,y:y,it:it};
+  });
+  const poly=pts.map(p=>p.x+','+p.y).join(' ');
+  const area='M'+pts[0].x+','+(h-padB)+' L'+pts.map(p=>p.x+','+p.y).join(' L')+' L'+pts[pts.length-1].x+','+(h-padB)+' Z';
+  let out='<path d="'+area+'" fill="#eff6ff"/>';
+  out+='<polyline points="'+poly+'" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>';
+  pts.forEach(p=>{
+    out+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3.5" fill="#fff" stroke="#2563eb" stroke-width="2"/>';
+    out+='<text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" font-size="10" fill="#475569">'+wan(p.it.v)+'</text>';
+    out+='<text x="'+p.x+'" y="'+(h-6)+'" text-anchor="middle" font-size="10.5" fill="#94a3b8">'+p.it.m+'</text>';
+  });
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block">'+out+'</svg>';
+}
+
+/* ---------- state ---------- */
+const ST={
+  custId:'C01',level:'A',factor:1.00,
+  orderCust:'C01',substitute:false,lines:[{pid:'P01',qty:50,loss:0}],
+  filtRoute:'全部',filtRegion:'全部',hideNoStock:true,showPrice:false
+};
+
+/* ============================================================
+   PAGE RENDERERS
+   ============================================================ */
+function renderDash(){
+  const rate=(totalYtd/totalTarget*100).toFixed(1);
+  const chans=[...new Set(DB.customers.map(c=>c.type))].map(t=>({k:t,v:sum(DB.customers.filter(c=>c.type===t),c=>c.ytd)}));
+  const colors=['#2563eb','#7c3aed','#16a34a','#e8890c','#e5484d','#0891b2'];
+  chans.forEach((c,i)=>c.c=colors[i%colors.length]);
+  const staffBars=DB.staff.map(s=>({k:s.region,v:staffYtd(s.name),c:'#2563eb'}));
+  const steps=[
+    ['经营驾驶舱','先讲整体规模与业务闭环，建立客户信任','dash'],
+    ['客户专属价格','一客一价 + 切换等级实时改价，直击价格泄露痛点','customer'],
+    ['信用额度管控','演示超额锁定与经理解锁，讲清风控','credit'],
+    ['AI 智慧录单','AI 录单 + 9999 超库存拦截，全场高潮','order'],
+    ['单据与送货单','按线路筛选、汇总打印、只印现货','delivery'],
+    ['出入库与溯源','分次入库 + 原料溯源，讲供应链规范','inventory'],
+    ['成本核算','生产倍率与成本分摊，讲精细化经营','cost'],
+    ['财务对账','区域欠款汇总 + 双向对账收尾','finance']
+  ];
+  return head('dash')+
+  '<div class="grid g4" style="margin-bottom:13px">'+
+    kpi('本月消费合计','#2563eb',money(sum(DB.customers,c=>c.month)),'12家样本客户 · 全渠道')+
+    kpi('应收欠款总额','#e8890c',money(totalAr),'账期口径 · 见财务对账')+
+    kpi('累计业绩(YTD)','#16a34a',money(totalYtd),'4名业务员汇总')+
+    kpi('年度目标完成率','#7c3aed',rate+'%',money(totalYtd)+' / '+money(totalTarget))+
+  '</div>'+
+  '<div class="grid g2" style="margin-bottom:13px">'+
+    '<div class="card"><div class="card-h"><h3><span class="dot"></span>渠道消费结构</h3><span class="sub">按累计消费 · 占比合计 100%</span></div>'+donut(chans)+'</div>'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#16a34a"></span>区域业绩分布</h3><span class="sub">业务员业绩 = 名下客户之和</span></div>'+barChart(staffBars,v=>wan(v))+'</div>'+
+  '</div>'+
+  '<div class="grid g2">'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#7c3aed"></span>近6个月销售趋势</h3><span class="sub">口径：全渠道累计销售额</span></div>'+lineChart(DB.trend)+'</div>'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#e8890c"></span>推荐演示动线（点击直达）</h3><span class="sub">约 8 分钟讲完全部痛点</span></div>'+
+      steps.map((s,i)=>'<div class="flow-step"><span class="no">'+(i+1)+'</span><span class="tx"><b>'+s[1]+'</b><br>'+s[2]+'<span class="go" onclick="go(\''+s[3]+'\')">→ 进入</span></span></div>').join('')+
+    '</div>'+
+  '</div>'+
+  '<div class="note" style="margin-top:13px">💡 <b>业务闭环：</b>客户档案+专属价+信用额度 → 客户/内勤下单(联动库存+损耗) → 原料分次入库+成品出库 → 自动核算倍率与成本 → 生成日/月/账期账单并双向对账 → 超额锁定、经理解锁，全链路闭环。</div>';
+}
+function kpi(lb,color,vl,ex){
+  return '<div class="kpi"><div class="lb"><i style="background:'+color+'"></i>'+lb+'</div><div class="vl">'+vl+'</div><div class="ex">'+ex+'</div></div>';
+}
+
+function renderCustomer(){
+  const cs=DB.customers;
+  const custOpts=cs.map(c=>'<option value="'+c.id+'"'+(c.id===ST.custId?' selected':'')+'>'+c.name+'（'+c.type+'）</option>').join('');
+  const lvOpts=Object.keys(DISCOUNT).map(l=>'<option value="'+l+'"'+(l===ST.level?' selected':'')+'>'+LEVELNAME[l]+' · '+Math.round(DISCOUNT[l]*100)+'折</option>').join('');
+  const rows=DB.products.map(p=>{
+    const pr=priceFor(p.id,ST.level,ST.factor);
+    const gp=pr-p.cost, gpr=(gp/pr*100).toFixed(1);
+    return '<tr><td><b>'+p.name+'</b></td><td>'+p.cat+'</td><td>'+p.spec+'</td>'+
+      '<td class="r num">'+p2(p.base)+'</td>'+
+      '<td class="r num" style="color:var(--pri);font-weight:700">'+p2(pr)+'</td>'+
+      '<td class="r num">'+p2(p.cost)+'</td>'+
+      '<td class="r num" style="color:var(--ok);font-weight:600">'+p2(gp)+'</td>'+
+      '<td class="r"><span class="tag '+(gpr>=18?'t-ok':gpr>=10?'t-warn':'t-dan')+'">'+gpr+'%</span></td></tr>';
+  }).join('');
+  const regRows=DB.regions.map(r=>{
+    const list=cs.filter(c=>c.region===r);
+    return '<tr><td><b>'+r+'</b></td><td>'+list.length+'</td><td class="r num">'+money(sum(list,c=>c.ytd))+'</td><td class="r num" style="color:var(--warn)">'+money(sum(list,c=>c.ar))+'</td></tr>';
+  }).join('');
+  return head('customer')+
+  '<div class="card" style="margin-bottom:13px"><div class="card-h"><h3><span class="dot"></span>专属价实时试算</h3><span class="sub">切换客户或等级 → 单价/折扣/毛利立刻重算</span></div>'+
+    '<div class="controls">'+
+      '<div class="field"><label>选择客户（一客一价）</label><select id="custSel" onchange="onCustChange()">'+custOpts+'</select></div>'+
+      '<div class="field"><label>客户等级（折扣）</label><select id="lvSel" onchange="onLevelChange()">'+lvOpts+'</select></div>'+
+      '<div class="field" style="min-width:130px"><label>专属调价系数</label><input id="facIn" type="number" step="0.01" min="0.5" max="1.2" value="'+ST.factor+'" onchange="onFactorChange()"></div>'+
+      '<div class="btn btn-pri" onclick="resetFactor()" style="align-self:flex-end">恢复默认价</div>'+
+    '</div>'+
+    '<div class="note">当前：<b>'+custById(ST.custId).name+'</b> · '+LEVELNAME[ST.level]+' · 折扣 <b>'+Math.round(DISCOUNT[ST.level]*100)+'%</b> · 调价系数 <b>'+ST.factor+'</b>。客户端仅可见下方「成交价」，看不到基准价与成本。</div>'+
+    '<div class="tb-wrap" style="margin-top:12px"><table><thead><tr><th>产品</th><th>品类</th><th>规格</th><th class="r">基准价</th><th class="r">成交价(专属)</th><th class="r">单位成本</th><th class="r">毛利</th><th class="r">毛利率</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="alert ok" id="priceAlert">✅ 已按当前客户等级重新计算全部成交价与毛利。现场可对照客户真实报价单逐项核对。</div>'+
+  '</div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#7c3aed"></span>客户区域分类管理</h3><span class="sub">按业务员区域归类，支撑区域业绩/欠款汇总</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>区域</th><th>客户数</th><th class="r">累计消费</th><th class="r">欠款合计</th></tr></thead><tbody>'+regRows+'</tbody></table></div></div>';
+}
+function onCustChange(){
+  ST.custId=document.getElementById('custSel').value;
+  const c=custById(ST.custId); ST.level=c.level; ST.factor=c.factor;
+  document.getElementById('lvSel').value=ST.level;
+  document.getElementById('facIn').value=ST.factor;
+  refreshCustomer();
+}
+function onLevelChange(){ST.level=document.getElementById('lvSel').value;refreshCustomer();}
+function onFactorChange(){ST.factor=parseFloat(document.getElementById('facIn').value)||1;refreshCustomer();}
+function resetFactor(){ST.factor=custById(ST.custId).factor;document.getElementById('facIn').value=ST.factor;refreshCustomer();}
+function refreshCustomer(){
+  document.getElementById('view').innerHTML=renderCustomer();
+  const a=document.getElementById('priceAlert'); if(a){a.classList.add('show');setTimeout(()=>a.classList.remove('show'),2600);}
+}
+
+function renderBilling(){
+  const cc=custById(ST.custId);
+  const hist=[
+    {d:'2026-11-14',type:'订单欠款',amt:12800,bal:cc.ar},
+    {d:'2026-11-09',type:'对账确认',amt:-18000,bal:cc.ar-12800},
+    {d:'2026-11-03',type:'订单欠款',amt:24600,bal:cc.ar+5000},
+    {d:'2026-10-28',type:'回款',amt:-30000,bal:cc.ar-19600},
+    {d:'2026-10-20',type:'订单欠款',amt:31800,bal:cc.ar+10400}
+  ];
+  const opts=DB.customers.map(c=>'<option value="'+c.id+'"'+(c.id===ST.custId?' selected':'')+'>'+c.name+'</option>').join('');
+  const cRows=DB.customers.map(c=>{
+    const r=c.ar/c.credit;
+    return '<tr><td><b>'+c.name+'</b></td><td>'+c.type+'</td><td class="r num">'+money(c.month)+'</td><td class="r num" style="color:var(--warn);font-weight:600">'+money(c.ar)+'</td><td class="r num">'+money(c.credit)+'</td>'+
+      '<td style="min-width:110px"><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(r*100,100)+'%;background:'+(r>0.9?'#e5484d':r>0.7?'#e8890c':'#16a34a')+'"></div></div></td></tr>';
+  }).join('');
+  return head('billing')+
+  '<div class="controls"><div class="field"><label>查看客户</label><select onchange="ST.custId=this.value;go(\'billing\')">'+opts+'</select></div><span class="hint">← 切换客户，下方账单明细与欠款概览同步更新</span></div>'+
+  '<div class="grid g4" style="margin-bottom:13px">'+
+    kpi('当前欠款总额','#e5484d',money(cc.ar),'账期：月结30天')+
+    kpi('本月消费总额','#2563eb',money(cc.month),'较上月 +8.6%')+
+    kpi('单批次欠款','#e8890c',money(12800),'最近一笔 2026-11-14')+
+    kpi('信用额度','#16a34a',money(cc.credit),'已用 '+(cc.ar/cc.credit*100).toFixed(0)+'%')+
+  '</div>'+
+  '<div class="grid g2">'+
+    '<div class="card"><div class="card-h"><h3><span class="dot"></span>'+cc.name+' · 历史对账与欠款记录</h3><span class="sub">客户端自助可查</span></div>'+
+      '<div class="tb-wrap"><table><thead><tr><th>日期</th><th>类型</th><th class="r">金额</th><th class="r">余额</th></tr></thead><tbody>'+
+      hist.map(h=>'<tr><td>'+h.d+'</td><td><span class="tag '+(h.amt<0?'t-ok':'t-warn')+'">'+h.type+'</span></td><td class="r num" style="color:'+(h.amt<0?'var(--ok)':'var(--ink)')+'">'+(h.amt<0?'-':'+')+money(Math.abs(h.amt))+'</td><td class="r num">'+money(h.bal)+'</td></tr>').join('')+
+      '</tbody></table></div></div>'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#e8890c"></span>全客户欠款概览</h3><span class="sub">账目透明 · 便于催收</span></div>'+
+      '<div class="tb-wrap"><table><thead><tr><th>客户</th><th>类型</th><th class="r">本月消费</th><th class="r">欠款</th><th class="r">额度</th><th>占用</th></tr></thead><tbody>'+cRows+'</tbody></table></div></div>'+
+  '</div>';
+}
+
+function renderCredit(){
+  const rows=DB.customers.map(c=>{
+    const used=(c.ar/c.credit*100);
+    const locked=c.ar>=c.credit*0.95;
+    return '<tr><td><b>'+c.name+'</b></td><td>'+LEVELNAME[c.level]+'</td><td class="r num">'+money(c.credit)+'</td><td class="r num">'+money(c.ar)+'</td>'+
+      '<td style="min-width:120px"><div class="bar-track"><div class="bar-fill" style="width:'+Math.min(used,100)+'%;background:'+(locked?'#e5484d':used>75?'#e8890c':'#16a34a')+'"></div></div><span class="hint">'+used.toFixed(0)+'%</span></td>'+
+      '<td>'+(locked?'<span class="tag t-dan">已锁定</span>':used>75?'<span class="tag t-warn">临界</span>':'<span class="tag t-ok">正常</span>')+'</td>'+
+      '<td>'+(locked?'<span class="link" onclick="openUnlock(\''+c.id+'\')">经理解锁</span>':'<span class="mini-badge">—</span>')+'</td></tr>';
+  }).join('');
+  return head('credit')+
+  '<div class="grid g4" style="margin-bottom:13px">'+
+    kpi('临界客户','#e8890c',DB.customers.filter(c=>c.ar/c.credit>0.75&&c.ar/c.credit<0.95).length+' 家','欠款占用超 75%')+
+    kpi('锁定客户','#e5484d',DB.customers.filter(c=>c.ar>=c.credit*0.95).length+' 家','下单权限已冻结')+
+    kpi('风控拦截金额','#7c3aed',money(68000),'本月累计拦截')+
+    kpi('解锁审批','#16a34a','3 笔','本月经理临时解锁')+
+  '</div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot"></span>客户信用额度台账</h3><span class="sub">超额自动锁定 · 经理可临时解锁</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>客户</th><th>等级</th><th class="r">信用额度</th><th class="r">累计欠款</th><th>额度占用</th><th>状态</th><th>操作</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="note warn" style="margin-top:12px">🛡️ <b>演示要点：</b>客户下单金额 / 累计欠款超出额度 → 系统自动锁定下单权限；业务经理可自定义解锁时长与临时额度，既控坏账风险，又不耽误紧急订单。点击右侧「经理解锁」体验。</div>'+
+    '<div class="alert ok" id="unlockMsg"></div>'+
+  '</div>'+
+  '<div class="mask" id="unlockMask" style="z-index:41"></div>'+
+  '<div id="unlockBox" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;width:min(420px,92vw);background:#fff;border-radius:14px;padding:20px;box-shadow:0 20px 60px rgba(15,23,42,.3)">'+
+    '<div class="card-h"><h3>🔓 经理临时解锁</h3><span class="link" onclick="closeUnlock()">关闭</span></div>'+
+    '<div id="unlockBody"></div>'+
+  '</div>';
+}
+function openUnlock(id){
+  const c=custById(id);
+  document.getElementById('unlockBody').innerHTML=
+    '<div class="note">客户：<b>'+c.name+'</b> · 当前欠款 '+money(c.ar)+' · 额度 '+money(c.credit)+'</div>'+
+    '<div class="grid g2" style="margin-top:12px">'+
+      '<div class="field"><label>临时增加额度</label><input id="tmpCredit" type="number" value="50000" step="10000"></div>'+
+      '<div class="field"><label>解锁时长</label><select id="tmpHours"><option>2 小时</option><option>24 小时</option><option>至本单完成</option></select></div>'+
+    '</div>'+
+    '<div class="field" style="margin-top:10px"><label>解锁原因</label><input value="紧急集采订单，客户已回款在途" ></div>'+
+    '<div class="btn btn-pri" style="margin-top:14px;width:100%" onclick="doUnlock(\''+id+'\')">确认解锁并放行下单</div>';
+  document.getElementById('unlockBox').style.display='block';
+  document.getElementById('unlockMask').classList.add('on');
+}
+function closeUnlock(){document.getElementById('unlockBox').style.display='none';document.getElementById('unlockMask').classList.remove('on');}
+function doUnlock(id){
+  const c=custById(id), amt=Number(document.getElementById('tmpCredit').value)||0;
+  closeUnlock();
+  const m=document.getElementById('unlockMsg');
+  if(m){m.textContent='✅ 已为「'+c.name+'」临时增加额度 '+money(amt)+'，解锁 '+(document.getElementById('tmpHours')?document.getElementById('tmpHours').value:'2 小时')+'。下单权限已恢复，操作留痕可追溯。';m.classList.add('show');}
+  toast('解锁成功，已放行下单','ok');
+}
+
+function renderOrder(){
+  const custOpts=DB.customers.map(c=>'<option value="'+c.id+'"'+(c.id===ST.orderCust?' selected':'')+'>'+c.name+'</option>').join('');
+  const prodOpts=DB.products.map(p=>'<option value="'+p.id+'">'+p.name+'（'+p.spec+'）</option>').join('');
+  const c=custById(ST.orderCust);
+  let total=0,totalLoss=0;
+  const lineHtml=ST.lines.map((ln,i)=>{
+    const p=prodById(ln.pid);
+    const pr=priceFor(ln.pid,c.level,c.factor);
+    const amt=pr*ln.qty; total+=amt; totalLoss+=ln.loss;
+    const bad=ln.qty+ln.loss>p.stock;
+    return '<div class="line-item">'+
+      '<select class="qty-in" style="width:132px;text-align:left" onchange="ST.lines['+i+'].pid=this.value;go(\'order\')">'+prodOpts.replace('value="'+ln.pid+'"','value="'+ln.pid+'" selected')+'</select>'+
+      '<div class="p"><b>'+p.name+'</b><span>规格 '+p.spec+' · 库存 <b style="color:'+(p.stock<p.min?'var(--dan)':'var(--ink2)')+'">'+p.stock+'</b> · 已售 '+p.sold+'</span></div>'+
+      '<label class="hint" style="white-space:nowrap">数量 <input class="qty-in '+(bad?'bad':'')+'" type="number" min="0" value="'+ln.qty+'" onchange="ST.lines['+i+'].qty=+this.value;go(\'order\')"></label>'+
+      '<label class="hint" style="white-space:nowrap">损耗 <input class="qty-in" type="number" min="0" value="'+ln.loss+'" onchange="ST.lines['+i+'].loss=+this.value;go(\'order\')"></label>'+
+      '<span class="num" style="min-width:66px;text-align:right">'+money(amt)+'</span>'+
+      '<span class="link" onclick="ST.lines.splice('+i+',1);go(\'order\')">删除</span>'+
+    '</div>';
+  }).join('');
+  return head('order')+
+  '<div class="controls">'+
+    '<div class="field"><label>下单客户</label><select onchange="ST.orderCust=this.value;go(\'order\')">'+custOpts+'</select></div>'+
+    '<div class="field"><label>单据模式</label><select onchange="ST.substitute=this.value===\'1\';go(\'order\')"><option value="0"'+(ST.substitute?'':' selected')+'>客户自主下单</option><option value="1"'+(ST.substitute?' selected':'')+'>内勤代单 / 改单</option></select></div>'+
+    '<span class="hint">当前客户等级 '+LEVELNAME[c.level]+'，单据自动带出专属价</span>'+
+  '</div>'+
+  '<div class="grid g2" style="margin-bottom:13px">'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#7c3aed"></span>AI 智慧录单</h3><span class="sub">自然语言 → 自动识别产品/规格/数量</span></div>'+
+      '<div class="field"><label>试试输入（点击示例一键填入）</label><textarea id="aiText" style="width:100%;min-height:66px;border:1px solid var(--line);border-radius:8px;padding:9px;font-size:12.5px;resize:vertical"> '+c.name+'：要 60 袋龙须挂面、25 袋高筋小麦粉，损耗记 2 袋</textarea></div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px">'+
+        '<span class="pill link" onclick="fillAI(1)">示例1·常规单</span>'+
+        '<span class="pill link" onclick="fillAI(2)">示例2·超库存单(9999)</span>'+
+        '<span class="pill link" onclick="fillAI(3)">示例3·多规格单</span>'+
+        '<span class="btn btn-pri" style="margin-left:auto" onclick="aiParse()">✨ AI 识别录单</span>'+
+      '</div>'+
+      '<div class="hint" style="margin-top:8px">AI 已内置 40+ SKU 识别库，支持「固定规格 + 自定义规格」混合录入。</div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#16a34a"></span>实时库存联动</h3><span class="sub">录入时即时查看现货，杜绝超库存接单</span></div>'+
+      '<div class="tb-wrap"><table><thead><tr><th>产品</th><th class="r">当前库存</th><th class="r">已售</th><th class="r">可售余量</th><th>状态</th></tr></thead><tbody>'+
+      DB.products.slice(0,7).map(p=>'<tr><td>'+p.name+'</td><td class="r num">'+p.stock+'</td><td class="r num">'+p.sold+'</td><td class="r num">'+p.stock+'</td><td>'+(p.stock===0?'<span class="tag t-dan">缺货</span>':p.stock<p.min?'<span class="tag t-warn">偏低</span>':'<span class="tag t-ok">充足</span>')+'</td></tr>').join('')+
+      '</tbody></table></div></div>'+
+  '</div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot"></span>'+(ST.substitute?'代单 / 改单':'客户下单')+'明细</h3>'+
+    '<div style="display:flex;gap:8px"><span class="btn" onclick="loadLast()">↻ 再来一单</span><span class="btn" onclick="ST.lines.push({pid:\'P01\',qty:20,loss:0});go(\'order\')">+ 添加行</span></div></div>'+
+    lineHtml+
+    '<div style="display:flex;justify-content:flex-end;gap:26px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">'+
+      '<span class="hint">损耗合计 <b style="color:var(--warn)">'+totalLoss+'</b></span>'+
+      '<span style="font-size:13px;color:var(--ink2)">订单金额</span><span class="num" style="font-size:21px;font-weight:800;color:var(--pri)">'+money(total)+'</span>'+
+      '<span class="btn btn-pri" onclick="submitOrder()">提交订单</span>'+
+    '</div>'+
+    '<div class="alert err" id="orderErr"></div><div class="alert ok" id="orderOk"></div>'+
+    '<div class="note" style="margin-top:12px">⚠️ <b>现场必演：</b>点「示例2·超库存单(9999)」→ AI 录单 → 提交，系统将拦截并提示超出可用库存。这是客户最在意的「杜绝超库存接单」卖点。</div>'+
+  '</div>';
+}
+function fillAI(n){
+  const c=custById(ST.orderCust).name;
+  const txts={
+    1:''+c+'：要 60 袋龙须挂面、25 袋高筋小麦粉，损耗记 2 袋',
+    2:''+c+'：龙须挂面 9999 袋，急单',
+    3:''+c+'：手擀面 500g 30袋、宽面 500g 45袋、白面馒头 200 个'
+  };
+  document.getElementById('aiText').value=txts[n];
+  toast('已填入示例'+(n===2?'（超库存单）':''));
+}
+function aiParse(){
+  const t=document.getElementById('aiText').value;
+  const found=[];
+  DB.products.forEach(p=>{
+    const idx=t.indexOf(p.name);
+    if(idx<0) return;
+    // 优先识别「数量在品名之前」：如 "60 袋龙须挂面"
+    const before=t.slice(0,idx).match(/(\d+)\s*[袋个把箱斤kg]?\s*$/i);
+    // 兼容「数量在品名之后」：先跳过规格 token（500g / 25kg 等），再取首个数量
+    let tail=t.slice(idx+p.name.length).replace(/^\s*\d+(?:\.\d+)?\s*(?:g|kg|ml|l)\b/gi,'');
+    const after=tail.match(/^[^\d]{0,12}(\d+)/);
+    const qty=before?+before[1]:(after?+after[1]:10);
+    found.push({pid:p.id,qty:qty,loss:0});
+  });
+  if(!found.length){ toast('未识别到产品，请试试示例按钮','err'); return; }
+  const lm=t.match(/损耗[^\d]{0,6}(\d+)/); if(lm) found[0].loss=+lm[1];
+  ST.lines=found; go('order'); toast('AI 已识别 '+found.length+' 个品项并自动录入','ok');
+}
+function loadLast(){ST.lines=[{pid:'P02',qty:40,loss:0},{pid:'P09',qty:15,loss:0},{pid:'P11',qty:100,loss:0}];go('order');toast('已载入上次订单，可直接改量','ok');}
+function submitOrder(){
+  const c=custById(ST.orderCust);
+  for(const ln of ST.lines){
+    const p=prodById(ln.pid);
+    if(ln.qty+ln.loss>p.stock){
+      const e=document.getElementById('orderErr'),o=document.getElementById('orderOk');
+      e.innerHTML='⛔ <b>提交失败：</b>「'+p.name+'」本次数量 '+(ln.qty+ln.loss)+' '+p.unit+' 超出可用库存（当前库存 '+p.stock+' '+p.unit+'），无法提交。请调整数量或走补货流程。';
+      e.classList.add('show'); if(o)o.classList.remove('show');
+      toast('超出可用库存，无法提交','err'); return;
+    }
+  }
+  const e=document.getElementById('orderErr'),o=document.getElementById('orderOk');
+  if(e)e.classList.remove('show');
+  o.innerHTML='✅ 订单提交成功！已按 '+c.name+' 的专属价结算，库存同步扣减，单据进入配送排班。';o.classList.add('show');
+  toast('订单提交成功','ok');
+}
+
+function renderDelivery(){
+  const rOpts=['全部'].concat(DB.routes).map(r=>'<option'+(r===ST.filtRoute?' selected':'')+'>'+r+'</option>').join('');
+  const gOpts=['全部'].concat(DB.regions).map(g=>'<option'+(g===ST.filtRegion?' selected':'')+'>'+g+'</option>').join('');
+  let list=DB.routeOrders.filter(o=>(ST.filtRoute==='全部'||o.route===ST.filtRoute)&&(ST.filtRegion==='全部'||o.region===ST.filtRegion));
+  if(ST.hideNoStock) list=list.filter(o=>prodById(o.pid).stock>0);
+  const rows=list.map(o=>{const p=prodById(o.pid);return '<tr><td>'+o.route+'</td><td>'+o.region+'</td><td><b>'+p.name+'</b></td><td>'+p.spec+'</td><td class="r num">'+o.qty+'</td><td>'+(p.stock>0?'<span class="tag t-ok">有现货</span>':'<span class="tag t-dan">无货</span>')+'</td>'+(ST.showPrice?'<td class="r num">'+p2(p.base)+'</td><td class="r num">'+money(p.base*o.qty)+'</td>':'')+'</tr>';}).join('');
+  const summary={};
+  DB.routeOrders.filter(o=>ST.filtRoute==='全部'||o.route===ST.filtRoute).forEach(o=>{summary[o.pid]=(summary[o.pid]||0)+o.qty;});
+  const sumRows=Object.keys(summary).map(pid=>{const p=prodById(pid);return '<tr><td>'+p.name+'</td><td>'+p.spec+'</td><td class="r num">'+summary[pid]+'</td><td class="r num">'+money(p.base*summary[pid])+'</td></tr>';}).join('');
+  return head('delivery')+
+  '<div class="controls">'+
+    '<div class="field"><label>司机配送路线</label><select onchange="ST.filtRoute=this.value;go(\'delivery\')">'+rOpts+'</select></div>'+
+    '<div class="field"><label>业务员负责区域</label><select onchange="ST.filtRegion=this.value;go(\'delivery\')">'+gOpts+'</select></div>'+
+    '<label class="hint" style="align-self:flex-end"><input type="checkbox" '+(ST.hideNoStock?'checked':'')+' onchange="ST.hideNoStock=this.checked;go(\'delivery\')"> 仅打印有现货产品</label>'+
+    '<label class="hint" style="align-self:flex-end"><input type="checkbox" '+(ST.showPrice?'checked':'')+' onchange="ST.showPrice=this.checked;go(\'delivery\')"> 显示单价/总价</label>'+
+    '<span class="btn btn-pri" style="align-self:flex-end" onclick="toast(\'已生成送货单打印预览（'+list.length+' 行）\',\'ok\')">🖨 打印送货单</span>'+
+  '</div>'+
+  '<div class="card" style="margin-bottom:13px"><div class="card-h"><h3><span class="dot"></span>送货单预览（'+ST.filtRoute+' / '+ST.filtRegion+'）</h3><span class="sub">'+list.length+' 行 · '+(ST.hideNoStock?'已隐藏无货产品':'含无货产品')+'</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>路线</th><th>区域</th><th>产品</th><th>规格</th><th class="r">数量</th><th>库存</th>'+(ST.showPrice?'<th class="r">单价</th><th class="r">金额</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="note warn" style="margin-top:12px">🖨 <b>打印模板可自定义：</b>可自由显示/隐藏单价、总价，适配客户对账与门店收货不同场景。勾选「仅打印有现货产品」后，无货产品（鲜切面）自动隐藏。</div>'+
+  '</div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#16a34a"></span>线路品项汇总（备货用）</h3><span class="sub">按配送线路自动汇总各产品订单总量</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>产品</th><th>规格</th><th class="r">订单总量</th><th class="r">预估货值</th></tr></thead><tbody>'+sumRows+'</tbody></table></div></div>';
+}
+
+function renderInventory(){
+  const inRows=DB.inbounds.map(b=>'<tr><td>'+b.no+'</td><td><b>'+b.mat+'</b></td><td>'+b.batch+'</td><td class="r num">'+b.qty+'</td><td>'+b.time+'</td><td><span class="tag t-pri">'+b.times+'</span></td><td>'+b.by+'</td></tr>').join('');
+  const dRows=DB.stockDiff.map(d=>'<tr><td><b>'+d.mat+'</b></td><td class="r num">'+d.book+'</td><td class="r num">'+d.real+'</td><td class="r num" style="color:'+(d.diff<0?'var(--dan)':'var(--ok)')+'">'+(d.diff>0?'+':'')+d.diff+'</td><td><span class="tag '+(d.type==='溢余'?'t-ok':'t-warn')+'">'+d.type+'</span></td><td>'+d.reason+'</td></tr>').join('');
+  const bRows=DB.batches.map(b=>{const used=(b.used/b.qty*100).toFixed(0);return '<tr><td>'+b.id+'</td><td><b>'+b.mat+'</b></td><td>'+b.supplier+'</td><td>'+b.in+'</td><td class="r num">'+b.qty+'</td><td class="r num">'+b.used+'</td><td>'+b.to+'</td><td style="min-width:100px"><div class="bar-track"><div class="bar-fill" style="width:'+used+'%;background:#7c3aed"></div></div><span class="hint">'+used+'% 已耗用</span></td></tr>';}).join('');
+  return head('inventory')+
+  '<div class="grid g4" style="margin-bottom:13px">'+
+    kpi('原料批次','#7c3aed',DB.batches.length+' 批','全程可溯源')+
+    kpi('分次入库单','#2563eb',DB.inbounds.length+' 单','同物料多批次')+
+    kpi('本期报损折损','#e5484d','46 '+('单位'),'已登记可追溯')+
+    kpi('账实差异项','#e8890c',DB.stockDiff.length+' 项','账面 vs 实际')+
+  '</div>'+
+  '<div class="card" style="margin-bottom:13px"><div class="card-h"><h3><span class="dot"></span>分次入库登记</h3><span class="sub">原料/成品可分批次、分多次录入，无需整单一次入库</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>入库单号</th><th>物料</th><th>批次</th><th class="r">数量(kg)</th><th>入库时间</th><th>批次</th><th>登记人</th></tr></thead><tbody>'+inRows+'</tbody></table></div></div>'+
+  '<div class="grid g2">'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#e5484d"></span>库存损耗与账实差异</h3><span class="sub">盈亏全程可追溯</span></div>'+
+      '<div class="tb-wrap"><table><thead><tr><th>物料</th><th class="r">账面</th><th class="r">实际</th><th class="r">差异</th><th>类型</th><th>原因</th></tr></thead><tbody>'+dRows+'</tbody></table></div></div>'+
+    '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#7c3aed"></span>原料溯源与用量绑定</h3><span class="sub">每批原料用量分摊至对应成品</span></div>'+
+      '<div class="tb-wrap"><table><thead><tr><th>批次</th><th>原料</th><th>供应商</th><th>入库日</th><th class="r">入库量</th><th class="r">已用</th><th>用于成品</th><th>耗用</th></tr></thead><tbody>'+bRows+'</tbody></table></div></div>'+
+  '</div>';
+}
+
+function renderCost(){
+  const rows=DB.costRows.map(r=>{
+    const p=prodById(r.pid);
+    const total=+(r.costMat+r.aux+r.mfg).toFixed(2);
+    const outRate=(r.out/r.matIn).toFixed(2);
+    const lossRate=((1-r.matIn/r.out)*100).toFixed(1);
+    const gp=p.base-total, gpr=(gp/p.base*100).toFixed(1);
+    return '<tr><td><b>'+p.name+'</b></td><td class="r num">'+r.matIn+'</td><td class="r num">'+r.out+'</td><td class="r num" style="color:var(--pri)">'+outRate+'</td><td class="r num">'+lossRate+'%</td>'+
+      '<td class="r num">'+p2(r.costMat)+'</td><td class="r num">'+p2(r.aux)+'</td><td class="r num">'+p2(r.mfg)+'</td><td class="r num" style="font-weight:700">'+p2(total)+'</td>'+
+      '<td class="r num">'+p2(p.base)+'</td><td class="r"><span class="tag '+(gpr>=18?'t-ok':'t-warn')+'">'+gpr+'%</span></td></tr>';
+  }).join('');
+  const bars=DB.costRows.slice(0,5).map((r,i)=>({k:prodById(r.pid).name,v:+(r.costMat+r.aux+r.mfg).toFixed(2),c:['#2563eb','#7c3aed','#16a34a','#e8890c','#0891b2'][i]}));
+  return head('cost')+
+  '<div class="grid g4" style="margin-bottom:13px">'+
+    kpi('核算成品','#2563eb',DB.costRows.length+' 款','基于原料实际用量')+
+    kpi('平均产出倍率','#16a34a','1.14','产出 / 领用')+
+    kpi('平均损耗倍率','#e8890c','12.6%','转化过程损耗')+
+    kpi('成本口径','#7c3aed','原料+辅料+制造','精细化分摊')+
+  '</div>'+
+  '<div class="card" style="margin-bottom:13px"><div class="card-h"><h3><span class="dot"></span>生产倍率与成本分摊明细</h3><span class="sub">单位成本 = 原辅料成本 + 制造费用 · 自动核算</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>成品</th><th class="r">原料领用</th><th class="r">成品产出</th><th class="r">产出倍率</th><th class="r">损耗倍率</th><th class="r">原料成本</th><th class="r">辅料</th><th class="r">制造费用</th><th class="r">单位成本</th><th class="r">售价</th><th class="r">毛利率</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="note" style="margin-top:12px">📐 <b>倍率说明：</b>产出倍率 = 成品产出 ÷ 原料领用；损耗倍率 = (1 − 原料领用 ÷ 成品产出)。系统依据原料实际领用与成品产出自动计算，无需人工统计。</div>'+
+  '</div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot" style="background:#7c3aed"></span>各成品单位成本对比</h3><span class="sub">为定价与利润核算提供精准数据</span></div>'+barChart(bars,v=>'¥'+p2(v))+'</div>';
+}
+
+function renderFinance(){
+  const rRows=DB.regions.map(r=>{
+    const list=DB.customers.filter(c=>c.region===r);
+    const ytd=sum(list,c=>c.ytd), ar=sum(list,c=>c.ar);
+    return '<tr><td><b>'+r+'</b></td><td>'+list.length+'</td><td class="r num">'+money(ytd)+'</td><td class="r num" style="color:var(--warn);font-weight:600">'+money(ar)+'</td><td class="r num">'+(ar/ytd*100).toFixed(1)+'%</td><td>'+(ar/ytd>0.25?'<span class="tag t-dan">关注坏账</span>':'<span class="tag t-ok">正常</span>')+'</td></tr>';
+  }).join('');
+  const recRows=DB.recon.map(r=>'<tr><td>'+r.no+'</td><td><b>'+r.cust+'</b></td><td>'+r.period+'</td><td class="r num">'+money(r.amt)+'</td><td><span class="tag '+(r.status==='已确认'?'t-ok':'t-warn')+'">'+r.status+'</span></td><td>'+r.way+'</td></tr>').join('');
+  return head('finance')+
+  '<div class="grid g3" style="margin-bottom:13px">'+
+    kpi('今日账单小计','#2563eb',money(DB.timeCash),'每日账单日清')+
+    kpi('当前账期累计欠款','#e8890c',money(DB.periodAr),'账期口径汇总')+
+    kpi('月底账单汇总','#16a34a',money(DB.monthEnd),'月结统一出账')+
+  '</div>'+
+  '<div class="card" style="margin-bottom:13px"><div class="card-h"><h3><span class="dot" style="background:#e8890c"></span>区域欠款汇总统计</h3><span class="sub">按业务员负责区域自动归集 · 管控区域坏账</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>区域</th><th>客户数</th><th class="r">累计消费</th><th class="r">欠款合计</th><th class="r">欠款率</th><th>风险</th></tr></thead><tbody>'+rRows+'</tbody></table></div></div>'+
+  '<div class="card"><div class="card-h"><h3><span class="dot"></span>双向对账记录</h3>'+
+    '<span class="btn" onclick="toast(\'已导出客户对账明细 + 区域对账数据\',\'ok\')">⬇ 一键导出对账明细</span></div>'+
+    '<div class="tb-wrap"><table><thead><tr><th>对账单号</th><th>客户</th><th>账期</th><th class="r">金额</th><th>状态</th><th>对账方式</th></tr></thead><tbody>'+recRows+'</tbody></table></div>'+
+    '<div class="note" style="margin-top:12px">🔄 <b>双向对账：</b>客户端可自助完成历史账单与欠款对账；企业后台一键导出客户对账明细与区域对账数据，供需双方账目统一，财务日清月结。</div>'+
+  '</div>';
+}
+
+/* ---------- shell / routing ---------- */
+function buildNav(){
+  let html='',lastG='';
+  PAGES.forEach(p=>{
+    if(p.group!==lastG){html+='<div class="nav-g">'+p.group+'</div>';lastG=p.group;}
+    html+='<div class="nav-i" id="nav-'+p.id+'" onclick="go(\''+p.id+'\')"><span class="ic">'+p.icon+'</span><span class="nm">'+p.name+'</span>'+(p.pain?'<span class="pd">'+p.pain.split(' ').length+'</span>':'')+'</div>';
+  });
+  document.getElementById('nav').innerHTML=html;
+}
+const RENDER={dash:renderDash,customer:renderCustomer,billing:renderBilling,credit:renderCredit,order:renderOrder,delivery:renderDelivery,inventory:renderInventory,cost:renderCost,finance:renderFinance};
+function go(id){
+  PAGES.forEach(p=>{const el=document.getElementById('nav-'+p.id);if(el)el.classList.toggle('on',p.id===id);});
+  const p=PAGES.find(x=>x.id===id);
+  document.getElementById('crumb').innerHTML='京麦源 · 数智中枢 / <b>'+p.group+' / '+p.name+'</b>';
+  document.getElementById('view').innerHTML=RENDER[id]();
+  document.getElementById('view').scrollTop=0;
+  toggleNav(false);
+}
+let toastTimer;
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast on'+(type?' '+type:'');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),2400);
+}
+function toggleNav(force){
+  const on=typeof force==='boolean'?force:!document.body.classList.contains('nav-open');
+  document.body.classList.toggle('nav-open',on);
+  document.getElementById('mask').classList.toggle('on',on&&document.body.classList.contains('compact'));
+}
+function togglePhone(){
+  document.body.classList.toggle('phone-mode');
+  syncCompact();
+}
+const NARROW=window.matchMedia('(max-width: 820px)');
+function syncCompact(){
+  const phone=document.body.classList.contains('phone-mode');
+  document.body.classList.toggle('compact',phone||NARROW.matches);
+}
+NARROW.addEventListener('change',syncCompact);
+window.addEventListener('resize',syncCompact);
+
+/* ---------- boot ---------- */
+buildNav();syncCompact();go('dash');
+</script>
+</body>
+</html>
