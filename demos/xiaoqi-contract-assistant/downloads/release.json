@@ -1,0 +1,79 @@
+{
+  "version": "1.0.6",
+  "filename": "合同小助手_在线安装包_v1.0.6.zip",
+  "type": "online-installer",
+  "bytes": 5103622,
+  "sha256": "4e95da9e7109ca9465feafe927bdc61b367da11f6971fe3d47ca7f19c3c40a00",
+  "parts": [
+    {
+      "file": "client.part1.json",
+      "path": "downloads/client.part1.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "034d5e11c78e86aca48610edb4e6932c48587a1ca91bcbc721d15291560a2250"
+    },
+    {
+      "file": "client.part2.json",
+      "path": "downloads/client.part2.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "8075ed59ccd9a1892e16dda06cc72acb3887eeb3a8e649f7ae191e743b1bd7ee"
+    },
+    {
+      "file": "client.part3.json",
+      "path": "downloads/client.part3.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "ff9a36df38249a3c645dd8a19a35d028ba25e9400350945fe6a8d7d45f74aed4"
+    },
+    {
+      "file": "client.part4.json",
+      "path": "downloads/client.part4.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "230f63aab77585819bcf357fdf0902a2eaa47649fe12f6f401da58ec6a0d3860"
+    },
+    {
+      "file": "client.part5.json",
+      "path": "downloads/client.part5.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "3a5656d992828e13cef50289cf9e7bd3f9a64c1b0dd304b4252a59a83f6c3eaf"
+    },
+    {
+      "file": "client.part6.json",
+      "path": "downloads/client.part6.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "4077a1b7ca555202b1316c809a81611c308bf0e9b24cc7b06956211ca47acb43"
+    },
+    {
+      "file": "client.part7.json",
+      "path": "downloads/client.part7.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "1f6b4b8e6637e179d325dd40aea90a722b63fb2326193d2e21e1e423e68840cb"
+    },
+    {
+      "file": "client.part8.json",
+      "path": "downloads/client.part8.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "c55613770b2ea67a670cb16bb7a4ebac3afb4e608ca8e15299165f172480d0da"
+    },
+    {
+      "file": "client.part9.json",
+      "path": "downloads/client.part9.json",
+      "bytes": 524288,
+      "downloadBytes": 699065,
+      "sha256": "c1d1b542ace619a6a0b2e77cb52a559b71f2082e065ea969c0b0f776e12bbd10"
+    },
+    {
+      "file": "client.part10.json",
+      "path": "downloads/client.part10.json",
+      "bytes": 385030,
+      "downloadBytes": 513389,
+      "sha256": "4bd74c33f136cf3749d70d34174d572e21465fd643f934bd7f0844d641833cad"
+    }
+  ]
+}
