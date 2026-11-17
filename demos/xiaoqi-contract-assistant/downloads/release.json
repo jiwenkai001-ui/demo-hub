@@ -5,22 +5,67 @@
   "sha256": "61411a03b7fb56be5e16d1b46f530a6b1b2c926230267345c266de193bc99bf3",
   "parts": [
     {
-      "file": "client.part1.bin",
-      "path": "../xiaoqi-client-downloads/downloads/client.part1.bin",
-      "bytes": 48234496,
-      "sha256": "ddf2865ace1005deaa2d176c0c2330ed855c4b8f7151a523698ddb2728fca15e"
+      "file": "client.part1.json",
+      "path": "../xiaoqi-client-downloads/downloads/client.part1.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "ef62fba76b192398d1a0cbf35c4b7b6de68dcdff77c7b9a648cb45d801dbfa12"
     },
     {
-      "file": "client.part2.bin",
-      "path": "../xiaoqi-client-downloads/downloads/client.part2.bin",
-      "bytes": 48234496,
-      "sha256": "4f6fcca1e66bf499dbbc18c87b1f911af742805f44046efcc0329da01266e950"
+      "file": "client.part2.json",
+      "path": "../xiaoqi-client-downloads/downloads/client.part2.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "d1542299e47b1410b24589271dd4c5006f6c96df72c0d06e5008cc398b0a2f4c"
     },
     {
-      "file": "client.part3.bin",
-      "path": "downloads/client.part3.bin",
-      "bytes": 45288686,
-      "sha256": "cf33a48ada6f00aec0649eeec8a48451f913370ac6f0a784351051338dd710ef"
+      "file": "client.part3.json",
+      "path": "../xiaoqi-client-downloads/downloads/client.part3.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "25859612710e08b844521be0f9da8b25fce41638c1a490450058ea23f4f147e1"
+    },
+    {
+      "file": "client.part4.json",
+      "path": "../xiaoqi-client-downloads/downloads/client.part4.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "1aadf2f9d431919f5705cc542d25bfda684082df0063deb149f5652a7e1f640a"
+    },
+    {
+      "file": "client.part5.json",
+      "path": "../xiaoqi-client-downloads/downloads/client.part5.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "c703302302f5620e288637db6f081502f9c3d30f5b84bc766e5e3bd7a46c16b4"
+    },
+    {
+      "file": "client.part6.json",
+      "path": "downloads/client.part6.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "9960ce57c9328f7dfe091b2d903af0a7462a565b1e85185c168946f65c1d0fe2"
+    },
+    {
+      "file": "client.part7.json",
+      "path": "downloads/client.part7.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "6962e18fe523a03d480217ba4c4efe242dd9e94a7111ef7031595aedbfef1207"
+    },
+    {
+      "file": "client.part8.json",
+      "path": "downloads/client.part8.json",
+      "bytes": 16777216,
+      "downloadBytes": 22369637,
+      "sha256": "b70ab604651ad7cf95fa533498e7464538f1e6c15543ad1beddacfb443de92ae"
+    },
+    {
+      "file": "client.part9.json",
+      "path": "downloads/client.part9.json",
+      "bytes": 7539950,
+      "downloadBytes": 10053281,
+      "sha256": "f096c4330296157dd60f7a11f6f49c4f52e3b3f03146f848017117a231e5917d"
     }
   ]
 }

@@ -13,7 +13,7 @@ async function loadRelease(){
  if(!response.ok)throw Error('下载信息暂时不可用，请稍后重试。');
  const data=await response.json();
  if(data.version!=='1.0.5'||!Array.isArray(data.parts)||!data.parts.length||!Number.isSafeInteger(data.bytes)||data.bytes<=0)throw Error('下载信息有误，请联系维护人员。');
- for(const part of data.parts)if(!/^client\.part\d+\.bin$/.test(part.file)||!['downloads/'+part.file,'../xiaoqi-client-downloads/downloads/'+part.file].includes(part.path)||!Number.isSafeInteger(part.bytes)||part.bytes<=0||!/^[a-f0-9]{64}$/.test(part.sha256))throw Error('下载文件信息有误，请联系维护人员。');
+ for(const part of data.parts)if(!/^client\.part\d+\.json$/.test(part.file)||!['downloads/'+part.file,'../xiaoqi-client-downloads/downloads/'+part.file].includes(part.path)||!Number.isSafeInteger(part.bytes)||part.bytes<=0||!Number.isSafeInteger(part.downloadBytes)||part.downloadBytes<=0||!/^[a-f0-9]{64}$/.test(part.sha256))throw Error('下载文件信息有误，请联系维护人员。');
  if(data.parts.reduce((total,part)=>total+part.bytes,0)!==data.bytes)throw Error('下载文件大小信息不一致。');
  release=data;
  document.querySelector('#release-version').textContent='v'+data.version;
@@ -32,11 +32,14 @@ button.addEventListener('click',async()=>{
   for(const part of data.parts){
    const response=await fetch(part.path,{signal});if(!response.ok)throw Error('客户端下载暂时失败，请重试。');
    const reader=response.body.getReader(),chunks=[];let received=0;
-   while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;if(received>part.bytes)throw Error('下载文件大小异常，请重试。');chunks.push(value);updateProgress(completed+received,data.bytes);}
-   if(received!==part.bytes)throw Error('网络传输未完成，请重试。');
-   const blob=new Blob(chunks);statusText.textContent=`正在校验文件 · ${Math.floor((completed+received)/data.bytes*100)}%`;
+   while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;if(received>part.downloadBytes)throw Error('下载文件大小异常，请重试。');chunks.push(value);updateProgress(completed+Math.floor(received/part.downloadBytes*part.bytes),data.bytes);}
+   if(received!==part.downloadBytes)throw Error('网络传输未完成，请重试。');
+   const payload=JSON.parse(await new Blob(chunks).text());if(typeof payload.base64!=='string')throw Error('下载文件格式异常，请重试。');
+   const binary=atob(payload.base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+   if(bytes.length!==part.bytes)throw Error('下载文件不完整，请重试。');
+   const blob=new Blob([bytes]);statusText.textContent=`正在校验文件 · ${Math.floor((completed+part.bytes)/data.bytes*100)}%`;
    if(await sha256(await blob.arrayBuffer())!==part.sha256)throw Error('下载文件校验未通过，请重新下载。');
-   if(signal.aborted)throw new DOMException('已取消','AbortError');blobs.push(blob);completed+=received;
+   if(signal.aborted)throw new DOMException('已取消','AbortError');blobs.push(blob);completed+=part.bytes;
   }
   const blob=new Blob(blobs,{type:'application/zip'});if(blob.size!==data.bytes)throw Error('下载文件不完整，请重试。');
   const url=URL.createObjectURL(blob);objectUrls.add(url);const a=document.createElement('a');a.href=url;a.download=data.filename;document.body.append(a);a.click();a.remove();
