@@ -1,0 +1,26 @@
+{
+  "version": "1.0.5",
+  "filename": "合同小助手_Windows便携版_v1.0.5.zip",
+  "bytes": 141757678,
+  "sha256": "61411a03b7fb56be5e16d1b46f530a6b1b2c926230267345c266de193bc99bf3",
+  "parts": [
+    {
+      "file": "client.part1.bin",
+      "path": "../xiaoqi-client-downloads/downloads/client.part1.bin",
+      "bytes": 48234496,
+      "sha256": "ddf2865ace1005deaa2d176c0c2330ed855c4b8f7151a523698ddb2728fca15e"
+    },
+    {
+      "file": "client.part2.bin",
+      "path": "../xiaoqi-client-downloads/downloads/client.part2.bin",
+      "bytes": 48234496,
+      "sha256": "4f6fcca1e66bf499dbbc18c87b1f911af742805f44046efcc0329da01266e950"
+    },
+    {
+      "file": "client.part3.bin",
+      "path": "downloads/client.part3.bin",
+      "bytes": 45288686,
+      "sha256": "cf33a48ada6f00aec0649eeec8a48451f913370ac6f0a784351051338dd710ef"
+    }
+  ]
+}
