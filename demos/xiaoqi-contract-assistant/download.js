@@ -13,11 +13,11 @@ async function loadRelease(){
  if(!response.ok)throw Error('下载信息暂时不可用，请稍后重试。');
  const data=await response.json();
  if(data.version!=='1.0.5'||!Array.isArray(data.parts)||!data.parts.length||!Number.isSafeInteger(data.bytes)||data.bytes<=0)throw Error('下载信息有误，请联系维护人员。');
- for(const part of data.parts)if(!/^client\.part\d+\.json$/.test(part.file)||!['downloads/'+part.file,'../xiaoqi-client-downloads/downloads/'+part.file].includes(part.path)||!Number.isSafeInteger(part.bytes)||part.bytes<=0||!Number.isSafeInteger(part.downloadBytes)||part.downloadBytes<=0||!/^[a-f0-9]{64}$/.test(part.sha256))throw Error('下载文件信息有误，请联系维护人员。');
+ for(const part of data.parts)if(!/^client\.part\d+\.json$/.test(part.file)||!['downloads/'+part.file,'../xiaoqi-client-downloads/downloads/'+part.file,'../xiaoqi-client-downloads-2/downloads/'+part.file].includes(part.path)||!Number.isSafeInteger(part.bytes)||part.bytes<=0||!Number.isSafeInteger(part.downloadBytes)||part.downloadBytes<=0||!/^[a-f0-9]{64}$/.test(part.sha256))throw Error('下载文件信息有误，请联系维护人员。');
  if(data.parts.reduce((total,part)=>total+part.bytes,0)!==data.bytes)throw Error('下载文件大小信息不一致。');
  release=data;
  document.querySelector('#release-version').textContent='v'+data.version;
- document.querySelector('#release-meta').textContent=`Windows 64 位 · ${mib(data.bytes)} MB · 便携版`;
+ document.querySelector('#release-meta').textContent=`Windows 64 位 · ${mib(data.bytes)} MB · 在线安装包`;
  return data;
 }
 function updateProgress(bytes,total){const percent=Math.min(100,Math.floor(bytes/total*100));document.querySelector('#progress-fill').style.width=percent+'%';progressBar.setAttribute('aria-valuenow',String(percent));statusText.textContent=`正在下载 ${percent}% · ${mib(bytes)} / ${mib(total)} MB`;}
@@ -44,9 +44,9 @@ button.addEventListener('click',async()=>{
   const blob=new Blob(blobs,{type:'application/zip'});if(blob.size!==data.bytes)throw Error('下载文件不完整，请重试。');
   const url=URL.createObjectURL(blob);objectUrls.add(url);const a=document.createElement('a');a.href=url;a.download=data.filename;document.body.append(a);a.click();a.remove();
   setTimeout(()=>{URL.revokeObjectURL(url);objectUrls.delete(url);},300000);
-  statusText.textContent='文件校验完成';showMessage('已提交浏览器下载。请在下载列表中查看 ZIP，完整解压后运行「合同小助手.exe」。');
+  statusText.textContent='文件校验完成';showMessage('已提交浏览器下载。请在下载列表中查看 ZIP，完整解压后运行「安装小栖.cmd」，首次需联网安装运行组件。');
  }catch(error){showMessage(error.name==='AbortError'?'下载已取消，随时可以重新开始。':error.message||'下载失败，请检查网络后重试。',error.name!=='AbortError');}
- finally{controller=null;button.disabled=false;button.textContent='下载 Windows 客户端 ↓';progress.hidden=true;}
+ finally{controller=null;button.disabled=false;button.textContent='下载 Windows 在线安装包 ↓';progress.hidden=true;}
 });
 window.addEventListener('pagehide',()=>{controller?.abort();for(const url of objectUrls)URL.revokeObjectURL(url);objectUrls.clear();});
 loadRelease().catch(()=>showMessage('暂时无法获取版本信息，点击下载可重试。',true));
