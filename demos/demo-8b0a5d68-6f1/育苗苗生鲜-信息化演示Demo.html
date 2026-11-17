@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>育苗苗生鲜 · 数字化经营管理系统（演示 Demo）</title>
+<style>
+:root{
+  --pri:#2563eb;--pri-d:#1d4ed8;--ok:#16a34a;--warn:#e8890c;--danger:#e5484d;--purple:#7c3aed;
+  --bg:#f4f6fa;--card:#ffffff;--line:#e6e9f0;--line2:#eef1f6;
+  --t1:#1f2937;--t2:#4b5563;--t3:#8b95a6;
+  --sh:0 1px 3px rgba(16,24,40,.05),0 1px 2px rgba(16,24,40,.04);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+  font-size:13px;color:var(--t1);background:var(--bg);height:100dvh;overflow:hidden;
+  -webkit-text-size-adjust:100%;
+}
+.phone-shell{display:contents}
+.app{display:flex;width:100%;height:100dvh;overflow:hidden;background:var(--bg)}
+
+/* ---------- Sidebar ---------- */
+.sidebar{width:228px;flex:0 0 228px;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{height:58px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--line2);flex:0 0 auto}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#16a34a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:0 0 auto}
+.brand b{font-size:14px;letter-spacing:.2px;display:block;line-height:1.2}
+.brand small{color:var(--t3);font-size:10px}
+.nav{flex:1;overflow-y:auto;padding:10px 8px 20px}
+.nav-g{margin:10px 8px 6px;color:var(--t3);font-size:10.5px;font-weight:700;letter-spacing:.6px}
+.nav-i{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:var(--t2);cursor:pointer;margin-bottom:2px;user-select:none;font-size:12.5px;line-height:1.3}
+.nav-i:hover{background:#f5f7fb;color:var(--t1)}
+.nav-i.on{background:#eaf1ff;color:var(--pri-d);font-weight:700}
+.nav-i .ic{width:17px;text-align:center;color:var(--pri);font-size:13px;flex:0 0 auto}
+.nav-i.on .ic{color:var(--pri-d)}
+.side-foot{padding:10px 16px;border-top:1px solid var(--line2);color:var(--t3);font-size:10.5px;flex:0 0 auto}
+
+/* ---------- Main ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.topbar{height:58px;flex:0 0 58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 18px}
+.crumb{color:var(--t3);font-size:12px}
+.crumb b{color:var(--t1);font-weight:600}
+.crumb .sep{margin:0 7px;color:#cbd5e1}
+.spacer{flex:1}
+.demo-badge{background:#fff7ed;color:#b45309;border:1px solid #fed7aa;padding:5px 9px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.tb-btn{border:1px solid var(--line);background:#fff;color:var(--t2);border-radius:8px;padding:6px 10px;font-size:11.5px;cursor:pointer;white-space:nowrap}
+.tb-btn:hover{border-color:#bfdbfe;color:var(--pri)}
+.hamb{display:none;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:15px;cursor:pointer}
+#view{flex:1;overflow:auto;padding:18px 20px 34px}
+
+/* ---------- Page header ---------- */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 0 16px}
+.ph h1{font-size:18px;margin:0 0 4px;font-weight:750;letter-spacing:.2px}
+.ph p{margin:0;color:var(--t3);font-size:11.5px;line-height:1.5}
+.pain{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:999px;padding:5px 10px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.pain::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--danger)}
+.pain.none{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+.pain.none::before{background:#94a3b8}
+
+/* ---------- Grid & Card ---------- */
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sp-a{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.sp-b{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:11px;box-shadow:var(--sh);padding:16px;min-width:0}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;min-width:0}
+.card-h h3{margin:0;font-size:13px;font-weight:700}
+.card-h .sub{color:var(--t3);font-size:10.5px;font-weight:400}
+.tag{font-size:10px;padding:3px 7px;border-radius:6px;background:#eff6ff;color:var(--pri-d);font-weight:700;white-space:nowrap}
+.tag.g{background:#f0fdf4;color:#15803d}.tag.o{background:#fffbeb;color:#b45309}.tag.r{background:#fef2f2;color:#b91c1c}.tag.p{background:#f5f3ff;color:#6d28d9}
+
+/* ---------- KPI ---------- */
+.kpi{background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:var(--sh);padding:15px 16px;min-width:0}
+.kpi .lb{color:var(--t3);font-size:11px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.kpi .lb i{width:6px;height:6px;border-radius:2px;display:inline-block}
+.kpi .v{font-size:23px;font-weight:800;letter-spacing:-.4px;line-height:1.15}
+.kpi .v.sm{font-size:19px}
+.kpi .ft{margin-top:7px;font-size:10.5px;color:var(--t3)}
+.kpi .ft b{color:var(--ok)}
+.kpi .ft b.down{color:var(--danger)}
+
+/* ---------- Table ---------- */
+.tb-wrap{overflow-x:auto;width:100%}
+.tb-wrap.nowrap table{white-space:nowrap}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line2);white-space:nowrap}
+th{color:var(--t3);font-weight:600;font-size:11px;background:#fafbfd;position:sticky;top:0}
+tbody tr:hover{background:#fafcff}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tfoot td{font-weight:800;background:#f8fafc;border-top:2px solid var(--line);border-bottom:none}
+.pill{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700}
+.pill.g{background:#dcfce7;color:#15803d}.pill.o{background:#fef3c7;color:#b45309}.pill.r{background:#fee2e2;color:#b91c1c}.pill.b{background:#dbeafe;color:#1d4ed8}.pill.gray{background:#f1f5f9;color:#64748b}
+.muted{color:var(--t3)}.strong{font-weight:700}
+.pos{color:var(--danger);font-weight:700}.neg{color:var(--ok);font-weight:700}
+
+/* ---------- Buttons / forms ---------- */
+.btn{border:1px solid var(--pri);background:var(--pri);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--pri-d)}
+.btn.ghost{background:#fff;color:var(--pri);border-color:#bfdbfe}
+.btn.ghost:hover{background:#f5f9ff}
+.btn.warn{background:var(--warn);border-color:var(--warn)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label{color:var(--t2);font-size:11px;font-weight:600}
+.field select,.field input{border:1px solid #d9dee8;border-radius:8px;padding:8px 9px;font-size:12px;color:var(--t1);background:#fff;width:100%;min-width:0;outline:none}
+.field select:focus,.field input:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.form-row{display:grid;gap:12px;align-items:end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{border:none;background:#fff;color:var(--t2);padding:7px 13px;font-size:11.5px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--pri);color:#fff}
+
+.alert{border-radius:8px;padding:10px 12px;font-size:11.5px;line-height:1.5;margin-top:10px}
+.alert-danger{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-weight:600}
+.alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-weight:600}
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+
+.callout{background:linear-gradient(135deg,#f0f6ff,#f7fbff);border:1px solid #dbeafe;border-radius:10px;padding:13px 15px;font-size:11.5px;color:#1e40af;line-height:1.6}
+.callout b{color:#1d4ed8}
+.steps{display:flex;flex-direction:column;gap:9px}
+.step{display:flex;gap:10px;align-items:center;border:1px solid var(--line2);border-radius:9px;padding:9px 10px;cursor:pointer;background:#fff}
+.step:hover{border-color:#bfdbfe;background:#f9fbff}
+.step .n{width:22px;height:22px;flex:0 0 22px;border-radius:7px;background:#eaf1ff;color:var(--pri-d);font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center}
+.step .tx{flex:1;min-width:0}
+.step .tx b{display:block;font-size:11.5px}
+.step .tx span{color:var(--t3);font-size:10.5px}
+.step .ar{color:var(--pri);font-size:14px}
+
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:8px;font-size:10.5px;color:var(--t2)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+.prog{height:6px;background:#eef1f6;border-radius:99px;overflow:hidden;min-width:80px}
+.prog>i{display:block;height:100%;background:var(--pri);border-radius:99px}
+
+/* ---------- Paper / chat ---------- */
+.paper{background:#fffdf7;border:1px solid #e8e2cf;border-radius:8px;padding:14px;font-family:"Microsoft YaHei",sans-serif;box-shadow:inset 0 0 0 4px #fffdf7,0 1px 2px rgba(0,0,0,.04)}
+.paper h4{margin:0 0 4px;text-align:center;font-size:13px;letter-spacing:2px}
+.paper .meta{text-align:center;color:#8b8371;font-size:10px;margin-bottom:10px}
+.paper .pl{border-top:1px dashed #d8d0b8;padding:6px 0;display:flex;justify-content:space-between;font-size:11.5px}
+.paper .pl b{font-weight:700}
+.chat{display:flex;flex-direction:column;gap:9px}
+.msg{display:flex;gap:8px;align-items:flex-start}
+.msg .av{width:26px;height:26px;border-radius:7px;background:#e2e8f0;color:#475569;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:0 0 auto}
+.msg .bd{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:11.5px;line-height:1.5;max-width:100%}
+.msg .tm{color:var(--t3);font-size:10px;margin-top:2px}
+.file{display:inline-flex;align-items:center;gap:6px;border:1px solid #dbeafe;background:#f5f9ff;color:#1d4ed8;border-radius:6px;padding:4px 8px;font-size:10.5px;margin:3px 5px 0 0}
+
+/* ---------- Drawer (order detail) ---------- */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:540px;max-width:100%;background:#fff;box-shadow:-10px 0 40px rgba(15,23,42,.18);z-index:45;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column}
+body.drawer-open .drawer{transform:translateX(0)}
+body.drawer-open .mask{display:block}
+.drawer-h{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px}
+.drawer-h .x{margin-left:auto;border:none;background:#f1f5f9;color:var(--t2);border-radius:7px;padding:5px 10px;cursor:pointer;font-size:12px}
+.drawer-b{flex:1;overflow:auto;padding:16px 18px 28px}
+.d-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;margin-bottom:8px;font-size:11.5px}
+.d-meta div{display:flex;gap:8px;min-width:0}
+.d-meta span{color:var(--t3);flex:0 0 auto}
+.d-meta b{font-weight:700}
+.drawer-b h4{font-size:12px;margin:16px 0 8px}
+body.compact .drawer{width:100%}
+
+/* ---------- Toast / mask / phone ---------- */
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);background:#111827;color:#fff;padding:10px 16px;border-radius:9px;font-size:12px;opacity:0;pointer-events:none;transition:.22s;z-index:80;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:30}
+.phone-top{display:none;position:absolute;top:0;left:0;right:0;height:46px;background:#fff;border-bottom:1px solid var(--line);align-items:center;padding:0 12px;gap:8px;z-index:35;font-size:12px;font-weight:700}
+.phone-top .btn{margin-left:auto;padding:5px 10px;font-size:11px}
+
+/* ---------- Compact (phones & preview box) ---------- */
+body.compact .hamb{display:block}
+body.compact .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:40;width:264px;transform:translateX(-102%);transition:transform .24s ease;box-shadow:8px 0 30px rgba(15,23,42,.12)}
+body.compact.nav-open .sidebar{transform:translateX(0)}
+body.compact.nav-open .mask{display:block}
+body.compact .demo-badge{font-size:9.5px;padding:4px 7px}
+body.compact .tb-btn.hide-c{display:none}
+body.compact #view{padding:14px 12px 30px}
+body.compact .ph{flex-direction:column;gap:8px}
+body.compact .pain{align-self:flex-start}
+body.compact .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.compact .g3,body.compact .g2{grid-template-columns:minmax(0,1fr)}
+body.compact .sp-a,body.compact .sp-b{grid-template-columns:minmax(0,1fr)}
+body.compact .grid>*,body.compact .g2>*,body.compact .g3>*,body.compact .g4>*{min-width:0}
+body.compact .card,body.compact .kpi{min-width:0;max-width:100%}
+body.compact .card-h>*{min-width:0}
+body.compact .bar-track{min-width:0}
+body.compact .field input,body.compact .field select{min-width:0;max-width:100%}
+body.compact .kpi .v{font-size:20px}
+body.compact .kpi .v.sm{font-size:18px}
+body.compact .tb-wrap{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+body.compact .tb-wrap table{white-space:nowrap;min-width:max-content}
+body.compact .tb-wrap th,body.compact .tb-wrap td{white-space:nowrap}
+body.compact .form-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+body.compact .form-row .span-all{grid-column:1/-1}
+body.compact .lb-m{display:inline}
+.lb-m{display:none;color:var(--t3);font-size:10px;margin-right:4px}
+body.compact .seg{width:100%}
+body.compact .seg button{flex:1}
+body.compact .chart{min-width:0}
+
+/* Phone preview frame on desktop */
+body.phone-mode .phone-shell{display:block;position:relative;margin:0 auto;width:412px;height:840px;max-height:100dvh;background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 20px 60px rgba(15,23,42,.28);transform:translateZ(0)}
+body.phone-mode{background:#e2e8f0}
+body.phone-mode .app{width:412px;height:840px;max-height:100dvh;border-radius:26px}
+body.phone-mode .phone-top{display:flex}
+body.phone-mode #view{padding-top:60px}
+body.phone-mode .brand,body.phone-mode .topbar{display:none}
+body.phone-mode .main{padding-top:0}
+body.phone-mode .mask,body.phone-mode .sidebar,body.phone-mode #toast,body.phone-mode .drawer{position:absolute}
+body.phone-mode .sidebar{top:0}
+body.phone-mode .phone-top~.main .demo-badge{display:none}
+body:not(.phone-mode) .phone-top{display:none}
+@media (max-width:820px){body:not(.phone-mode) .phone-shell{display:contents}}
+</style>
+</head>
+<body>
+<div class="phone-shell">
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">苗</div>
+      <div><b>育苗苗生鲜</b><small>数字化经营管理系统</small></div>
+    </div>
+    <div class="nav" id="nav"></div>
+    <div class="side-foot">演示系统 · 数据均为仿真构造</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="hamb" data-act="toggleNav">☰</button>
+      <div class="crumb">育苗苗生鲜<span class="sep">/</span><b id="crumbCur">经营驾驶舱</b></div>
+      <div class="spacer"></div>
+      <span class="demo-badge">演示数据 · 非真实经营数据</span>
+      <button class="tb-btn hide-c" data-act="togglePhone">手机预览</button>
+    </div>
+    <div id="view"></div>
+  </div>
+
+  <div class="mask" data-act="closeNav"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-h"><span id="drawerTitle">订单详情</span><button class="x" data-act="closeDrawer">关闭</button></div>
+    <div class="drawer-b" id="drawerBody"></div>
+  </div>
+  <div class="phone-top"><span>育苗苗生鲜 · 手机版演示</span><button class="btn ghost" data-act="togglePhone">退出预览</button></div>
+  <div id="toast"></div>
+</div>
+</div>
+
+<script>
+/* =========================================================
+   DATA LAYER  (pure data + pure helpers — no DOM access)
+   ========================================================= */
+const DB = {
+  company:{name:'育苗苗生鲜',city:'西安',skuCount:2086,biz:'西安地区学校生鲜配送'},
+  // 账龄天数 days: <=30 未到期, 31-60, 61-90, >90
+  schools:[
+    {n:'西安市雁塔区第一小学',t:'中小学',a:'雁塔区',c:'王主任',p:'138****1021',o:'张敏',days:18,m:98000},
+    {n:'西安市碑林区实验小学',t:'中小学',a:'碑林区',c:'李校长',p:'139****2044',o:'张敏',days:25,m:92000},
+    {n:'西安市莲湖区青年路小学',t:'中小学',a:'莲湖区',c:'赵老师',p:'137****3312',o:'张敏',days:12,m:88000},
+    {n:'西安市新城区通济坊小学',t:'中小学',a:'新城区',c:'孙主任',p:'135****7781',o:'张敏',days:42,m:85000},
+    {n:'西安市未央区方新小学',t:'中小学',a:'未央区',c:'周老师',p:'136****5520',o:'张敏',days:9,m:82000},
+    {n:'西安市灞桥区纺织城小学',t:'中小学',a:'灞桥区',c:'吴校长',p:'158****9013',o:'张敏',days:67,m:80000},
+    {n:'西安高新第一小学',t:'中小学',a:'高新区',c:'郑主任',p:'133****4408',o:'张敏',days:15,m:125000},
+    {n:'西安高新第二小学',t:'中小学',a:'高新区',c:'冯老师',p:'132****6672',o:'张敏',days:22,m:118000},
+    {n:'西安市曲江新区第一小学',t:'中小学',a:'曲江新区',c:'陈校长',p:'135****2289',o:'张敏',days:33,m:105000},
+    {n:'西安市长安区韦曲街道中心学校',t:'中小学',a:'长安区',c:'刘主任',p:'137****4490',o:'张敏',days:51,m:76000},
+    {n:'西安市阎良区西飞第一小学',t:'中小学',a:'阎良区',c:'杨老师',p:'139****8834',o:'张敏',days:96,m:72000},
+    {n:'西安市临潼区铁路小学',t:'中小学',a:'临潼区',c:'何校长',p:'136****1205',o:'张敏',days:28,m:68000},
+    {n:'西安市鄠邑区东关小学',t:'中小学',a:'鄠邑区',c:'高老师',p:'158****3367',o:'张敏',days:74,m:65000},
+    {n:'西安建筑科技大学附属小学',t:'中小学',a:'碑林区',c:'马主任',p:'133****9912',o:'张敏',days:11,m:92000},
+    {n:'西安交通大学附属小学',t:'中小学',a:'碑林区',c:'徐校长',p:'135****7745',o:'张敏',days:20,m:108000},
+    {n:'西北工业大学附属小学',t:'中小学',a:'碑林区',c:'董老师',p:'137****1188',o:'张敏',days:38,m:112000},
+    {n:'陕西师范大学附属小学',t:'中小学',a:'雁塔区',c:'于主任',p:'136****2290',o:'张敏',days:6,m:105000},
+    {n:'西安市铁一中学',t:'中小学',a:'碑林区',c:'曹老师',p:'139****5561',o:'张敏',days:14,m:96000},
+    {n:'西安市第五中学',t:'中小学',a:'莲湖区',c:'袁校长',p:'132****8830',o:'张敏',days:58,m:62000},
+    {n:'西安市第八十五中学',t:'中小学',a:'雁塔区',c:'邓主任',p:'135****4402',o:'张敏',days:30,m:58000},
+    {n:'西安市第一中学',t:'中小学',a:'莲湖区',c:'彭老师',p:'138****7719',o:'张敏',days:81,m:70000},
+    {n:'西安外国语学校',t:'中小学',a:'雁塔区',c:'苏校长',p:'158****2256',o:'张敏',days:17,m:66000},
+    {n:'西安市第二十六中学',t:'中小学',a:'碑林区',c:'吕主任',p:'137****6690',o:'张敏',days:27,m:74000},
+    {n:'西安市育才中学',t:'中小学',a:'雁塔区',c:'任老师',p:'133****5528',o:'张敏',days:44,m:78000},
+    {n:'西安市第一幼儿园',t:'幼儿园',a:'碑林区',c:'梁园长',p:'139****3318',o:'李强',days:16,m:42000},
+    {n:'西安市第二幼儿园',t:'幼儿园',a:'新城区',c:'郝老师',p:'136****8891',o:'李强',days:35,m:38000},
+    {n:'西安交通大学幼儿园',t:'幼儿园',a:'碑林区',c:'施园长',p:'135****4407',o:'李强',days:8,m:55000},
+    {n:'陕西师范大学幼儿园',t:'幼儿园',a:'雁塔区',c:'孔老师',p:'137****2264',o:'李强',days:21,m:52000},
+    {n:'西北工业大学幼儿园',t:'幼儿园',a:'碑林区',c:'邵园长',p:'138****9930',o:'李强',days:63,m:50000},
+    {n:'西安高新文理幼儿园',t:'幼儿园',a:'高新区',c:'邱老师',p:'132****1158',o:'李强',days:13,m:46000},
+    {n:'西安市雁塔区航天幼儿园',t:'幼儿园',a:'雁塔区',c:'秦园长',p:'135****6674',o:'李强',days:29,m:44000},
+    {n:'西安市未央区大明宫幼儿园',t:'幼儿园',a:'未央区',c:'江老师',p:'139****4471',o:'李强',days:49,m:41000},
+    {n:'西安市碑林区保育院',t:'幼儿园',a:'碑林区',c:'顾园长',p:'136****7723',o:'李强',days:99,m:39000},
+    {n:'西安市莲湖区萌迪幼儿园',t:'幼儿园',a:'莲湖区',c:'毛老师',p:'137****3390',o:'李强',days:24,m:36000},
+    {n:'曲江池畔幼儿园',t:'幼儿园',a:'曲江新区',c:'孟园长',p:'158****5502',o:'李强',days:10,m:47000},
+    {n:'西安市灞桥区蓝天幼儿园',t:'幼儿园',a:'灞桥区',c:'白老师',p:'133****8816',o:'李强',days:55,m:43000},
+    {n:'金色摇篮幼儿园（西安）',t:'幼儿园',a:'雁塔区',c:'侯园长',p:'135****1147',o:'李强',days:31,m:40000},
+    {n:'西安市新城区实验幼儿园',t:'幼儿园',a:'新城区',c:'廖老师',p:'138****6695',o:'李强',days:19,m:37000},
+    {n:'西安市长安区婴幼儿保育院',t:'幼儿园',a:'长安区',c:'田园长',p:'132****4482',o:'李强',days:72,m:35000},
+    {n:'西安市曲江新区第二幼儿园',t:'幼儿园',a:'曲江新区',c:'方老师',p:'139****2208',o:'李强',days:26,m:48000}
+  ],
+  suppliers:[
+    {n:'西安新绿叶蔬菜种植合作社',cat:'蔬菜',c:'孙经理',payable:180000},
+    {n:'陕西秦蔬农产品供应链有限公司',cat:'蔬菜',c:'李总',payable:165000},
+    {n:'西安润禾果品批发有限公司',cat:'水果',c:'王经理',payable:152000},
+    {n:'陕西正大肉类食品有限公司',cat:'肉类',c:'赵总',payable:148000},
+    {n:'西安冰源冷冻食品有限公司',cat:'冻品',c:'刘经理',payable:135000},
+    {n:'西安海韵水产贸易有限公司',cat:'海鲜',c:'陈总',payable:128000},
+    {n:'西安味全调味品有限公司',cat:'调料',c:'杨经理',payable:120000},
+    {n:'杨凌绿丰蔬菜基地',cat:'蔬菜',c:'张经理',payable:115000},
+    {n:'西安鲜达蛋品有限公司',cat:'肉类',c:'周总',payable:108000},
+    {n:'陕西果缘农业发展有限公司',cat:'水果',c:'吴经理',payable:102000},
+    {n:'西安鑫源冻品商行',cat:'冻品',c:'郑经理',payable:98000},
+    {n:'西安百味源调料经营部',cat:'调料',c:'何经理',payable:92000},
+    {n:'陕西牧原肉业销售有限公司',cat:'肉类',c:'高总',payable:88000},
+    {n:'西安海鲜港商贸有限公司',cat:'海鲜',c:'马经理',payable:85000},
+    {n:'西安康禾蔬菜配送有限公司',cat:'蔬菜',c:'罗经理',payable:78000},
+    {n:'陕西鲜果时光农业有限公司',cat:'水果',c:'谢总',payable:72000},
+    {n:'西安雪隆冷冻食品厂',cat:'冻品',c:'唐经理',payable:68000},
+    {n:'西安香满园调味品厂',cat:'调料',c:'韩经理',payable:62000}
+  ],
+  categories:[
+    {name:'蔬菜',share:38,color:'#16a34a'},
+    {name:'肉类',share:18,color:'#e5484d'},
+    {name:'水果',share:15,color:'#e8890c'},
+    {name:'冻品',share:12,color:'#2563eb'},
+    {name:'调料',share:9,color:'#7c3aed'},
+    {name:'海鲜',share:8,color:'#0891b2'}
+  ],
+  products:[
+    {name:'土豆',cat:'蔬菜',sub:'根茎类',spec:'1kg/份',unit:'kg',cost:3.2,priceP:4.1,priceK:4.5,stock:320},
+    {name:'白菜',cat:'蔬菜',sub:'叶菜类',spec:'1kg/份',unit:'kg',cost:1.8,priceP:2.4,priceK:2.7,stock:260},
+    {name:'油麦菜',cat:'蔬菜',sub:'叶菜类',spec:'500g/份',unit:'kg',cost:4.5,priceP:5.8,priceK:6.4,stock:180},
+    {name:'白萝卜',cat:'蔬菜',sub:'根茎类',spec:'1kg/份',unit:'kg',cost:1.6,priceP:2.2,priceK:2.5,stock:410},
+    {name:'芹菜',cat:'蔬菜',sub:'叶菜类',spec:'500g/份',unit:'kg',cost:3.8,priceP:4.9,priceK:5.4,stock:150},
+    {name:'苹果',cat:'水果',sub:'仁果类',spec:'5kg/箱',unit:'kg',cost:8.5,priceP:10.8,priceK:11.8,stock:220},
+    {name:'香蕉',cat:'水果',sub:'蕉类',spec:'5kg/箱',unit:'kg',cost:5.6,priceP:7.2,priceK:7.9,stock:190},
+    {name:'猪里脊',cat:'肉类',sub:'猪肉',spec:'1kg/份',unit:'kg',cost:28,priceP:33,priceK:35,stock:85},
+    {name:'鸡胸肉',cat:'肉类',sub:'禽肉',spec:'1kg/份',unit:'kg',cost:15,priceP:18.5,priceK:19.8,stock:120},
+    {name:'冻鸡翅',cat:'冻品',sub:'禽类冻品',spec:'2kg/袋',unit:'kg',cost:19,priceP:23,priceK:24.5,stock:200},
+    {name:'食盐',cat:'调料',sub:'调味品',spec:'20袋/箱',unit:'袋',cost:1.2,priceP:1.6,priceK:1.8,stock:900},
+    {name:'鲈鱼',cat:'海鲜',sub:'鱼类',spec:'1条/份',unit:'kg',cost:26,priceP:32,priceK:34,stock:60}
+  ],
+  staff:[
+    {n:'张敏',role:'业务对接',area:'中小学片区（24所）',target:22000000,ytd:20300000},
+    {n:'李强',role:'业务对接',area:'幼儿园片区（16所）',target:18000000,ytd:16540000}
+  ],
+  ops:[
+    {n:'王芳',role:'入库录单',shift:'白班',note:'负责收货入库 / 单据确认'},
+    {n:'赵磊',role:'入库录单',shift:'白班',note:'负责分拣复核 / 退换调拨'},
+    {n:'孙会',role:'财务',shift:'白班',note:'对账 / 报表（1人，压力大）'}
+  ],
+  trend:[88,102,95,110,98,121,106,93,115,124,108,119,112,131], // 近14日销售额（千元）
+  trendLabels:['10/25','10/26','10/27','10/28','10/29','10/30','10/31','11/01','11/02','11/03','11/04','11/05','11/06','11/07'],
+  orders:[
+    {id:'SO-20261107-0186',s:'西安高新第一小学',mode:'客户自主下单',items:26,amt:5240,st:'已分拣'},
+    {id:'SO-20261107-0185',s:'陕西师范大学附属小学',mode:'客户自主下单',items:22,amt:4680,st:'已分拣'},
+    {id:'SO-20261107-0184',s:'西安交通大学幼儿园',mode:'内部代下单',items:18,amt:3120,st:'待分拣'},
+    {id:'SO-20261107-0183',s:'西安市雁塔区第一小学',mode:'客户自主下单',items:31,amt:6280,st:'配送中'},
+    {id:'SO-20261107-0182',s:'曲江池畔幼儿园',mode:'客户自主下单',items:15,amt:2560,st:'待分拣'},
+    {id:'SO-20261107-0181',s:'西安市第八十五中学',mode:'内部代下单',items:20,amt:3980,st:'已分拣'},
+    {id:'SO-20261107-0180',s:'西安市未央区方新小学',mode:'客户自主下单',items:24,amt:4460,st:'配送中'},
+    {id:'SO-20261107-0179',s:'西安高新文理幼儿园',mode:'客户自主下单',items:17,amt:2890,st:'已完成'}
+  ],
+  returns:[
+    {id:'TH-1107-04',kind:'采购退货',party:'西安海韵水产贸易有限公司',product:'鲈鱼',qty:12,weight:'12 kg',amount:312,reason:'到货规格偏小，不符合协议标准',date:'11-07',st:'待审核'},
+    {id:'TH-1107-03',kind:'采购退货',party:'西安新绿叶蔬菜种植合作社',product:'白菜',qty:40,weight:'40 kg',amount:72,reason:'叶菜发黄，验收不合格',date:'11-07',st:'已退款'},
+    {id:'TH-1107-02',kind:'采购换货',party:'陕西正大肉类食品有限公司',product:'猪里脊',qty:8,weight:'8 kg',amount:224,reason:'冷链温度异常，肉质存疑',date:'11-06',st:'处理中'},
+    {id:'TH-1107-01',kind:'采购退货',party:'西安润禾果品批发有限公司',product:'香蕉',qty:25,weight:'25 kg',amount:140,reason:'成熟度过高，到货即腐',date:'11-06',st:'已退款'},
+    {id:'XT-1107-06',kind:'客户退货',party:'西安高新第一小学',product:'土豆',qty:15,weight:'15 kg',amount:62,reason:'配送延迟，学校拒收',date:'11-07',st:'待审核'},
+    {id:'XT-1107-05',kind:'客户换货',party:'陕西师范大学附属小学',product:'油麦菜',qty:10,weight:'10 kg',amount:58,reason:'品相不佳，要求换货',date:'11-07',st:'处理中'},
+    {id:'XT-1107-04',kind:'客户退货',party:'曲江池畔幼儿园',product:'白菜',qty:20,weight:'20 kg',amount:48,reason:'实到数量与单据差异',date:'11-06',st:'已退款'},
+    {id:'XT-1107-03',kind:'客户退货',party:'西安交通大学幼儿园',product:'苹果',qty:18,weight:'18 kg',amount:194,reason:'部分果品有压伤',date:'11-06',st:'已退款'}
+  ],
+  sorting:[
+    {id:'PK-1107-01',s:'西安高新第一小学',sku:26,kg:386,prog:100,st:'已完成'},
+    {id:'PK-1107-02',s:'陕西师范大学附属小学',sku:22,kg:312,prog:100,st:'已完成'},
+    {id:'PK-1107-03',s:'西安市雁塔区第一小学',sku:31,kg:458,prog:72,st:'分拣中'},
+    {id:'PK-1107-04',s:'西安市未央区方新小学',sku:24,kg:341,prog:35,st:'分拣中'},
+    {id:'PK-1107-05',s:'西安交通大学幼儿园',sku:18,kg:210,prog:0,st:'待分拣'}
+  ],
+  delivery:[
+    {line:'线路 A · 雁塔/高新',school:9,vendor:'西安快捷冷链配送',plate:'陕A·D3821',st:'配送中',eta:'07:40'},
+    {line:'线路 B · 碑林/莲湖',school:11,vendor:'西安快捷冷链配送',plate:'陕A·D5567',st:'配送中',eta:'07:55'},
+    {line:'线路 C · 未央/灞桥',school:8,vendor:'西安鲜风物流',plate:'陕A·F9013',st:'待发车',eta:'08:10'},
+    {line:'线路 D · 曲江/长安',school:7,vendor:'西安鲜风物流',plate:'陕A·F2280',st:'待发车',eta:'08:20'},
+    {line:'线路 E · 幼儿园专线',school:5,vendor:'西安快捷冷链配送',plate:'陕A·D7745',st:'已发车',eta:'07:30'}
+  ],
+  foodFiles:[
+    {tm:'18:20',who:'秦蔬供应链',name:'蔬菜合格证_11.07.pdf',type:'合格证'},
+    {tm:'19:05',who:'正大肉类',name:'猪肉检疫检验报告.pdf',type:'检测报告'},
+    {tm:'21:10',who:'新绿叶合作社',name:'农产品质量检测报告.pdf',type:'检测报告'},
+    {tm:'22:48',who:'海韵水产',name:'水产合格证_1107.jpg',type:'合格证'},
+    {tm:'00:35',who:'润禾果品',name:'水果农残检测报告.pdf',type:'检测报告'}
+  ],
+  aiRows:[
+    {name:'土豆',spec:'1kg/份',qty:'120 kg',price:'¥3.20',date:'2026-11-07',shelf:'7 天',conf:'99%'},
+    {name:'白菜',spec:'1kg/份',qty:'85 kg',price:'¥1.80',date:'2026-11-07',shelf:'5 天',conf:'98%'},
+    {name:'猪里脊',spec:'1kg/份',qty:'30 kg',price:'¥28.00',date:'2026-11-07',shelf:'3 天',conf:'96%'},
+    {name:'油麦菜',spec:'500g/份',qty:'40 kg',price:'¥4.50',date:'2026-11-07',shelf:'4 天',conf:'97%'}
+  ]
+};
+
+const DISCOUNT={primary:0.96,kindergarten:1.00};
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const money=n=>'¥'+Math.round(n).toLocaleString('zh-CN');
+const price2=n=>'¥'+Number(n).toFixed(2);
+const wan=n=>(n/10000).toFixed(1)+'万';
+const pct=(a,b)=>b?(a/b*100).toFixed(1)+'%':'0%';
+function derived(){
+  const monthSales=sum(DB.schools,s=>s.m);
+  const arTotal=sum(DB.schools,s=>s.ar||s.m);
+  const buckets=[0,0,0,0];
+  DB.schools.forEach(s=>{const d=s.days;buckets[d<=30?0:d<=60?1:d<=90?2:3]+=s.ar||s.m;});
+  const ytd=sum(DB.staff,s=>s.ytd),target=sum(DB.staff,s=>s.target);
+  const payable=sum(DB.suppliers,s=>s.payable);
+  const typeSales={
+    primary:sum(DB.schools.filter(s=>s.t==='中小学'),s=>s.m),
+    kindergarten:sum(DB.schools.filter(s=>s.t==='幼儿园'),s=>s.m)
+  };
+  return {monthSales,arTotal,buckets,ytd,target,payable,typeSales};
+}
+/* 价格波动：蔬果肉蛋每周浮动，冻品/调料长期稳定 */
+const PRICE_VOL={'蔬菜':0.085,'水果':0.075,'肉类':0.11,'海鲜':0.10,'冻品':0.015,'调料':0.008};
+const WEEK_LABELS=['09/15','09/22','09/29','10/06','10/13','10/20','10/27','11/03'];
+function priceSeries(p,grain){
+  const day=grain==='day',n=day?14:8;
+  const amp=PRICE_VOL[p.cat]||0.03;
+  const seed=p.name.length*0.73+(p.cat==='蔬菜'?1.2:0.5);
+  const raw=[];
+  for(let i=0;i<n;i++){
+    raw.push(p.cost*(1+amp*Math.sin(i*0.9+seed)+amp*0.45*Math.cos(i*1.7+seed)));
+  }
+  const k=p.cost/raw[n-1];
+  const values=raw.map((v,i)=>+(v*k).toFixed(2));
+  const labels=day?DB.trendLabels.slice(-n):WEEK_LABELS.slice(-n);
+  return {labels,values};
+}
+/* 订单明细：数量按规格换算、重量单价自洽，金额合计精确等于订单金额 */
+const SPEC_KG={'1kg/份':1,'500g/份':0.5,'5kg/箱':5,'2kg/袋':2,'20袋/箱':1,'1条/份':1};
+function orderLines(o){
+  const lines=[];let used=0;
+  const kind=o.s.indexOf('幼儿园')>=0?'K':'P';
+  for(let i=0;i<DB.products.length&&i<6;i++){
+    const p=DB.products[i];
+    const per=SPEC_KG[p.spec]||1;
+    const qty=6+((i*5+o.items)%13);
+    const kg=Math.round(qty*per*10)/10;
+    const up=kind==='K'?p.priceK:p.priceP;
+    const amt=Math.round(kg*up*100)/100;
+    if(used+amt>o.amt*0.82)continue;
+    const wt=(p.unit==='袋'?qty*20:kg)+' '+p.unit;
+    lines.push({name:p.name,spec:p.spec,qty:qty,weight:wt,price:price2(up),amt:price2(amt)});
+    used+=amt;
+  }
+  const rest=Math.round((o.amt-used)*100)/100;
+  lines.push({name:'其他品类（合并）',spec:'—',qty:'—',weight:'—',price:'—',amt:price2(rest)});
+  return lines;
+}
+function orderPay(o){
+  const rate={'已完成':1,'配送中':0.6,'已分拣':0.3,'待分拣':0}[o.st]||0;
+  const paid=Math.round(o.amt*rate);
+  return {payable:o.amt,paid,unpaid:o.amt-paid};
+}
+//__RENDER__
+</script>
+
+<script>
+/* =========================================================
+   RENDER + INTERACTION LAYER
+   ========================================================= */
+const D=derived();
+const $=(s,r=document)=>r.querySelector(s);
+const PAGE_META={
+  dash:'经营驾驶舱',customers:'客户管理',products:'商品库',orders:'订单管理',
+  aiEntry:'AI 智慧录单',purchase:'采购入库 / 调拨',foodSafety:'食安资料中心',
+  agreement:'协议价与预警',sorting:'分拣管理',delivery:'配送管理',
+  reconcile:'对账管理',reports:'经营分析报表',private:'私有化与品牌'
+};
+const NAV=[
+  {g:'经营总览',items:[['dash','◎','经营驾驶舱']]},
+  {g:'AI 智能应用',items:[['aiEntry','◇','AI 智慧录单'],['foodSafety','▤','食安资料中心'],['agreement','△','协议价与预警']]},
+  {g:'供应链',items:[['purchase','↧','采购入库 / 调拨'],['sorting','▦','分拣管理'],['delivery','➜','配送管理'],['suppliers','▣','供应商管理'],['products','▥','商品库']]},
+  {g:'商务与客户',items:[['customers','◉','客户管理'],['orders','▤','订单管理'],['reconcile','≡','对账管理'],['reports','▧','经营分析报表']]},
+  {g:'系统',items:[['private','⚙','私有化与品牌']]}
+];
+PAGE_META.suppliers='供应商管理';
+
+/* ---------- state ---------- */
+let current='dash';
+let aiDone=false,foodDone=false,recTab='customer';
+let repDim='school',repGrain='week',repSchool='all';
+let priceGrain='day',priceProd=DB.products[0].name;
+let orderTab='list',purchaseTab='inbound';
+let toastTimer=null;
+
+/* ---------- product thumbnails: inline SVG, offline-safe ---------- */
+function productIcon(name){
+  const cat=(DB.products.find(p=>p.name===name)||{cat:'蔬菜'}).cat;
+  const bg={'蔬菜':'#e9f7ef','水果':'#fff3e2','肉类':'#fdecef','冻品':'#e9f0ff','调料':'#f2edff','海鲜':'#e6f6fa'}[cat]||'#f1f5f9';
+  let a='';
+  switch(name){
+    case '土豆':a='<ellipse cx="22" cy="24" rx="13" ry="10" fill="#c99a4b"/><ellipse cx="22" cy="24" rx="13" ry="10" fill="none" stroke="#a97f35"/><circle cx="17" cy="22" r="1.3" fill="#8c6828"/><circle cx="25" cy="27" r="1.2" fill="#8c6828"/><circle cx="26" cy="19" r="1" fill="#8c6828"/>';break;
+    case '白菜':a='<ellipse cx="22" cy="26" rx="14" ry="10" fill="#8fd19e"/><ellipse cx="22" cy="23" rx="11" ry="9" fill="#b8e6bf"/><ellipse cx="22" cy="21" rx="7" ry="6" fill="#dff3df"/><path d="M22 15 L22 11" stroke="#5aa96e" stroke-width="2"/>';break;
+    case '油麦菜':a='<path d="M13 33 Q10 20 20 12 Q30 20 27 33 Q22 37 13 33Z" fill="#7cc47f"/><path d="M20 12 L20 33" stroke="#4e9e5a" stroke-width="1.5"/><path d="M16 20 L20 24 M24 20 L20 24 M16 27 L20 30 M24 27 L20 30" stroke="#4e9e5a"/>';break;
+    case '白萝卜':a='<path d="M22 14 Q31 20 25 34 Q22 38 19 34 Q13 20 22 14Z" fill="#fbfcfd" stroke="#d7dee8"/><path d="M22 15 Q16 9 14 8 M22 15 Q22 8 22 7 M22 15 Q28 9 30 8" stroke="#5aa96e" stroke-width="2" fill="none"/>';break;
+    case '芹菜':a='<path d="M19 14 L18 35 M23 14 L24 35 M21 15 L21 36" stroke="#5fb56a" stroke-width="3" stroke-linecap="round"/><circle cx="17" cy="13" r="4" fill="#7fd08a"/><circle cx="22" cy="11" r="5" fill="#8ed899"/><circle cx="27" cy="13" r="4" fill="#7fd08a"/>';break;
+    case '苹果':a='<path d="M22 15 C14 13 11 20 13 27 C15 34 20 36 22 35 C24 36 29 34 31 27 C33 20 30 13 22 15Z" fill="#e5484d"/><path d="M22 15 Q22 10 24 8" stroke="#8a5a2b" stroke-width="2" fill="none"/><ellipse cx="28" cy="10" rx="5" ry="2.5" fill="#5aa96e" transform="rotate(-25 28 10)"/>';break;
+    case '香蕉':a='<path d="M11 16 Q14 32 27 31 Q34 30 34 22 Q31 28 26 27 Q17 26 16 16 Q13 13 11 16Z" fill="#f5c542" stroke="#d9a92c"/><path d="M11 16 L10 14" stroke="#8a6a2b" stroke-width="2"/>';break;
+    case '猪里脊':a='<path d="M12 20 Q14 14 22 14 Q31 14 33 20 Q34 29 26 32 Q17 34 13 28 Q11 24 12 20Z" fill="#f2a9ad" stroke="#dd8288"/><path d="M16 22 Q22 18 28 22 M16 26 Q22 23 28 26" stroke="#d98187" fill="none"/>';break;
+    case '鸡胸肉':a='<path d="M22 13 C29 13 33 19 31 26 C29 32 24 34 22 34 C20 34 15 32 13 26 C11 19 15 13 22 13Z" fill="#f6c9c4" stroke="#e2a49d"/><path d="M22 15 Q19 24 22 32" stroke="#e0a39d" stroke-width="1.4" fill="none"/>';break;
+    case '冻鸡翅':a='<path d="M14 19 Q20 13 28 17 Q34 20 31 27 Q27 33 19 30 Q13 27 14 19Z" fill="#e8a24a" stroke="#c9822f"/><path d="M18 20 L26 26 M22 17 L29 24" stroke="#c9822f"/><path d="M9 11 L9 17 M6 14 L12 14 M36 31 L36 37 M33 34 L39 34" stroke="#7fb8e8" stroke-width="1.4"/>';break;
+    case '食盐':a='<rect x="15" y="15" width="14" height="19" rx="2" fill="#ffffff" stroke="#cbd5e1"/><rect x="15" y="12" width="14" height="5" rx="1.5" fill="#2563eb"/><text x="22" y="29" font-size="9" text-anchor="middle" fill="#64748b" font-weight="700">盐</text>';break;
+    case '鲈鱼':a='<ellipse cx="21" cy="23" rx="12" ry="7" fill="#a8bdc9" stroke="#7d97a6"/><path d="M9 23 L3 17 L3 29 Z" fill="#8fa9b8"/><circle cx="27" cy="21" r="1.6" fill="#334155"/><path d="M17 17 L14 12 L21 16 Z" fill="#8fa9b8"/>';break;
+    default:a='<circle cx="22" cy="24" r="10" fill="#94a3b8"/>';
+  }
+  return `<svg viewBox="0 0 44 44" width="40" height="40" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="42" height="42" rx="11" fill="${bg}"/>${a}</svg>`;
+}
+/* ---------- charts (hand-written SVG, no external libs) ---------- */
+function lineChart(data,labels,opt){
+  opt=opt||{};
+  const w=640,h=210,pl=46,pr=14,pt=14,pb=30;
+  const yfmt=opt.yfmt||(v=>(v/10).toFixed(0)+'k');
+  const lastText=opt.lastText||('¥'+(data[data.length-1]/10).toFixed(1)+'万');
+  const color=opt.color||'#2563eb';
+  const max=Math.max(...data)*1.12,min=Math.min(...data)*0.86;
+  const X=i=>pl+i*(w-pl-pr)/(data.length-1);
+  const Y=v=>pt+(h-pt-pb)*(1-(v-min)/(max-min));
+  const pts=data.map((v,i)=>[X(i),Y(v)]);
+  const poly=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const area=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1));
+  const areaStr=X(0).toFixed(1)+','+(h-pb)+' '+area.join(' ')+' '+X(data.length-1).toFixed(1)+','+(h-pb);
+  let grid='';
+  for(let k=0;k<4;k++){
+    const v=min+(max-min)*k/3,y=Y(v);
+    grid+=`<line x1="${pl}" y1="${y.toFixed(1)}" x2="${w-pr}" y2="${y.toFixed(1)}" stroke="#eef1f6"/>`;
+    grid+=`<text x="${pl-8}" y="${(y+3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="#8b95a6">${yfmt(v)}</text>`;
+  }
+  let xlab='';
+  data.forEach((_,i)=>{if(i%2===0||i===data.length-1)xlab+=`<text x="${X(i).toFixed(1)}" y="${h-8}" text-anchor="middle" font-size="9.5" fill="#8b95a6">${labels[i]}</text>`;});
+  const dots=pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i===data.length-1?4:2.4}" fill="${color}" stroke="#fff" stroke-width="${i===data.length-1?2:1}"/>`).join('');
+  const last=pts[pts.length-1];
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".22"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}<polygon points="${areaStr}" fill="url(#lg)"/>
+    <polyline points="${poly}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${xlab}
+    <text x="${last[0].toFixed(1)-6}" y="${(last[1]-10).toFixed(1)}" text-anchor="end" font-size="10.5" font-weight="700" fill="${color}">${lastText}</text>
+  </svg>`;
+}
+function donutChart(items){
+  const cx=104,cy=100,r=66,sw=22,c=2*Math.PI*r,total=items.reduce((s,i)=>s+i.value,0);
+  let off=0,segs='';
+  items.forEach(it=>{
+    const frac=it.value/total,d=c*frac;
+    segs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${it.color}" stroke-width="${sw}" stroke-dasharray="${d.toFixed(2)} ${(c-d).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    off+=d;
+  });
+  let leg='';
+  items.forEach((it,i)=>{
+    const y=52+i*30;
+    leg+=`<rect x="208" y="${y-9}" width="10" height="10" rx="2" fill="${it.color}"/>`;
+    leg+=`<text x="225" y="${y}" font-size="11" fill="#4b5563">${it.label}</text>`;
+    leg+=`<text x="378" y="${y}" font-size="11" font-weight="700" text-anchor="end" fill="#1f2937">${(it.value/total*100).toFixed(1)}%</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 388 200" xmlns="http://www.w3.org/2000/svg">
+    ${segs}
+    <text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="17" font-weight="800" fill="#1f2937">${items.length} 类</text>
+    <text x="${cx}" y="${cy+15}" text-anchor="middle" font-size="10" fill="#8b95a6">客户结构</text>
+    ${leg}
+  </svg>`;
+}
+function barChart(items){
+  const w=620,rowH=36,h=items.length*rowH+12,labelW=54;
+  const max=Math.max(...items.map(i=>i.value));
+  let out='';
+  items.forEach((it,i)=>{
+    const y=i*rowH+8,bw=(w-labelW-70)*(it.value/max);
+    out+=`<text x="0" y="${y+14}" font-size="11" fill="#4b5563">${it.label}</text>`;
+    out+=`<rect x="${labelW}" y="${y+3}" width="${w-labelW-70}" height="15" rx="4" fill="#f1f4f9"/>`;
+    out+=`<rect x="${labelW}" y="${y+3}" width="${bw.toFixed(1)}" height="15" rx="4" fill="${it.color}"/>`;
+    out+=`<text x="${w}" y="${y+15}" text-anchor="end" font-size="11" font-weight="700" fill="#1f2937">${it.value}%</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${out}</svg>`;
+}
+
+/* ---------- helpers ---------- */
+function head(title,desc,pain){return `<div class="ph"><div><h1>${title}</h1><p>${desc}</p></div>${pain?`<span class="pain">解决痛点：${pain}</span>`:'<span class="pain none">基础业务模块</span>'}</div>`;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);}
+function tbl(headers,rows,tfoot){return `<div class="tb-wrap nowrap"><table><thead><tr>${headers.map((x,i)=>`<th class="${typeof x==='object'&&x.num?'num':''}">${typeof x==='object'?x.t:x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody>${tfoot?`<tfoot><tr>${tfoot.map((x,i)=>`<td class="${typeof x==='object'&&x.num?'num':''}">${typeof x==='object'?x.t:x}</td>`).join('')}</tr></tfoot>`:''}</table></div>`;}
+
+/* ======================= PAGES ======================= */
+const R={};
+
+R.dash=()=>{
+  const rate=pct(D.ytd,D.target);
+  const steps=[
+    ['dash','先看全局经营驾驶舱','40所学校 / 月营收约300万，建立客户规模认知'],
+    ['aiEntry','AI 智慧录单（痛点1）','纸质送货单拍照→自动识别→确认入库'],
+    ['foodSafety','食安资料中心（痛点2）','微信群资料 AI 抓取 + IoT 打印'],
+    ['agreement','协议价与预警（痛点3）','切换客户等级改价，录错亏本价即时拦截'],
+    ['reports','经营分析报表（痛点4）','按学校/商品看毛利净利，多颗粒度输出']
+  ];
+  return head('经营驾驶舱','育苗苗生鲜 · 西安学校生鲜配送 · 数据截至 2026-11-07','#4 经营数据无法及时获取')
+  +`<div class="grid g4" style="margin-bottom:14px">
+     <div class="kpi"><div class="lb"><i style="background:var(--pri)"></i>当月销售额</div><div class="v">${money(D.monthSales)}</div><div class="ft">40 所学校 · 约 <b>300万</b>/月</div></div>
+     <div class="kpi"><div class="lb"><i style="background:var(--purple)"></i>年度累计销售额</div><div class="v">${wan(D.ytd)}</div><div class="ft">年度目标 ${wan(D.target)} · 完成 <b>${rate}</b></div></div>
+     <div class="kpi"><div class="lb"><i style="background:var(--warn)"></i>客户应收余额</div><div class="v">${wan(D.arTotal)}</div><div class="ft">月结账期 · <b class="down">${DB.schools.filter(s=>s.days>30).length}</b> 所有逾期</div></div>
+     <div class="kpi"><div class="lb"><i style="background:var(--ok)"></i>供应商应付</div><div class="v">${wan(D.payable)}</div><div class="ft">${DB.suppliers.length} 家供应商 · 月结</div></div>
+   </div>
+   <div class="grid sp-a" style="margin-bottom:14px">
+     <div class="card"><div class="card-h"><h3>近 14 日销售额趋势</h3><span class="sub">单位：万元 / 日</span></div>${lineChart(DB.trend,DB.trendLabels)}</div>
+     <div class="card"><div class="card-h"><h3>客户结构（按销售额）</h3><span class="sub">两套协议价</span></div>
+       ${donutChart([{label:'中小学（24所）',value:D.typeSales.primary,color:'#2563eb'},{label:'幼儿园（16所）',value:D.typeSales.kindergarten,color:'#16a34a'}])}
+       <div class="callout" style="margin-top:6px">中小学与幼儿园执行<b>两套销售协议价</b>，系统按客户类型自动匹配单价。</div>
+     </div>
+   </div>
+   <div class="grid sp-a">
+     <div class="card"><div class="card-h"><h3>品类销售占比</h3><span class="sub">一级分类共 6 类 · SKU ${DB.company.skuCount}+</span></div>${barChart(DB.categories.map(c=>({label:c.name,value:c.share,color:c.color})))}</div>
+     <div class="card"><div class="card-h"><h3>推荐演示动线</h3><span class="sub">点击直接跳转</span></div>
+       <div class="steps">${steps.map((s,i)=>`<div class="step" data-go="${s[0]}"><div class="n">${i+1}</div><div class="tx"><b>${s[1]}</b><span>${s[2]}</span></div><div class="ar">›</div></div>`).join('')}</div>
+     </div>
+   </div>`;
+};
+
+R.customers=()=>{
+  const rows=DB.schools.map((s,i)=>`<tr><td class="muted">${String(i+1).padStart(2,'0')}</td><td class="strong">${s.n}</td><td><span class="pill ${s.t==='中小学'?'b':'g'}">${s.t}</span></td><td>${s.a}</td><td>${s.c}</td><td>${s.p}</td><td>${s.o}</td><td class="num">${money(s.m)}</td><td class="num">${money(s.ar||s.m)}</td><td><span class="pill ${s.days<=30?'g':s.days<=60?'o':'r'}">${s.days}天</span></td></tr>`);
+  return head('客户管理','客户名称 / 区域 / 联系人 · 中小学与幼儿园两类客户，执行两套协议价','客户档案基础能力')
+  +`<div class="card"><div class="card-h"><h3>学校客户档案（共 ${DB.schools.length} 家）</h3><span class="tag">中小学 ${DB.schools.filter(s=>s.t==='中小学').length} · 幼儿园 ${DB.schools.filter(s=>s.t==='幼儿园').length}</span></div>
+    ${tbl(['#','客户名称','类型','区域','联系人','联系电话','对接人',{t:'月销售额',num:true},{t:'应收余额',num:true},'账龄'],rows)}
+   </div>`;
+};
+
+R.products=()=>{
+  const rows=DB.products.map(p=>`<tr><td>${productIcon(p.name)}</td><td class="strong">${p.name}</td><td>${p.cat}</td><td>${p.sub}</td><td>${p.spec}</td><td class="num">${price2(p.cost)}</td><td class="num strong">${price2(p.priceP)}</td><td class="num strong">${price2(p.priceK)}</td><td class="num">${p.stock} ${p.unit}</td><td><span class="pill g">在售</span></td></tr>`);
+  const p=DB.products.find(x=>x.name===priceProd)||DB.products[0];
+  const series=priceSeries(p,priceGrain);
+  const hi=Math.max(...series.values),lo=Math.min(...series.values);
+  const swing=((hi-lo)/lo*100).toFixed(1);
+  const stable=p.cat==='冻品'||p.cat==='调料';
+  return head('商品库','一级分类：蔬菜 / 水果 / 调料 / 肉类 / 冻品 / 海鲜；二级分类按品类细化 · SKU '+DB.company.skuCount+'+','商品分类基础能力')
+  +`<div class="grid g3" style="margin-bottom:14px">
+      ${DB.categories.map(c=>`<div class="kpi"><div class="lb"><i style="background:${c.color}"></i>${c.name}</div><div class="v sm">${c.share}%</div><div class="ft">一级分类 · 销售额占比</div></div>`).join('')}
+   </div>
+   <div class="card" style="margin-bottom:14px"><div class="card-h"><h3>SKU 明细（示例 ${DB.products.length} 条 / 共 ${DB.company.skuCount} 条）</h3><span class="tag">两套协议价</span></div>
+    ${tbl(['图片','商品','一级分类','二级分类','规格',{t:'采购成本',num:true},{t:'中小学协议价',num:true},{t:'幼儿园协议价',num:true},{t:'可用库存',num:true},'状态'],rows)}
+   </div>
+   <div class="card"><div class="card-h"><h3>采购价格波动趋势 · ${p.name}</h3><span class="tag ${stable?'g':'o'}">${stable?'价格长期稳定':'随行就市波动'}</span></div>
+     <div class="form-row" style="grid-template-columns:2fr 1fr;margin-bottom:10px">
+       <div class="field"><label>选择商品</label><select id="priceProd" data-act="priceProdChange">${DB.products.map(x=>`<option value="${x.name}" ${x.name===p.name?'selected':''}>${x.name}（${x.cat}）</option>`).join('')}</select></div>
+       <div class="field"><label>显示颗粒度</label><div class="seg"><button data-act="priceGrain" data-v="day" class="${priceGrain==='day'?'on':''}">按天</button><button data-act="priceGrain" data-v="week" class="${priceGrain==='week'?'on':''}">按周</button></div></div>
+     </div>
+     ${lineChart(series.values,series.labels,{yfmt:v=>'¥'+v.toFixed(1),lastText:'¥'+p.cost.toFixed(2),color:stable?'#16a34a':'#e8890c'})}
+     <div class="grid g3" style="margin-top:10px">
+       <div class="kpi"><div class="lb">当前采购成本</div><div class="v sm">¥${p.cost.toFixed(2)}</div><div class="ft">${p.unit} · 最新一期</div></div>
+       <div class="kpi"><div class="lb">区间最高 / 最低</div><div class="v sm">¥${hi.toFixed(2)} / ¥${lo.toFixed(2)}</div><div class="ft">${priceGrain==='day'?'近 14 天':'近 8 周'}</div></div>
+       <div class="kpi"><div class="lb">波动幅度</div><div class="v sm">${swing}%</div><div class="ft">${stable?'冻品/调料价格长期稳定':'蔬果肉蛋随行就市'}</div></div>
+     </div>
+     <div class="callout" style="margin-top:12px">${stable?'冻品、调料价格长期稳定，系统按固定周期更新即可。':'蔬菜水果肉蛋价格每周浮动——系统记录每日 / 每周采购价，为协议价维护与成本预警提供基准。'}</div>
+   </div>`;
+};
+
+function returnPill(st){return st==='待审核'?'o':st==='处理中'?'b':'g';}
+function renderReturnsTable(list){
+  const rows=list.map(r=>`<tr><td>${r.id}</td><td><span class="pill ${r.kind.indexOf('客户')>=0?'b':'o'}">${r.kind}</span></td><td class="strong">${r.party}</td><td>${r.product}</td><td class="num">${r.qty}</td><td>${r.weight}</td><td class="num">${money(r.amount)}</td><td class="muted">${r.reason}</td><td>${r.date}</td><td><span class="pill ${returnPill(r.st)}">${r.st}</span></td></tr>`);
+  return tbl(['单号','类型','往来单位','商品',{t:'数量',num:true},'重量',{t:'金额',num:true},'原因','日期','状态'],rows);
+}
+function openOrder(id){
+  const o=DB.orders.find(x=>x.id===id);
+  if(!o)return;
+  const lines=orderLines(o),pay=orderPay(o);
+  const rows=lines.map(l=>`<tr><td class="strong">${l.name}</td><td>${l.spec}</td><td class="num">${l.qty}</td><td>${l.weight}</td><td class="num">${l.price}</td><td class="num strong">${l.amt}</td></tr>`);
+  $('#drawerTitle').textContent='订单详情 · '+o.id;
+  $('#drawerBody').innerHTML=`
+    <div class="d-meta">
+      <div><span>客户</span><b>${o.s}</b></div>
+      <div><span>下单方式</span><b>${o.mode}</b></div>
+      <div><span>订单状态</span><b>${o.st}</b></div>
+      <div><span>下单时间</span><b>2026-11-07 06:12</b></div>
+    </div>
+    <h4>商品明细（数量 / 重量 / 单价 / 金额）</h4>
+    ${tbl(['商品','规格',{t:'数量',num:true},'重量',{t:'单价',num:true},{t:'金额',num:true}],rows,[{t:'合计'},{t:''},{t:''},{t:''},{t:''},{t:money(o.amt),num:true}])}
+    <h4>收付款情况（月结账期）</h4>
+    <div class="grid g3">
+      <div class="kpi"><div class="lb">应付金额</div><div class="v sm">${money(pay.payable)}</div><div class="ft">本订单应收总额</div></div>
+      <div class="kpi"><div class="lb">已付金额</div><div class="v sm neg">${money(pay.paid)}</div><div class="ft">已核销回款</div></div>
+      <div class="kpi"><div class="lb">待付金额</div><div class="v sm pos">${money(pay.unpaid)}</div><div class="ft">月结到期待收</div></div>
+    </div>
+    <div class="alert alert-info">应付 ${money(pay.payable)} = 已付 ${money(pay.paid)} + 待付 ${money(pay.unpaid)}；点击行可穿透查看产品明细。</div>`;
+  document.body.classList.add('drawer-open');
+}
+R.orders=()=>{
+  const rows=DB.orders.map(o=>`<tr data-act="viewOrder" data-id="${o.id}" style="cursor:pointer"><td>${o.id}</td><td class="strong">${o.s}</td><td><span class="pill ${o.mode==='内部代下单'?'o':'b'}">${o.mode}</span></td><td class="num">${o.items}</td><td class="num strong">${money(o.amt)}</td><td><span class="pill ${o.st==='已完成'?'g':o.st==='待分拣'?'o':'b'}">${o.st}</span></td><td><span class="tag">详情 ›</span></td></tr>`);
+  const custReturns=DB.returns.filter(r=>r.kind.indexOf('客户')>=0);
+  return head('订单管理','客户扫码/链接进入商城 APP 自主下单，订单自动同步；约 10% 为内部代下单','#4 订单与经营数据贯通')
+  +`<div class="grid g4" style="margin-bottom:14px">
+     <div class="kpi"><div class="lb">今日订单</div><div class="v">268</div><div class="ft">自主下单 <b>242</b> · 代下单 26</div></div>
+     <div class="kpi"><div class="lb">代下单占比</div><div class="v">≈10%</div><div class="ft">可由业务员协助录入</div></div>
+     <div class="kpi"><div class="lb">今日销售额</div><div class="v">${money(DB.trend[DB.trend.length-1]*1000)}</div><div class="ft">较昨日 <b>+9.6%</b></div></div>
+     <div class="kpi"><div class="lb">客户退换货</div><div class="v">${custReturns.length}</div><div class="ft">待审核 ${custReturns.filter(r=>r.st==='待审核').length} 单</div></div>
+   </div>
+   <div class="card"><div class="card-h"><h3>${orderTab==='list'?'今日订单（点击行穿透详情）':'客户退换货单'}</h3>
+     <div class="seg"><button data-act="orderTab" data-v="list" class="${orderTab==='list'?'on':''}">订单列表</button><button data-act="orderTab" data-v="returns" class="${orderTab==='returns'?'on':''}">退换货单</button></div>
+   </div>
+   ${orderTab==='list'?tbl(['订单号','客户','下单方式',{t:'品类数',num:true},{t:'金额',num:true},'状态','操作'],rows):renderReturnsTable(custReturns)}
+   </div>`;
+};
+
+R.aiEntry=()=>{
+  const rows=DB.aiRows.map(r=>`<tr><td class="strong">${r.name}</td><td>${r.spec}</td><td class="num">${r.qty}</td><td class="num">${r.price}</td><td>${r.date}</td><td>${r.shelf}</td><td><span class="pill g">${r.conf}</span></td></tr>`);
+  return head('AI 智慧录单','供应商纸质送货单拍照识别，自动提取品名/规格/数量/单价及生产日期、保质期，人员仅做确认','#1 入库录单人力消耗大')
+  +`<div class="grid sp-b">
+     <div class="card"><div class="card-h"><h3>纸质送货单（模拟拍照）</h3><span class="tag o"> suppliers 送货单</span></div>
+       <div class="paper"><h4>送货单</h4><div class="meta">供货单位：西安新绿叶蔬菜种植合作社　日期：2026-11-07</div>
+         <div class="pl"><span>土豆</span><span>120 kg × ¥3.20</span><b>¥384</b></div>
+         <div class="pl"><span>白菜</span><span>85 kg × ¥1.80</span><b>¥153</b></div>
+         <div class="pl"><span>猪里脊</span><span>30 kg × ¥28.00</span><b>¥840</b></div>
+         <div class="pl"><span>油麦菜</span><span>40 kg × ¥4.50</span><b>¥180</b></div>
+         <div class="pl"><span>生产日期 / 保质期</span><span colspan="2">2026-11-07 / 3~7天</span></div>
+       </div>
+       <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+         <button class="btn" data-act="aiScan">${aiDone?'重新识别':'拍照并 AI 识别'}</button>
+         <button class="btn ghost" data-act="aiConfirm" ${aiDone?'':'disabled'}>确认入库</button>
+       </div>
+       <div class="callout" style="margin-top:12px">识别后可对接现有蔬东坡系统 API，人员仅复核确认，<b>2 名入库人员负荷大幅下降</b>。</div>
+     </div>
+     <div class="card"><div class="card-h"><h3>AI 识别结果</h3><span class="tag ${aiDone?'g':'gray'}">${aiDone?'识别完成 · 4 行':'等待识别'}</span></div>
+       <div id="aiResult">${aiDone?tbl(['品名','规格',{t:'数量',num:true},{t:'单价',num:true},'生产日期','保质期','置信度'],rows):'<div class="alert alert-info">点击左侧「拍照并 AI 识别」，模拟从纸质送货单自动提取结构化数据（含效期信息）。</div>'}</div>
+     </div>
+   </div>`;
+};
+
+R.purchase=()=>{
+  const opts=DB.products.map(p=>`<option value="${p.name}">${p.name}（可用 ${p.stock}${p.unit}）</option>`).join('');
+  return head('采购入库 / 调拨','收货入库 → 分拣 → 对外配送；退换货、调拨频繁，系统实时校验可用库存，防止超调','#1 退换货/调拨反复核对')
+  +`<div class="grid sp-a">
+     <div class="card"><div class="card-h"><h3>库存调拨单</h3><span class="tag r">库存校验演示</span></div>
+       <div class="form-row" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+         <div class="field"><label>调出商品</label><select id="tProduct" data-act="tProdChange">${opts}</select></div>
+         <div class="field"><label>调入仓库</label><select><option>主仓</option><option>分拣暂存区</option></select></div>
+         <div class="field"><label>可用库存（自动带出）</label><input id="tAvail" value="${DB.products[0].stock} ${DB.products[0].unit}" readonly></div>
+         <div class="field"><label>调拨数量（${DB.products[0].unit}）</label><input id="tQty" type="number" value="9999"></div>
+         <div class="field span-all"><label>&nbsp;</label><button class="btn" data-act="doTransfer">提交调拨</button></div>
+       </div>
+       <div id="tMsg" class="alert alert-info" style="margin-top:12px">提示：演示校验，可尝试提交默认的 9999，观察系统拦截。</div>
+     </div>
+    <div class="card"><div class="card-h"><h3>${purchaseTab==='inbound'?'今日入库单':'退换货单'}</h3>
+      <div class="seg"><button data-act="purTab" data-v="inbound" class="${purchaseTab==='inbound'?'on':''}">入库单</button><button data-act="purTab" data-v="returns" class="${purchaseTab==='returns'?'on':''}">退换货单</button></div>
+    </div>
+      ${purchaseTab==='inbound'
+        ? tbl(['单据号','供应商',{t:'品类数',num:true},{t:'金额',num:true},'效期','状态'],[
+            ['RK-1107-01','西安新绿叶蔬菜种植合作社',12,'¥2,860','已录入','已入库'],
+            ['RK-1107-02','陕西正大肉类食品有限公司',6,'¥4,120','已录入','已入库'],
+            ['RK-1107-03','西安润禾果品批发有限公司',8,'¥1,940','已录入','待确认']
+          ].map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td><td><span class="pill ${r[5]==='已入库'?'g':r[5]==='待确认'?'o':'b'}">${r[5]}</span></td></tr>`))
+        : renderReturnsTable(DB.returns)}
+      <div class="callout" style="margin-top:12px">${purchaseTab==='inbound'?'效期（生产日期 / 保质期）随单据自动录入，临期商品自动预警。':'退换货单据统一登记，退货原因、金额与状态全程留痕，避免反复核对。'}</div>
+    </div>
+   </div>`;
+};
+
+R.foodSafety=()=>{
+  return head('食安资料中心','AI 监控企业微信群，自动抓取合格证 / 第三方检测报告，对接 IoT 打印机自动打印；人员仅审核分配','#2 食安资料处理繁琐')
+  +`<div class="grid sp-a">
+     <div class="card"><div class="card-h"><h3>供应商群 · 资料推送</h3><span class="tag o">收集时段 18:00 – 次日 01:00</span></div>
+       <div class="chat">
+        ${DB.foodFiles.map(f=>`<div class="msg"><div class="av">${f.who.slice(0,1)}</div><div><div class="bd"><b>${f.who}</b> 上传了 <span class="file">${f.name}</span><div class="tm">${f.tm} · ${f.type}</div></div></div></div>`).join('')}
+       </div>
+       <button class="btn" style="margin-top:14px" data-act="foodGrab">${foodDone?'重新抓取':'AI 立即抓取并打印'}</button>
+       <div class="callout" style="margin-top:12px">过去需在 <b>01:00 前</b>人工下载打印整理，<b>04:00</b> 出车；AI 自动处理后人员仅做审核分配。</div>
+     </div>
+     <div class="card"><div class="card-h"><h3>${foodDone?'已抓取资料':'待抓取队列'}</h3><span class="tag ${foodDone?'g':'gray'}">${foodDone?'IoT 打印中 / 已完成':'尚未处理'}</span></div>
+       <div id="foodResult">${foodDone?tbl(['时间','供应商','资料名称','类型','打印','审核'],DB.foodFiles.map(f=>`<tr><td>${f.tm}</td><td>${f.who}</td><td>${f.name}</td><td><span class="pill ${f.type==='检测报告'?'b':'g'}">${f.type}</span></td><td><span class="pill g">已打印</span></td><td><span class="pill o">待审核</span></td></tr>`)):'<div class="alert alert-info">点击左侧「AI 立即抓取并打印」，模拟自动下载群文件并推送至 IoT 打印机。</div>'}</div>
+     </div>
+   </div>`;
+};
+
+R.agreement=()=>{
+  return head('协议价与价格异常预警','中小学 / 幼儿园两套协议价；切换客户等级自动改价、算毛利，录错亏本价即时拦截','#3 协议价维护风险高')
+  +`<div class="grid sp-a">
+     <div class="card"><div class="card-h"><h3>模拟开单 · 实时联动</h3><span class="tag b">核心交互</span></div>
+       <div class="form-row" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+         <div class="field span-all"><label>客户等级（切换观察单价 / 折扣 / 毛利实时重算）</label>
+           <div class="seg"><button data-act="setType" data-v="中小学" class="${priceType==='中小学'?'on':''}">中小学协议价</button><button data-act="setType" data-v="幼儿园" class="${priceType==='幼儿园'?'on':''}">幼儿园协议价</button></div>
+         </div>
+         <div class="field"><label>商品</label><select id="fProduct" data-act="priceChange">${DB.products.map(p=>`<option value="${p.name}" ${p.name===priceProd?'selected':''}>${p.name}（${p.spec}）</option>`).join('')}</select></div>
+         <div class="field"><label>数量</label><input id="fQty" type="number" value="100" data-act="priceChange"></div>
+         <div class="field span-all"><label>销售单价（可手动修改，模拟录错价）</label><input id="fPrice" type="number" step="0.01" value="" data-act="priceInput"></div>
+       </div>
+       <div id="priceResult"></div>
+       <button class="btn" id="savePrice" style="margin-top:12px" data-act="savePrice">保存价格</button>
+     </div>
+     <div class="card"><div class="card-h"><h3>价格异常预警规则</h3><span class="tag r">负毛利拦截</span></div>
+       <div class="alert alert-danger">当销售价低于采购成本基准时，系统即时预警并<b>禁止保存 / 发货</b>，规避录价错误造成的亏本发货。</div>
+       <div style="margin-top:14px">
+        ${tbl(['客户等级','折扣','协议价说明','适用场景'],[
+          ['中小学','96 折','批量大，协议价 × 0.96','24 所中小学'],
+          ['幼儿园','无折扣','幼儿协议价（原价）','16 所幼儿园']
+        ].map(r=>`<tr><td><span class="pill ${r[0]==='中小学'?'b':'g'}">${r[0]}</span></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`))}
+       </div>
+       <div class="callout" style="margin-top:14px">每周协议价维护由系统按客户等级批量更新，替代手工录入，<b>避免录错导致负毛利</b>。</div>
+     </div>
+   </div>`;
+};
+let priceType='中小学';
+function recalcPrice(){
+  const p=DB.products.find(x=>x.name===$('#fProduct').value);
+  if(!p)return;
+  const qty=Math.max(0,+$('#fQty').value||0);
+  const base=priceType==='中小学'?p.priceP:p.priceK;
+  const disc=priceType==='中小学'?DISCOUNT.primary:DISCOUNT.kindergarten;
+  const auto=+(base*disc).toFixed(2);
+  let pv=$('#fPrice').value;
+  if(pv===''||+$('#fPrice').dataset.auto==='1'){pv=auto;$('#fPrice').value=auto;}
+  const unit=+pv||0;
+  const sales=unit*qty,cost=p.cost*qty,gross=sales-cost,rate=sales?gross/sales*100:0;
+  const bad=unit<p.cost;
+  $('#priceResult').innerHTML=`
+    <div class="grid g4" style="margin-top:14px">
+      <div class="kpi"><div class="lb">协议价 / 折扣</div><div class="v sm">¥${base.toFixed(2)} <span style="font-size:12px;color:var(--t3)">×${disc}</span></div><div class="ft">${priceType}价</div></div>
+      <div class="kpi"><div class="lb">实际单价</div><div class="v sm">¥${unit.toFixed(2)}</div><div class="ft">采购成本 ¥${p.cost.toFixed(2)}</div></div>
+      <div class="kpi"><div class="lb">销售额</div><div class="v sm">${money(sales)}</div><div class="ft">数量 ${qty} ${p.unit}</div></div>
+      <div class="kpi"><div class="lb">毛利 / 毛利率</div><div class="v sm ${bad?'pos':'neg'}">${money(gross)} / ${rate.toFixed(1)}%</div><div class="ft">${bad?'已触发亏损':'正常'}</div></div>
+    </div>
+    ${bad?`<div class="alert alert-danger">价格异常预警：售价 ¥${unit.toFixed(2)} 低于采购成本 ¥${p.cost.toFixed(2)}，本单预计亏损 <b>${money(-gross)}</b>，禁止保存发货。</div>`:'<div class="alert alert-ok">价格校验通过，毛利率正常，可保存。</div>'}`;
+  const sb=$('#savePrice');if(sb)sb.disabled=bad;
+}
+
+R.sorting=()=>{
+  return head('分拣管理','按学校订单生成分拣任务，实时显示进度，对接后续外包配送','#1 分拣作业效率')
+  +`<div class="card"><div class="card-h"><h3>今日分拣任务</h3><span class="tag">共 ${DB.sorting.length} 单</span></div>
+    ${tbl(['分拣单号','学校','品类数',{t:'重量(kg)',num:true},'进度','状态'],DB.sorting.map(s=>`<tr><td>${s.id}</td><td class="strong">${s.s}</td><td class="num">${s.sku}</td><td class="num">${s.kg}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="prog"><i style="width:${s.prog}%"></i></div><span class="muted">${s.prog}%</span></div></td><td><span class="pill ${s.st==='已完成'?'g':s.st==='待分拣'?'o':'b'}">${s.st}</span></td></tr>`))}
+   </div>`;
+};
+
+R.delivery=()=>{
+  return head('配送管理','配送全部外包第三方（自有车辆成本过高放弃自营），按线路跟踪发车与到货','配送外包')
+  +`<div class="card"><div class="card-h"><h3>配送线路（第三方外包）</h3><span class="tag g">5 条线路</span></div>
+    ${tbl(['线路','学校数','承运商','车牌','状态','预计到达'],DB.delivery.map(d=>`<tr><td class="strong">${d.line}</td><td class="num">${d.school}</td><td>${d.vendor}</td><td>${d.plate}</td><td><span class="pill ${d.st==='已发车'?'g':d.st==='待发车'?'o':'b'}">${d.st}</span></td><td>${d.eta}</td></tr>`))}
+   </div>`;
+};
+
+R.suppliers=()=>{
+  const rows=DB.suppliers.map((s,i)=>`<tr><td class="muted">${String(i+1).padStart(2,'0')}</td><td class="strong">${s.n}</td><td><span class="pill b">${s.cat}</span></td><td>${s.c}</td><td class="num">${money(s.payable)}</td><td>月结</td><td><span class="pill g">合作中</span></td></tr>`);
+  return head('供应商管理','供应商名称 / 供应品类 / 价格；月结账期，蔬果肉蛋每周浮动、冻品调料长期稳定','供应商档案')
+  +`<div class="card"><div class="card-h"><h3>合作供应商（共 ${DB.suppliers.length} 家）</h3><span class="tag">应付合计 ${money(D.payable)}</span></div>
+    ${tbl(['#','供应商名称','供应品类','联系人',{t:'本月应付',num:true},'账期','状态'],rows)}
+   </div>`;
+};
+
+R.reconcile=()=>{
+  const isCus=recTab==='customer';
+  let body;
+  if(isCus){
+    const labels=['未到期(≤30天)','逾期 31-60 天','逾期 61-90 天','逾期 90 天以上'];
+    const rows=D.buckets.map((b,i)=>`<tr><td>${labels[i]}</td><td class="num">${money(b)}</td><td class="num">${(b/D.arTotal*100).toFixed(1)}%</td><td><span class="pill ${i===0?'g':i===1?'o':'r'}">${i===0?'正常':i===1?'关注':'催收'}</span></td></tr>`);
+    body=`<div class="grid sp-b">
+      <div class="card"><div class="card-h"><h3>客户应收账龄</h3><span class="tag">应收合计 ${money(D.arTotal)}</span></div>
+        ${tbl(['账龄区间',{t:'金额',num:true},'占比','状态'],rows,[{t:'合计',t2:''},{t:money(D.arTotal),num:true},{t:'100.0%'},''])}
+      </div>
+      <div class="card"><div class="card-h"><h3>对账进度</h3><span class="tag b">月结</span></div>
+        ${tbl(['学校','月销售额',{t:'应收',num:true},'账单状态'],DB.schools.slice(0,8).map(s=>`<tr><td>${s.n}</td><td class="num">${money(s.m)}</td><td class="num">${money(s.ar||s.m)}</td><td><span class="pill ${s.days<=30?'g':'o'}">${s.days<=30?'已出账':'待确认'}</span></td></tr>`))}
+      </div></div>`;
+  }else{
+    const rows=DB.suppliers.map(s=>`<tr><td>${s.n}</td><td>${s.cat}</td><td class="num">${money(s.payable)}</td><td>月结</td><td><span class="pill ${'g'}">待结算</span></td></tr>`);
+    body=`<div class="card"><div class="card-h"><h3>供应商应付对账</h3><span class="tag o">应付合计 ${money(D.payable)}</span></div>
+      ${tbl(['供应商','品类',{t:'应付金额',num:true},'账期','状态'],rows,[{t:'合计'},'',{t:money(D.payable),num:true},'','' ])}
+     </div>`;
+  }
+  return head('对账管理','客户对账与供应商对账双线管理，账龄自动分桶，缓解 1 名财务的报表压力','#4 经营数据无法及时获取')
+  +`<div style="margin-bottom:14px"><div class="seg">
+      <button data-act="recTab" data-v="customer" class="${isCus?'on':''}">客户对账</button>
+      <button data-act="recTab" data-v="supplier" class="${!isCus?'on':''}">供应商对账</button>
+    </div></div>`+body;
+};
+
+R.reports=()=>{
+  const grains=[['day','每日'],['3day','2-3 天'],['week','每周']];
+  const schoolOpts='<option value="all">全部学校</option>'+DB.schools.map(s=>`<option value="${s.n}" ${repSchool===s.n?'selected':''}>${s.n}</option>`).join('');
+  let rows=[],totalSales=0,totalCost=0,totalGross=0,totalNet=0;
+  const list=repDim==='school'
+    ? DB.schools.filter(s=>repSchool==='all'||s.n===repSchool).map(s=>({label:s.n,sales:s.m,cr:0.70}))
+    : DB.products.map(p=>({label:p.name,sales:D.monthSales/DB.products.length,cr:p.cost/p.priceP}));
+  list.forEach(it=>{
+    const sales=it.sales,cost=Math.round(sales*it.cr),gross=sales-cost,net=Math.round(gross-sales*0.04);
+    totalSales+=sales;totalCost+=cost;totalGross+=gross;totalNet+=net;
+    rows.push(`<tr><td class="strong">${it.label}</td><td class="num">${money(sales)}</td><td class="num">${money(cost)}</td><td class="num neg">${money(gross)}</td><td class="num">${(gross/sales*100).toFixed(1)}%</td><td class="num">${money(net)}</td></tr>`);
+  });
+  return head('经营分析报表','按学校 / 商品多维度统计采购价、销售价、单品毛利与净利润；支持每日 / 2-3 天 / 周颗粒度','#4 经营数据无法及时获取')
+  +`<div class="card" style="margin-bottom:14px"><div class="card-h"><h3>筛选条件</h3><button class="btn" data-act="genReport">生成报表</button></div>
+     <div class="form-row" style="grid-template-columns:1fr 1fr 2fr">
+       <div class="field"><label>统计维度</label><div class="seg"><button data-act="repDim" data-v="school" class="${repDim==='school'?'on':''}">按学校</button><button data-act="repDim" data-v="product" class="${repDim==='product'?'on':''}">按商品</button></div></div>
+       <div class="field"><label>输出颗粒度</label><div class="seg">${grains.map(g=>`<button data-act="repGrain" data-v="${g[0]}" class="${repGrain===g[0]?'on':''}">${g[1]}</button>`).join('')}</div></div>
+       <div class="field"><label>学校</label><select id="repSchool" data-act="repSchoolChange">${schoolOpts}</select></div>
+     </div>
+   </div>
+   <div class="grid g4" style="margin-bottom:14px">
+     <div class="kpi"><div class="lb">销售额</div><div class="v sm">${money(totalSales)}</div><div class="ft">统计维度：${repDim==='school'?'按学校':'按商品'}</div></div>
+     <div class="kpi"><div class="lb">采购成本</div><div class="v sm">${money(totalCost)}</div><div class="ft">成本率 ${(totalCost/totalSales*100).toFixed(1)}%</div></div>
+     <div class="kpi"><div class="lb">毛利</div><div class="v sm neg">${money(totalGross)}</div><div class="ft">毛利率 ${(totalGross/totalSales*100).toFixed(1)}%</div></div>
+     <div class="kpi"><div class="lb">净利润（估）</div><div class="v sm">${money(totalNet)}</div><div class="ft">净利率 ${(totalNet/totalSales*100).toFixed(1)}%</div></div>
+   </div>
+   <div class="card"><div class="card-h"><h3>${repDim==='school'?'各学校':'各商品'}经营明细</h3><span class="tag p">颗粒度：${grains.find(g=>g[0]===repGrain)[1]}</span></div>
+    ${tbl([repDim==='school'?'学校':'商品',{t:'销售额',num:true},{t:'采购成本',num:true},{t:'毛利',num:true},'毛利率',{t:'净利润',num:true}],rows,
+      [{t:'合计'},{t:money(totalSales),num:true},{t:money(totalCost),num:true},{t:money(totalGross),num:true},{t:(totalGross/totalSales*100).toFixed(1)+'%'},{t:money(totalNet),num:true}])}
+   </div>`;
+};
+
+R.private=()=>{
+  return head('私有化定制 · 品牌自定义','替换体验差的旧系统（蔬东坡），私有化部署，自定义软件名称与 Logo，交付源码支持二次开发','#5 现有系统服务差，考虑替换')
+  +`<div class="grid sp-a">
+     <div class="card"><div class="card-h"><h3>品牌自定义（现场演示）</h3><span class="tag g">实时生效</span></div>
+       <div class="field"><label>软件名称</label><input id="brandName" value="育苗苗生鲜管理系统" data-act="brandInput"></div>
+       <div style="margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:14px;background:#fafcff">
+         <div style="display:flex;align-items:center;gap:10px"><div class="logo">苗</div><div><b id="brandPreview" style="font-size:14px">育苗苗生鲜管理系统</b><small style="display:block;color:var(--t3)">登录页 / 系统标题预览</small></div></div>
+       </div>
+       <div class="callout" style="margin-top:12px">输入任意名称即可预览<b>自定义软件名称</b>，私有化版本可同步替换 Logo 与登录页。</div>
+     </div>
+     <div class="card"><div class="card-h"><h3>替换旧系统 · 能力清单</h3><span class="tag b">对比蔬东坡</span></div>
+       ${tbl(['能力','旧系统（蔬东坡）','本方案'],[
+         ['系统体验 / 培训服务','体验差、培训不到位','简洁易用 + 现场培训'],
+         ['AI 单据 / 食安识别','无','拍照识别 + 群文件抓取'],
+         ['价格异常预警','无','负毛利即时拦截'],
+         ['经营毛利报表','取数慢','按学校/商品实时多维'],
+         ['私有化 / 源码','不支持','私有部署 + 源码交付 + 二开'],
+         ['现有系统对接','—','可对接蔬东坡 API 平滑过渡']
+       ].map(r=>`<tr><td class="strong">${r[0]}</td><td><span class="pill r">${r[1]}</span></td><td><span class="pill g">${r[2]}</span></td></tr>`))}
+       <div class="alert alert-ok">服务到期前可平滑替换：先对接现有 API 同步数据，再逐步切换至私有化系统。</div>
+     </div>
+   </div>`;
+};
+
+/* ======================= ROUTER ======================= */
+function renderNav(){
+  $('#nav').innerHTML=NAV.map(g=>`<div class="nav-g">${g.g}</div>`+g.items.map(([id,ic,name])=>`<div class="nav-i ${id===current?'on':''}" data-go="${id}"><span class="ic">${ic}</span><span>${name}</span></div>`).join('')).join('');
+}
+function go(id){
+  if(!R[id])return;
+  current=id;
+  $('#crumbCur').textContent=PAGE_META[id]||id;
+  $('#view').innerHTML=R[id]();
+  renderNav();
+  $('#view').scrollTop=0;
+  toggleNav(false);
+  closeDrawer();
+  if(id==='agreement')recalcPrice();
+}
+function closeDrawer(){document.body.classList.remove('drawer-open');}
+function toggleNav(on){document.body.classList.toggle('nav-open',!!on);}
+function togglePhone(){document.body.classList.toggle('phone-mode');document.body.classList.add('compact');toast(document.body.classList.contains('phone-mode')?'已进入手机预览':'已退出手机预览');}
+
+/* ======================= EVENTS ======================= */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){go(g.dataset.go);return;}
+  const b=e.target.closest('[data-act]');
+  if(!b)return;
+  const a=b.dataset.act;
+  switch(a){
+    case 'toggleNav':toggleNav(!document.body.classList.contains('nav-open'));break;
+    case 'closeNav':toggleNav(false);closeDrawer();break;
+    case 'togglePhone':togglePhone();break;
+    case 'viewOrder':openOrder(b.dataset.id);break;
+    case 'closeDrawer':closeDrawer();break;
+    case 'orderTab':orderTab=b.dataset.v;go('orders');break;
+    case 'purTab':purchaseTab=b.dataset.v;go('purchase');break;
+    case 'priceGrain':priceGrain=b.dataset.v;go('products');break;
+    case 'priceProdChange':priceProd=$('#priceProd').value;go('products');break;
+    case 'aiScan':aiDone=true;go('aiEntry');toast('AI 识别完成，已提取 4 行单据数据（含生产日期与保质期）');break;
+    case 'aiConfirm':toast('已确认入库 4 行，单据同步完成');break;
+    case 'foodGrab':foodDone=true;go('foodSafety');toast('已抓取 5 份食安资料并推送 IoT 打印机');break;
+    case 'doTransfer':doTransfer();break;
+    case 'tProdChange':{const p=DB.products.find(x=>x.name===$('#tProduct').value);$('#tAvail').value=p.stock+' '+p.unit;}
+      break;
+    case 'setType':priceType=b.dataset.v;$('#fPrice').dataset.auto='1';go('agreement');break;
+    case 'priceChange':$('#fPrice').dataset.auto='1';recalcPrice();break;
+    case 'priceInput':$('#fPrice').dataset.auto='0';recalcPrice();break;
+    case 'savePrice':toast('价格已保存，协议价已更新');break;
+    case 'recTab':recTab=b.dataset.v;go('reconcile');break;
+    case 'repDim':repDim=b.dataset.v;go('reports');break;
+    case 'repGrain':repGrain=b.dataset.v;go('reports');break;
+    case 'repSchoolChange':repSchool=$('#repSchool').value;go('reports');break;
+    case 'genReport':toast('报表已生成，可按日 / 2-3 天 / 周导出');break;
+    case 'brandInput':$('#brandPreview').textContent=$('#brandName').value||'未命名系统';break;
+  }
+});
+function doTransfer(){
+  const p=DB.products.find(x=>x.name===$('#tProduct').value);
+  const qty=+$('#tQty').value||0;
+  const msg=$('#tMsg');
+  if(qty>p.stock){
+    msg.className='alert alert-danger';
+    msg.innerHTML=`⛔ 超出可用库存，无法提交：${p.name} 当前可用 ${p.stock} ${p.unit}，本次调拨 ${qty} ${p.unit}。`;
+    toast('调拨被拦截：超出可用库存');
+  }else if(qty<=0){
+    msg.className='alert alert-danger';msg.textContent='调拨数量必须大于 0。';
+  }else{
+    msg.className='alert alert-ok';
+    msg.innerHTML=`✓ 校验通过：${p.name} 调拨 ${qty} ${p.unit}，提交成功（剩余 ${p.stock-qty} ${p.unit}）。`;
+    toast('调拨单提交成功');
+  }
+}
+/* responsive */
+const NARROW=window.matchMedia('(max-width:820px)');
+function syncCompact(){
+  const phone=document.body.classList.contains('phone-mode');
+  document.body.classList.toggle('compact',phone||NARROW.matches);
+}
+NARROW.addEventListener('change',syncCompact);
+window.addEventListener('resize',syncCompact);
+syncCompact();
+go('dash');
+</script>
+</body>
+</html>
