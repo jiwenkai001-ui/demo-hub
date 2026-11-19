@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-10-21T18:05:04+08:00",
+  "python": "3.13.15",
+  "browser": "Microsoft Edge / Chromium via Playwright",
+  "testBackend": "Real Python HTTP server + temporary SQLite databases; /queue/ prefix",
+  "durationSeconds": 42.297,
+  "testsRun": 28,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": 28,
+  "success": true,
+  "tests": [
+    {
+      "id": "test_browser.BrowserTests.test_01_multiclient_lifecycle_and_restoration",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_02_same_device_tabs_language_and_store_isolation",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_03_pending_recall_stays_disabled_across_refresh",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_04_old_and_malformed_snapshots_do_not_overwrite",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_05_settings_preserve_draft_and_live_customer_updates",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_06_history_pagination_and_actual_download",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_07_qr_subdirectory_local_assets_and_display_rotation",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_08_network_recovery_session_expiry_and_speech",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_09_responsive_layout_all_pages",
+      "status": "passed"
+    },
+    {
+      "id": "test_browser.BrowserTests.test_10_lost_write_ack_retries_same_operation",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.HTTPTests.test_auth_origin_and_structured_failures",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.HTTPTests.test_csv_exports_all_filtered_rows",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.HTTPTests.test_subdirectory_assets_and_private_files",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_concurrent_same_device",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_concurrent_unique_numbers_and_single_call",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_day_rollover_and_history",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_fifo_and_occupied_current_guard",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_history_beyond_thirty_and_filters",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_idempotency_replay_and_fingerprint",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_idempotency_replay_returns_fresh_state",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_passed_recall_and_device_reuse",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_pause_and_eta_settings",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_reset_keeps_history_and_counter",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_same_device_unique_and_completed_can_retake",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_stale_version_and_wrong_ticket_rejected",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_store_isolation_and_restart",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_store_scoped_session_logout",
+      "status": "passed"
+    },
+    {
+      "id": "test_queue.QueueTests.test_validation_and_empty_queue",
+      "status": "passed"
+    }
+  ],
+  "limitations": [
+    "No physical phone scan or speaker audio test",
+    "Local demo acceptance; no production load or deployment certification"
+  ]
+}
