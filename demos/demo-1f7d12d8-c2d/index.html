@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>商户盈亏分析智能体 · 通用版</title>
+<style>
+:root{
+  --bg:#f4f6fb;--surface:#fff;--border:#e6eaf1;--text:#1e293b;--sub:#64748b;
+  --mute:#94a3b8;--primary:#4f46e5;--primary-soft:#eef2ff;--radius:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
+
+.app{height:100vh;display:flex;flex-direction:column}
+.topbar{height:60px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;font-size:18px;font-weight:700;box-shadow:0 4px 12px rgba(79,70,229,.3)}
+.logo strong{display:block;font-size:16px}.logo small{display:block;font-size:11px;color:var(--mute)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.engine-badge{font-size:12px;padding:7px 12px;border-radius:20px;background:#ecfdf5;color:#047857;font-weight:600}
+.btn{border:1px solid transparent;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;transition:.15s}
+.btn-ghost{background:var(--surface);color:var(--sub);border-color:var(--border)}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover:not(:disabled){background:#4338ca}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* 输入区 */
+.input-card{flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px}
+.input-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.input-title h3{margin:0;font-size:14px}
+.input-title h3 span{font-weight:400;color:var(--sub);font-size:12px;margin-left:8px}
+.input-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr) auto;gap:12px;align-items:end}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label{font-size:11.5px;color:var(--sub)}
+.fld label b{color:#dc2626}
+.fld input,.fld textarea{border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;outline:none;width:100%}
+.fld input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.fld .unit-hint{font-size:10px;color:var(--mute)}
+.more-toggle{font-size:12px;color:var(--primary);background:none;border:none;padding:4px 0;font-weight:600}
+.more-panel{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.more-panel.open{display:block}
+.more-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.more-grid .f-full{grid-column:1/-1}
+.more-note{font-size:11px;color:var(--sub);background:var(--primary-soft);padding:8px 12px;border-radius:8px;margin-bottom:12px}
+
+.workspace{flex:1;display:grid;grid-template-columns:minmax(360px,44%) 1fr;gap:0;min-height:0}
+.left-panel{background:var(--bg);border-right:1px solid var(--border);overflow-y:auto;padding:20px 22px 40px}
+.right-panel{background:var(--surface);min-width:0;display:flex}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.panel-head h2{font-size:17px;margin:0 0 4px}
+.panel-head p{margin:0;font-size:12px;color:var(--sub)}
+.update-time{font-size:11px;color:var(--mute);white-space:nowrap;margin-top:3px}
+.empty-hint{padding:50px 20px;text-align:center;color:var(--sub);line-height:1.8}
+.empty-hint .big{font-size:40px;margin-bottom:12px}
+
+.diag-panel{display:flex;flex-direction:column;gap:18px}
+.score-card{background:linear-gradient(135deg,#eef2ff,#faf5ff);border:1px solid #e0e7ff;border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:22px}
+.score-ring{width:100px;height:100px;border-radius:50%;flex-shrink:0;position:relative;background:conic-gradient(var(--color) var(--score),#e2e8f0 0);display:grid;place-items:center}
+.score-inner{width:80px;height:80px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-size:30px;font-weight:800;line-height:1}
+.score-unit{font-size:11px;color:var(--mute);margin-top:3px}
+.score-meta h3{margin:8px 0 6px;font-size:15px}
+.score-meta p{margin:0;font-size:12.5px;line-height:1.6;color:#475569}
+.severity-pill{font-size:11px;color:#fff;padding:3px 10px;border-radius:12px;font-weight:600}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:3px}
+.metric-label{font-size:11.5px;color:var(--sub)}
+.metric-value{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.metric-sub{font-size:10.5px;color:var(--mute)}
+.metric-indigo .metric-value{color:#4f46e5}.metric-blue .metric-value{color:#0284c7}
+.metric-green .metric-value{color:#16a34a}.metric-red .metric-value{color:#dc2626}
+.metric-amber .metric-value{color:#d97706}.metric-orange .metric-value{color:#ea580c}
+.panel-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.section-heading{font-size:14px;margin:0 0 6px}
+.section-hint{font-size:11px;color:var(--mute);margin:0 0 14px}
+.dimension-list{display:flex;flex-direction:column;gap:14px}
+.dimension-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.dimension-name{font-size:12.5px;font-weight:600}
+.dimension-name .opt{font-size:10px;color:var(--mute);font-weight:400;margin-left:6px}
+.dimension-score{font-size:13px;font-weight:700}
+.dimension-track{height:6px;background:#eef2f7;border-radius:4px;overflow:hidden}
+.dimension-fill{height:100%;border-radius:4px;transition:width .5s}
+.dimension-finding{margin:6px 0 0;font-size:11px;color:var(--sub);line-height:1.5}
+.dim-locked{opacity:.55}
+.cause-list{display:flex;flex-direction:column;gap:10px}
+.cause-item{display:flex;gap:10px;align-items:flex-start}
+.cause-item>div{display:flex;flex-direction:column;gap:2px}
+.cause-item strong{font-size:12.5px}
+.cause-item span{font-size:11px;color:var(--sub);line-height:1.5}
+.weight-tag{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:700;flex-shrink:0;margin-top:2px}
+.w-高{background:#fee2e2;color:#b91c1c}.w-中{background:#fef3c7;color:#b45309}.w-低{background:#f1f5f9;color:#64748b}
+
+.chat-view{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-header{height:58px;flex-shrink:0;border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.chat-title{display:flex;align-items:center;gap:10px}
+.bot-avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+.chat-title strong{display:block;font-size:14px}.chat-title small{display:block;font-size:11px;color:var(--mute)}
+.engine-chip{font-size:11px;color:var(--sub);background:var(--bg);border:1px solid var(--border);padding:5px 10px;border-radius:16px}
+.chat-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.chat-welcome{margin:auto;text-align:center;max-width:480px}
+.welcome-icon{font-size:42px;margin-bottom:12px}
+.chat-welcome h2{font-size:20px;margin:0 0 10px}
+.chat-welcome p{color:var(--sub);line-height:1.7;font-size:13px}
+.welcome-chips,.chat-suggestions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.welcome-chips button,.chat-suggestions button{background:var(--surface);border:1px solid var(--primary);color:var(--primary);border-radius:18px;padding:8px 14px;font-size:12.5px;transition:.15s}
+.welcome-chips button:hover,.chat-suggestions button:hover{background:var(--primary-soft)}
+.chat-suggestions{padding:0 24px 8px;margin-top:0;justify-content:flex-start}
+.chat-suggestions button:disabled{opacity:.5}
+.msg{display:flex;gap:10px;max-width:92%}
+.msg-user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:30px;height:30px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#4338ca);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.msg-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.msg-tag{font-size:10.5px;color:var(--sub)}
+.msg-user .msg-tag{text-align:right}
+.msg-content{border-radius:12px;padding:14px 16px;line-height:1.7;font-size:13px;background:var(--surface);border:1px solid var(--border);box-shadow:0 1px 3px rgba(16,24,40,.04)}
+.msg-user .msg-content{background:var(--primary);color:#fff;border-color:transparent}
+.markdown h3{font-size:15px;margin:4px 0 10px}
+.markdown h4{font-size:13.5px;margin:12px 0 6px}
+.markdown p{margin:6px 0}
+.markdown ul{margin:8px 0;padding-left:20px}
+.markdown li{margin:4px 0}
+.markdown strong{font-weight:700}
+.markdown blockquote{margin:10px 0;padding:8px 12px;border-left:3px solid var(--primary);background:var(--primary-soft);border-radius:0 8px 8px 0;color:#4338ca;font-size:12.5px}
+.markdown code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12px}
+.md-space{height:4px}
+.msg-user .msg-content.markdown blockquote{background:rgba(255,255,255,.15);color:#fff;border-color:#fff}
+.thinking{display:flex;gap:5px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;width:fit-content}
+.thinking span{width:7px;height:7px;border-radius:50%;background:var(--primary);animation:bounce 1.2s infinite}
+.thinking span:nth-child(2){animation-delay:.2s}.thinking span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.chat-input{padding:14px 24px 20px;border-top:1px solid var(--border);display:flex;gap:10px}
+.chat-input input{flex:1;border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13.5px;outline:none;transition:.15s}
+.chat-input input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.chat-input button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:0 20px;font-size:13px;font-weight:600}
+.chat-input button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:1040px){.workspace{grid-template-columns:1fr;grid-template-rows:45% 55%}.left-panel{border-right:none;border-bottom:1px solid var(--border)}.input-grid{grid-template-columns:repeat(2,1fr)}.more-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo"><span class="logo-mark">盈</span><div><strong>商户盈亏分析智能体</strong><small>通用版 · 任意商户 · 离线可用</small></div></div>
+    <div class="topbar-right">
+      <span class="engine-badge">⚙ 规则引擎（离线可用）</span>
+      <button class="btn btn-ghost btn-sm" id="btnExample">载入名创完整示例</button>
+    </div>
+  </header>
+
+  <section class="input-card">
+    <div class="input-title">
+      <h3>📝 输入商户数据 <span>只需填写 3 项即可分析，其余可选用于启用更多维度</span></h3>
+      <button class="more-toggle" id="moreToggle">展开更多字段 ▾</button>
+    </div>
+    <div class="input-grid">
+      <div class="fld"><label>商户名称</label><input id="inName" value="示例商户" placeholder="任意商户名称" /></div>
+      <div class="fld"><label>月销售额 <b>*</b></label><input id="inSales" type="number" step="0.01" value="142948.77" placeholder="如 142948.77" /></div>
+      <div class="fld"><label>月总成本 <b>*</b></label><input id="inCost" type="number" step="0.01" value="80985.29" placeholder="如 80985.29" /></div>
+      <div class="fld"><label>毛利率 <b>*</b></label><input id="inMargin" type="number" step="0.01" value="35" placeholder="如 35 表示 35%" /><span class="unit-hint">填 35 或 0.35 均可</span></div>
+      <div class="fld"><button class="btn btn-primary" id="btnAnalyze" style="height:41px">开始分析 ➤</button></div>
+    </div>
+    <div class="more-panel" id="morePanel">
+      <div class="more-note">补充以下数据可启用「坪效 / 租售比 / 成长趋势 / 优惠效能」维度，健康分将按全部维度加权计算。不填则仅用核心 3 项分析。</div>
+      <div class="more-grid">
+        <div class="fld"><label>建筑面积 (㎡)</label><input id="inArea" type="number" step="0.01" placeholder="启用坪效" /></div>
+        <div class="fld"><label>月租金 (元)</label><input id="inRent" type="number" step="0.01" placeholder="启用租售比/优惠" /></div>
+        <div class="fld"><label>综合管理费 (元)</label><input id="inMgmt" type="number" step="0.01" placeholder="启用租售比" /></div>
+        <div class="fld"><label>人工+住宿 (元)</label><input id="inLabor" type="number" step="0.01" placeholder="成本结构细项" /></div>
+        <div class="fld"><label>折扣率</label><input id="inDiscount" type="number" step="0.05" placeholder="如 0.6 表示6折" /></div>
+        <div class="fld"><label>销售同比下滑 (%)</label><input id="inSalesDrop" type="number" step="0.01" placeholder="如 28.87" /></div>
+        <div class="fld"><label>客流环比下降 (%)</label><input id="inTrafficDrop" type="number" step="0.01" placeholder="如 32.96" /></div>
+        <div class="fld f-full"><label>经营备注（竞争/扶持等情况）</label><textarea id="inReason" rows="2" placeholder="如：邻近存在同品牌竞争，已连续多月给予租金扶持…"></textarea></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <aside class="left-panel">
+      <div class="panel-head">
+        <div><h2 id="panelTitle">盈亏诊断</h2><p id="panelSub">填写左侧数据后点击「开始分析」</p></div>
+        <span class="update-time" id="updateTime"></span>
+      </div>
+      <div id="diagArea"><div class="empty-hint"><div class="big">📊</div>输入销售额、总成本与毛利率，<br/>即可获得任意商户的盈亏诊断结论。</div></div>
+    </aside>
+    <main class="right-panel">
+      <div class="chat-view">
+        <div class="chat-header">
+          <div class="chat-title"><span class="bot-avatar">智</span><div><strong>盈亏分析智能体</strong><small>基于输入数据 · 可解释分析</small></div></div>
+          <span class="engine-chip">规则引擎</span>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-suggestions" id="chatSuggestions"></div>
+        <form class="chat-input" id="chatForm">
+          <input id="chatInput" placeholder="输入问题，例如：这个商户为什么会亏？该不该给扶持？" autocomplete="off" />
+          <button type="submit" id="chatSend">发送 ➤</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   商户盈亏分析智能体 · 通用版（纯前端 / 无依赖 / 离线）
+   ============================================================ */
+
+/* ---------- 工具 ---------- */
+function r2(n){return Number.isFinite(n)?Math.round(n*100)/100:0;}
+function div(a,b){return b===0?0:a/b;}
+function fmt(n){return (Number(n)||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+var money=function(n){return '¥'+fmt(n);};
+var metricMoney=function(n){return fmt(n);};
+function pct(n,d){if(d===undefined)d=1;return ((Number(n)||0)*100).toFixed(d)+'%';}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function num(v){var n=Number(v);return Number.isFinite(n)?n:0;}
+function normRate(v){v=num(v);return v>1?v/100:v;} // 35 -> 0.35
+function has(v){return !(v===undefined||v===null||String(v).trim()==='');}
+function ratioSign(n,pos,neg){return n>=0?pos:neg;}
+
+/* ---------- 从备注解析下滑百分比 ---------- */
+function parseDropPct(reason,keywords){
+  if(!reason) return 0;
+  for(var i=0;i<keywords.length;i++){
+    var re=new RegExp(keywords[i]+'[^0-9]{0,6}([0-9]+(?:\\.[0-9]+)?)\\s*%');
+    var m=reason.match(re);
+    if(m) return r2(Number(m[1]));
+  }
+  return 0;
+}
+
+/* ---------- 指标计算（核心 3 项 + 可选） ---------- */
+function computeMetrics(d){
+  var S=num(d.sales), C=num(d.cost), g=normRate(d.grossMargin);
+  if(g<0)g=0; if(g>1)g=1;
+  var grossProfit=S*g;
+  var monthlyProfit=grossProfit-C;
+  var netMargin=div(monthlyProfit,S);           // 净利率
+  var costRate=div(C,S);                         // 成本率
+  var coverage=div(grossProfit,C);               // 毛利对成本的覆盖倍数 = 销售达成率
+  var breakEvenSales=div(C,g);                   // 盈亏平衡销售额
+  var gap=Math.max(0,breakEvenSales-S);
+
+  // 可选维度
+  var hasArea=has(d.area)&&num(d.area)>0;
+  var avgSalesPsf=hasArea?div(S,num(d.area)):null;
+  var rent=has(d.rent)?num(d.rent):0;
+  var mgmt=has(d.managementFee)?num(d.managementFee):0;
+  var rentMgmt=rent+mgmt;
+  var hasRent=rentMgmt>0;
+  var rentSalesRatio=hasRent?div(rentMgmt,S):null;
+  var labor=has(d.laborCost)?num(d.laborCost):0;
+  var discountRate=has(d.discountRate)?normRate(d.discountRate):1;
+  var hasDiscount=hasRent&&discountRate<1;
+  var discountAmount=hasDiscount?rent*(1-discountRate):0;
+  var discountedRentMgmt=rentMgmt-discountAmount;
+  var discountedRatio=hasRent?div(discountedRentMgmt,S):null;
+  var discountedProfit=monthlyProfit+discountAmount;
+  var lossBefore=Math.max(0,-monthlyProfit);
+  var offsetRate=lossBefore>0?div(discountAmount,lossBefore):(lossBefore===0?1:0);
+
+  var salesDrop=has(d.salesDropPct)?r2(num(d.salesDropPct)):parseDropPct(d.reason,['下滑','下降','下跌','同比']);
+  var trafficDrop=has(d.trafficDropPct)?r2(num(d.trafficDropPct)):parseDropPct(d.reason,['客流','人流','到访']);
+  var hasTrend=(salesDrop>0||trafficDrop>0);
+
+  return {
+    sales:S,cost:C,grossMargin:g,grossProfit:r2(grossProfit),monthlyProfit:r2(monthlyProfit),
+    netMargin:Math.round(netMargin*10000)/10000,costRate:Math.round(costRate*10000)/10000,
+    coverage:Math.round(coverage*10000)/10000,breakEvenSales:r2(breakEvenSales),gap:r2(gap),
+    hasArea:hasArea,avgSalesPsf:avgSalesPsf===null?null:r2(avgSalesPsf),
+    rent:rent,managementFee:mgmt,rentMgmt:rentMgmt,hasRent:hasRent,
+    rentSalesRatio:rentSalesRatio===null?null:Math.round(rentSalesRatio*10000)/10000,
+    labor:labor,discountRate:discountRate,hasDiscount:hasDiscount,
+    discountAmount:r2(discountAmount),discountedRentMgmt:r2(discountedRentMgmt),
+    discountedRatio:discountedRatio===null?null:Math.round(discountedRatio*10000)/10000,
+    discountedProfit:r2(discountedProfit),offsetRate:Math.round(offsetRate*10000)/10000,
+    salesDropPct:salesDrop,trafficDropPct:trafficDrop,hasTrend:hasTrend
+  };
+}
+
+/* ---------- 诊断引擎 ---------- */
+function severityFromScore(s){if(s>=75)return'good';if(s>=55)return'watch';if(s>=35)return'warning';return'critical';}
+var SEVERITY_LABEL={good:'良好',watch:'关注',warning:'预警',critical:'严重'};
+var SEVERITY_COLOR={good:'#16a34a',watch:'#f59e0b',warning:'#f97316',critical:'#dc2626'};
+
+var ALL_DIMENSIONS=[
+  {key:'profitability',name:'盈利能力',weight:0.28,optional:false},
+  {key:'costStructure',name:'成本结构',weight:0.12,optional:false},
+  {key:'breakEven',name:'盈亏平衡',weight:0.16,optional:false},
+  {key:'efficiency',name:'坪效水平',weight:0.12,optional:true},
+  {key:'rentBurden',name:'租售比',weight:0.20,optional:true},
+  {key:'trend',name:'成长趋势',weight:0.07,optional:true},
+  {key:'discount',name:'优惠效能',weight:0.05,optional:true}
+];
+
+function diagnose(d){
+  var m=computeMetrics(d);
+  var D=[];
+
+  // 1 盈利能力（核心）
+  var pm=m.netMargin;
+  var profitScore=m.monthlyProfit>0?Math.min(100,60+pm*200):Math.max(5,55+pm*250);
+  D.push({
+    key:'profitability',name:'盈利能力',optional:false,severity:severityFromScore(profitScore),score:Math.round(profitScore),
+    finding:m.monthlyProfit>=0
+      ?('月净利润为正（'+money(m.monthlyProfit)+'），净利率 '+pct(pm)+'，处于盈利状态。')
+      :('月净利润为负（'+money(m.monthlyProfit)+'），净利率 '+pct(pm)+'，处于亏损状态。'),
+    detail:'月销售 '+money(m.sales)+' × 毛利率 '+pct(m.grossMargin)+' = 毛利 '+money(m.grossProfit)+'，扣除月总成本 '+money(m.cost)+' 后'+(m.monthlyProfit>=0?'仍有盈余':'不足以覆盖成本')+'。',
+    advice:m.monthlyProfit>=0?'维持当前毛利与成本结构，关注成本上行风险。':'提升毛利或压降成本，是扭亏的关键路径。'
+  });
+
+  // 2 成本结构（核心；有人工数据则细化）
+  if(m.hasRent&&d.laborCost!==undefined&&num(d.laborCost)>0){
+    var rentShare=div(m.rentMgmt,m.cost||1);
+    var laborShare=div(m.labor,m.cost||1);
+    var costScore=rentShare>0.75?28:rentShare>0.6?48:72;
+    D.push({key:'costStructure',name:'成本结构',optional:false,severity:severityFromScore(costScore),score:costScore,
+      finding:'租管费占总成本 '+pct(rentShare)+'，人工占 '+pct(laborShare)+'，成本以刚性支出为主。',
+      detail:'总成本 '+money(m.cost)+' 中，租金+管理费 '+money(m.rentMgmt)+'、人工 '+money(m.labor)+'。刚性成本占比高意味着销售下滑时利润弹性差。',
+      advice:rentShare>0.7?'刚性成本占比过高，抗风险能力弱；建议探索浮动租金/联营抽成模式。':'成本结构相对均衡。'});
+  }else{
+    var cr=m.costRate;
+    var costScore2=cr<=0.4?90:cr<=0.55?75:cr<=0.7?55:cr<=0.85?38:20;
+    D.push({key:'costStructure',name:'成本结构',optional:false,severity:severityFromScore(costScore2),score:costScore2,
+      finding:'月总成本 '+money(m.cost)+'，占销售额的 '+pct(cr)+'；毛利对成本的覆盖倍数 '+m.coverage.toFixed(2)+' 倍。',
+      detail:'成本率 = 总成本 ÷ 销售额 = '+pct(cr)+'。毛利率 '+pct(m.grossMargin)+' 是盈利的"天花板"：成本率低于毛利率才可能盈利。当前'+(cr<m.grossMargin?'成本率低于毛利率，存在盈利空间。':'成本率已高于毛利率，毛利无法覆盖成本。'),
+      advice:cr<m.grossMargin?'成本可控，建议保持并关注成本上行。':'需压降成本或提升销售/毛利，使成本率低于毛利率。'});
+  }
+
+  // 3 盈亏平衡（核心）
+  var beScore=Math.max(5,Math.min(100,m.coverage*70));
+  D.push({key:'breakEven',name:'盈亏平衡',optional:false,severity:severityFromScore(beScore),score:Math.round(beScore),
+    finding:'盈亏平衡销售额 '+money(m.breakEvenSales)+'，当前销售达成 '+pct(Math.min(m.coverage,9.99),0)+'，'+(m.coverage<1?'尚未跨过盈亏平衡点':'已越过盈亏平衡点')+'。',
+    detail:'按 '+pct(m.grossMargin)+' 毛利率，需月销 '+money(m.breakEvenSales)+' 才能覆盖 '+money(m.cost)+' 总成本；当前月销 '+money(m.sales)+'，缺口 '+money(m.gap)+'。',
+    advice:m.coverage<1?'需将月销提升至盈亏平衡线以上，或同步压降成本、提高毛利。':'已实现盈亏平衡，关注安全边际。'});
+
+  // 4 坪效（可选）
+  if(m.hasArea){
+    var psfScore=Math.max(5,Math.min(100,m.avgSalesPsf/8));
+    D.push({key:'efficiency',name:'坪效水平',optional:true,severity:severityFromScore(psfScore),score:Math.round(psfScore),
+      finding:'坪效 '+money(m.avgSalesPsf)+'/㎡·月，'+(m.avgSalesPsf<300?'低于':m.avgSalesPsf<600?'接近':'高于')+'零售业态常见区间。',
+      detail:'建筑面积 '+num(d.area)+'㎡，月均销售 '+money(m.sales)+'。坪效反映单位面积的产出效率。',
+      advice:m.avgSalesPsf<400?'通过提升陈列效率、调整品类结构提高单位面积产出。':'坪效表现尚可，可继续保持。'});
+  }
+
+  // 5 租售比（可选）
+  if(m.hasRent){
+    var rp=m.rentSalesRatio;
+    var ratioScore=rp<=0.15?92:rp<=0.2?80:rp<=0.25?65:rp<=0.3?50:rp<=0.4?30:12;
+    D.push({key:'rentBurden',name:'租售比',optional:true,severity:severityFromScore(ratioScore),score:ratioScore,
+      finding:'租售比 '+pct(rp)+'，'+(rp>0.3?'明显偏高（健康参考值约 15%~25%）':'处于合理区间')+'。',
+      detail:'租金+管理费 '+money(m.rentMgmt)+' 占月销售 '+money(m.sales)+' 的 '+pct(rp)+(m.hasDiscount?('；折后租售比 '+pct(m.discountedRatio)):'')+'。',
+      advice:rp>0.3?'租金刚性负担偏重，是亏损的重要结构性因素。':'租售比健康，租金负担可控。'});
+  }
+
+  // 6 成长趋势（可选）
+  if(m.hasTrend){
+    var drop=Math.max(m.salesDropPct,m.trafficDropPct);
+    var trendScore=drop>=30?15:drop>=20?30:drop>=10?50:75;
+    D.push({key:'trend',name:'成长趋势',optional:true,severity:severityFromScore(trendScore),score:trendScore,
+      finding:'销售同比下滑 '+m.salesDropPct+'%，客流环比下降 '+m.trafficDropPct+'%，处于'+(drop>=25?'明显':'轻度')+'下行通道。',
+      detail:'趋势信号来自输入的同比/环比或备注披露，反映外部需求变化，是亏损的常见触发因素。',
+      advice:'需判断下滑是商圈性、季节性还是竞争性，针对性制定引流与差异化策略。'});
+  }
+
+  // 7 优惠效能（可选）
+  if(m.hasDiscount){
+    var disScore=m.discountedProfit>=0?90:m.offsetRate>=0.7?65:m.offsetRate>=0.4?45:25;
+    D.push({key:'discount',name:'优惠效能',optional:true,severity:severityFromScore(disScore),score:disScore,
+      finding:'月优惠 '+money(m.discountAmount)+'，可覆盖原亏损的 '+pct(Math.min(m.offsetRate,9.99),0)+'；折后盈亏 '+money(m.discountedProfit)+'。',
+      detail:'折扣率 '+pct(m.discountRate,0)+'，折后月租管费 '+money(m.discountedRentMgmt)+'，折后租售比 '+pct(m.discountedRatio)+'。',
+      advice:m.offsetRate<1?'单次优惠不足以完全扭亏，需配套经营改善措施。':'优惠后可实现盈亏平衡或盈利。'});
+  }
+
+  // 健康分（按可用维度加权归一化）
+  var scoreMap={}; D.forEach(function(x){scoreMap[x.key]=x;});
+  var healthScore=0,weightSum=0;
+  ALL_DIMENSIONS.forEach(function(def){
+    if(scoreMap[def.key]){healthScore+=scoreMap[def.key].score*def.weight;weightSum+=def.weight;}
+  });
+  healthScore=Math.round(healthScore/(weightSum||1));
+  var overallSeverity=severityFromScore(healthScore);
+
+  // 根因
+  var rootCauses=[];
+  if(m.monthlyProfit<0){
+    if(m.costRate>=m.grossMargin) rootCauses.push({factor:'毛利不足以覆盖成本',evidence:'成本率 '+pct(m.costRate)+' ≥ 毛利率 '+pct(m.grossMargin),weight:'高'});
+    else rootCauses.push({factor:'经营规模不足',evidence:'销售 '+money(m.sales)+' 未达盈亏平衡线 '+money(m.breakEvenSales),weight:'高'});
+  }
+  if(m.costRate>0.7) rootCauses.push({factor:'成本负担偏重',evidence:'成本占销售 '+pct(m.costRate),weight:'高'});
+  if(m.hasRent&&m.rentSalesRatio>0.3) rootCauses.push({factor:'租金刚性偏高',evidence:'租售比 '+pct(m.rentSalesRatio),weight:'高'});
+  if(m.salesDropPct>0) rootCauses.push({factor:'销售趋势下滑',evidence:'销售同比下滑 '+m.salesDropPct+'%',weight:'高'});
+  if(m.trafficDropPct>0) rootCauses.push({factor:'外部客流下滑',evidence:'客流环比下降 '+m.trafficDropPct+'%',weight:'高'});
+  if(d.reason&&/竞争|竞品|同品牌/.test(d.reason)) rootCauses.push({factor:'同业竞争分流',evidence:'备注提及同品牌竞争',weight:'中'});
+  if(m.hasArea&&m.avgSalesPsf<400) rootCauses.push({factor:'坪效偏低',evidence:'坪效 '+money(m.avgSalesPsf)+'/㎡·月',weight:'中'});
+  if(!rootCauses.length) rootCauses.push({factor:'暂无显著异常',evidence:'各项指标处于合理区间',weight:'低'});
+
+  // 风险
+  var risks=[];
+  if(m.monthlyProfit<0) risks.push('持续亏损：月度净亏损 '+money(Math.abs(m.monthlyProfit))+'，现金流承压。');
+  if(m.coverage<1) risks.push('销售未达盈亏平衡线，缺口 '+money(m.gap)+'。');
+  if(m.costRate>0.7) risks.push('成本率 '+pct(m.costRate)+' 偏高，利润弹性差。');
+  if(m.hasRent&&m.rentSalesRatio>0.3) risks.push('租售比长期高于健康区间，可持续经营能力存疑。');
+  if(m.hasDiscount&&m.offsetRate<1) risks.push('优惠只能部分减亏，若外部客流持续下滑，扶持效果将被侵蚀。');
+  if(d.reason&&/已给予|连续|每月.*扶持/.test(d.reason)) risks.push('存在连续多月扶持记录，需警惕政策依赖与公平性质疑。');
+
+  // 机会
+  var opportunities=[];
+  if(m.monthlyProfit<0&&m.coverage<1) opportunities.push('销售距平衡线仅差 '+money(m.gap)+'，销售回升即可显著减亏。');
+  if(m.hasDiscount&&m.discountAmount>0) opportunities.push('优惠每月释放 '+money(m.discountAmount)+' 现金流，可缓解短期压力。');
+  if(m.hasArea&&m.avgSalesPsf<400) opportunities.push('坪效提升空间大，品类优化与陈列调整有望带来增量。');
+  if(m.hasRent) opportunities.push('可探索销售抽成/联营等浮动租金模式，实现风险共担。');
+  if(!opportunities.length) opportunities.push('经营稳健，可考虑扩大销售规模或优化品类结构提升利润。');
+
+  // 建议
+  var recommendations=[];
+  if(m.monthlyProfit<0){
+    recommendations.push({title:'短期：设定扭亏目标',detail:'将月销提升至盈亏平衡线 '+money(m.breakEvenSales)+' 以上，或压降成本至 '+money(m.sales*m.grossMargin)+' 以内，二者任一突破即可扭亏。',priority:'高'});
+  }
+  if(m.costRate>0.7) recommendations.push({title:'成本：压降刚性支出',detail:'成本率 '+pct(m.costRate)+' 偏高，建议逐项审视租金、人工等大额支出，探索浮动/联营模式降低固定负担。',priority:'高'});
+  if(d.reason&&/竞争|同品牌/.test(d.reason)) recommendations.push({title:'中期：差异化应对竞争',detail:'调整品类结构、引入体验型/高毛利品类，降低与周边同品牌的价格竞争。',priority:'高'});
+  if(m.hasRent&&m.discountRate<1&&m.monthlyProfit<0&&m.offsetRate<1) recommendations.push({title:'审批：扶持设退出机制',detail:'建议批准本期 '+money(m.discountAmount)+' 扶持，但以"月销回升至 '+money(m.breakEvenSales*0.9)+' 以上"作为递减/退出条件，避免长期依赖。',priority:'高'});
+  if(m.hasArea) recommendations.push({title:'效率：提升坪效人效',detail:'当前坪效 '+money(m.avgSalesPsf)+'/㎡，建议优化陈列动线与排班，设定月度提升目标。',priority:'中'});
+  recommendations.push({title:'管理：建立经营数据台账',detail:'按月采集销售、成本、毛利数据，监控成本率与盈亏平衡线，从事后分析转向事前预警。',priority:'中'});
+
+  var headline=m.monthlyProfit>=0
+    ?(d.merchantName+' 实现盈利，月净利润 '+money(m.monthlyProfit)+'，净利率 '+pct(m.netMargin)+'，健康分 '+healthScore+'。')
+    :(d.merchantName+' 处于亏损，月净亏 '+money(Math.abs(m.monthlyProfit))+'，成本率 '+pct(m.costRate)+' 高于毛利率 '+pct(m.grossMargin)+'，健康分 '+healthScore+'。');
+
+  return {generatedAt:new Date().toISOString(),data:d,metrics:m,healthScore:healthScore,overallSeverity:overallSeverity,
+    headline:headline,dimensions:D,rootCauses:rootCauses,risks:risks,opportunities:opportunities,recommendations:recommendations};
+}
+
+/* ---------- 意图识别 ---------- */
+var PATTERNS=[
+  {intent:'greeting',words:['你好','您好','hi','hello','在吗','嗨']},
+  {intent:'rootcause',words:['根因','原因','为什么','为何','归因','根源','导致','亏的原因']},
+  {intent:'recommend',words:['建议','怎么办','如何改进','措施','对策','方案','优化','该不该','要不要','审批','扶持','扭亏']},
+  {intent:'risk',words:['风险','隐患','危险','问题','注意']},
+  {intent:'discount',words:['优惠','扶持','折扣','减免','折后']},
+  {intent:'rent',words:['租售比','租金','管理费','租管费','房租']},
+  {intent:'efficiency',words:['坪效','面积','单位面积','㎡','产出效率']},
+  {intent:'cost',words:['成本','费用','成本率','支出']},
+  {intent:'breakeven',words:['盈亏平衡','平衡点','保本','达成','缺口','平衡线']},
+  {intent:'trend',words:['趋势','下滑','下降','客流','同比','环比','竞争','销售']},
+  {intent:'profit',words:['盈利','亏损','利润','净利','毛利','赚钱','赔钱','净利率']},
+  {intent:'data',words:['数据','公式','怎么算','怎么来的','来源','口径','依据']},
+  {intent:'overview',words:['诊断','总结','整体','概况','分析','评估','健康','看一下','结论']}
+];
+var INTENT_LABEL={overview:'整体诊断',profit:'盈利能力',rent:'租售比',efficiency:'坪效',cost:'成本结构',breakeven:'盈亏平衡',trend:'趋势',discount:'优惠效能',rootcause:'根因分析',risk:'风险提示',recommend:'改进建议',data:'数据口径',greeting:'问候',unknown:'自由提问'};
+var INTENT_ICON={rootcause:'🔍',recommend:'✅',rent:'🏠',discount:'🎁',risk:'⚠️',profit:'💰',efficiency:'📐',cost:'🧾',breakeven:'⚖️',trend:'📉',overview:'📊',data:'📋',greeting:'👋'};
+function recognizeIntent(q){q=q.toLowerCase().trim();for(var i=0;i<PATTERNS.length;i++){var p=PATTERNS[i];for(var j=0;j<p.words.length;j++){if(q.indexOf(p.words[j].toLowerCase())>=0)return p.intent;}}return'unknown';}
+function severityZh(s){return({good:'良好',watch:'关注',warning:'预警',critical:'严重'})[s]||s;}
+function dim(d,key){for(var i=0;i<d.dimensions.length;i++){if(d.dimensions[i].key===key)return d.dimensions[i];}return null;}
+function df(d,key,field,fallback){var x=dim(d,key);return x?(x[field]||fallback):(fallback||'（该维度需补充数据后可用）');}
+function missingHint(key){
+  var m={efficiency:'建筑面积',rentBurden:'租金/管理费',trend:'下滑或客流数据',discount:'折扣率'};
+  return '（补充'+m[key]+'后可启用该维度）';
+}
+
+/* ---------- 规则回答 ---------- */
+function generateRuleAnswer(intent,d){
+  var m=d.metrics;
+  switch(intent){
+    case 'greeting':
+      return '你好！我是商户盈亏分析智能体 👋\n\n我已基于你输入的销售、成本与毛利率完成盈亏诊断。你可以直接问我：\n- **整体结论怎么样？**\n- **为什么会亏损？**\n- **成本率健康吗？**\n- **盈亏平衡还差多少？**\n\n所有结论都由数据推导，可解释、可复现。';
+    case 'overview':
+      return [
+        '## 📊 '+d.data.merchantName+' · 盈亏诊断总览',
+        '**综合健康分：'+d.healthScore+'/100（'+severityZh(d.overallSeverity)+'）**',
+        d.headline,'','### 核心指标',
+        '- 月销售：'+money(m.sales)+'　|　月总成本：'+money(m.cost),
+        '- 毛利率：'+pct(m.grossMargin)+'　|　毛利：'+money(m.grossProfit),
+        '- 月净利润：**'+money(m.monthlyProfit)+'**（净利率 '+pct(m.netMargin)+'）',
+        '- 成本率：'+pct(m.costRate)+'　|　毛利成本覆盖：'+m.coverage.toFixed(2)+' 倍',
+        '- 盈亏平衡线：'+money(m.breakEvenSales)+'　|　缺口：'+money(m.gap),'','### 各维度评分',
+        ...d.dimensions.map(function(x){return '- **'+x.name+'** '+x.score+'分（'+severityZh(x.severity)+'）：'+x.finding;}),
+        '','### 最需要关注的三件事',
+        ...d.risks.slice(0,3).map(function(r,i){return (i+1)+'. '+r;}),'',
+        '> 想深入了解某一项？试试问「为什么亏」「成本率怎么降」「盈亏平衡还差多少」。'
+      ].join('\n');
+    case 'profit':
+      return [
+        '## 💰 盈利诊断',
+        dim(d,'profitability')?dim(d,'profitability').finding:'',
+        '','拆解：',
+        '- 毛利 = 销售 '+money(m.sales)+' × 毛利率 '+pct(m.grossMargin)+' = **'+money(m.grossProfit)+'**',
+        '- 月总成本 = **'+money(m.cost)+'**',
+        '- 月净利润 = 毛利 − 成本 = **'+money(m.monthlyProfit)+'**，净利率 **'+pct(m.netMargin)+'**','',
+        '**结论**：'+df(d,'profitability','advice',''),
+        m.monthlyProfit<0?('要实现盈利，要么把月销提升到 '+money(m.breakEvenSales)+' 以上，要么把总成本压到 '+money(m.grossProfit)+' 以内。'):'盈利能力健康，建议保持并关注成本上行。'
+      ].join('\n');
+    case 'cost':
+      return [
+        '## 🧾 成本结构诊断',
+        dim(d,'costStructure')?dim(d,'costStructure').finding:'','',
+        '- 成本率 = 总成本 ÷ 销售 = '+money(m.cost)+' ÷ '+money(m.sales)+' = **'+pct(m.costRate)+'**',
+        '- 毛利率 = **'+pct(m.grossMargin)+'**（盈利天花板）',
+        '- 二者差额（净利率）= **'+pct(m.netMargin)+'**','',
+        '**解读**：'+(m.costRate<m.grossMargin?'成本率低于毛利率，存在盈利空间。':'成本率已高于毛利率，毛利无法覆盖成本，这是亏损的直接原因。'),
+        '**建议**：'+df(d,'costStructure','advice','')
+      ].join('\n');
+    case 'breakeven':
+      return [
+        '## ⚖️ 盈亏平衡诊断',dim(d,'breakEven')?dim(d,'breakEven').finding:'','',
+        '- 盈亏平衡销售额 = 成本 ÷ 毛利率 = '+money(m.cost)+' ÷ '+pct(m.grossMargin)+' = **'+money(m.breakEvenSales)+'**',
+        '- 当前月销 '+money(m.sales)+'，达成率 **'+pct(Math.min(m.coverage,9.99),0)+'**',
+        '- 距离平衡线缺口：**'+money(m.gap)+'**','',
+        '**建议**：'+df(d,'breakEven','advice','')
+      ].join('\n');
+    case 'efficiency':
+      if(!dim(d,'efficiency')) return '坪效维度需要建筑面积数据才能计算。\n\n请在顶部点击「展开更多字段」，填入建筑面积后重新分析，即可启用「坪效水平」维度。'+missingHint('efficiency');
+      return ['## 📐 坪效诊断',dim(d,'efficiency').finding,'',
+        '- 建筑面积：'+num(d.data.area)+'㎡','- 坪效 = 销售 ÷ 面积 = **'+money(m.avgSalesPsf)+'/㎡·月**','',
+        '**建议**：'+dim(d,'efficiency').advice].join('\n');
+    case 'rent':
+      if(!dim(d,'rentBurden')) return '租售比维度需要租金与综合管理费数据。\n\n请在顶部点击「展开更多字段」，填入月租金（及管理费）后重新分析，即可启用「租售比」维度。'+missingHint('rentBurden');
+      return ['## 🏠 租售比诊断',dim(d,'rentBurden').finding,'',
+        '- 租金+管理费：'+money(m.rentMgmt),'- 占月销售 '+money(m.sales)+' 的 **'+pct(m.rentSalesRatio)+'**',
+        m.hasDiscount?('- 折后租售比 '+pct(m.discountedRatio)):'','',
+        '零售业态健康租售比通常 **15%~25%**，超过 30% 视为偏高。','**建议**：'+dim(d,'rentBurden').advice].join('\n');
+    case 'trend':
+      if(!dim(d,'trend')) return '成长趋势维度需要销售同比/客流环比数据（或备注中披露的下滑百分比）。\n\n请展开更多字段填写后重新分析。'+missingHint('trend');
+      return ['## 📉 成长趋势诊断',dim(d,'trend').finding,'',
+        '- 销售同比：'+(m.salesDropPct?('下滑 **'+m.salesDropPct+'%**'):'数据未提供'),
+        '- 客流环比：'+(m.trafficDropPct?('下降 **'+m.trafficDropPct+'%**'):'数据未提供'),'',
+        ...d.rootCauses.filter(function(r){return /客流|竞争|销售趋势|下滑/.test(r.factor);}).map(function(r){return '- **'+r.factor+'**：'+r.evidence;}),'',
+        '**解读**：趋势下滑常是亏损的直接触发因素，需区分商圈性、季节性还是竞争性。'].join('\n');
+    case 'discount':
+      if(!dim(d,'discount')) return '优惠效能维度需要租金与折扣率数据。\n\n请展开更多字段填入月租金和折扣率（如 0.6 表示 6 折）后重新分析。'+missingHint('discount');
+      return ['## 🎁 优惠效能诊断',dim(d,'discount').finding,'',
+        '- 原租金 '+money(m.rent)+'，折扣率 '+pct(m.discountRate,0),
+        '- 月优惠 = 租金 × (1−折扣率) = **'+money(m.discountAmount)+'**',
+        '- 折后月租管费 '+money(m.discountedRentMgmt)+'，折后盈亏 **'+money(m.discountedProfit)+'**','',
+        '**审批视角**：',...d.recommendations.map(function(r){return '- ['+r.priority+'优先] '+r.title+'：'+r.detail;}),'',
+        '> 优惠只能缓解现金流，建议与经营改善目标挂钩。'].join('\n');
+    case 'rootcause':
+      return ['## 🔍 亏损/盈亏根因分析',
+        m.monthlyProfit<0?'综合数据与备注，识别出以下根因（按影响权重排序）：':'当前实现盈利，以下为影响盈亏的关键因素：','',
+        ...d.rootCauses.map(function(r,i){return (i+1)+'. **'+r.factor+'**〔'+r.weight+'影响〕\n   - 证据：'+r.evidence;}),'',
+        '**一句话归因**：'+d.headline,''].join('\n');
+    case 'risk':
+      return ['## ⚠️ 风险提示','本次分析识别到以下风险点：','',
+        ...(d.risks.length?d.risks.map(function(r,i){return (i+1)+'. '+r;}):['- 暂未识别到显著风险。']),'',
+        '**缓释建议**：',...d.recommendations.filter(function(r){return r.priority==='高';}).map(function(r){return '- '+r.title+'：'+r.detail;})].join('\n');
+    case 'recommend':
+      return ['## ✅ 经营改善建议','按优先级排序：','',
+        ...d.recommendations.map(function(r,i){return '**'+(i+1)+'. '+r.title+'**〔'+r.priority+'优先〕\n'+r.detail+'\n';}),
+        '### 可把握的机会',...d.opportunities.map(function(o){return '- '+o;})].join('\n');
+    case 'data':
+      return ['## 📋 数据与口径说明','核心 3 项输入：月销售额、月总成本、毛利率（填 35 或 0.35 均可）。','',
+        '- 毛利 = 销售 × 毛利率',
+        '- 净利润 = 毛利 − 总成本；净利率 = 净利润 ÷ 销售',
+        '- 成本率 = 总成本 ÷ 销售（低于毛利率才可能盈利）',
+        '- 盈亏平衡销售 = 总成本 ÷ 毛利率',
+        '- 达成率 = 销售 ÷ 盈亏平衡线 = 毛利 ÷ 成本','',
+        '补充面积、租金、管理费、折扣、同比下滑后可启用坪效、租售比、趋势、优惠效能维度。','结论由确定性规则推导，可解释、可复现。'].join('\n');
+    default:
+      return ['我理解你想了解「'+INTENT_LABEL[intent]+'」相关内容。基于当前数据，核心判断是：','',
+        d.headline,'',
+        '我可以帮你分析：','- 为什么会亏？（根因）','- 成本率健康吗？（成本）','- 盈亏平衡还差多少？','- 该不该给扶持？（建议/优惠）','- 有哪些风险？'].join('\n');
+  }
+}
+var DEFAULT_SUGGESTIONS=['整体结论怎么样？','为什么会亏损？','成本率健康吗？','盈亏平衡还差多少？','给出改善建议','有哪些风险？'];
+
+/* ---------- Markdown 渲染 ---------- */
+function inlineMd(text){
+  return String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean).map(function(p){
+    if(p.indexOf('**')===0&&p.lastIndexOf('**')===p.length-2)return'<strong>'+p.slice(2,-2)+'</strong>';
+    if(p.indexOf('`')===0&&p.lastIndexOf('`')===p.length-2)return'<code>'+p.slice(1,-1)+'</code>';
+    return p;
+  }).join('');
+}
+function renderMarkdown(text){
+  var lines=String(text).split('\n'),html='',list=[];
+  function flush(){if(list.length){html+='<ul>'+list.map(function(x){return'<li>'+inlineMd(esc(x))+'</li>';}).join('')+'</ul>';list=[];}}
+  for(var i=0;i<lines.length;i++){
+    var t=lines[i].trim();
+    if(t.indexOf('- ')===0){list.push(t.slice(2));continue;}
+    flush();
+    if(t.indexOf('## ')===0)html+='<h3>'+inlineMd(esc(t.slice(3)))+'</h3>';
+    else if(t.indexOf('### ')===0)html+='<h4>'+inlineMd(esc(t.slice(4)))+'</h4>';
+    else if(t.indexOf('> ')===0)html+='<blockquote>'+inlineMd(esc(t.slice(2)))+'</blockquote>';
+    else if(t==='')html+='<div class="md-space"></div>';
+    else html+='<p>'+inlineMd(esc(t))+'</p>';
+  }
+  flush();return html;
+}
+
+/* ---------- 状态与渲染 ---------- */
+var state={data:null,diagnosis:null,messages:[],suggestions:DEFAULT_SUGGESTIONS.slice(),loading:false};
+
+function renderDiagnosis(){
+  var d=state.diagnosis,m=d.metrics;
+  document.getElementById('panelTitle').textContent=d.data.merchantName+' · 盈亏诊断';
+  document.getElementById('panelSub').textContent='销售 '+money(m.sales)+' / 成本 '+money(m.cost)+' / 毛利率 '+pct(m.grossMargin);
+  document.getElementById('updateTime').textContent='更新于 '+new Date(d.generatedAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  var color=SEVERITY_COLOR[d.overallSeverity];
+  var html='<div class="diag-panel">';
+  html+='<section class="score-card"><div class="score-ring" style="--score:'+(d.healthScore*3.6)+'deg;--color:'+color+'"><div class="score-inner"><span class="score-num" style="color:'+color+'">'+d.healthScore+'</span><span class="score-unit">/100</span></div></div><div class="score-meta"><span class="severity-pill" style="background:'+color+'">'+SEVERITY_LABEL[d.overallSeverity]+'</span><h3>盈亏健康分</h3><p>'+esc(d.headline)+'</p></div></section>';
+  var metrics=[
+    ['月销售额',metricMoney(m.sales),'近月','indigo'],
+    ['月总成本',metricMoney(m.cost),'成本率 '+pct(m.costRate),'orange'],
+    ['毛利 / 毛利率',metricMoney(m.grossProfit),pct(m.grossMargin),'blue'],
+    ['月净利润',metricMoney(m.monthlyProfit),'净利率 '+pct(m.netMargin),m.monthlyProfit<0?'red':'green'],
+    ['盈亏平衡线',metricMoney(m.breakEvenSales),'达成 '+pct(Math.min(m.coverage,9.99),0),'amber'],
+    ['毛利成本覆盖',m.coverage.toFixed(2)+' 倍','>1 倍即盈利',m.coverage>=1?'green':'red']
+  ];
+  html+='<section class="metric-grid">';
+  metrics.forEach(function(x){html+='<div class="metric metric-'+x[3]+'"><span class="metric-label">'+x[0]+'</span><span class="metric-value">'+x[1]+'</span><span class="metric-sub">'+x[2]+'</span></div>';});
+  html+='</section>';
+  // 维度：先显示已启用，再显示未启用（锁定）
+  html+='<section class="panel-section"><h3 class="section-heading">📊 维度诊断</h3><p class="section-hint">按案例维度体系分析；灰色维度需补充数据后启用</p><div class="dimension-list">';
+  d.dimensions.forEach(function(dim){
+    var c=SEVERITY_COLOR[dim.severity];
+    html+='<div class="dimension"><div class="dimension-head"><span class="dimension-name">'+dim.name+(dim.optional?'<span class="opt">可选</span>':'')+'</span><span class="dimension-score" style="color:'+c+'">'+dim.score+'</span></div><div class="dimension-track"><div class="dimension-fill" style="width:'+dim.score+'%;background:'+c+'"></div></div><p class="dimension-finding">'+esc(dim.finding)+'</p></div>';
+  });
+  var enabled={};d.dimensions.forEach(function(x){enabled[x.key]=true;});
+  ALL_DIMENSIONS.forEach(function(def){
+    if(!enabled[def.key]) html+='<div class="dimension dim-locked"><div class="dimension-head"><span class="dimension-name">'+def.name+'<span class="opt">可选 · 需补充数据</span></span><span class="dimension-score">—</span></div><div class="dimension-track"><div class="dimension-fill" style="width:0%"></div></div></div>';
+  });
+  html+='</div></section>';
+  html+='<section class="panel-section"><h3 class="section-heading">🔍 盈亏根因</h3><div class="cause-list">';
+  d.rootCauses.forEach(function(c){html+='<div class="cause-item"><span class="weight-tag w-'+c.weight+'">'+c.weight+'</span><div><strong>'+esc(c.factor)+'</strong><span>'+esc(c.evidence)+'</span></div></div>';});
+  html+='</div></section>';
+  html+='<section class="panel-section"><h3 class="section-heading">💡 机会与建议</h3><div class="cause-list">';
+  d.recommendations.slice(0,3).forEach(function(r){html+='<div class="cause-item"><span class="weight-tag w-'+r.priority+'">'+r.priority+'</span><div><strong>'+esc(r.title)+'</strong><span>'+esc(r.detail)+'</span></div></div>';});
+  html+='</div></section>';
+  html+='</div>';
+  document.getElementById('diagArea').innerHTML=html;
+}
+
+function renderChat(){
+  var box=document.getElementById('chatMessages'),html='';
+  if(!state.diagnosis){
+    html='<div class="chat-welcome"><div class="welcome-icon">🤖</div><h2>你好，我是盈亏分析智能体</h2><p>输入任意商户的月销售额、月总成本与毛利率，我就能给出盈亏诊断。试试上面的示例数据，或直接修改后点「开始分析」。</p><div class="welcome-chips">';
+    DEFAULT_SUGGESTIONS.forEach(function(s){html+='<button data-q="'+esc(s)+'">'+esc(s)+'</button>';});
+    html+='</div></div>';
+  }else{
+    state.messages.forEach(function(msg){
+      html+='<div class="msg msg-'+msg.role+'">';
+      if(msg.role==='assistant')html+='<div class="msg-avatar">智</div>';
+      html+='<div class="msg-body">';
+      if(msg.intent)html+='<div class="msg-tag">'+(INTENT_ICON[msg.intent]||'💬')+' 分析 · 规则</div>';
+      html+='<div class="msg-content markdown">'+renderMarkdown(msg.content)+'</div></div></div>';
+    });
+  }
+  if(state.loading)html+='<div class="msg msg-assistant"><div class="msg-avatar">智</div><div class="msg-body"><div class="thinking"><span></span><span></span><span></span></div></div></div>';
+  box.innerHTML=html;
+  var sug=document.getElementById('chatSuggestions');
+  if(state.diagnosis&&state.messages.length>0){
+    var s='';state.suggestions.slice(0,4).forEach(function(x){s+='<button data-q="'+esc(x)+'"'+(state.loading?' disabled':'')+'>'+esc(x)+'</button>';});sug.innerHTML=s;
+  }else sug.innerHTML='';
+  requestAnimationFrame(function(){box.scrollTop=box.scrollHeight;});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-q]'),function(b){b.onclick=function(){if(!state.loading)ask(b.getAttribute('data-q'));};});
+}
+
+function ask(q){
+  var question=(q||'').trim();
+  if(!question||state.loading)return;
+  if(!state.diagnosis){state.messages=[{role:'assistant',content:'请先输入销售额、总成本与毛利率并点击「开始分析」，我才能基于数据回答。'}];renderChat();return;}
+  state.messages.push({role:'user',content:question});
+  state.loading=true;renderChat();
+  setTimeout(function(){
+    var intent=recognizeIntent(question);
+    state.messages.push({role:'assistant',content:generateRuleAnswer(intent,state.diagnosis),intent:intent,engine:'rule'});
+    state.loading=false;state.suggestions=DEFAULT_SUGGESTIONS.slice(0,4);renderChat();
+  },400);
+}
+
+/* ---------- 读取输入并分析 ---------- */
+function readInput(){
+  return {
+    merchantName:document.getElementById('inName').value.trim()||'该商户',
+    sales:document.getElementById('inSales').value,
+    cost:document.getElementById('inCost').value,
+    grossMargin:document.getElementById('inMargin').value,
+    area:document.getElementById('inArea').value,
+    rent:document.getElementById('inRent').value,
+    managementFee:document.getElementById('inMgmt').value,
+    laborCost:document.getElementById('inLabor').value,
+    discountRate:document.getElementById('inDiscount').value,
+    salesDropPct:document.getElementById('inSalesDrop').value,
+    trafficDropPct:document.getElementById('inTrafficDrop').value,
+    reason:document.getElementById('inReason').value
+  };
+}
+function runAnalyze(){
+  var S=num(document.getElementById('inSales').value),C=num(document.getElementById('inCost').value),gRaw=num(document.getElementById('inMargin').value);
+  if(S<=0){alert('请输入有效的月销售额（大于 0）。');return;}
+  if(C<0){alert('请输入有效的月总成本。');return;}
+  if(gRaw<=0){alert('请输入有效的毛利率（如 35 表示 35%）。');return;}
+  state.data=readInput();
+  state.diagnosis=diagnose(state.data);
+  state.messages=[];
+  renderDiagnosis();renderChat();
+}
+
+/* ---------- 载入名创完整示例 ---------- */
+function loadExample(){
+  document.getElementById('inName').value='名创优品（丈八北店）';
+  document.getElementById('inSales').value='142948.77';
+  document.getElementById('inCost').value='80985.29';
+  document.getElementById('inMargin').value='35';
+  document.getElementById('inArea').value='389.94';
+  document.getElementById('inRent').value='46793';
+  document.getElementById('inMgmt').value='12392.29';
+  document.getElementById('inLabor').value='20000';
+  document.getElementById('inDiscount').value='0.6';
+  document.getElementById('inSalesDrop').value='28.87';
+  document.getElementById('inTrafficDrop').value='32.96';
+  document.getElementById('inReason').value='邻近500米大贸城存在同品牌竞争；2026年1-9月已给予每月18717元租金扶持，申请10月继续给予租金6折扶持。';
+  document.getElementById('morePanel').classList.add('open');
+  document.getElementById('moreToggle').textContent='收起更多字段 ▴';
+  runAnalyze();
+}
+
+/* ---------- 初始化 ---------- */
+document.getElementById('moreToggle').onclick=function(){
+  var p=document.getElementById('morePanel');p.classList.toggle('open');
+  this.textContent=p.classList.contains('open')?'收起更多字段 ▴':'展开更多字段 ▾';
+};
+document.getElementById('btnAnalyze').onclick=runAnalyze;
+document.getElementById('btnExample').onclick=loadExample;
+document.getElementById('chatForm').onsubmit=function(e){e.preventDefault();ask(document.getElementById('chatInput').value);document.getElementById('chatInput').value='';};
+
+// 首次打开：用默认的核心 3 项直接给出分析结论（只读核心项，不含可选）
+(function(){
+  var d={
+    merchantName:document.getElementById('inName').value.trim()||'该商户',
+    sales:document.getElementById('inSales').value,
+    cost:document.getElementById('inCost').value,
+    grossMargin:document.getElementById('inMargin').value,
+    area:'',rent:'',managementFee:'',laborCost:'',discountRate:'',salesDropPct:'',trafficDropPct:'',reason:''
+  };
+  state.data=d;state.diagnosis=diagnose(d);renderDiagnosis();renderChat();
+})();
+</script>
+</body>
+</html>
