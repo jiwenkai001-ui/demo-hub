@@ -1,0 +1,29 @@
+{
+  "completedAt": "2026-10-22 18:18:39",
+  "suites": [
+    {
+      "suite": "业务与HTTP回归",
+      "exitCode": 0,
+      "seconds": 97.01,
+      "log": "业务与HTTP回归.log"
+    },
+    {
+      "suite": "原有浏览器流程",
+      "exitCode": 0,
+      "seconds": 50.33,
+      "log": "原有浏览器流程.log"
+    },
+    {
+      "suite": "体验优化浏览器流程",
+      "exitCode": 0,
+      "seconds": 24.0,
+      "log": "体验优化浏览器流程.log"
+    },
+    {
+      "suite": "媒体浏览器流程",
+      "exitCode": 0,
+      "seconds": 11.51,
+      "log": "媒体浏览器流程.log"
+    }
+  ]
+}
