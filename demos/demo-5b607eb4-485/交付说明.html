@@ -1,0 +1,648 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>萌宠农场 · 重构版交付说明</title><style>
+:root{font-family:'Microsoft YaHei','PingFang SC',sans-serif;color:#294438;line-height:1.9;background:#f6f8f2;font-size:14px}*{box-sizing:border-box}body{margin:0}a{color:#317456;text-underline-offset:4px}header{background:#254e3c;color:#fff;padding:54px max(30px,calc((100vw - 1250px)/2))}header .label{font-size:11px;letter-spacing:3px;color:#c2d2b5}header h1{font-size:34px;letter-spacing:2px;margin:12px 0}header p{color:#c6d6c4;font-size:13px}header a{display:inline-block;padding:10px 24px;background:#edf0df;color:#254e3c;text-decoration:none;border-radius:10px;margin:12px 12px 0 0;font-weight:600}header a.alt{background:#ffffff12;color:white;border:1px solid #ffffff30}.layout{max-width:1320px;margin:35px auto;padding:0 30px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:36px}aside{align-self:start;position:sticky;top:25px;max-height:90vh;overflow:auto;font-size:11px;padding:10px 0}aside ul{padding-left:17px}aside li{margin:7px 0}aside a{text-decoration:none;color:#718375}aside a:hover{color:#254e3c}aside .toctitle{font-weight:700;color:#254e3c;font-size:13px}main{min-width:0;background:white;border:1px solid #e5eadf;padding:36px 40px;border-radius:22px}main>h1{font-size:26px;border-bottom:2px solid #e3eddc;padding-bottom:18px;margin-top:10px}main>h1:not(:first-child){margin-top:55px}h2{font-size:21px;margin:36px 0 17px;scroll-margin-top:22px}h3{font-size:17px;margin:25px 0 14px;scroll-margin-top:22px}p{color:#64786a;overflow-wrap:anywhere}strong{color:#294438}li{margin:8px 0;color:#64786a}table{display:block;width:100%;overflow:auto;border-collapse:collapse;font-size:12px;margin:20px 0;line-height:1.8}th,td{border:1px solid #e6ecdf;padding:12px 14px;text-align:left;min-width:115px}th{background:#edf3e7;color:#365d45;font-weight:600}tr:nth-child(even){background:#fafcf8}code{background:#f0f4ec;padding:2px 6px;border-radius:5px;color:#3c6e4b;font-size:12px;overflow-wrap:anywhere}pre{background:#eff4e9;padding:18px;border-radius:12px;overflow:auto}pre code{padding:0}hr{border:0;border-top:1px solid #e5ebdf;margin:45px 0}footer{padding:30px;text-align:center;color:#94a18e;font-size:11px}.preview{display:grid;grid-template-columns:1fr 185px;gap:14px;margin:24px 0}.preview a{border:1px solid #e5ebdf;border-radius:12px;overflow:hidden;display:block;height:300px}.preview img{width:100%;height:auto;display:block}.note{background:#eff4e9;color:#60806a;padding:16px 20px;border-radius:12px;font-size:12px}button:focus-visible,a:focus-visible{outline:3px solid #a6c694;outline-offset:3px}@media(max-width:850px){.layout{display:block;padding:0 18px;margin:20px auto}aside{position:static;max-height:190px;margin:10px 0 20px;border:1px solid #e5ebdf;border-radius:13px;padding:15px 20px;background:white}main{padding:24px 20px}header{padding:35px 24px}header h1{font-size:26px}.preview{grid-template-columns:1fr 100px}.preview a{height:190px}h2{font-size:19px}}
+</style></head><body><header><div class="label">PAW FARM · REBUILT DEMO</div><h1>萌宠农场，重新出发。</h1><p>原有业务保留 · 本地流程补齐 · 桌面与手机界面重构　｜　2026-10-22</p><a href="index.html">打开新版演示 →</a><a href="../业务与功能详细说明.html" class="alt">查看原版分析</a></header><div class="layout"><aside><div class="toc"><span class="toctitle">阅读导航</span><ul>
+<li><a href="#_1">先体验这几条流程</a></li>
+<li><a href="#_2">初始演示数据</a></li>
+<li><a href="#_3">保存与备份</a></li>
+<li><a href="#_4">可选：通过本地服务打开</a></li>
+<li><a href="#_5">验证与源码</a></li>
+<li><a href="#_6">演示与正式系统的边界</a></li>
+<li><a href="#1">1. 重构范围</a></li>
+<li><a href="#2-g01g25">2. G01—G25逐项处理</a></li>
+<li><a href="#3">3. 原页面逐项映射</a></li>
+<li><a href="#4">4. 统一计价规则</a><ul>
+<li><a href="#_8">活动与订单金额</a></li>
+<li><a href="#_9">容量、库存与服务</a></li>
+</ul>
+</li>
+<li><a href="#5">5. 状态与异常处理</a></li>
+<li><a href="#6">6. 内容、健康和用户经营</a><ul>
+<li><a href="#_10">社区与知识</a></li>
+<li><a href="#_11">宠物与健康</a></li>
+<li><a href="#_12">会员、积分与营销</a></li>
+</ul>
+</li>
+<li><a href="#7">7. 验证结果与交付文件</a></li>
+</ul>
+</div>
+</aside><main><div class="note">直接打开index.html使用。所有示例资源已放在本地；支付与外部服务明确采用模拟方式，详细范围见下文。</div><div class="preview"><a href="tests/首页-桌面.png"><img src="tests/首页-桌面.png" alt="新版桌面首页预览"></a><a href="tests/首页-手机.png"><img src="tests/首页-手机.png" alt="新版手机首页预览"></a></div><h1 id="demo">萌宠农场 · 重构版 Demo</h1>
+<p>这是基于原 Demo 和《业务与功能详细说明》V1.1 重构的离线演示系统。保留首页、社区、商城、我的四个主栏目及原有27个子页面的业务能力，补齐本地数据保存和可演练的业务流程，重新设计桌面与手机界面。</p>
+<p><strong>直接打开 <a href="index.html">index.html</a> 即可使用，推荐新版 Edge / Chrome。无需安装依赖，无需联网。</strong></p>
+<ul>
+<li><a href="index.html">打开重构 Demo</a></li>
+<li><a href="交付说明.html">交付说明（可视化阅读版）</a></li>
+<li><a href="修复与功能对照说明.md">修复与功能对照说明</a></li>
+<li><a href="tests/验证结果.json">业务验证结果</a></li>
+<li><a href="tests/首页-桌面.png">桌面预览</a> / <a href="tests/首页-手机.png">手机预览</a></li>
+</ul>
+<h2 id="_1">先体验这几条流程</h2>
+<table>
+<thead>
+<tr>
+<th>演示内容</th>
+<th>操作路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>活动预约与核销</td>
+<td>首页 → 活动 → 选择日期时段、人数、联系人 → 提交 → 模拟支付成功 → 查看券码 → 展开订单“演示工具” → 模拟到店核销</td>
+</tr>
+<tr>
+<td>付款失败与取消</td>
+<td>创建订单 → 模拟支付失败 / 取消支付 → 查看待付订单 → 继续支付或取消订单，观察积分、券和资源释放</td>
+</tr>
+<tr>
+<td>商品购买与履约</td>
+<td>商城 → 规格 → 加购物车 / 立即购买 → 地址或自提 → 优惠券和积分 → 创建订单 → 模拟支付 → 订单演示工具模拟发货 / 备货 → 确认收货 / 提货 → 评价</td>
+</tr>
+<tr>
+<td>退款与退货</td>
+<td>已支付未发货订单 → 申请退款；已发货订单 → 申请退货 → 演示确认退货 → 库存、券及抵扣积分返还，消费奖励扣回</td>
+</tr>
+<tr>
+<td>宠物健康记录</td>
+<td>我的宠物 → 选择豆豆或毛毛 → 健康档案 → 新增疫苗 / 驱虫 / 体检记录 → 消息中心查看按日期生成的提醒</td>
+</tr>
+<tr>
+<td>寄养与照护</td>
+<td>寄养 → 房型和起止日期 → 付款 → 券码模拟入住 → 寄养中 → 演示记录喂食 / 遛弯 / 健康观察 → 模拟退房 → 评价</td>
+</tr>
+<tr>
+<td>会员与积分</td>
+<td>会员中心领取月券 / 生日礼 → 积分中心签到和兑换 → 在结算观察会员折扣、券、积分及消费奖励</td>
+</tr>
+<tr>
+<td>内容互动</td>
+<td>社区 → 点赞 / 关注 → 详情评论 → 发布动态、上传照片、选分类和话题 → 刷新确认保存</td>
+</tr>
+<tr>
+<td>领养与营销</td>
+<td>领养申请 → 演示审核 → 确认领养 → 回访；邀请有礼 → 模拟好友注册及首单 → 拼团 / 助力 → 领券 / 演示佣金结算</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">初始演示数据</h2>
+<ul>
+<li>当前账户“宠物爱好者”，L2，成长值1280，积分1256。</li>
+<li>原有3项活动、12件商品、4篇社区动态、2只宠物、5张优惠券、2条地址、5笔历史示例订单继续保留。另补充2件“用品”分类商品及独立知识文章。</li>
+<li>活动未来7天可约；初始预约、券有效期与健康提醒按首次使用当天生成，避免固定历史日期全部失效。</li>
+<li>原有订单编号保留为历史样例标识，展示日期采用相对当前日期；新增订单生成唯一编号。</li>
+<li>“设置 → 演示工具”可切换L1—L4，便于验证不同等级权益；重置可恢复初始数据。</li>
+</ul>
+<h2 id="_3">保存与备份</h2>
+<p>数据使用 <code>localStorage</code> 保存在当前浏览器，存储键为 <code>paw-farm-rebuilt-2026-v1</code>。刷新和关闭页面后再打开同一地址可继续操作；其他标签页的更新会同步到当前页面。</p>
+<p>在“账号与设置”可导出 / 导入 JSON 备份。导入会校验结构、类型、图片、金额与对象关联，替换前有确认提示；无效备份不会覆盖已有记录。存储写入失败时，本次订单与库存等修改不会提交。</p>
+<p>文件路径、浏览器、访问协议或端口变化可能对应不同的存储空间；清理浏览器数据会删除本地记录。需保留时先导出备份。</p>
+<h2 id="_4">可选：通过本地服务打开</h2>
+<p>如果已有 Python，也可在本目录运行：</p>
+<pre><code class="language-powershell">python -m http.server 8123 --bind 127.0.0.1
+</code></pre>
+<p>然后访问 <code>http://127.0.0.1:8123/index.html</code>。文件直接打开和本地服务访问均已验证，二者的数据空间分别保存。</p>
+<h2 id="_5">验证与源码</h2>
+<p>验证日期：2026-10-22。业务与交互验证 <strong>41项通过</strong>；响应式巡检 <strong>68个页面与尺寸组合通过</strong>，未发现脚本报错和横向溢出。明细和截图保存在 <code>tests/</code>，不以按钮存在代替流程验证。</p>
+<p>需要重跑测试时，安装 Python 的 Playwright 包，确保已安装 Edge，然后在本目录执行：</p>
+<pre><code class="language-powershell">python tests/verify.py
+python tests/smoke.py
+</code></pre>
+<p>测试会在独立无头浏览器中创建和重置测试数据，不修改日常浏览器中的演示记录。脚本默认使用Windows标准Edge安装路径。</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>index.html</code></td>
+<td>唯一启动页</td>
+</tr>
+<tr>
+<td><code>assets/style.css</code></td>
+<td>桌面、手机和弹窗样式</td>
+</tr>
+<tr>
+<td><code>assets/images/</code></td>
+<td>原创本地SVG插画，不依赖远程图片</td>
+</tr>
+<tr>
+<td><code>assets/vendor/qrcode.js</code></td>
+<td>Kazuhiko Arase QR Code Generator，MIT许可，原始许可保留在文件头</td>
+</tr>
+<tr>
+<td><code>js/store.js</code></td>
+<td>统一数据、计价、资源预占、状态流转、校验和持久化</td>
+</tr>
+<tr>
+<td><code>js/app.js</code></td>
+<td>路由、页面、表单、上传及交互</td>
+</tr>
+<tr>
+<td><code>js/icons.js</code></td>
+<td>本地SVG图标</td>
+</tr>
+<tr>
+<td><code>tests/logic-cases.js</code></td>
+<td>金额、资源、状态与奖励等业务断言</td>
+</tr>
+<tr>
+<td><code>tests/verify.py</code></td>
+<td>业务断言及真实浏览器交互验证</td>
+</tr>
+<tr>
+<td><code>tests/smoke.py</code></td>
+<td>桌面1440、手机390宽度的页面巡检</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">演示与正式系统的边界</h2>
+<p>该版本提供单个本地演示账户，<strong>未接入真实登录鉴权、微信授权、后台数据库、支付、物流、短信、客服人工坐席、摄像头或视频平台</strong>。演示支付、商家发货、到店核销、领养审核、好友注册 / 首单和佣金结算均在界面明确标识；监护画面为本地插画示意，纪念卡为本地生成，不是现场摄影照片。</p>
+<p>二维码实际编码订单与专属令牌，可在当前数据集内粘贴核销，但没有跨设备的服务器验真，也未集成摄像头扫码。分享会复制当前链接，文件地址适合本机查看；跨设备传播需要部署可访问站点并提供服务端数据。</p>
+<p>本地事务可防止单次操作部分保存，跨标签页提供更新同步；它不具备多人并发锁、真实身份权限或支付回调安全性。原Demo没有明确的计费与营销规则，在新版中的演示默认值详见对照说明，正式建设时应由业务确认。</p>
+<hr />
+<h1 id="_7">萌宠农场重构版：修复与功能对照说明</h1>
+<p>交付日期：2026-10-22。依据为父目录的《业务与功能详细说明》V1.1和原始Demo快照。原始快照与分析文档不被新版覆盖；本说明描述新实现，原文的缺口结论仍对应原版。</p>
+<h2 id="1">1. 重构范围</h2>
+<p>保留四个主栏目和27个子页面原有的业务内容与入口，使用统一数据模型重新实现。页面合并或位置调整以方便操作为目的，例如“疫苗记录”纳入按宠物区分的健康档案，仍可查看、登记和编辑，并扩展到驱虫和体检。</p>
+<p>界面采用森林绿、奶油白与暖橙配色，本地动物和商品插画、统一图标、响应式卡片、侧边导航、手机底栏与原生模态弹窗。每次仅渲染一个主路由内容，避免收藏覆盖商品详情等多层页面冲突。</p>
+<h2 id="2-g01g25">2. G01—G25逐项处理</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>原版问题</th>
+<th>新版处理与实际边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>无保存、登录、用户隔离和后台</td>
+<td>实现统一本地持久化、备份导入导出、恢复提示及跨标签页同步；真实登录鉴权、微信账户、多用户隔离和服务端不在本地版本中伪造</td>
+</tr>
+<tr>
+<td>G02</td>
+<td>活动价不一致</td>
+<td>详情、预约、底部金额、订单都读取活动独立成人 / 儿童价，统一结算引擎计算</td>
+</tr>
+<tr>
+<td>G03</td>
+<td>预约未绑定信息</td>
+<td>保存活动ID、日历日期、时段、人数、宠物、联系人、优惠与金额快照，表单与业务层双重校验</td>
+</tr>
+<tr>
+<td>G04</td>
+<td>余位固定，不占位</td>
+<td>按活动、日期及重叠时段计算空间峰值；待付预占15分钟，超时、取消和退款释放，满员拒绝提交</td>
+</tr>
+<tr>
+<td>G05</td>
+<td>CSS假二维码，无核销</td>
+<td>使用本地标准QR库生成真实编码；载荷绑定订单与令牌；未支付、失效及重复核销均拒绝。无摄像头扫码和服务端验真</td>
+</tr>
+<tr>
+<td>G06</td>
+<td>付款不建单不清车</td>
+<td>创建待付订单，成功支付后清理此次结算的购物车数量；失败 / 取消仍待付，支付流水与订单同步保存</td>
+</tr>
+<tr>
+<td>G07</td>
+<td>固定减15元</td>
+<td>校验优惠券门槛、范围、有效期、周三条件及占用状态，实时计算积分余额与20%抵扣上限，配送费独立计算</td>
+</tr>
+<tr>
+<td>G08</td>
+<td>立即购买覆盖购物车</td>
+<td>独立购买草稿与结算来源，不改写原购物车；只在购物车订单付款后扣减对应购物车数量</td>
+</tr>
+<tr>
+<td>G09</td>
+<td>用品分类空集回退全部</td>
+<td>每类严格过滤，补充用品商品；搜索空集真实展示空状态，支持价格排序</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>订单按钮只提示</td>
+<td>支持继续付款、取消、退款、退货、模拟发货 / 备货、确认收货 / 提货、评价、再次购买、活动改期与核销；非法状态拒绝操作</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>发帖、评论、分享不落数据</td>
+<td>内容、分类、话题、最多3张压缩照片与评论保存；分享实际复制链接，受浏览器限制时提供手动复制框</td>
+</tr>
+<tr>
+<td>G12</td>
+<td>点赞不保存且不同步</td>
+<td>列表与详情从相同帖子数据渲染，点赞和关注持久化，样式由实际布尔状态决定</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>知识错接与详情复用</td>
+<td>独立知识列表、文章ID、正文、分类、搜索、阅读、点赞、收藏和正确详情链接</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>毛毛打开豆豆档案</td>
+<td>所有健康记录、曲线、提醒和编辑均携带宠物ID，多宠物数据分别展示</td>
+</tr>
+<tr>
+<td>G15</td>
+<td>宠物、疫苗只提示保存</td>
+<td>宠物和健康记录新增 / 编辑、头像 / 凭证、体重历史均保存；新增奖励记账，编辑不重复奖励</td>
+</tr>
+<tr>
+<td>G16</td>
+<td>会员、积分、券无计算</td>
+<td>成长分级、活动折扣、等级积分倍数、周三积分翻倍、月券、生日礼、季度免费体检、积分兑换及券状态联动</td>
+</tr>
+<tr>
+<td>G17</td>
+<td>地址、收藏、消息固定</td>
+<td>地址增删改和唯一默认地址、下单地址快照、三类真实收藏、业务消息及已读状态</td>
+</tr>
+<tr>
+<td>G18</td>
+<td>统计、日期和状态不一致</td>
+<td>统计来自订单 / 券 / 收藏等集合；日期相对当前日计算，券过期自动归类，健康计划采用同项目最新记录</td>
+</tr>
+<tr>
+<td>G19</td>
+<td>扩展服务占位</td>
+<td>寄养房态、按晚费用、入住照护退房；美容项目、技师排班；领养申请审核回访；邀请、首单、拼团、助力和佣金模拟结算</td>
+</tr>
+<tr>
+<td>G20</td>
+<td>空车全选残留、页面栈混乱</td>
+<td>空状态与选择值来自实际购物车；浏览器历史驱动返回，主内容统一渲染，弹窗使用原生dialog</td>
+</tr>
+<tr>
+<td>G21</td>
+<td>收藏覆盖商品详情</td>
+<td>从收藏直接切换到商品路由，详情立即显示；返回恢复收藏页</td>
+</tr>
+<tr>
+<td>G22</td>
+<td>交叉点赞高亮相反</td>
+<td>高亮按当前liked字段重绘，重复跨页操作不依赖旧DOM的class切换</td>
+</tr>
+<tr>
+<td>G23</td>
+<td>换活动沿用旧输入</td>
+<td>进入新预约按活动初始化草稿与价格；金额重算和图片上传保留已填表单内容</td>
+</tr>
+<tr>
+<td>G24</td>
+<td>日期存相对索引、满员可提交</td>
+<td>保存YYYY-MM-DD绝对日期，提交时再校验实际日期、时段、开始时间和剩余容量</td>
+</tr>
+<tr>
+<td>G25</td>
+<td>桌面按钮漂移、子页布局失控</td>
+<td>主栏目、详情、表单与发布页使用同一自适应容器；桌面侧栏、手机底栏和固定控件适配各自视口</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3">3. 原页面逐项映射</h2>
+<p>下面的“路由”是 <code>index.html#</code> 后的内容。<code>{id}</code>表示相应记录的唯一编号，不是固定样例文本。</p>
+<table>
+<thead>
+<tr>
+<th>原页面</th>
+<th>新路由 / 位置</th>
+<th>保留与增强</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首页 <code>page-home</code></td>
+<td><code>home</code></td>
+<td>3张自动 / 手动横幅、10宫格、活动、推荐商品、知识、会员与健康提醒</td>
+</tr>
+<tr>
+<td>社区 <code>page-community</code></td>
+<td><code>community</code></td>
+<td>推荐、关注、最新、我的、搜索及发布入口</td>
+</tr>
+<tr>
+<td>商城 <code>page-shop</code></td>
+<td><code>shop</code></td>
+<td>原5类与12件商品、购物车、搜索、排序和优惠横幅</td>
+</tr>
+<tr>
+<td>我的 <code>page-profile</code></td>
+<td><code>profile</code></td>
+<td>账户、会员、实时统计、订单分组、宠物和个人服务</td>
+</tr>
+<tr>
+<td>活动详情 <code>sub-activity</code></td>
+<td><code>activity/{id}</code></td>
+<td>独立活动介绍、价格、容量、须知、评价、收藏与预约</td>
+</tr>
+<tr>
+<td>活动预约 <code>sub-booking</code></td>
+<td><code>booking/{id}</code></td>
+<td>未来7天、6个时段、人数、携宠、联系信息及优惠</td>
+</tr>
+<tr>
+<td>核销券码 <code>sub-verify</code></td>
+<td><code>voucher/{订单id}</code></td>
+<td>真实二维码、复制码、订单入口与模拟核销</td>
+</tr>
+<tr>
+<td>商品详情 <code>sub-product</code></td>
+<td><code>product/{id}</code></td>
+<td>图片、价格、规格、评价、购物车、收藏和独立购买</td>
+</tr>
+<tr>
+<td>购物车 <code>sub-cart</code></td>
+<td><code>cart</code></td>
+<td>选择、全选、数量、管理删除和选中结算</td>
+</tr>
+<tr>
+<td>确认订单 <code>sub-checkout</code></td>
+<td><code>checkout/cart</code> / <code>checkout/buy</code></td>
+<td>地址 / 自提、商品、备注、券、积分、运费和实付</td>
+</tr>
+<tr>
+<td>支付结果 <code>sub-pay-result</code></td>
+<td><code>result/{订单id}</code></td>
+<td>成功、失败 / 取消、重试、查看订单 / 券码</td>
+</tr>
+<tr>
+<td>订单列表 <code>sub-orders</code></td>
+<td><code>orders</code></td>
+<td>全部、待付、待履约、完成、取消 / 退款，按类型筛选</td>
+</tr>
+<tr>
+<td>订单详情 <code>sub-order-detail</code></td>
+<td><code>order/{id}</code></td>
+<td>明细、联系人、金额、状态、支付、物流、自提、评价与售后</td>
+</tr>
+<tr>
+<td>知识详情 <code>sub-knowledge-detail</code></td>
+<td><code>article/{id}</code></td>
+<td>正确文章正文、计数、点赞、收藏与分享；新增<code>knowledge</code>知识目录</td>
+</tr>
+<tr>
+<td>帖子详情 <code>sub-post-detail</code></td>
+<td><code>post/{id}</code></td>
+<td>点赞、关注、评论、图片和分享</td>
+</tr>
+<tr>
+<td>发布帖子 <code>sub-post</code></td>
+<td><code>publish</code></td>
+<td>真实内容、最多3图、分类与话题，奖励到账</td>
+</tr>
+<tr>
+<td>我的宠物 <code>sub-pets</code></td>
+<td><code>pets</code></td>
+<td>原2只宠物及新增宠物，按ID进入档案</td>
+</tr>
+<tr>
+<td>宠物编辑 <code>sub-pet-edit</code></td>
+<td><code>pet-edit/new</code> / <code>pet-edit/{id}</code></td>
+<td>头像、昵称、物种、品种、性别、出生日期、体重、绝育和芯片</td>
+</tr>
+<tr>
+<td>健康档案 <code>sub-pet-health</code></td>
+<td><code>health/{宠物id}</code></td>
+<td>宠物信息、体重曲线、疫苗 / 驱虫 / 体检与预约</td>
+</tr>
+<tr>
+<td>疫苗记录 <code>sub-vaccine</code></td>
+<td>健康档案的“疫苗接种”筛选</td>
+<td>保留豆豆原有3条疫苗项目，为毛毛建立独立记录；日期和提醒动态计算</td>
+</tr>
+<tr>
+<td>疫苗登记 <code>sub-vaccine-add</code></td>
+<td><code>health-edit/{宠物id}/new</code></td>
+<td>类型、名称、日期、下次日期、机构、批号、凭证和备注；可编辑既有记录</td>
+</tr>
+<tr>
+<td>会员 <code>sub-member</code></td>
+<td><code>member</code></td>
+<td>L1—L4、成长进度、权益表、月券、生日、免费体检和客服</td>
+</tr>
+<tr>
+<td>积分 <code>sub-points</code></td>
+<td><code>points</code></td>
+<td>余额、折元、签到、兑换、规则和完整本地流水</td>
+</tr>
+<tr>
+<td>优惠券 <code>sub-coupons</code></td>
+<td><code>coupons</code></td>
+<td>可用、预占、已用、过期分类和适用页面入口</td>
+</tr>
+<tr>
+<td>消息 <code>sub-message</code></td>
+<td><code>messages</code></td>
+<td>系统、订单、活动、健康、互动与服务分类，已读与业务跳转</td>
+</tr>
+<tr>
+<td>地址 <code>sub-address</code></td>
+<td><code>addresses</code></td>
+<td>新增、默认、编辑、删除与下单联动</td>
+</tr>
+<tr>
+<td>收藏 <code>sub-favorites</code></td>
+<td><code>favorites</code></td>
+<td>商品、活动、文章三类收藏均真实可访问</td>
+</tr>
+<tr>
+<td>寄养 <code>sub-extension-boarding</code></td>
+<td><code>service/boarding</code>及寄养订单</td>
+<td>房型、入住退房日期、房态、付款、入住、每日照护、监护示意、退房</td>
+</tr>
+<tr>
+<td>洗护 <code>sub-extension-grooming</code></td>
+<td><code>service/grooming</code></td>
+<td>洗护、美容、SPA、药浴，宠物、技师、日期和时段</td>
+</tr>
+<tr>
+<td>领养 <code>sub-extension-adoption</code></td>
+<td><code>adoption</code></td>
+<td>待领养宠物、申请、审核、确认领养和回访</td>
+</tr>
+<tr>
+<td>邀请 <code>sub-extension-promo</code></td>
+<td><code>promo</code></td>
+<td>邀请标识、模拟注册 / 首单、拼团、助力、奖励券、佣金和模拟提现</td>
+</tr>
+</tbody>
+</table>
+<p>额外增加统一搜索<code>search</code>、账号与备份<code>settings</code>、本地客服<code>support</code>和体检预约<code>service/checkup</code>，供原有内容和权益实际使用。</p>
+<h2 id="4">4. 统一计价规则</h2>
+<p>原版未明确的规则采用以下演示默认值，并在页面显示，不作为真实门店的经营政策。</p>
+<h3 id="_8">活动与订单金额</h3>
+<table>
+<thead>
+<tr>
+<th>规则</th>
+<th>默认实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>成人 / 儿童票</td>
+<td>萌兔39 / 19元，狗狗59 / 29元，猫咪88 / 44元；儿童需成人陪同，适合3岁以上</td>
+</tr>
+<tr>
+<td>携宠</td>
+<td>关联用户宠物档案，不额外收费，不影响入场人数计数</td>
+</tr>
+<tr>
+<td>活动会员价</td>
+<td>L1 9.5折、L2 9折、L3 8.5折、L4 8折；总原价折扣一次四舍五入到分</td>
+</tr>
+<tr>
+<td>计算顺序</td>
+<td>原价 → 活动会员折扣 → 一张优惠券 → 积分抵扣 → 运费</td>
+</tr>
+<tr>
+<td>券门槛</td>
+<td>按会员折扣后金额判断；范围、到期日、周三条件和使用状态必须同时满足</td>
+</tr>
+<tr>
+<td>积分抵扣</td>
+<td>100分=1元，即1分抵0.01元，最多为券后金额20%，不抵运费；负积分余额不可继续抵扣</td>
+</tr>
+<tr>
+<td>配送费</td>
+<td>快递原商品金额满99元免运费，否则8元；自提免费</td>
+</tr>
+<tr>
+<td>预占</td>
+<td>提交待付订单即占库存 / 场次 / 房间 / 技师 / 免费体检次数，同时占券及扣减抵扣积分，15分钟超时释放</td>
+</tr>
+<tr>
+<td>支付奖励</td>
+<td>实付不含运费，每满1元增加1成长值；消费积分为实付元数×付款时等级倍数，向下取整</td>
+</tr>
+<tr>
+<td>会员日</td>
+<td>每周三消费积分额外乘2，与等级倍数叠加；5元会员日券也仅周三可用</td>
+</tr>
+<tr>
+<td>退款</td>
+<td>返还库存 / 资源、券和抵扣积分，扣回原订单实际奖励与成长值；已消费奖励不足时允许积分暂负，不额外补发</td>
+</tr>
+</tbody>
+</table>
+<p>示例：L2预约狗狗活动2成人1儿童，原价147元，会员减14.70元，使用活动券减10元，再抵1256积分（12.56元），应付109.74元。订单保存整套金额快照，后续升级不会改写历史实付或退款奖励。</p>
+<h3 id="_9">容量、库存与服务</h3>
+<ul>
+<li>活动按场地同时在场人数校验：例如萌兔09:00—11:00和10:00—12:00共用15人空间，不能各自独立卖出15人。新时段与已有区间发生重叠时，按重叠段的最大占用人数扣位。</li>
+<li>原6个起始时段保留：09:00、10:00、13:00、14:00、15:00、16:00。结束时间按活动时长计算，不把不同活动统一为2小时。</li>
+<li>所有商品初始化40件单件库存；双件装按2件扣库存，价格为标准装2倍；购物车中的同商品不同规格共同校验库存。普通购物车本身不占库存，创建待付单后才预占。</li>
+<li>寄养标准间80元 / 晚、4间；豪华间128元 / 晚、2间；VIP套间198元 / 晚、1间。最短1晚最长30晚，退房日不占房；同一宠物不能重复预约重叠寄养日期。演示提前退房仍按原预约日期保留房间配额，避免演练改变其他订单的既定房态。</li>
+<li>美容基础洗护68元 / 60分钟、精致美容128元 / 90分钟、SPA158元 / 90分钟、药浴198元 / 90分钟。当前为统一项目价格，未引入体型加价；可选择小林、小陈、阿乐，09:00、11:00、14:00、16:00时段，同一服务人员在同一时段不能被洗护与体检重复预约。</li>
+<li>体检单次128元；L3每季1次、L4每季2次免费。按服务日期所属自然季度计算，待支付也占权益；取消、超时或退款可归还该笔权益。免费体检不再叠加券与积分，实付0元也通过演示收银台完成确认。</li>
+</ul>
+<h2 id="5">5. 状态与异常处理</h2>
+<table>
+<thead>
+<tr>
+<th>业务</th>
+<th>状态流转</th>
+<th>主要限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>活动 / 美容 / 体检</td>
+<td>待付 → 已付待使用 → 核销完成 → 评价</td>
+<td>专属券只核销一次；活动与服务提前24小时可退款，活动还可改期</td>
+</tr>
+<tr>
+<td>寄养</td>
+<td>待付 → 已付待入住 → 核销入住 / 寄养中 → 照护记录 → 退房完成 → 评价</td>
+<td>核销入住不会直接完成订单；照护日期须在入住至退房前一日之间</td>
+</tr>
+<tr>
+<td>快递 / 自提</td>
+<td>待付 → 已付待发货 / 备货 → 已发货 / 备好 → 确认收货 / 提货 → 完成 → 评价</td>
+<td>商家步骤在折叠演示工具内，用户步骤使用正常订单按钮</td>
+</tr>
+<tr>
+<td>取消与超时</td>
+<td>待付 → 已取消</td>
+<td>回滚该订单预占的所有资源和优惠；重复取消拒绝</td>
+</tr>
+<tr>
+<td>商城退款</td>
+<td>已付未发货 → 已退款</td>
+<td>发货后先进入退货处理中，演示确认退回后才退款与恢复库存</td>
+</tr>
+<tr>
+<td>支付失败 / 取消</td>
+<td>保持待付，记录本次失败 / 取消结果</td>
+<td>不清车、不奖励、不生成有效券，可在15分钟内重试</td>
+</tr>
+<tr>
+<td>领养</td>
+<td>待审核 → 通过 / 未通过 → 已领养 → 回访</td>
+<td>不可跳过审核直接领养；同一宠物不能重复有效申请</td>
+</tr>
+</tbody>
+</table>
+<p>已完成的订单不在此Demo中提供普通退款入口，真实长期售后、分次退款和争议处理需服务端规则。演示工具允许模拟未来预约提前核销 / 入住及提前退房，便于现场演练，不代表真实门店可跳过服务时间。</p>
+<p>异常值不会只依赖按钮禁用：业务方法会再次检查日期、号码、人数、时段、余位、库存、关联对象、优惠资格和当前状态。页面价格预览对超大或非法输入作显示保护，提交仍拒绝不合法值。</p>
+<p>本地写入采用“读取最新快照 → 克隆 → 全部校验和修改 → 单次保存成功 → 发布新状态”。验证失败或空间不足不提交半成品。浏览器之间提供存储事件同步，但没有跨进程原子锁，不能用于真实多人抢购。</p>
+<h2 id="6">6. 内容、健康和用户经营</h2>
+<h3 id="_10">社区与知识</h3>
+<p>帖子正文5—2000字，评论1—500字，最多3张JPG / PNG / WebP图片，单张原图限8MB，保存前压缩为本地JPEG。上传重绘保留正文；成功发布才奖励10积分。点赞、关注、评论、图片、话题与分类都保存。</p>
+<p>原帖的历史评论数保留为明确标注的热度计数，实际保存的评论单独列出，不伪造几十条可见评论。详情、列表与刷新后读取同一份记录。当前演示仅有一个账户，自发帖子首次被当前演示点赞时演练一次获赞积分，反复取消 / 点赞不重复记奖；真实多用户点赞归因需要账号服务。</p>
+<p>知识文章各有独立ID和正文，第一次打开时本地阅读数加1，同账户重复打开不重复计数，点赞与收藏按文章保存。</p>
+<h3 id="_11">宠物与健康</h3>
+<p>保存昵称、物种、品种、性别、出生日期、体重、绝育、芯片与头像。芯片非空时不能重复；出生日期不能在未来。新增档案+20积分，编辑不重复奖励。</p>
+<p>疫苗、驱虫、体检记录保存机构、类型、名称、本次和下次日期、批号、说明与凭证。实际日期不能在未来，下次日期须晚于本次；新增疫苗+10积分，编辑不重复奖励。体重历史按日期保存，同一天新增体重会覆盖该日记录，当前体重取最新日期值。</p>
+<p>同一宠物、类别与项目类型的提醒采用最新实际记录；下次日期距今7天内或逾期时生成消息。新计划不会继续沿用旧接种计划催办。提醒是页面内计算，不是微信订阅或系统推送。</p>
+<h3 id="_12">会员、积分与营销</h3>
+<ul>
+<li>等级阈值保持0 / 500 / 2000 / 5000，消费积分倍数保持1 / 1.2 / 1.5 / 2，L4优先预约通过专属咨询协助体现，不绕开容量校验。</li>
+<li>L2 / L3 / L4每月可领1 / 2 / 3张满49减10券，当月按已领取次数判断，重复领取拒绝；券30天有效。</li>
+<li>L2 / L3生日当月每年领取100积分，L4为200积分。默认生日为演示资料，可在设置修改；生产生日核验需账户规则。</li>
+<li>每日签到+5分，每条有效发布+10分，每只新增宠物+20分，每条新增疫苗+10分；500积分可兑换满49减10券，有效30天。</li>
+<li>邀请标识<code>PAW-DEMO-ME</code>关联当前本地演示账户。模拟好友注册记录邀请关系，手机号不能为本人或重复；注册+50分，模拟首单一次性+100分与5元演示佣金。</li>
+<li>拼团、砍价各需要2位不同模拟好友。拼团获得商城满99减20券，助力获得商城满79减15券，7天有效，各领一次；这是对原占位活动的明确演示规则，没有自动扣款或虚构真实团购交易。</li>
+<li>佣金结算将未结算条目标记并生成提现历史，不发生真实转账，不可重复结算同一条佣金。</li>
+</ul>
+<h2 id="7">7. 验证结果与交付文件</h2>
+<p>自动验证使用本机Edge无头浏览器。业务和交互共41项，通过41项，页面脚本错误0项；响应式巡检34条路由×桌面1440 / 手机390宽度，共68项，无横向溢出及脚本错误。覆盖本地文件直接打开与本地HTTP访问。</p>
+<p>重点验证了价格叠加、跨时段占位、券与积分返还、双件装库存、支付失败重试和幂等、配送售后、真实QR载荷、一次核销、改期、多宠物区分、实际图片上传、最新健康计划、权益次数、寄养入住照护退房、邀请奖励、无效备份拒绝、存储失败不提交和跨标签页同步。会员日采用固定周三时钟额外验证。</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tests/验证结果.json</code></td>
+<td>41项逐项名称和通过结果</td>
+</tr>
+<tr>
+<td><code>tests/smoke-results.json</code></td>
+<td>68个页面 / 尺寸组合的标题、溢出状态与脚本错误</td>
+</tr>
+<tr>
+<td><code>tests/verify.py</code>、<code>tests/logic-cases.js</code></td>
+<td>可重跑的业务与交互验证源码</td>
+</tr>
+<tr>
+<td><code>tests/smoke.py</code></td>
+<td>响应式巡检源码</td>
+</tr>
+<tr>
+<td><code>tests/首页-桌面.png</code>、<code>tests/首页-手机.png</code></td>
+<td>最终首页预览</td>
+</tr>
+<tr>
+<td><code>tests/预约凭证-1440.png</code>、<code>tests/商城履约-1440.png</code></td>
+<td>实际流程中的订单与核销截图</td>
+</tr>
+</tbody>
+</table>
+<p>这些验证针对本地Demo，不等同于真实支付、硬件、账号安全、后台负载或多人并发验收。服务端、微信小程序工程、真实运营后台、人工客服、视频监控、电子领养协议和外部履约集成仍需正式项目实现。</p></main></div><footer>PAW FARM · 原始资料保留于上级目录 · 本地演示交付</footer></body></html>
