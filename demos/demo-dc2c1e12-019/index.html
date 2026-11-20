@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASSETFORGE — 固定资产管理出入库系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ========== RESET & BASE ========== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --bg-primary: #0f1115;
+    --bg-secondary: #161922;
+    --bg-tertiary: #1e2230;
+    --bg-card: rgba(30, 34, 48, 0.7);
+    --border-color: rgba(245, 158, 11, 0.12);
+    --border-strong: rgba(245, 158, 11, 0.25);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-primary: #f59e0b;
+    --accent-secondary: #14b8a6;
+    --accent-danger: #ef4444;
+    --accent-success: #22c55e;
+    --accent-blue: #3b82f6;
+    --accent-purple: #a855f7;
+    --glow-amber: rgba(245, 158, 11, 0.15);
+    --glow-teal: rgba(20, 184, 166, 0.15);
+    --font-display: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+    --font-body: 'Noto Sans SC', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* Grid background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Ambient glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ========== LAYOUT ========== */
+  .app-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+    width: 260px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+      transparent 0%, 
+      var(--accent-primary) 20%, 
+      var(--accent-primary) 80%, 
+      transparent 100%);
+    opacity: 0.3;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 24px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent-primary), #d97706);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--bg-primary);
+    position: relative;
+  }
+
+  .logo-icon::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid var(--accent-primary);
+    border-radius: 10px;
+    opacity: 0.3;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+  }
+
+  .logo-subtitle {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 20px 16px;
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    margin-bottom: 24px;
+  }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0 12px 10px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 2px;
+    position: relative;
+  }
+
+  .nav-item:hover {
+    background: rgba(245, 158, 11, 0.06);
+    color: var(--text-primary);
+  }
+
+  .nav-item.active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+    color: var(--accent-primary);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background: var(--accent-primary);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-family: var(--font-mono);
+  }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .storage-info {
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+  }
+
+  .storage-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .storage-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .storage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 3px;
+    width: 67%;
+  }
+
+  .storage-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  /* ========== MAIN CONTENT ========== */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ========== TOP BAR ========== */
+  .topbar {
+    height: 64px;
+    background: rgba(22, 25, 34, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .page-title::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: var(--accent-primary);
+    border-radius: 2px;
+  }
+
+  .topbar-search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+  }
+
+  .topbar-search input {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 9px 14px 9px 38px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+  }
+
+  .topbar-search input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--glow-amber);
+  }
+
+  .topbar-search input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 16px;
+    height: 16px;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  .topbar-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    position: relative;
+  }
+
+  .topbar-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-danger);
+    border-radius: 50%;
+    border: 2px solid var(--bg-tertiary);
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px 6px 6px;
+    background: var(--bg-tertiary);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .user-profile:hover {
+    border-color: var(--border-strong);
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--bg-primary);
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .user-name {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .user-role {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* ========== CONTENT AREA ========== */
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+
+  .content-area::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .content-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .content-area::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.2);
+    border-radius: 3px;
+  }
+
+  .content-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 158, 11, 0.4);
+  }
+
+  /* ========== VIEW TOGGLE ========== */
+  .view { display: none; animation: fadeIn 0.4s ease; }
+  .view.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== DASHBOARD ========== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--card-accent, var(--accent-primary)), transparent);
+  }
+
+  .kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--card-accent, var(--accent-primary));
+  }
+
+  .kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+  }
+
+  .kpi-trend.up {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--accent-success);
+  }
+
+  .kpi-trend.down {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-danger);
+  }
+
+  .kpi-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .kpi-footnote {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .kpi-footnote::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--card-accent, var(--accent-primary));
+  }
+
+  /* Charts row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .chart-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .chart-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-tertiary);
+    padding: 3px;
+    border-radius: 6px;
+  }
+
+  .chart-tab {
+    padding: 5px 12px;
+    font-size: 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    font-family: var(--font-mono);
+  }
+
+  .chart-tab.active {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    font-weight: 600;
+  }
+
+  /* Bar chart */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    height: 200px;
+    padding: 0 8px;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    max-width: 32px;
+    background: linear-gradient(to top, var(--accent-primary), rgba(245, 158, 11, 0.4));
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .bar:hover {
+    background: linear-gradient(to top, var(--accent-secondary), rgba(20, 184, 166, 0.4));
+  }
+
+  .bar-value {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .bar:hover .bar-value { opacity: 1; }
+
+  .bar-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* Donut chart */
+  .donut-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .donut-chart {
+    position: relative;
+    width: 160px;
+    height: 160px;
+  }
+
+  .donut-chart svg {
+    transform: rotate(-90deg);
+  }
+
+  .donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .donut-total {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .donut-label {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .legend-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .legend-label { flex: 1; color: var(--text-secondary); }
+  .legend-value { font-family: var(--font-mono); color: var(--text-primary); font-weight: 500; }
+
+  /* Bottom row */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Recent activity */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+  }
+
+  .activity-item:hover {
+    background: rgba(245, 158, 11, 0.04);
+  }
+
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+
+  .activity-icon.in { background: rgba(34, 197, 94, 0.1); color: var(--accent-success); }
+  .activity-icon.out { background: rgba(239, 68, 68, 0.1); color: var(--accent-danger); }
+  .activity-icon.transfer { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+
+  .activity-content { flex: 1; min-width: 0; }
+  .activity-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .activity-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .activity-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* Asset status card */
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .status-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .status-item:hover {
+    border-color: var(--border-strong);
+  }
+
+  .status-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--status-color, var(--accent-primary));
+  }
+
+  .status-number {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .status-label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .status-bar-sm {
+    margin-top: 10px;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .status-bar-fill {
+    height: 100%;
+    background: var(--status-color, var(--accent-primary));
+    border-radius: 2px;
+  }
+
+  /* ========== ASSETS PAGE ========== */
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary), #d97706);
+    color: var(--bg-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+  }
+
+  .btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-strong);
+    background: rgba(245, 158, 11, 0.05);
+  }
+
+  .btn-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filter-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .filter-select {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 7px 12px;
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    min-width: 120px;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .filter-search {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .filter-search input {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px 12px 8px 34px;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-family: var(--font-body);
+  }
+
+  .filter-search input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+
+  .filter-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Asset table */
+  .table-container {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table thead {
+    background: rgba(245, 158, 11, 0.04);
+  }
+
+  .data-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .data-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 13px;
+  }
+
+  .data-table tbody tr {
+    transition: background 0.15s ease;
+    cursor: pointer;
+  }
+
+  .data-table tbody tr:hover {
+    background: rgba(245, 158, 11, 0.03);
+  }
+
+  .data-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .asset-code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-primary);
+    font-weight: 500;
+  }
+
+  .asset-name {
+    font-weight: 500;
+  }
+
+  .asset-category {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-badge.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--accent-success);
+  }
+  .status-badge.active::before { background: var(--accent-success); }
+
+  .status-badge.in-use {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+  }
+  .status-badge.in-use::before { background: var(--accent-blue); }
+
+  .status-badge.maintenance {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent-primary);
+  }
+  .status-badge.maintenance::before { background: var(--accent-primary); }
+
+  .status-badge.retired {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--text-muted);
+  }
+  .status-badge.retired::before { background: var(--text-muted); }
+
+  .price-value {
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .table-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+  }
+
+  .table-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: rgba(245, 158, 11, 0.08);
+  }
+
+  .table-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .pagination-info {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .pagination-info strong {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 12px;
+    transition: all 0.2s ease;
+    padding: 0 8px;
+  }
+
+  .page-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .page-btn.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--bg-primary);
+    font-weight: 600;
+  }
+
+  .page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ========== STOCK IN/OUT PAGE ========== */
+  .stock-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .form-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-title-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .form-title-icon.in { background: rgba(34, 197, 94, 0.1); color: var(--accent-success); }
+  .form-title-icon.out { background: rgba(239, 68, 68, 0.1); color: var(--accent-danger); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .form-label .req {
+    color: var(--accent-danger);
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font-body);
+    transition: all 0.2s ease;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--glow-amber);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .form-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Quick scan */
+  .scan-section {
+    background: var(--bg-tertiary);
+    border: 1px dashed var(--border-strong);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scan-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+  }
+
+  .scan-text {
+    flex: 1;
+  }
+
+  .scan-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .scan-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .scan-btn {
+    padding: 7px 14px;
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+
+  /* Transaction history */
+  .transactions-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+
+  .transactions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .transactions-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tx-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+    cursor: pointer;
+  }
+
+  .tx-item:hover {
+    background: rgba(245, 158, 11, 0.04);
+  }
+
+  .tx-type {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: var(--font-mono);
+  }
+
+  .tx-type.in { background: rgba(34, 197, 94, 0.12); color: var(--accent-success); }
+  .tx-type.out { background: rgba(239, 68, 68, 0.12); color: var(--accent-danger); }
+  .tx-type.transfer { background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); }
+
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-asset {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .tx-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 10px;
+  }
+
+  .tx-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tx-amount {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .tx-amount.in { color: var(--accent-success); }
+  .tx-amount.out { color: var(--accent-danger); }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .stock-layout { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .content-area { padding: 16px; }
+  }
+
+  /* Animation delays for staggered entrance */
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">AF</div>
+        <div class="logo-text">
+          <span class="logo-title">ASSETFORGE</span>
+          <span class="logo-subtitle">Asset Management v2.4</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">主菜单</div>
+        <div class="nav-item active" data-view="dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/>
+            <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
+          </svg>
+          <span>仪表盘</span>
+        </div>
+        <div class="nav-item" data-view="assets">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          <span>资产列表</span>
+          <span class="nav-badge">248</span>
+        </div>
+        <div class="nav-item" data-view="stock">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
+          </svg>
+          <span>出入库管理</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">记录与报表</div>
+        <div class="nav-item" data-view="transactions">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>交易记录</span>
+        </div>
+        <div class="nav-item" data-view="reports">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>统计报表</span>
+        </div>
+        <div class="nav-item" data-view="departments">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>部门管理</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">系统</div>
+        <div class="nav-item" data-view="settings">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>系统设置</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="storage-info">
+        <div class="storage-label">
+          <span>存储容量</span>
+          <span>67%</span>
+        </div>
+        <div class="storage-bar">
+          <div class="storage-fill"></div>
+        </div>
+        <div class="storage-text">2.1 GB / 3.2 GB</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="page-title" id="pageTitle">仪表盘概览</div>
+      <div class="topbar-search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" placeholder="搜索资产编号、名称、部门...">
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" title="通知">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-dot"></span>
+        </button>
+        <button class="topbar-btn" title="帮助">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+        <div class="user-profile">
+          <div class="user-avatar">ZL</div>
+          <div class="user-info">
+            <span class="user-name">张立恒</span>
+            <span class="user-role">资产管理员</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+      
+      <!-- DASHBOARD VIEW -->
+      <div class="view active" id="view-dashboard">
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card stagger-1" style="--card-accent: #f59e0b;">
+            <div class="kpi-header">
+              <div class="kpi-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+              </div>
+              <div class="kpi-trend up">↑ 12.4%</div>
+            </div>
+            <div class="kpi-value">248</div>
+            <div class="kpi-label">资产总数</div>
+            <div class="kpi-footnote">本月新增 28 项资产</div>
+          </div>
+
+          <div class="kpi-card stagger-2" style="--card-accent: #22c55e;">
+            <div class="kpi-header">
+              <div class="kpi-icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div class="kpi-trend up">↑ 5.2%</div>
+            </div>
+            <div class="kpi-value">186</div>
+            <div class="kpi-label">在用资产</div>
+            <div class="kpi-footnote">占比 75.0%，使用率良好</div>
+          </div>
+
+          <div class="kpi-card stagger-3" style="--card-accent: #3b82f6;">
+            <div class="kpi-header">
+              <div class="kpi-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div class="kpi-trend down">↓ 2.1%</div>
+            </div>
+            <div class="kpi-value">¥1.86M</div>
+            <div class="kpi-label">资产总价值</div>
+            <div class="kpi-footnote">累计折旧 ¥428,500</div>
+          </div>
+
+          <div class="kpi-card stagger-4" style="--card-accent: #a855f7;">
+            <div class="kpi-header">
+              <div class="kpi-icon" style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div class="kpi-trend up">↑ 18.7%</div>
+            </div>
+            <div class="kpi-value">56</div>
+            <div class="kpi-label">本月出入库</div>
+            <div class="kpi-footnote">入库 32 / 出库 24</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-card stagger-5">
+            <div class="chart-header">
+              <div class="chart-title">出入库趋势</div>
+              <div class="chart-tabs">
+                <div class="chart-tab active">周</div>
+                <div class="chart-tab">月</div>
+                <div class="chart-tab">季</div>
+                <div class="chart-tab">年</div>
+              </div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-group">
+                <div class="bar" style="height: 45%;"><span class="bar-value">12</span></div>
+                <span class="bar-label">周一</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 65%;"><span class="bar-value">18</span></div>
+                <span class="bar-label">周二</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 35%;"><span class="bar-value">9</span></div>
+                <span class="bar-label">周三</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 80%;"><span class="bar-value">22</span></div>
+                <span class="bar-label">周四</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 55%;"><span class="bar-value">15</span></div>
+                <span class="bar-label">周五</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 20%;"><span class="bar-value">5</span></div>
+                <span class="bar-label">周六</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar" style="height: 10%;"><span class="bar-value">2</span></div>
+                <span class="bar-label">周日</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card stagger-6">
+            <div class="chart-header">
+              <div class="chart-title">资产分类</div>
+            </div>
+            <div class="donut-wrapper">
+              <div class="donut-chart">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="16"/>
+                  <circle cx="80" cy="80" r="60" fill="none" stroke="#f59e0b" stroke-width="16" stroke-dasharray="169.6 377.1" stroke-linecap="round"/>
+                  <circle cx="80" cy="80" r="60" fill="none" stroke="#14b8a6" stroke-width="16" stroke-dasharray="94.2 377.1" stroke-dashoffset="-169.6" stroke-linecap="round"/>
+                  <circle cx="80" cy="80" r="60" fill="none" stroke="#3b82f6" stroke-width="16" stroke-dasharray="67.9 377.1" stroke-dashoffset="-263.8" stroke-linecap="round"/>
+                  <circle cx="80" cy="80" r="60" fill="none" stroke="#a855f7" stroke-width="16" stroke-dasharray="45.2 377.1" stroke-dashoffset="-331.7" stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-total">248</div>
+                  <div class="donut-label">总资产</div>
+                </div>
+              </div>
+            </div>
+            <div class="legend-list">
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #f59e0b;"></span>
+                <span class="legend-label">电子设备</span>
+                <span class="legend-value">92</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #14b8a6;"></span>
+                <span class="legend-label">办公家具</span>
+                <span class="legend-value">56</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #3b82f6;"></span>
+                <span class="legend-label">机器设备</span>
+                <span class="legend-value">41</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background: #a855f7;"></span>
+                <span class="legend-label">交通工具</span>
+                <span class="legend-value">27</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="bottom-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">最近动态</div>
+              <button class="btn-secondary btn" style="padding: 5px 12px; font-size: 11px;">查看全部</button>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon in">↓</div>
+                <div class="activity-content">
+                  <div class="activity-title">MacBook Pro 16" 入库</div>
+                  <div class="activity-desc">采购入库 · 供应商：苹果中国 · 数量：5台</div>
+                </div>
+                <div class="activity-time">10分钟前</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon out">↑</div>
+                <div class="activity-content">
+                  <div class="activity-title">戴尔显示器 U2723QE 出库</div>
+                  <div class="activity-desc">领用人：李明 · 部门：研发部 · 数量：2台</div>
+                </div>
+                <div class="activity-time">25分钟前</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon transfer">⇄</div>
+                <div class="activity-content">
+                  <div class="activity-title">办公椅 部门调拨</div>
+                  <div class="activity-desc">从：行政部 → 到：市场部 · 数量：8把</div>
+                </div>
+                <div class="activity-time">1小时前</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon in">↓</div>
+                <div class="activity-content">
+                  <div class="activity-title"> Herman Miller 人体工学椅 入库</div>
+                  <div class="activity-desc">采购入库 · 供应商：赫曼米勒 · 数量：12把</div>
+                </div>
+                <div class="activity-time">2小时前</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon out">↑</div>
+                <div class="activity-content">
+                  <div class="activity-title">投影仪 Epson CB-X50 出库</div>
+                  <div class="activity-desc">领用人：王芳 · 部门：销售部 · 数量：1台</div>
+                </div>
+                <div class="activity-time">3小时前</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">资产状态分布</div>
+            </div>
+            <div class="status-grid">
+              <div class="status-item" style="--status-color: #22c55e;">
+                <div class="status-number">186</div>
+                <div class="status-label">正常使用</div>
+                <div class="status-bar-sm"><div class="status-bar-fill" style="width: 75%;"></div></div>
+              </div>
+              <div class="status-item" style="--status-color: #f59e0b;">
+                <div class="status-number">32</div>
+                <div class="status-label">库存闲置</div>
+                <div class="status-bar-sm"><div class="status-bar-fill" style="width: 13%;"></div></div>
+              </div>
+              <div class="status-item" style="--status-color: #3b82f6;">
+                <div class="status-number">18</div>
+                <div class="status-label">维修中</div>
+                <div class="status-bar-sm"><div class="status-bar-fill" style="width: 7%;"></div></div>
+              </div>
+              <div class="status-item" style="--status-color: #64748b;">
+                <div class="status-number">12</div>
+                <div class="status-label">已报废</div>
+                <div class="status-bar-sm"><div class="status-bar-fill" style="width: 5%;"></div></div>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">本月预警</div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(239, 68, 68, 0.06); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.15);">
+                  <span style="color: #ef4444; font-size: 16px;">⚠</span>
+                  <div>
+                    <div style="font-size: 12px; font-weight: 500;">6 项资产过保</div>
+                    <div style="font-size: 10px; color: var(--text-muted);">需要及时处理续保或报废</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(245, 158, 11, 0.06); border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.15);">
+                  <span style="color: #f59e0b; font-size: 16px;">⚡</span>
+                  <div>
+                    <div style="font-size: 12px; font-weight: 500;">3 项资产即将到期</div>
+                    <div style="font-size: 10px; color: var(--text-muted);">保修期将在 30 天内到期</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASSETS VIEW -->
+      <div class="view" id="view-assets">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">资产管理</div>
+            <div style="font-size: 12px; color: var(--text-muted);">共 248 项固定资产，总价值 ¥1,860,000</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              导出
+            </button>
+            <button class="btn btn-primary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              新增资产
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-search">
+            <svg class="filter-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" placeholder="搜索资产编号、名称、序列号...">
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">分类</span>
+            <select class="filter-select">
+              <option>全部分类</option>
+              <option>电子设备</option>
+              <option>办公家具</option>
+              <option>机器设备</option>
+              <option>交通工具</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">状态</span>
+            <select class="filter-select">
+              <option>全部状态</option>
+              <option>正常使用</option>
+              <option>库存闲置</option>
+              <option>维修中</option>
+              <option>已报废</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">部门</span>
+            <select class="filter-select">
+              <option>全部部门</option>
+              <option>研发部</option>
+              <option>市场部</option>
+              <option>财务部</option>
+              <option>行政部</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>资产编号</th>
+                <th>资产名称</th>
+                <th>分类</th>
+                <th>使用部门</th>
+                <th>状态</th>
+                <th>购置价值</th>
+                <th>购入日期</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="asset-code">AST-2024-001</span></td>
+                <td>
+                  <div class="asset-name">MacBook Pro 16" M3 Max</div>
+                  <div class="asset-category">SN: FVFGYXXXX</div>
+                </td>
+                <td>电子设备</td>
+                <td>研发部</td>
+                <td><span class="status-badge in-use">使用中</span></td>
+                <td><span class="price-value">¥29,999</span></td>
+                <td>2024-03-15</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn" title="查看">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button class="table-btn" title="编辑">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="table-btn" title="更多">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2024-002</span></td>
+                <td>
+                  <div class="asset-name">戴尔 U2723QE 显示器</div>
+                  <div class="asset-category">SN: CN0XXXX</div>
+                </td>
+                <td>电子设备</td>
+                <td>研发部</td>
+                <td><span class="status-badge in-use">使用中</span></td>
+                <td><span class="price-value">¥4,299</span></td>
+                <td>2024-02-20</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2024-003</span></td>
+                <td>
+                  <div class="asset-name">Herman Miller Aeron 椅</div>
+                  <div class="asset-category">SN: HM-AER-0034</div>
+                </td>
+                <td>办公家具</td>
+                <td>行政部</td>
+                <td><span class="status-badge active">库存中</span></td>
+                <td><span class="price-value">¥12,800</span></td>
+                <td>2024-01-10</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2023-156</span></td>
+                <td>
+                  <div class="asset-name">佳能 imageRUNNER 复印机</div>
+                  <div class="asset-category">SN: IR-2923-778</div>
+                </td>
+                <td>机器设备</td>
+                <td>行政部</td>
+                <td><span class="status-badge maintenance">维修中</span></td>
+                <td><span class="price-value">¥28,500</span></td>
+                <td>2023-08-05</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2023-089</span></td>
+                <td>
+                  <div class="asset-name">别克 GL8 商务车</div>
+                  <div class="asset-category">车牌号：沪A·XXXXX</div>
+                </td>
+                <td>交通工具</td>
+                <td>行政部</td>
+                <td><span class="status-badge in-use">使用中</span></td>
+                <td><span class="price-value">¥358,000</span></td>
+                <td>2023-05-12</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2024-045</span></td>
+                <td>
+                  <div class="asset-name">iPhone 15 Pro Max 256G</div>
+                  <div class="asset-category">SN: DNXXXXXXX</div>
+                </td>
+                <td>电子设备</td>
+                <td>销售部</td>
+                <td><span class="status-badge in-use">使用中</span></td>
+                <td><span class="price-value">¥9,999</span></td>
+                <td>2024-04-01</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">AST-2022-023</span></td>
+                <td>
+                  <div class="asset-name">惠普 LaserJet 打印机</div>
+                  <div class="asset-category">SN: VNB3XXXXX</div>
+                </td>
+                <td>机器设备</td>
+                <td>财务部</td>
+                <td><span class="status-badge retired">已报废</span></td>
+                <td><span class="price-value">¥3,200</span></td>
+                <td>2022-03-18</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                    <button class="table-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <div class="pagination-info">显示 <strong>1-7</strong> 条，共 <strong>248</strong> 条记录</div>
+            <div class="pagination-controls">
+              <button class="page-btn" disabled>上一页</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">...</button>
+              <button class="page-btn">36</button>
+              <button class="page-btn">下一页</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STOCK IN/OUT VIEW -->
+      <div class="view" id="view-stock">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">出入库管理</div>
+            <div style="font-size: 12px; color: var(--text-muted);">快速处理资产的入库、出库与调拨操作</div>
+          </div>
+        </div>
+
+        <div class="stock-layout">
+          <!-- Stock In Form -->
+          <div class="form-card">
+            <div class="form-title">
+              <div class="form-title-icon in">↓</div>
+              <span>资产入库</span>
+            </div>
+
+            <div class="scan-section">
+              <div class="scan-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                  <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                  <path d="M7 8v8"/><path d="M11 8v8"/><path d="M15 8v8"/><path d="M19 8v8"/>
+                </svg>
+              </div>
+              <div class="scan-text">
+                <div class="scan-title">扫码快速入库</div>
+                <div class="scan-desc">扫描资产条码自动填充信息</div>
+              </div>
+              <button class="scan-btn">扫码</button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">资产编号 <span class="req">*</span></label>
+                <input type="text" class="form-input" placeholder="AST-2024-XXX">
+              </div>
+              <div class="form-group">
+                <label class="form-label">资产分类 <span class="req">*</span></label>
+                <select class="form-select">
+                  <option>请选择分类</option>
+                  <option>电子设备</option>
+                  <option>办公家具</option>
+                  <option>机器设备</option>
+                  <option>交通工具</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">资产名称 <span class="req">*</span></label>
+              <input type="text" class="form-input" placeholder="输入资产名称">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">数量 <span class="req">*</span></label>
+                <input type="number" class="form-input" value="1" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">单价 (元)</label>
+                <input type="number" class="form-input" placeholder="0.00">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">入库类型 <span class="req">*</span></label>
+                <select class="form-select">
+                  <option>采购入库</option>
+                  <option>调拨入库</option>
+                  <option>归还入库</option>
+                  <option>盘盈入库</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">供应商</label>
+                <input type="text" class="form-input" placeholder="供应商名称">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">存放位置</label>
+              <select class="form-select">
+                <option>总仓 - A区</option>
+                <option>总仓 - B区</option>
+                <option>分仓 - 研发楼</option>
+                <option>分仓 - 行政楼</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">备注</label>
+              <textarea class="form-textarea" placeholder="输入备注信息..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-secondary">重置</button>
+              <button class="btn btn-primary">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                确认入库
+              </button>
+            </div>
+          </div>
+
+          <!-- Stock Out Form -->
+          <div class="form-card">
+            <div class="form-title">
+              <div class="form-title-icon out">↑</div>
+              <span>资产出库</span>
+            </div>
+
+            <div class="scan-section" style="border-color: rgba(239, 68, 68, 0.25);">
+              <div class="scan-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                  <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                  <path d="M7 8v8"/><path d="M11 8v8"/><path d="M15 8v8"/><path d="M19 8v8"/>
+                </svg>
+              </div>
+              <div class="scan-text">
+                <div class="scan-title">扫码快速出库</div>
+                <div class="scan-desc">扫描资产条码自动识别信息</div>
+              </div>
+              <button class="scan-btn" style="background: #ef4444;">扫码</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">选择资产 <span class="req">*</span></label>
+              <select class="form-select">
+                <option>请选择要出库的资产</option>
+                <option>AST-2024-001 - MacBook Pro 16"</option>
+                <option>AST-2024-002 - 戴尔 U2723QE 显示器</option>
+                <option>AST-2024-003 - Herman Miller Aeron 椅</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">出库数量 <span class="req">*</span></label>
+                <input type="number" class="form-input" value="1" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">出库类型 <span class="req">*</span></label>
+                <select class="form-select">
+                  <option>领用出库</option>
+                  <option>调拨出库</option>
+                  <option>报废出库</option>
+                  <option>维修出库</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">领用人 <span class="req">*</span></label>
+                <input type="text" class="form-input" placeholder="输入领用人姓名">
+              </div>
+              <div class="form-group">
+                <label class="form-label">所属部门 <span class="req">*</span></label>
+                <select class="form-select">
+                  <option>请选择部门</option>
+                  <option>研发部</option>
+                  <option>市场部</option>
+                  <option>财务部</option>
+                  <option>行政部</option>
+                  <option>销售部</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">预计归还日期</label>
+              <input type="date" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">出库事由</label>
+              <textarea class="form-textarea" placeholder="请描述出库原因..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-secondary">重置</button>
+              <button class="btn btn-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #ef4444; box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17L17 7"/><path d="M7 7h10v10"/>
+                </svg>
+                确认出库
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="transactions-card">
+          <div class="transactions-header">
+            <div class="transactions-title">今日出入库记录</div>
+            <div class="chart-tabs">
+              <div class="chart-tab active">今日</div>
+              <div class="chart-tab">本周</div>
+              <div class="chart-tab">本月</div>
+            </div>
+          </div>
+          <div class="transactions-list">
+            <div class="tx-item">
+              <div class="tx-type in">↓</div>
+              <div class="tx-info">
+                <div class="tx-asset">MacBook Pro 16" M3 Max × 5</div>
+                <div class="tx-meta">
+                  <span>📦 采购入库</span>
+                  <span>🏢 苹果中国</span>
+                  <span>👤 张立恒</span>
+                </div>
+              </div>
+              <div class="tx-amount in">+¥149,995</div>
+            </div>
+            <div class="tx-item">
+              <div class="tx-type out">↑</div>
+              <div class="tx-info">
+                <div class="tx-asset">戴尔 U2723QE 显示器 × 2</div>
+                <div class="tx-meta">
+                  <span>👤 领用出库</span>
+                  <span>🧑 李明</span>
+                  <span>🏢 研发部</span>
+                </div>
+              </div>
+              <div class="tx-amount out">-¥8,598</div>
+            </div>
+            <div class="tx-item">
+              <div class="tx-type transfer">⇄</div>
+              <div class="tx-info">
+                <div class="tx-asset">办公椅 × 8</div>
+                <div class="tx-meta">
+                  <span>🔄 部门调拨</span>
+                  <span>行政部 → 市场部</span>
+                  <span>👤 王芳</span>
+                </div>
+              </div>
+              <div class="tx-amount" style="color: var(--accent-blue);">调拨</div>
+            </div>
+            <div class="tx-item">
+              <div class="tx-type in">↓</div>
+              <div class="tx-info">
+                <div class="tx-asset">Herman Miller Aeron 椅 × 12</div>
+                <div class="tx-meta">
+                  <span>📦 采购入库</span>
+                  <span>🏢 赫曼米勒</span>
+                  <span>👤 张立恒</span>
+                </div>
+              </div>
+              <div class="tx-amount in">+¥153,600</div>
+            </div>
+            <div class="tx-item">
+              <div class="tx-type out">↑</div>
+              <div class="tx-info">
+                <div class="tx-asset">Epson CB-X50 投影仪 × 1</div>
+                <div class="tx-meta">
+                  <span>👤 领用出库</span>
+                  <span>🧑 王芳</span>
+                  <span>🏢 销售部</span>
+                </div>
+              </div>
+              <div class="tx-amount out">-¥5,299</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS VIEW (placeholder) -->
+      <div class="view" id="view-transactions">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">交易记录</div>
+            <div style="font-size: 12px; color: var(--text-muted);">所有资产出入库及调拨历史记录</div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>流水号</th>
+                <th>类型</th>
+                <th>资产名称</th>
+                <th>数量</th>
+                <th>金额</th>
+                <th>操作人</th>
+                <th>时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="asset-code">TX-20241110-001</span></td>
+                <td><span class="status-badge active">入库</span></td>
+                <td>MacBook Pro 16" M3 Max</td>
+                <td>5</td>
+                <td><span class="price-value">¥149,995</span></td>
+                <td>张立恒</td>
+                <td>2024-11-10 09:32</td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">TX-20241110-002</span></td>
+                <td><span class="status-badge maintenance">出库</span></td>
+                <td>戴尔 U2723QE 显示器</td>
+                <td>2</td>
+                <td><span class="price-value">¥8,598</span></td>
+                <td>张立恒</td>
+                <td>2024-11-10 10:15</td>
+              </tr>
+              <tr>
+                <td><span class="asset-code">TX-20241110-003</span></td>
+                <td><span class="status-badge in-use">调拨</span></td>
+                <td>办公椅</td>
+                <td>8</td>
+                <td><span class="price-value">—</span></td>
+                <td>王芳</td>
+                <td>2024-11-10 11:00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REPORTS VIEW (placeholder) -->
+      <div class="view" id="view-reports">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">统计报表</div>
+            <div style="font-size: 12px; color: var(--text-muted);">资产数据统计与可视化分析</div>
+          </div>
+        </div>
+        <div class="chart-card" style="padding: 60px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+          <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">报表模块</div>
+          <div style="color: var(--text-muted);">详细的资产统计报表将在此展示</div>
+        </div>
+      </div>
+
+      <!-- DEPARTMENTS VIEW (placeholder) -->
+      <div class="view" id="view-departments">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">部门管理</div>
+            <div style="font-size: 12px; color: var(--text-muted);">组织架构与部门资产管理</div>
+          </div>
+        </div>
+        <div class="chart-card" style="padding: 60px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🏢</div>
+          <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">部门管理模块</div>
+          <div style="color: var(--text-muted);">部门与人员配置管理</div>
+        </div>
+      </div>
+
+      <!-- SETTINGS VIEW (placeholder) -->
+      <div class="view" id="view-settings">
+        <div class="page-header">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px;">系统设置</div>
+            <div style="font-size: 12px; color: var(--text-muted);">系统参数与偏好配置</div>
+          </div>
+        </div>
+        <div class="chart-card" style="padding: 60px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 16px;">⚙️</div>
+          <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">系统设置</div>
+          <div style="color: var(--text-muted);">资产分类、编码规则、权限配置等</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Navigation
+  const navItems = document.querySelectorAll('.nav-item[data-view]');
+  const views = document.querySelectorAll('.view');
+  const pageTitle = document.getElementById('pageTitle');
+
+  const titleMap = {
+    dashboard: '仪表盘概览',
+    assets: '资产管理',
+    stock: '出入库管理',
+    transactions: '交易记录',
+    reports: '统计报表',
+    departments: '部门管理',
+    settings: '系统设置'
+  };
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const viewId = item.dataset.view;
+      
+      navItems.forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      
+      views.forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      
+      pageTitle.textContent = titleMap[viewId] || '';
+    });
+  });
+
+  // Chart tabs
+  document.querySelectorAll('.chart-tabs').forEach(tabs => {
+    tabs.querySelectorAll('.chart-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  });
+
+  // Staggered animation on load
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.kpi-card, .chart-card, .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        el.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+
+</body>
+</html>
