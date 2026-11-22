@@ -1,0 +1,3143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>协同 OA · 办公协同平台（演示）</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231B4A85'/%3E%3Cpath d='M9 21V11l7 4 7-4v10' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ========== 设计 token ========== */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#F8FAFC; --surface-3:#F1F4F8;
+  --line:#E4E8EE; --line-strong:#D2D9E3;
+  --text:#18222E; --text-2:#5A6777; --text-3:#8B95A4;
+  --primary:#1B4A85; --primary-hover:#143C6E; --primary-soft:#EAF0F8; --primary-line:#C9D9EC;
+  --success:#1A7F4B; --success-soft:#E8F5EE; --success-line:#C7E4D5;
+  --warn:#A96500; --warn-soft:#FBF1DE; --warn-line:#EFD9B4;
+  --danger:#B42318; --danger-soft:#FCECEA; --danger-line:#F2CDC8;
+  --radius:10px; --radius-sm:7px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+  --shadow-md:0 8px 24px rgba(16,24,40,.10);
+  --shadow-lg:0 20px 56px rgba(16,24,40,.18);
+  --sidebar-w:236px; --topbar-h:60px;
+  --font:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:inherit;text-decoration:none}
+svg{display:block;flex:none}
+::selection{background:var(--primary-line)}
+h1,h2,h3,p{margin:0}
+
+/* ========== 应用外壳 ========== */
+.app{min-height:100vh}
+.web-shell{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{height:var(--topbar-h);display:flex;align-items:center;gap:10px;padding:0 18px;border-bottom:1px solid var(--line)}
+.brand-mark{width:32px;height:32px;border-radius:8px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:600;font-size:15px;letter-spacing:.02em;flex:none}
+.brand-text{min-width:0}
+.brand-name{font-size:15.5px;font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.brand-sub{font-size:10px;color:var(--text-3);letter-spacing:.18em;text-transform:uppercase;margin-top:-1px}
+.nav{flex:1;overflow-y:auto;padding:12px 12px 18px}
+.nav-group{margin-top:10px}
+.nav-group:first-child{margin-top:2px}
+.nav-group-label{font-size:11px;color:var(--text-3);letter-spacing:.08em;padding:10px 10px 6px}
+.nav-item{position:relative;display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:8px;color:var(--text-2);font-size:13.5px;text-align:left;transition:background .15s,color .15s;margin-bottom:2px}
+.nav-item svg{color:var(--text-3);transition:color .15s}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item:hover svg{color:var(--text-2)}
+.nav-item.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.nav-item.active svg{color:var(--primary)}
+.nav-item.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--primary)}
+.nav-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--danger-soft);color:var(--danger);font-size:11px;font-weight:600;display:grid;place-items:center;flex:none}
+.nav-badge.is-soft{background:var(--primary-soft);color:var(--primary)}
+.sidebar-foot{padding:14px 18px 18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--text-3);line-height:1.7}
+.sidebar-foot strong{display:block;color:var(--text-2);font-weight:600;font-size:12px}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;position:sticky;top:0;z-index:20}
+.topbar-left{display:flex;align-items:center;gap:10px;min-width:0;font-size:12.5px;color:var(--text-3);white-space:nowrap;overflow:hidden}
+.org{font-size:13.5px;font-weight:600;color:var(--text)}
+.topbar-sep{width:1px;height:16px;background:var(--line)}
+.demo-chip{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--text-2);background:var(--surface-2);white-space:nowrap}
+.topbar-right{display:flex;align-items:center;gap:12px;flex:none}
+.segmented{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px}
+.segmented button{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:7px;font-size:12.5px;color:var(--text-2);transition:.15s}
+.segmented button:hover{color:var(--text)}
+.segmented button.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.09)}
+.identity{position:relative}
+.identity-btn{display:flex;align-items:center;gap:9px;padding:4px 8px 4px 4px;border-radius:8px;transition:background .15s}
+.identity-btn:hover{background:var(--surface-2)}
+.identity-btn .meta{text-align:left;line-height:1.25}
+.identity-btn .meta b{display:block;font-size:13px;font-weight:600}
+.identity-btn .meta small{font-size:11px;color:var(--text-3)}
+.identity-btn svg{color:var(--text-3)}
+.identity-drop{position:absolute;right:0;top:calc(100% + 8px);width:280px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-md);padding:6px;z-index:40;animation:dropIn .16s ease}
+.identity-drop .drop-title{font-size:11.5px;color:var(--text-3);padding:8px 10px 6px}
+.identity-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:8px;text-align:left}
+.identity-item:hover{background:var(--surface-2)}
+.identity-item.on{background:var(--primary-soft)}
+.identity-item .meta{flex:1;min-width:0;line-height:1.3}
+.identity-item .meta b{display:block;font-size:13px;font-weight:600}
+.identity-item .meta small{font-size:11.5px;color:var(--text-3)}
+.identity-item svg{color:var(--primary)}
+
+/* ========== 内容区 ========== */
+.content{padding:26px 28px 40px;width:100%;max-width:1440px;margin:0 auto}
+.content-inner{animation:fadeUp .24s ease}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:20px}
+.page-title{font-size:23px;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.page-sub{font-size:12.5px;color:var(--text-2);margin-top:6px;line-height:1.6}
+.actions{display:flex;align-items:center;gap:10px;flex:none}
+
+/* ========== 按钮 ========== */
+.btn{height:34px;padding:0 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--primary-hover)}
+.btn-ghost{background:var(--surface);border-color:var(--line-strong);color:var(--text-2)}
+.btn-ghost:hover:not(:disabled){border-color:#B9C4D2;color:var(--text);background:var(--surface-2)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover:not(:disabled){background:#9A1D14}
+.btn-danger-ghost{background:var(--surface);border-color:var(--danger-line);color:var(--danger)}
+.btn-danger-ghost:hover{background:var(--danger-soft)}
+.btn-soft{background:var(--primary-soft);color:var(--primary);border-color:var(--primary-line)}
+.btn-soft:hover{background:#DFEAF6}
+.btn-sm{height:28px;padding:0 10px;font-size:12px;border-radius:6px}
+.btn-text{height:auto;padding:0;color:var(--primary);font-size:12.5px;font-weight:500;gap:4px}
+.btn-text:hover{text-decoration:underline}
+.icon-btn{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:var(--text-3);transition:.15s}
+.icon-btn:hover{background:var(--surface-2);color:var(--text)}
+
+/* ========== 卡片 ========== */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);min-width:0}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line);min-height:54px}
+.card-title{font-size:14px;font-weight:600;letter-spacing:.005em;display:flex;align-items:center;gap:8px}
+.card-title svg{color:var(--text-3)}
+.card-sub{font-size:11.5px;color:var(--text-3);font-weight:400}
+.card-body{padding:16px 18px}
+.card-body.flush{padding:0}
+.card-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-3)}
+
+/* ========== 统计卡 ========== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.stat-label{font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.stat-value{font-size:26px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:7px;line-height:1.2}
+.stat-value small{font-size:12px;font-weight:500;color:var(--text-3);letter-spacing:0;margin-left:3px}
+.stat-note{font-size:11.5px;color:var(--text-3);margin-top:5px}
+.stat-icon{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex:none;margin-top:2px}
+
+/* ========== 表格 ========== */
+.table-wrap{width:100%;overflow-x:auto}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{background:var(--surface-2);color:var(--text-2);font-weight:600;font-size:11.5px;letter-spacing:.02em;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.table td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.table tbody tr:nth-child(even){background:#FAFBFD}
+.table tbody tr:last-child td{border-bottom:none}
+.table tbody tr:hover{background:var(--primary-soft)}
+.table .num{font-variant-numeric:tabular-nums}
+.table .muted{color:var(--text-3);font-size:12px}
+.table-nowrap{min-width:940px}
+.table-nowrap td{white-space:nowrap}
+/* 窄屏下隐藏邮箱列，避免操作列被挤出；邮箱可在员工详情中查看 */
+@media (max-width:1379px){
+  .roster-table th:nth-child(6),.roster-table td:nth-child(6){display:none}
+}
+.cell-name{display:flex;align-items:center;gap:9px;min-width:120px}
+.cell-name b{font-size:13px;font-weight:600;white-space:nowrap}
+.cell-name small{display:block;font-size:11px;color:var(--text-3);font-weight:400}
+.cell-ellipsis{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;color:var(--text-2)}
+.row-actions{display:flex;gap:10px;align-items:center;white-space:nowrap}
+
+/* ========== 标签 ========== */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:5px;font-size:11.5px;line-height:1.7;border:1px solid transparent;white-space:nowrap;font-weight:500}
+.tag svg{width:12px;height:12px}
+.tag-success{background:var(--success-soft);color:var(--success);border-color:var(--success-line)}
+.tag-warn{background:var(--warn-soft);color:var(--warn);border-color:var(--warn-line)}
+.tag-danger{background:var(--danger-soft);color:var(--danger);border-color:var(--danger-line)}
+.tag-primary{background:var(--primary-soft);color:var(--primary);border-color:var(--primary-line)}
+.tag-neutral{background:var(--surface-3);color:var(--text-2);border-color:var(--line)}
+.tag-plain{color:var(--text-3);font-size:11.5px;font-weight:400}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block}
+
+/* ========== 工具栏 / 输入 ========== */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line)}
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.search{position:relative;display:flex;align-items:center}
+.search svg{position:absolute;left:10px;color:var(--text-3);pointer-events:none}
+.search input{height:34px;width:218px;padding:0 10px 0 32px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,74,85,.10)}
+.search input::placeholder{color:var(--text-3)}
+.select{height:34px;padding:0 28px 0 10px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B95A4' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center;appearance:none;font-size:12.5px;outline:none;color:var(--text);cursor:pointer}
+.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,74,65,.10)}
+.input{width:100%;height:36px;padding:0 11px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,74,85,.10)}
+textarea.input{height:auto;min-height:78px;padding:9px 11px;resize:vertical;line-height:1.65}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:500;color:var(--text-2)}
+.field .hint{font-size:11.5px;color:var(--text-3);line-height:1.55}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row{display:flex;gap:14px}
+.check{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-2);cursor:pointer;user-select:none}
+.check input{width:15px;height:15px;accent-color:var(--primary);margin:0;cursor:pointer}
+.radio-card{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;transition:.15s}
+.radio-card:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.radio-card.on{border-color:var(--primary);background:var(--primary-soft)}
+
+/* ========== 分页 ========== */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--text-3)}
+.pager-btns{display:flex;align-items:center;gap:4px}
+.pager-btn{min-width:28px;height:28px;padding:0 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-size:12px;color:var(--text-2);display:grid;place-items:center}
+.pager-btn:hover:not(:disabled){border-color:var(--line-strong);background:var(--surface-2)}
+.pager-btn.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+.pager-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ========== 工作台 ========== */
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
+.dash-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.clock-card .clock-body{padding:18px}
+.punch-pair{display:grid;grid-template-columns:1fr 1px 1fr;gap:14px;align-items:center}
+.punch-sep{width:1px;height:74px;background:var(--line)}
+.punch-block .k{font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.punch-block .v{font-size:25px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:4px}
+.punch-block .v small{font-size:12px;font-weight:500;color:var(--text-3);letter-spacing:0;margin-left:6px}
+.punch-block .state{font-size:11.5px;color:var(--text-3);margin-top:5px;display:flex;align-items:center;gap:5px}
+.clock-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.clock-note{display:flex;gap:7px;align-items:flex-start;font-size:11.5px;color:var(--text-3);margin-top:13px;line-height:1.6;border-top:1px dashed var(--line);padding-top:11px}
+.clock-note svg{color:var(--text-3);margin-top:1px}
+.todo-list{display:flex;flex-direction:column}
+.todo-item{display:flex;align-items:center;gap:11px;padding:12px 18px;border-bottom:1px solid var(--line);transition:background .15s}
+.todo-item:last-child{border-bottom:none}
+.todo-item:hover{background:var(--surface-2)}
+.todo-ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary);flex:none}
+.todo-ico.warn{background:var(--warn-soft);color:var(--warn)}
+.todo-ico.danger{background:var(--danger-soft);color:var(--danger)}
+.todo-main{flex:1;min-width:0}
+.todo-main b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-main small{font-size:11.5px;color:var(--text-3);display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-meta{display:flex;align-items:center;gap:10px;flex:none}
+.ann-list{display:flex;flex-direction:column}
+.ann-item{display:flex;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+.ann-item:last-child{border-bottom:none}
+.ann-item:hover{background:var(--surface-2)}
+.ann-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex:none;background:var(--line-strong)}
+.ann-dot.unread{background:var(--primary)}
+.ann-main{flex:1;min-width:0}
+.ann-main b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ann-main small{display:block;font-size:11.5px;color:var(--text-3);margin-top:3px}
+.ann-tags{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.anns-mini{font-size:11.5px;color:var(--text-3);padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.team-summary{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.team-summary > div{padding:12px 18px;border-right:1px solid var(--line)}
+.team-summary > div:last-child{border-right:none}
+.team-summary .k{font-size:11.5px;color:var(--text-3)}
+.team-summary .v{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px}
+.dept-bars{padding:14px 18px 4px;display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:72px minmax(0,1fr) 52px;align-items:center;gap:9px;font-size:12px}
+.bar-row .label{color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:7px;border-radius:4px;background:var(--surface-3);overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--primary);transform-origin:left;animation:barGrow .5s ease}
+.bar-row .val{text-align:right;color:var(--text-3);font-variant-numeric:tabular-nums;font-size:11.5px}
+.trend-wrap{padding:6px 18px 16px}
+.trend-head{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin:4px 0 8px}
+.trend-svg{width:100%;height:auto}
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 18px 16px}
+.quick-btn{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;color:var(--text-2);text-align:left;transition:.15s;background:var(--surface)}
+.quick-btn:hover{border-color:var(--primary-line);background:var(--primary-soft);color:var(--primary)}
+.quick-btn svg{color:var(--text-3)}
+.quick-btn:hover svg{color:var(--primary)}
+
+/* ========== 员工与部门 ========== */
+.split-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+.tree{padding:8px 10px 12px}
+.tree-row{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;font-size:13px;color:var(--text-2);width:100%;text-align:left}
+.tree-row:hover{background:var(--surface-2)}
+.tree-row .count{margin-left:auto;font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.tree-toggle{width:18px;height:18px;display:grid;place-items:center;color:var(--text-3);flex:none;transition:transform .15s}
+.tree-toggle.open{transform:rotate(90deg)}
+.tree-doc{width:16px;height:16px;color:var(--text-3)}
+.tree-row.root{font-weight:600;color:var(--text)}
+.dept-tag{margin-left:auto;font-size:10.5px;color:var(--text-3)}
+.pos-list{display:flex;flex-direction:column}
+.pos-row{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);font-size:12.5px}
+.pos-row:last-child{border-bottom:none}
+.pos-row .pos-name{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pos-row .pos-count{color:var(--text-3);font-size:11.5px;font-variant-numeric:tabular-nums}
+.visibility{padding:14px 18px 16px}
+.scope-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 12px;margin-bottom:14px}
+.scope-check{display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;color:var(--text-2);cursor:pointer}
+.scope-check:hover{background:var(--surface-2)}
+.scope-check input{accent-color:var(--primary);width:15px;height:15px;margin:0}
+.info-strip{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--text-3);line-height:1.6;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:9px 11px;margin-bottom:12px}
+.info-strip svg{color:var(--text-3);margin-top:1px}
+
+/* ========== 班次与考勤 ========== */
+.shift-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:14px}
+.shift-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px}
+.shift-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.shift-name{font-size:14px;font-weight:600}
+.shift-range{font-size:20px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:8px;letter-spacing:-.02em}
+.shift-range small{font-size:11.5px;color:var(--text-3);font-weight:500;margin-left:5px}
+.shift-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--text-3)}
+.shift-meta span b{color:var(--text-2);font-weight:500;margin-left:4px}
+.workday-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.week-check{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;color:var(--text-2);cursor:pointer;background:var(--surface)}
+.week-check input{accent-color:var(--primary);margin:0;width:14px;height:14px}
+.week-check.on{border-color:var(--primary-line);background:var(--primary-soft);color:var(--primary)}
+.holiday-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.holiday-chip{font-size:11.5px;padding:4px 10px;border-radius:999px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-line);display:inline-flex;gap:6px;align-items:center}
+.record-stats{display:flex;gap:18px;flex-wrap:wrap;padding:0 18px;font-size:12px;color:var(--text-3)}
+.record-stats b{font-size:18px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums;margin-right:3px}
+.status-dot{display:inline-flex;align-items:center;gap:5px;font-size:12px}
+.status-dot i{width:6px;height:6px;border-radius:50%;background:var(--text-3)}
+.status-dot.ok i{background:var(--success)}
+.status-dot.warn i{background:var(--warn)}
+.status-dot.danger i{background:var(--danger)}
+.status-dot.leave i{background:var(--primary)}
+
+/* ========== 异常处理 ========== */
+.anom-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.anom-stat{display:flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12px;color:var(--text-2);cursor:pointer;transition:.15s}
+.anom-stat b{font-size:15px;font-weight:650;color:var(--text);font-variant-numeric:tabular-nums}
+.anom-stat.on{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}
+.anom-stat.on b{color:var(--primary)}
+.anom-list{display:flex;flex-direction:column;gap:12px}
+.anom-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.anom-head{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background .15s}
+.anom-head:hover{background:var(--surface-2)}
+.anom-head .main{flex:1;min-width:0}
+.anom-head .main b{font-size:13.5px;font-weight:600}
+.anom-head .main small{display:block;font-size:11.5px;color:var(--text-3);margin-top:3px}
+.anom-head .right{display:flex;align-items:center;gap:10px;flex:none}
+.anom-chevron{color:var(--text-3);transition:transform .18s}
+.anom-card.open .anom-chevron{transform:rotate(180deg)}
+.anom-body{border-top:1px solid var(--line);padding:16px 18px;background:var(--surface-2);animation:slideDown .2s ease}
+.compare{display:grid;grid-template-columns:1fr 34px 1fr;gap:10px;align-items:stretch}
+.compare-box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.compare-box.after{border-color:var(--success-line);background:#FBFEFC}
+.compare-box .k{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text-3);margin-bottom:8px}
+.compare-box.after .k{color:var(--success)}
+.kv-line{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:3px 0;color:var(--text-2)}
+.kv-line b{font-weight:500;color:var(--text);text-align:right}
+.compare-arrow{display:grid;place-items:center;color:var(--text-3)}
+.reason-line{font-size:12.5px;color:var(--text-2);margin-top:14px;line-height:1.7}
+.reason-line b{color:var(--text);font-weight:600}
+.log-block{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+.log-title{font-size:11.5px;color:var(--text-3);margin-bottom:9px;letter-spacing:.04em}
+.log-list{display:flex;flex-direction:column;gap:0}
+.log-item{display:flex;gap:10px;font-size:12px;padding:5px 0;position:relative}
+.log-time{color:var(--text-3);font-variant-numeric:tabular-nums;flex:none;width:120px;font-size:11.5px;padding-top:1px}
+.log-dot{width:7px;height:7px;border-radius:50%;background:var(--primary-line);flex:none;margin-top:7px}
+.log-text{color:var(--text-2)}
+.log-text b{color:var(--text);font-weight:600}
+.anom-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:15px;padding-top:14px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+/* ========== 请假 ========== */
+.tabs{display:flex;gap:2px;padding:10px 14px 0;border-bottom:1px solid var(--line);background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;overflow-x:auto}
+.tab{position:relative;padding:9px 13px 11px;font-size:13px;color:var(--text-2);white-space:nowrap;display:flex;align-items:center;gap:6px;border-radius:6px 6px 0 0}
+.tab:hover{color:var(--text);background:var(--surface-2)}
+.tab.on{color:var(--primary);font-weight:600}
+.tab.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:var(--primary);border-radius:1px}
+.tab .count{font-size:10.5px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--surface-3);color:var(--text-3);display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.tab.on .count{background:var(--primary-soft);color:var(--primary)}
+.leave-type{display:flex;align-items:center;gap:8px;min-width:96px}
+.type-ico{width:26px;height:26px;border-radius:7px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex:none}
+.type-ico.warn{background:var(--warn-soft);color:var(--warn)}
+.type-ico.success{background:var(--success-soft);color:var(--success)}
+.type-ico.neutral{background:var(--surface-3);color:var(--text-2)}
+.type-ico.danger{background:var(--danger-soft);color:var(--danger)}
+.duration-cell b{font-variant-numeric:tabular-nums;font-weight:600}
+.duration-cell small{display:block;color:var(--text-3);font-size:11px;margin-top:1px}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.balance{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.balance .k{font-size:11.5px;color:var(--text-3)}
+.balance .v{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px}
+.balance .v small{font-size:11px;color:var(--text-3);font-weight:400;margin-left:2px}
+
+/* ========== 考勤联动 ========== */
+.link-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+.timeline-bar{position:relative;height:36px;background:var(--surface-3);border-radius:7px;margin:14px 0 6px;overflow:hidden}
+.timeline-bar .seg{position:absolute;top:4px;bottom:4px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#fff;background:var(--primary);white-space:nowrap;overflow:hidden;padding:0 6px}
+.timeline-bar .seg.b{background:#4C7CAF}
+.timeline-scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-3)}
+.merge-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.merge-table th{font-size:11.5px;color:var(--text-2);text-align:left;padding:8px 10px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.merge-table td{padding:9px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.result-callout{display:flex;align-items:center;gap:10px;background:var(--success-soft);border:1px solid var(--success-line);border-radius:8px;padding:11px 13px;font-size:12.5px;color:var(--success);margin-top:12px}
+.result-callout b{font-weight:650;font-size:15px}
+.night-note{font-size:12px;color:var(--text-2);line-height:1.8}
+.night-note strong{color:var(--text)}
+.formula{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px 11px;color:var(--text-2);margin:8px 0;overflow-x:auto;white-space:nowrap}
+
+/* ========== 公告 ========== */
+.ann-row{display:flex;align-items:flex-start;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+.ann-row:hover{background:var(--surface-2)}
+.ann-row:last-child{border-bottom:none}
+.ann-level-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;margin-top:2px}
+.ann-level-ico.普通{background:var(--surface-3);color:var(--text-2)}
+.ann-level-ico.重要{background:var(--warn-soft);color:var(--warn)}
+.ann-level-ico.紧急{background:var(--danger-soft);color:var(--danger)}
+.ann-level-ico.草稿{background:var(--surface-3);color:var(--text-3)}
+.ann-row .main{flex:1;min-width:0}
+.ann-row .title-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ann-row .title-line b{font-size:13.5px;font-weight:600}
+.ann-row .title-line b.unread{color:var(--text)}
+.ann-row .summary{font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ann-row .meta{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-3);margin-top:8px;flex-wrap:wrap}
+.ann-row .meta span{display:inline-flex;align-items:center;gap:4px}
+.ann-row .side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.read-ratio{font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.read-bar{width:72px;height:4px;border-radius:2px;background:var(--surface-3);overflow:hidden;margin-top:3px}
+.read-bar i{display:block;height:100%;background:var(--primary);border-radius:2px}
+.pin-flag{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;color:var(--primary);background:var(--primary-soft);border:1px solid var(--primary-line);padding:1px 6px;border-radius:4px}
+.ann-content{font-size:13px;line-height:1.9;color:var(--text-2)}
+.ann-content p{margin:0 0 10px}
+.ann-content p:last-child{margin-bottom:0}
+
+/* ========== 设置 / 权限 ========== */
+.matrix{width:100%;border-collapse:collapse;font-size:12.5px}
+.matrix th{background:var(--surface-2);font-size:11.5px;color:var(--text-2);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);text-align:center}
+.matrix th:first-child{text-align:left}
+.matrix td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:center;color:var(--text-2)}
+.matrix td:first-child{text-align:left;color:var(--text);font-weight:500}
+.matrix tbody tr:last-child td{border-bottom:none}
+.matrix tbody tr:nth-child(even){background:#FAFBFD}
+.matrix .yes{color:var(--success);font-weight:600}
+.matrix .no{color:var(--text-3)}
+.matrix .part{color:var(--warn);font-weight:600}
+.identity-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.id-card{display:flex;align-items:center;gap:11px;padding:13px 14px;border:1px solid var(--line);border-radius:9px;background:var(--surface);text-align:left;cursor:pointer;transition:.15s;position:relative}
+.id-card:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.id-card.on{border-color:var(--primary);background:var(--primary-soft)}
+.id-card .meta{flex:1;min-width:0}
+.id-card .meta b{font-size:13px;font-weight:600;display:block}
+.id-card .meta small{font-size:11.5px;color:var(--text-3)}
+.id-card.on .check-badge{opacity:1}
+.check-badge{position:absolute;right:10px;top:10px;color:var(--primary);opacity:0;transition:.15s}
+.danger-zone{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.danger-zone .meta{max-width:560px}
+.danger-zone .meta b{font-size:13px;font-weight:600;display:block;margin-bottom:3px}
+.danger-zone .meta small{font-size:12px;color:var(--text-3);line-height:1.6}
+
+/* ========== 遮罩 / 抽屉 / 弹窗 / Toast ========== */
+.overlay{position:fixed;inset:0;background:rgba(16,24,40,.38);backdrop-filter:blur(1.5px);z-index:60;display:flex;justify-content:flex-end;animation:fade .16s ease}
+.drawer{width:452px;max-width:94vw;background:var(--surface);height:100%;display:flex;flex-direction:column;box-shadow:-12px 0 36px rgba(16,24,40,.14);animation:slideIn .22s cubic-bezier(.2,.7,.3,1)}
+.drawer-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.drawer-title{font-size:16px;font-weight:650}
+.drawer-sub{font-size:12px;color:var(--text-3);margin-top:4px}
+.drawer-body{flex:1;overflow-y:auto;padding:18px 22px}
+.drawer-foot{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;background:var(--surface)}
+.modal-wrap{position:fixed;inset:0;background:rgba(16,24,40,.38);backdrop-filter:blur(1.5px);z-index:65;display:flex;align-items:center;justify-content:center;padding:24px;animation:fade .16s ease}
+.modal{width:560px;max-width:96vw;max-height:88vh;background:var(--surface);border-radius:12px;box-shadow:var(--shadow-lg);display:flex;flex-direction:column;animation:pop .2s cubic-bezier(.2,.8,.3,1);overflow:hidden}
+.modal-head{padding:18px 22px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:16px;font-weight:650}
+.modal-sub{font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.5}
+.modal-body{padding:18px 22px;overflow-y:auto;flex:1}
+.modal-foot{padding:13px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;background:var(--surface)}
+.emp-hero{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.emp-hero .name{font-size:17px;font-weight:650;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.emp-hero .sub{font-size:12px;color:var(--text-3);margin-top:4px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-bottom:18px}
+.detail-item .k{font-size:11.5px;color:var(--text-3);margin-bottom:3px}
+.detail-item .v{font-size:13px;color:var(--text);word-break:break-all}
+.mini-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.mini-stat > div{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.mini-stat .k{font-size:11px;color:var(--text-3)}
+.mini-stat .v{font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px}
+.approval-timeline{display:flex;flex-direction:column;position:relative;padding-left:18px;margin-top:6px}
+.approval-timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line)}
+.tl-item{position:relative;padding:0 0 16px 0;font-size:12px}
+.tl-item:last-child{padding-bottom:0}
+.tl-item::before{content:"";position:absolute;left:-17px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--surface);border:2px solid var(--line-strong)}
+.tl-item.done::before{border-color:var(--success);background:var(--success)}
+.tl-item.now::before{border-color:var(--primary);background:var(--primary)}
+.tl-item b{display:block;font-size:12.5px;font-weight:600}
+.tl-item small{display:block;color:var(--text-3);font-size:11px;margin-top:2px;line-height:1.6}
+.tl-item .comment{margin-top:5px;font-size:11.5px;color:var(--text-2);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:5px 8px;line-height:1.55}
+#toastLayer{position:fixed;right:22px;bottom:22px;z-index:95;display:flex;flex-direction:column;gap:9px;pointer-events:none;max-width:min(360px,90vw)}
+.toast{display:flex;align-items:flex-start;gap:9px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:8px;padding:10px 13px;font-size:12.5px;line-height:1.55;box-shadow:0 10px 30px rgba(16,24,40,.16);animation:toastIn .24s cubic-bezier(.2,.8,.3,1);color:var(--text)}
+.toast.success{border-left-color:var(--success)}
+.toast.warn{border-left-color:var(--warn)}
+.toast.danger{border-left-color:var(--danger)}
+.toast svg{flex:none;margin-top:2px;color:var(--primary)}
+.toast.success svg{color:var(--success)}
+.toast.warn svg{color:var(--warn)}
+.toast.danger svg{color:var(--danger)}
+.empty{padding:40px 20px;text-align:center;color:var(--text-3);font-size:12.5px}
+.empty-ico{width:46px;height:46px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 12px;color:var(--text-3)}
+
+/* ========== 移动端预览 ========== */
+.stage{min-height:100vh;background:radial-gradient(1200px 600px at 20% -10%,#E8EEF6 0%,transparent 60%),radial-gradient(900px 500px at 90% 110%,#E6ECF4 0%,transparent 55%),var(--bg);display:flex;flex-direction:column}
+.stage-topbar{height:var(--topbar-h);background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;position:sticky;top:0;z-index:30}
+.stage-body{flex:1;display:flex;align-items:center;justify-content:center;gap:56px;padding:26px 28px 36px}
+.stage-caption{width:290px;flex:none;padding-bottom:20px}
+.stage-kicker{font-size:11px;letter-spacing:.16em;color:var(--text-3);text-transform:uppercase;margin-bottom:10px}
+.stage-caption h2{font-size:24px;font-weight:650;letter-spacing:-.01em;line-height:1.35;margin-bottom:10px}
+.stage-caption p{font-size:12.5px;color:var(--text-2);line-height:1.8}
+.stage-points{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+.stage-point{display:flex;gap:10px;font-size:12px;color:var(--text-2);line-height:1.6}
+.stage-point .ico{width:26px;height:26px;border-radius:7px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--primary);flex:none}
+.phone{width:406px;height:768px;background:#111A24;border-radius:44px;padding:11px;box-shadow:0 30px 90px rgba(16,24,40,.28),0 0 0 1px rgba(255,255,255,.06) inset;flex:none;position:relative}
+.phone::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:11px;width:120px;height:4px;border-radius:2px;background:rgba(255,255,255,.28);z-index:8}
+.phone-screen{width:100%;height:100%;border-radius:33px;background:var(--bg);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.status-bar{height:46px;padding:12px 24px 0;display:flex;align-items:center;justify-content:space-between;flex:none;color:var(--text)}
+.status-time{font-size:12.5px;font-weight:600;letter-spacing:.02em}
+.status-icons{display:flex;align-items:center;gap:5px;color:var(--text)}
+.status-icons svg{width:15px;height:15px}
+.m-header{padding:2px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none}
+.m-header .mtitle{font-size:19px;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.m-header .msub{font-size:11px;color:var(--text-3);margin-top:2px}
+.m-header .hbtns{display:flex;align-items:center;gap:6px}
+.m-avatar-btn{display:flex;align-items:center;gap:6px;padding:3px 5px 3px 3px;border-radius:8px}
+.m-avatar-btn:hover{background:var(--surface)}
+.m-content{flex:1;overflow-y:auto;padding:2px 14px 18px;scrollbar-width:none}
+.m-content::-webkit-scrollbar{display:none}
+.m-tabbar{height:60px;flex:none;border-top:1px solid var(--line);background:var(--surface);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 4px 6px;position:relative;z-index:6}
+.m-tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--text-3);padding-top:6px;height:100%;justify-content:center}
+.m-tab.on{color:var(--primary);font-weight:600}
+.m-tab svg{width:20px;height:20px}
+.m-tab .dotbadge{position:absolute;top:8px;margin-left:16px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+.m-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:11px}
+.m-card.tight{padding:13px 14px}
+.m-row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.m-label{font-size:11.5px;color:var(--text-3)}
+.m-hi{font-size:17px;font-weight:650;letter-spacing:-.01em}
+.m-sub{font-size:11.5px;color:var(--text-3);margin-top:3px}
+.m-greeting{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:4px 2px 13px}
+.m-clock{position:relative;overflow:hidden}
+.punch-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 2px}
+.punch{width:124px;height:124px;border-radius:50%;background:var(--primary);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 12px 26px rgba(27,74,133,.3);position:relative;transition:transform .12s,background .2s}
+.punch span.big{font-size:17px;font-weight:650;letter-spacing:.02em}
+.punch span.small{font-size:10.5px;opacity:.82}
+.punch::before{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(27,74,133,.22)}
+.punch::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(27,74,133,.14);animation:ringPulse 2.6s ease-out infinite}
+.punch:active{transform:scale(.97)}
+.punch.done{background:var(--success);box-shadow:0 12px 26px rgba(26,127,75,.24)}
+.punch.done::before{border-color:rgba(26,127,75,.25)}
+.punch.done::after{animation:none;border-color:rgba(26,127,75,.16)}
+.punch.loading{background:var(--primary-hover);pointer-events:none}
+.punch.loading::after{animation:none}
+.punch-state{font-size:11.5px;color:var(--text-3);margin-top:12px;display:flex;align-items:center;gap:5px}
+.punch-state.ok{color:var(--success);font-weight:500}
+.m-loc{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-2);margin-top:8px}
+.m-loc svg{width:13px;height:13px;color:var(--text-3)}
+.m-loc .ok{color:var(--success);font-weight:500}
+.m-note{font-size:10px;color:var(--text-3);line-height:1.6;margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}
+.punch-success{display:flex;flex-direction:column;align-items:center;padding:10px 0 4px;animation:pop .3s}
+.success-ring{width:92px;height:92px;border-radius:50%;background:var(--success-soft);display:grid;place-items:center;color:var(--success);border:1px solid var(--success-line);margin-bottom:12px;animation:ringPop .5s cubic-bezier(.2,.8,.3,1.3)}
+.punch-success b{font-size:15px}
+.punch-success small{font-size:11.5px;color:var(--text-3);margin-top:3px}
+.m-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px}
+.m-quick-btn{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--text-2)}
+.m-quick-btn svg{width:19px;height:19px;color:var(--primary)}
+.m-quick-btn:hover{background:var(--primary-soft);border-color:var(--primary-line)}
+.m-sec-head{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 8px}
+.m-sec-head b{font-size:13px;font-weight:600}
+.m-sec-head button{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:2px}
+.m-list{display:flex;flex-direction:column}
+.m-list-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.m-list-row:last-child{border-bottom:none;padding-bottom:2px}
+.m-list-row .main{flex:1;min-width:0}
+.m-list-row .main b{font-size:12.5px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-list-row .main small{font-size:10.5px;color:var(--text-3);display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-ann-row{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.m-ann-row:last-child{border-bottom:none;padding-bottom:1px}
+.m-ann-row b{font-size:12px;font-weight:600;display:block;line-height:1.5}
+.m-ann-row small{font-size:10px;color:var(--text-3);margin-top:3px;display:block}
+.m-approval-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+.m-approval-top{display:flex;align-items:center;gap:9px}
+.m-approval-top .main{flex:1;min-width:0}
+.m-approval-top .main b{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.m-approval-top .main small{font-size:10.5px;color:var(--text-3);display:block;margin-top:2px}
+.m-kv{font-size:11.5px;color:var(--text-2);margin-top:9px;display:flex;justify-content:space-between;gap:10px}
+.m-kv span{color:var(--text-3)}
+.m-actions{display:flex;gap:8px;margin-top:12px}
+.m-actions .btn{flex:1;height:31px;font-size:12px}
+.m-comment{font-size:11px;color:var(--text-2);background:var(--surface-2);border-radius:6px;padding:7px 9px;margin-top:9px;line-height:1.6}
+.m-empty{padding:34px 10px;text-align:center;color:var(--text-3);font-size:11.5px}
+.m-empty .empty-ico{width:40px;height:40px;margin-bottom:10px}
+.m-search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 11px;height:36px;margin-bottom:11px}
+.m-search svg{color:var(--text-3);width:16px;height:16px}
+.m-search input{flex:1;border:0;outline:none;background:transparent;font-size:12px;height:100%}
+.m-group-title{font-size:10.5px;color:var(--text-3);letter-spacing:.04em;padding:10px 4px 4px;display:flex;justify-content:space-between}
+.m-contact-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)}
+.m-contact-row:last-child{border-bottom:none}
+.m-contact-row .meta{flex:1;min-width:0}
+.m-contact-row .meta b{font-size:12.5px;font-weight:600;display:block}
+.m-contact-row .meta small{font-size:10.5px;color:var(--text-3)}
+.m-contact-actions{display:flex;gap:2px}
+.m-contact-actions button{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--text-3)}
+.m-contact-actions button:hover{background:var(--surface-2);color:var(--primary)}
+.m-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.m-stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 9px;text-align:center}
+.m-stat .v{font-size:18px;font-weight:650;font-variant-numeric:tabular-nums}
+.m-stat .v small{font-size:10px;color:var(--text-3);font-weight:400;margin-left:1px}
+.m-stat .k{font-size:10px;color:var(--text-3);margin-top:1px}
+.m-balance{margin-bottom:9px}
+.m-balance .top{display:flex;justify-content:space-between;font-size:11px;color:var(--text-2);margin-bottom:4px}
+.m-balance .bar{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.m-balance .bar i{display:block;height:100%;background:var(--primary);border-radius:3px}
+.m-profile-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--text-2);width:100%;text-align:left}
+.m-profile-row:last-child{border-bottom:none}
+.m-profile-row .left{display:flex;align-items:center;gap:9px}
+.m-profile-row svg{color:var(--text-3);width:17px;height:17px}
+.m-profile-row .chev{color:var(--text-3)}
+.m-overlay{position:absolute;inset:0;background:rgba(16,24,40,.4);z-index:30;display:flex;align-items:flex-end;animation:fade .14s ease}
+.m-overlay--center{align-items:center;justify-content:center;padding:14px}
+.m-sheet{width:100%;background:var(--surface);border-radius:18px 18px 0 0;padding:12px 16px 24px;animation:sheetUp .22s cubic-bezier(.2,.8,.3,1);max-height:88%;overflow-y:auto}
+.m-sheet .sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--line-strong);margin:0 auto 14px}
+.m-sheet-title{font-size:14px;font-weight:650;margin-bottom:4px}
+.m-sheet-sub{font-size:11px;color:var(--text-3);margin-bottom:12px}
+.m-sheet-item{display:flex;align-items:center;gap:11px;width:100%;padding:12px 6px;border-bottom:1px solid var(--line);text-align:left;font-size:12.5px}
+.m-sheet-item:last-child{border-bottom:none}
+.m-sheet-item .main{flex:1;min-width:0}
+.m-sheet-item b{font-size:13px;font-weight:600;display:block}
+.m-sheet-item small{font-size:10.5px;color:var(--text-3)}
+.m-sheet-item svg{color:var(--text-3)}
+.m-overlay--center .modal{width:100%;max-height:86%;border-radius:14px}
+.m-overlay--center .modal-head{padding:15px 16px 12px}
+.m-overlay--center .modal-title{font-size:14.5px}
+.m-overlay--center .modal-body{padding:14px 16px}
+.m-overlay--center .modal-foot{padding:11px 16px}
+.m-overlay--center .modal-foot .btn{flex:1}
+.m-overlay--center .form-grid{grid-template-columns:1fr}
+.m-overlay--center .field label{font-size:11.5px}
+.phone-badge{position:absolute;left:50%;bottom:-25px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:10.5px;color:var(--text-2);box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:5px;z-index:9;white-space:nowrap}
+.phone-badge .dot{background:var(--success)}
+
+/* ========== 动画 ========== */
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes barGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ringPulse{0%{transform:scale(1);opacity:.9}70%{transform:scale(1.16);opacity:0}100%{transform:scale(1.16);opacity:0}}
+@keyframes ringPop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes sheetUp{from{transform:translateY(20px);opacity:.7}to{transform:none;opacity:1}}
+
+/* ========== 响应式 ========== */
+@media (max-width:1360px){
+  .content{padding:22px 22px 34px}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stage-caption{width:240px}
+  .stage-body{gap:36px}
+}
+@media (max-width:1180px){
+  .sidebar{--sidebar-w:212px}
+  .topbar{padding:0 18px}
+  .topbar-left .org-sub{display:none}
+  .dash-grid{grid-template-columns:minmax(0,1fr)}
+  .link-grid, .split-grid{grid-template-columns:minmax(0,1fr)}
+  .stage-caption{display:none}
+  .phone{transform:scale(.94);transform-origin:center}
+}
+@media (max-width:900px){
+  .web-shell{grid-template-columns:64px minmax(0,1fr)}
+  .brand{padding:0 15px;justify-content:center}
+  .brand-text{display:none}
+  .nav{padding:10px 8px}
+  .nav-group-label{display:none}
+  .nav-item{justify-content:center;padding:10px 0}
+  .nav-item span, .nav-item .nav-badge{display:none}
+  .nav-item svg{width:19px;height:19px}
+  .sidebar-foot{display:none}
+  .dash-grid{grid-template-columns:minmax(0,1fr)}
+  .clock-actions .btn{flex:1}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-height:820px){
+  .phone{transform:scale(.88);transform-origin:center}
+}
+@media (max-width:820px){
+  .topbar-left .org,.topbar-left .demo-chip,.topbar-sep{display:none}
+  .identity-btn .meta{display:none}
+  .content{padding:16px 14px 28px}
+}
+@media (max-width:520px){
+  .stage-topbar{padding:0 12px}
+  .stage-topbar .stage-brand-sub{display:none}
+  .stage-body{padding:12px 0 20px;gap:0}
+  .phone{transform:scale(.85)}
+}
+/* 极窄窗口下隐藏标题文案，仅保留品牌标与视图切换，避免顶栏换行 */
+@media (max-width:460px){
+  .stage-brand-text{display:none}
+  .segmented button{white-space:nowrap}
+}
+
+/* ========== 补充组件 ========== */
+.avatar{display:inline-grid;place-items:center;border-radius:50%;color:#fff;font-weight:600;flex:none;line-height:1;letter-spacing:.01em;user-select:none}
+.switch{width:34px;height:19px;border-radius:10px;background:var(--line-strong);position:relative;transition:background .18s;flex:none;border:0;padding:0}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(16,24,40,.24);transition:transform .18s}
+.switch.on{background:var(--success)}
+.switch.on::after{transform:translateX(15px)}
+.switch:disabled{opacity:.45;cursor:not-allowed}
+.tree-row.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.tree-row.active .count{color:var(--primary)}
+.attach-box{display:flex;align-items:center;gap:9px;border:1px dashed var(--line-strong);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text-3);background:var(--surface-2)}
+.attach-box svg{color:var(--text-3);flex:none}
+.duration-preview{display:flex;align-items:baseline;gap:8px;background:var(--primary-soft);border:1px solid var(--primary-line);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--primary)}
+.duration-preview b{font-size:17px;font-variant-numeric:tabular-nums}
+.mini-note{font-size:11px;color:var(--text-3);line-height:1.65}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.spin{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.m-chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
+.m-chip{font-size:10.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text-2)}
+.m-chip.on{background:var(--primary-soft);border-color:var(--primary-line);color:var(--primary);font-weight:600}
+.m-role-chip{font-size:10px;padding:3px 8px;border-radius:999px;background:var(--primary-soft);color:var(--primary);border:1px solid var(--primary-line);white-space:nowrap}
+.m-org-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--text-2)}
+.m-org-row:last-child{border-bottom:none}
+.m-org-row .ico{width:24px;height:24px;border-radius:6px;background:var(--surface-2);color:var(--text-3);display:grid;place-items:center;flex:none}
+.section-gap{margin-top:16px}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<div id="toastLayer"></div>
+<script>
+(function(){
+'use strict';
+
+/* ================= 常量与图标 ================= */
+const KEY = 'oa_collab_demo_v1';
+const TODAY = '2026-11-05';
+const WEEK = ['周日','周一','周二','周三','周四','周五','周六'];
+const DEMO_NOW = '2026-11-05 18:04';
+
+const ICONS = {
+  dashboard:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  alert:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  calendarCheck:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 15l2 2 4-4"/>',
+  link:'<path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l1-1"/>',
+  megaphone:'<path d="M3 11v2a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M14 8a4 4 0 0 1 0 8"/><path d="M18 5a8 8 0 0 1 0 14"/>',
+  smartphone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
+  shield:'<path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/><path d="M9 12l2 2 4-4"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  chevronDown:'<path d="M6 9l6 6 6-6"/>',
+  chevronRight:'<path d="M9 6l6 6-6 6"/>',
+  chevronLeft:'<path d="M15 6l-6 6 6 6"/>',
+  bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  pin:'<path d="M12 17v5"/><path d="M8 17h8l-1.5-5V7a2.5 2.5 0 0 0-5 0v5z"/>',
+  mapPin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  wifi:'<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+  send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/>',
+  arrowRight:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  clipboard:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+  filter:'<path d="M4 6h16M4 12h10M4 18h6"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  paperclip:'<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.49"/>',
+  building:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>'
+};
+function icon(name, size){
+  const s = size || 18;
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
+}
+
+/* ================= 基础数据 ================= */
+const DEPARTMENTS = [
+  {id:'gm', name:'总经办', parent:null},
+  {id:'hr', name:'人力资源部', parent:'gm'},
+  {id:'hr-rec', name:'招聘组', parent:'hr'},
+  {id:'hr-pay', name:'薪酬绩效组', parent:'hr'},
+  {id:'rd', name:'产品研发部', parent:'gm'},
+  {id:'rd-fe', name:'前端组', parent:'rd'},
+  {id:'rd-be', name:'后端组', parent:'rd'},
+  {id:'rd-qa', name:'测试组', parent:'rd'},
+  {id:'mkt', name:'市场运营部', parent:'gm'},
+  {id:'fin', name:'财务部', parent:'gm'},
+  {id:'adm', name:'行政后勤部', parent:'gm'}
+];
+
+const SHIFTS = [
+  {id:'S1', name:'正常班', start:'09:00', end:'18:00', work:8, rest:1, night:false, flex:30, dept:'全公司'},
+  {id:'S2', name:'早班', start:'07:00', end:'15:00', work:7.5, rest:0.5, night:false, flex:15, dept:'客户服务中心'},
+  {id:'S3', name:'晚班', start:'14:00', end:'22:00', work:7.5, rest:0.5, night:false, flex:15, dept:'客户服务中心'},
+  {id:'S4', name:'夜班（跨日）', start:'22:00', end:'06:00', work:7, rest:1, night:true, flex:0, dept:'运维值班组'},
+  {id:'S5', name:'弹性班', start:'09:30', end:'18:30', work:8, rest:1, night:false, flex:60, dept:'研发中心'}
+];
+
+const HOLIDAYS = [
+  {date:'2026-10-01', label:'国庆节'},
+  {date:'2026-10-02', label:'国庆假期'},
+  {date:'2026-10-03', label:'国庆假期'},
+  {date:'2026-09-25', label:'中秋节'},
+  {date:'2026-01-01', label:'元旦'}
+];
+
+const AVATAR_COLORS = ['#345D8C','#4C6B4F','#7A5C3E','#5B5476','#2F6B6B','#8A5A44','#46557A','#6B4C5C','#3E6B5A','#6A5540'];
+function avColor(i){ return AVATAR_COLORS[i % AVATAR_COLORS.length]; }
+
+const BASE_EMPLOYEES = [
+  ['EMP001','赵启明','gm','系统管理员','138 0000 0001','zhaoqm@xinghai.com','2016-07-01','在职','启用','管理员'],
+  ['EMP002','王慧','hr','薪酬绩效主管','138 0000 0002','wangh@xinghai.com','2017-03-06','在职','启用','HR'],
+  ['EMP003','李维','rd','研发总监','138 0000 0003','liwei@xinghai.com','2018-06-11','在职','启用','主管'],
+  ['EMP004','苏晓','hr','HRBP','138 0000 0004','suxiao@xinghai.com','2019-02-18','在职','启用','HR'],
+  ['EMP005','韩沐','rd-qa','测试工程师','138 0000 0005','hanmu@xinghai.com','2020-11-02','在职','启用','员工'],
+  ['EMP006','何静','fin','财务主管','138 0000 0006','hejing@xinghai.com','2017-09-04','在职','启用','主管'],
+  ['EMP007','许致远','fin','会计','138 0000 0007','xuzhiyuan@xinghai.com','2021-07-19','在职','启用','员工'],
+  ['EMP008','沈书言','mkt','市场经理','138 0000 0008','shenshuyan@xinghai.com','2019-05-20','在职','启用','主管'],
+  ['EMP009','郑凯文','mkt','运营专员','138 0000 0009','zhengkw@xinghai.com','2022-03-14','在职','启用','员工'],
+  ['EMP010','方知远','rd-be','架构师','138 0000 0010','fangzy@xinghai.com','2016-10-08','在职','启用','员工'],
+  ['EMP011','林清和','rd-fe','前端工程师','138 0000 0011','linqh@xinghai.com','2021-03-15','在职','启用','员工'],
+  ['EMP012','周雨桐','rd-fe','高级前端工程师','138 0000 0012','zhouyt@xinghai.com','2020-09-01','在职','启用','员工'],
+  ['EMP013','顾言','rd-be','后端工程师','138 0000 0013','guyan@xinghai.com','2025-09-01','试用','启用','员工'],
+  ['EMP014','杜若','rd','产品经理','138 0000 0014','duruo@xinghai.com','2020-04-13','在职','启用','员工'],
+  ['EMP015','江屿','rd','产品经理','138 0000 0015','jiangyu@xinghai.com','2021-08-23','在职','启用','员工'],
+  ['EMP016','唐晓宁','rd-qa','测试工程师','138 0000 0016','tangxn@xinghai.com','2025-08-11','试用','启用','员工'],
+  ['EMP017','罗嘉','hr-rec','招聘专员','138 0000 0017','luojia@xinghai.com','2022-06-06','在职','启用','员工'],
+  ['EMP018','程一诺','adm','行政专员','138 0000 0018','chengyn@xinghai.com','2021-12-01','在职','启用','员工'],
+  ['EMP019','邵然','adm','后勤主管','138 0000 0019','shaoran@xinghai.com','2018-11-26','在职','启用','主管'],
+  ['EMP020','秦朗','gm','行政助理','138 0000 0020','qinlang@xinghai.com','2023-02-20','在职','启用','员工'],
+  ['EMP021','叶蓁','mkt','品牌策划','138 0000 0021','yezhen@xinghai.com','2020-10-12','离职','停用','员工'],
+  ['EMP022','白露','hr-pay','招聘主管','138 0000 0022','bailu@xinghai.com','2019-08-05','在职','停用','主管'],
+  ['EMP023','陆铭','rd-be','后端工程师','138 0000 0023','luming@xinghai.com','2023-07-03','在职','启用','员工'],
+  ['EMP024','温言','fin','出纳','138 0000 0024','wenyan@xinghai.com','2024-04-15','在职','启用','员工']
+];
+
+const ATT_DATES = ['2026-10-22','2026-10-23','2026-10-26','2026-10-27','2026-10-28','2026-10-29','2026-10-30','2026-11-02','2026-11-03','2026-11-04','2026-11-05'];
+
+const ATT_OVERRIDE = {
+  'EMP011|2026-11-05': {status:'请假', in:'—', out:'—', hours:0},
+  'EMP012|2026-11-03': {status:'请假', in:'—', out:'—', hours:0},
+  'EMP005|2026-10-30': {out:'17:32', status:'早退', hours:7.0},
+  'EMP013|2026-11-05': {in:'—', out:'—', status:'缺卡', hours:0},
+  'EMP006|2026-10-30': {in:'08:52', out:'—', status:'缺卡', hours:0},
+  'EMP008|2026-10-28': {in:'—', out:'18:05', status:'缺卡', hours:0},
+  'EMP003|2026-11-04': {shift:'夜班（跨日）', in:'21:58', out:'—', status:'缺卡', hours:0},
+  'EMP005|2026-11-05': {in:'08:41', status:'正常'},
+  'EMP019|2026-11-04': {in:'08:47', out:'18:11', status:'正常', hours:8.4}
+};
+
+const BASE_LEAVES = [
+  {id:'LV-20261105-01', empId:'EMP011', type:'年假', start:'2026-11-05 09:00', end:'2026-11-06 18:00', hours:16, reason:'家中有事需处理，工作已与同组同事交接完毕。', approver:'EMP003', status:'approved', submitted:'2026-10-28 14:20', reviewedBy:'EMP003', reviewedAt:'2026-10-29 09:12', comment:'工作交接已确认，同意休假。'},
+  {id:'LV-20261105-02', empId:'EMP012', type:'病假', start:'2026-11-03 09:00', end:'2026-11-03 18:00', hours:8, reason:'急性肠胃炎，医院建议休息一天，已附门诊病历。', approver:'EMP003', status:'approved', submitted:'2026-11-02 21:35', reviewedBy:'EMP003', reviewedAt:'2026-11-03 08:40', comment:'已收到病历照片，注意休息。'},
+  {id:'LV-20261105-03', empId:'EMP013', type:'事假', start:'2026-11-06 09:00', end:'2026-11-06 12:00', hours:3, reason:'上午需前往政务大厅办理居住证续签。', approver:'EMP003', status:'pending', submitted:'2026-11-04 16:20'},
+  {id:'LV-20261105-04', empId:'EMP015', type:'调休', start:'2026-11-09 09:00', end:'2026-11-09 18:00', hours:8, reason:'上周版本发布加班 10 小时，申请调休一天。', approver:'EMP003', status:'pending', submitted:'2026-11-05 09:30'},
+  {id:'LV-20261105-05', empId:'EMP009', type:'年假', start:'2026-11-10 09:00', end:'2026-11-12 18:00', hours:24, reason:'年度剩余年假集中使用，行程已提前报备。', approver:'EMP008', status:'pending', submitted:'2026-11-05 10:12'},
+  {id:'LV-20261105-06', empId:'EMP005', type:'婚假', start:'2026-11-16 09:00', end:'2026-11-20 18:00', hours:40, reason:'登记结婚，申请婚假五天。', approver:'EMP003', status:'pending', submitted:'2026-11-05 11:05'},
+  {id:'LV-20261105-07', empId:'EMP011', type:'年假', start:'2026-12-24 09:00', end:'2026-12-26 18:00', hours:24, reason:'年末返乡，尚在确认行程。', approver:'EMP003', status:'draft', submitted:'2026-11-05 14:02'},
+  {id:'LV-20261028-08', empId:'EMP006', type:'事假', start:'2026-10-28 14:00', end:'2026-10-28 18:00', hours:4, reason:'需陪同家人复诊。', approver:'EMP002', status:'rejected', submitted:'2026-10-27 17:40', reviewedBy:'EMP002', reviewedAt:'2026-10-28 09:05', comment:'月末结账关键期，建议调整至下月。'},
+  /* 默认演示账号李维本人的已通过请假，使「我的请假」与年假余额有真实数据 */
+  {id:'LV-20261030-09', empId:'EMP003', type:'年假', start:'2026-11-10 09:00', end:'2026-11-10 18:00', hours:8, reason:'个人年假一天，团队工作已提前交接。', approver:'EMP002', status:'approved', submitted:'2026-10-30 10:15', reviewedBy:'EMP002', reviewedAt:'2026-10-31 09:20', comment:'同意，注意做好工作交接。'}
+];
+
+/* 考勤联动演示：同一天两条重叠的已通过请假 */
+const OVERLAP_LEAVES = [
+  {id:'DEMO-A', type:'年假', start:'2026-11-20 09:00', end:'2026-11-20 12:00'},
+  {id:'DEMO-B', type:'调休', start:'2026-11-20 10:00', end:'2026-11-20 14:00'}
+];
+
+const BASE_ANOMALIES = [
+  {
+    id:'AN-20261105-01', empId:'EMP003', date:'2026-11-04', shift:'夜班（跨日）', type:'跨日班次异常',
+    status:'pending',
+    before:{'上班打卡':'21:58','下班打卡':'—','有效工时':'未结算','考勤状态':'缺卡'},
+    after:{'上班打卡':'21:58','下班打卡':'11-05 06:02','有效工时':'7.1 小时','考勤状态':'正常'},
+    reason:'下班打卡落在次日 06:02，原按自然日归属被判缺卡，申请按夜班归属日（11-04）结算。',
+    logs:[
+      {time:'2026-11-05 08:40', actor:'李维', text:'发起跨日班次异常申诉'},
+      {time:'2026-11-05 08:42', actor:'系统', text:'已校验 A 座门禁记录：11-05 06:02 出场'}
+    ]
+  },
+  {
+    id:'AN-20261105-02', empId:'EMP012', date:'2026-11-03', shift:'正常班', type:'缺卡补卡',
+    status:'draft',
+    before:{'上班打卡':'—','下班打卡':'18:04','有效工时':'0 小时','考勤状态':'缺卡'},
+    after:{'上班打卡':'09:02','下班打卡':'18:04','有效工时':'8.0 小时','考勤状态':'迟到'},
+    reason:'当日忘带工卡，门禁记录显示 09:02 进入 A 座，申请补登上班卡。',
+    logs:[{time:'2026-11-04 10:15', actor:'周雨桐', text:'创建补卡申请（待提交）'}]
+  },
+  {
+    id:'AN-20261030-03', empId:'EMP006', date:'2026-10-30', shift:'正常班', type:'缺卡补卡',
+    status:'pending',
+    before:{'上班打卡':'08:52','下班打卡':'—','有效工时':'0 小时','考勤状态':'缺卡'},
+    after:{'上班打卡':'08:52','下班打卡':'18:10','有效工时':'8.3 小时','考勤状态':'正常'},
+    reason:'下班时门禁设备离线，现场值班保安登记 18:10 离场，申请补登下班卡。',
+    logs:[
+      {time:'2026-10-31 09:20', actor:'何静', text:'提交补卡申请'},
+      {time:'2026-10-31 09:25', actor:'系统', text:'附件缺失提醒：门禁设备离线记录'}
+    ]
+  },
+  {
+    id:'AN-20261030-04', empId:'EMP005', date:'2026-10-30', shift:'正常班', type:'早退异常',
+    status:'effective',
+    before:{'上班打卡':'08:55','下班打卡':'17:32','有效工时':'7.0 小时','考勤状态':'早退'},
+    after:{'上班打卡':'08:55','下班打卡':'17:32','有效工时':'7.0 小时','考勤状态':'早退（已备案）'},
+    reason:'当日下午参加公司组织的无偿献血，经行政备案后按外出公干处理。',
+    logs:[
+      {time:'2026-10-30 18:10', actor:'韩沐', text:'提交早退备案说明'},
+      {time:'2026-10-31 10:02', actor:'李维', text:'审批通过，按外出公干处理'},
+      {time:'2026-10-31 10:03', actor:'系统', text:'考勤结果已更新为「早退（已备案）」'}
+    ]
+  },
+  {
+    id:'AN-20261028-05', empId:'EMP008', date:'2026-10-28', shift:'正常班', type:'缺卡补卡',
+    status:'rejected',
+    before:{'上班打卡':'—','下班打卡':'18:05','有效工时':'0 小时','考勤状态':'缺卡'},
+    after:{'上班打卡':'08:58','下班打卡':'18:05','有效工时':'8.1 小时','考勤状态':'正常'},
+    reason:'申请补登 10-28 上班卡，当日直接前往客户现场，未经过公司门禁。',
+    logs:[
+      {time:'2026-10-29 11:30', actor:'沈书言', text:'提交补卡申请'},
+      {time:'2026-10-29 15:12', actor:'王慧', text:'驳回：缺客户现场到访证明，请补充后重新提交'}
+    ]
+  }
+];
+
+const BASE_ANNOUNCEMENTS = [
+  {
+    id:'ANNO-01', title:'关于 2026 年第四季度考勤核对的安排', level:'重要', scope:'全体员工',
+    author:'王慧', time:'2026-11-04 09:00', pinned:true, draft:false, read:68, total:82, readBy:[],
+    content:'为配合年度绩效结算，人力资源部将于 11 月 10 日至 11 月 21 日开展第四季度考勤集中核对。\n请各部门负责人督促本部门员工登录协同办公平台，核对 10 月至 11 月的打卡记录、请假单与补卡单。\n如发现考勤异常，请在 11 月 21 日 18:00 前通过「异常处理」提交补卡或申诉，逾期将按系统原始记录结算。\n核对期间如有疑问，请联系人力资源部王慧（分机 8021）。'
+  },
+  {
+    id:'ANNO-02', title:'协同办公平台移动端上线通知', level:'普通', scope:'全体员工',
+    author:'赵启明', time:'2026-11-03 15:30', pinned:false, draft:false, read:54, total:82, readBy:[],
+    content:'协同办公平台移动端已正式上线，支持手机打卡、请假申请、审批处理与通讯录查询。\n移动端与桌面端共用同一套账号与数据，打卡时间以服务端时间为准，请勿修改手机系统时间。\n首次使用请在企业微信工作台进入「协同 OA」，使用工号完成身份绑定。'
+  },
+  {
+    id:'ANNO-03', title:'产品研发部 Q4 冲刺排期与调休说明', level:'重要', scope:'产品研发部',
+    author:'李维', time:'2026-11-02 10:20', pinned:false, draft:false, read:19, total:26, readBy:[],
+    content:'Q4 版本冲刺周期为 11 月 3 日至 12 月 12 日，各小组排期已在项目看板同步。\n冲刺期间工作日加班满 2 小时可申请调休，调休需在季度内使用完毕，逾期不结转。\n夜班与跨日值班按《值班管理办法》执行，跨日打卡异常请走补卡流程并由直属主管确认。'
+  },
+  {
+    id:'ANNO-04', title:'关于开展消防疏散演练的通知', level:'紧急', scope:'全体员工',
+    author:'邵然', time:'2026-10-30 16:40', pinned:false, draft:false, read:78, total:82, readBy:[],
+    content:'11 月 6 日（周五）15:00 将在协同大厦开展消防疏散演练，预计持续 30 分钟。\n演练期间请听从楼层引导员指挥，从最近的安全通道有序撤离至一层广场集合。\n演练期间门禁将短暂开启，不计入迟到早退，请勿乘坐电梯。'
+  },
+  {
+    id:'ANNO-05', title:'年度体检预约安排（草稿）', level:'普通', scope:'全体员工',
+    author:'苏晓', time:'2026-11-05 11:30', pinned:false, draft:true, read:0, total:82, readBy:[],
+    content:'2026 年度员工体检拟于 12 月上旬开展，体检机构与套餐方案仍在比价中。\n本公告为草稿，待行政与财务确认预算后正式发布。'
+  },
+  {
+    id:'ANNO-06', title:'财务报销流程调整说明', level:'重要', scope:'财务部、各部门负责人',
+    author:'何静', time:'2026-10-27 14:10', pinned:false, draft:false, read:31, total:40, readBy:[],
+    content:'自 11 月 1 日起，差旅报销需在行程结束后 10 个工作日内提交，超期需附情况说明。\n单笔金额超过 5000 元的报销单，须由部门负责人与财务主管双签。\n电子发票请上传原件 PDF，截图与照片将退回重提。'
+  }
+];
+
+const PERMISSION_MATRIX = [
+  {module:'工作台', emp:'本人', mgr:'本部门', hr:'全公司', admin:'全公司'},
+  {module:'员工与部门', emp:'—', mgr:'查看本部门', hr:'全部', admin:'全部'},
+  {module:'班次与考勤', emp:'本人记录', mgr:'本部门', hr:'全部', admin:'全部'},
+  {module:'异常处理', emp:'提交本人', mgr:'审批本部门', hr:'审批全部', admin:'审批全部'},
+  {module:'请假审批', emp:'提交本人', mgr:'审批本部门', hr:'审批全部', admin:'审批全部'},
+  {module:'考勤联动', emp:'本人', mgr:'本部门', hr:'全部', admin:'全部'},
+  {module:'公告通知', emp:'查看', mgr:'查看/发布', hr:'查看/发布', admin:'全部'},
+  {module:'设置与权限', emp:'—', mgr:'—', hr:'部分', admin:'全部'}
+];
+
+const ROLE_LIST = ['员工','主管','HR','管理员'];
+
+/* ================= 工具函数 ================= */
+function pad2(n){ return String(n).padStart(2,'0'); }
+function hm(h, m){ return pad2(h)+':'+pad2(m); }
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))%100000; } return h; }
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function weekdayOf(d){
+  const dt = new Date(d+'T00:00:00');
+  return WEEK[dt.getDay()];
+}
+function fmtCn(d){
+  const p = d.split('-');
+  return p[0]+'年'+(+p[1])+'月'+(+p[2])+'日';
+}
+function fmtShort(d){
+  const p = d.split('-');
+  return (+p[1])+'月'+(+p[2])+'日';
+}
+function addDays(d, n){
+  const dt = new Date(d+'T00:00:00');
+  dt.setDate(dt.getDate()+n);
+  return dt.getFullYear()+'-'+pad2(dt.getMonth()+1)+'-'+pad2(dt.getDate());
+}
+function toMin(t){
+  if(!t || t==='—') return null;
+  const p = t.split(':');
+  return (+p[0])*60 + (+p[1]);
+}
+function minutesToHours(m){ return Math.round((m/60)*10)/10; }
+function leaveHours(start, end){
+  const a = new Date(start.replace(' ','T')+':00');
+  const b = new Date(end.replace(' ','T')+':00');
+  const diff = (b-a)/3600000;
+  return Math.max(0, Math.round(diff*10)/10);
+}
+function fmtHours(h){
+  if(!h) return '0 小时';
+  const days = Math.round((h/8)*10)/10;
+  return h+' 小时 · '+days+' 天';
+}
+function fmtDuration(h){
+  const days = Math.round((h/8)*10)/10;
+  return h+' 小时（'+days+' 天）';
+}
+function nowText(){ return DEMO_NOW; }
+
+/* ================= 数据组装 ================= */
+function makeEmployees(){
+  return BASE_EMPLOYEES.map(function(row, i){
+    return {
+      id:row[0], name:row[1], dept:row[2], position:row[3], phone:row[4], email:row[5],
+      hire:row[6], status:row[7], account:row[8], role:row[9],
+      avatar:avColor(i)
+    };
+  });
+}
+
+function makeAttendance(employees){
+  const list = [];
+  const active = employees.filter(function(e){ return e.status !== '离职'; });
+  const sortedEmp = active.slice().sort(function(a,b){ return a.id < b.id ? -1 : 1; });
+  ATT_DATES.forEach(function(date){
+    sortedEmp.forEach(function(emp, idx){
+      const seed = hashStr(emp.id + date);
+      let inH = 8, inM = 50 + (seed % 10);
+      let outH = 18, outM = (seed >> 3) % 9;
+      let status = '正常';
+      if(seed % 17 === 0){ inH = 9; inM = (seed % 15); status = '迟到'; }
+      if(seed % 23 === 0){ outH = 17; outM = 35 + (seed % 20); status = '早退'; }
+      if(date === TODAY){ outH = null; outM = null; if(status !== '迟到') status = '进行中'; }
+
+      const rec = {
+        id:'ATT-'+emp.id+'-'+date,
+        empId:emp.id, date:date, shift:'正常班',
+        in: hm(inH, inM),
+        out: outH === null ? '—' : hm(outH, outM),
+        status: status,
+        hours: (outH === null ? 0 : Math.max(0, Math.round((((outH*60+outM) - (inH*60+inM)) - 60)/60*10)/10))
+      };
+
+      const ov = ATT_OVERRIDE[emp.id+'|'+date];
+      if(ov){ Object.assign(rec, ov); }
+      list.push(rec);
+    });
+  });
+  return list;
+}
+
+function seedDB(){
+  const employees = makeEmployees();
+  return {
+    employees: employees,
+    attendance: makeAttendance(employees),
+    anomalies: JSON.parse(JSON.stringify(BASE_ANOMALIES)),
+    leaves: JSON.parse(JSON.stringify(BASE_LEAVES)),
+    announcements: JSON.parse(JSON.stringify(BASE_ANNOUNCEMENTS)),
+    workdays: [1,2,3,4,5],
+    holidays: JSON.parse(JSON.stringify(HOLIDAYS)),
+    visibility: ['gm','hr','rd','mkt','fin','adm']
+  };
+}
+
+/* ================= 全局状态 ================= */
+let db;
+let ui;
+
+function defaultUI(){
+  return {
+    view:'web', route:'dashboard', tab:'home',
+    user:'EMP003',
+    filters:{
+      empSearch:'', empDept:'all', empStatus:'all', empPage:1,
+      attEmp:'EMP003', attFrom:'2026-10-26', attTo:'2026-11-05', attPage:1,
+      anomStatus:'all', anomExpanded:null,
+      leaveTab:'pending',
+      linkEmp:'EMP011', linkDate:'2026-11-05',
+      annLevel:'all',
+      mContact:'', mContactDept:'all'
+    },
+    drawer:null, modal:null, identityOpen:false,
+    collapsed:{}, punchFlash:false, mobilePunching:false,
+    mLeaveTab:'pending', mApprovalTab:'pending'
+  };
+}
+
+function loadState(){
+  let saved = null;
+  try{ saved = JSON.parse(localStorage.getItem(KEY) || 'null'); }catch(e){ saved = null; }
+  if(saved && saved.db && saved.db.employees && saved.db.attendance && saved.db.leaves && saved.db.anomalies && saved.db.announcements){
+    db = saved.db;
+    ui = defaultUI();
+    if(saved.user && db.employees.some(function(e){ return e.id === saved.user; })) ui.user = saved.user;
+    if(saved.view === 'mobile') ui.view = 'mobile';
+    return;
+  }
+  db = seedDB();
+  ui = defaultUI();
+}
+
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify({ db:db, user:ui.user, view:ui.view })); }catch(e){}
+}
+
+function resetAll(){
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  /* 直接内存重置，避免 reload 期间把旧状态再次写回本地存储 */
+  db = seedDB();
+  ui = defaultUI();
+  render();
+  toast('演示数据已重置为初始状态', 'success');
+}
+
+/* ================= 查询辅助 ================= */
+function empById(id){ return db.employees.find(function(e){ return e.id === id; }); }
+function deptName(id){ const d = DEPARTMENTS.find(function(x){ return x.id === id; }); return d ? d.name : '—'; }
+function deptById(id){ return DEPARTMENTS.find(function(x){ return x.id === id; }); }
+function currentUser(){ return empById(ui.user) || db.employees[0]; }
+function canApprove(){ return ['主管','HR','管理员'].indexOf(currentUser().role) >= 0; }
+function isManagerLike(){ return ['主管','HR','管理员'].indexOf(currentUser().role) >= 0; }
+function visibleDepts(){
+  return DEPARTMENTS.filter(function(d){ return d.parent === null || d.parent === 'gm'; });
+}
+function subDepts(parentId){ return DEPARTMENTS.filter(function(d){ return d.parent === parentId; }); }
+function attRecord(empId, date){ return db.attendance.find(function(r){ return r.empId === empId && r.date === date; }); }
+function pendingLeaves(){ return db.leaves.filter(function(l){ return l.status === 'pending'; }); }
+function pendingAnomalies(){ return db.anomalies.filter(function(a){ return a.status === 'pending'; }); }
+function unreadAnnouncements(){
+  const uid = ui.user;
+  return db.announcements.filter(function(a){ return !a.draft && (a.readBy || []).indexOf(uid) < 0; });
+}
+function readCount(ann){ return (ann.read || 0) + ((ann.readBy || []).length); }
+
+/* ================= 通用渲染片段 ================= */
+function avatar(emp, size){
+  const s = size || 30;
+  const name = emp ? emp.name : '—';
+  return '<span class="avatar" style="width:'+s+'px;height:'+s+'px;font-size:'+Math.round(s*0.36)+'px;background:'+(emp && emp.avatar ? emp.avatar : '#345D8C')+'">'+esc(name.slice(-2))+'</span>';
+}
+function stateTag(s){
+  const map = {
+    '正常':'success','在职':'success','启用':'success','已通过':'success','已生效':'success','已读':'success','已完成':'success','生效':'success',
+    '迟到':'warn','早退':'warn','待审批':'warn','重要':'warn','试用':'warn','待生效':'warn',
+    '待提交':'neutral','草稿':'neutral','普通':'neutral','进行中':'primary','请假':'primary','调休':'primary',
+    '缺卡':'danger','已驳回':'danger','离职':'danger','停用':'danger','紧急':'danger'
+  };
+  return '<span class="tag tag-'+(map[s]||'neutral')+'">'+esc(s)+'</span>';
+}
+function levelTag(level){
+  const map = {'普通':'neutral','重要':'warn','紧急':'danger','草稿':'neutral'};
+  return '<span class="tag tag-'+(map[level]||'neutral')+'">'+esc(level)+'</span>';
+}
+function toast(msg, type){
+  const layer = document.getElementById('toastLayer');
+  if(!layer) return;
+  const t = type || 'success';
+  const el = document.createElement('div');
+  el.className = 'toast ' + t;
+  const ic = t === 'danger' ? 'alert' : (t === 'warn' ? 'info' : 'check');
+  el.innerHTML = icon(ic, 16) + '<div>' + esc(msg) + '</div>';
+  layer.appendChild(el);
+  setTimeout(function(){
+    el.style.transition = 'opacity .2s, transform .2s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(6px)';
+    setTimeout(function(){ el.remove(); }, 230);
+  }, 2800);
+}
+
+/* ================= 导航 ================= */
+const NAV_GROUPS = [
+  {label:'办公', items:[
+    {route:'dashboard', label:'工作台', icon:'dashboard'},
+    {route:'employees', label:'员工与部门', icon:'users'},
+    {route:'attendance', label:'班次与考勤', icon:'clock'},
+    {route:'anomalies', label:'异常处理', icon:'alert'},
+    {route:'leaves', label:'请假审批', icon:'calendarCheck'},
+    {route:'linkage', label:'考勤联动', icon:'link'}
+  ]},
+  {label:'协同', items:[
+    {route:'announcements', label:'公告通知', icon:'megaphone'},
+    {route:'mobile', label:'移动端预览', icon:'smartphone'},
+    {route:'settings', label:'设置与权限', icon:'shield'}
+  ]}
+];
+
+function routeAllowed(route){
+  /* 员工与部门涉及花名册与账号管理，仅管理者可见；设置页对所有身份开放，用于演示权限矩阵 */
+  if(route === 'employees') return isManagerLike();
+  return true;
+}
+function navBadge(route){
+  if(route === 'leaves' && isManagerLike()){
+    const n = pendingLeaves().length;
+    return n ? '<span class="nav-badge">'+n+'</span>' : '';
+  }
+  if(route === 'anomalies'){
+    const n = pendingAnomalies().length + db.anomalies.filter(function(a){ return a.status === 'draft'; }).length;
+    return n ? '<span class="nav-badge is-soft">'+n+'</span>' : '';
+  }
+  if(route === 'announcements'){
+    const n = unreadAnnouncements().length;
+    return n ? '<span class="nav-badge is-soft">'+n+'</span>' : '';
+  }
+  return '';
+}
+
+function identityDrop(){
+  return '<div class="identity-drop">'+
+    '<div class="drop-title">切换演示身份（影响待办与可见菜单）</div>'+
+    ['EMP003','EMP011','EMP002','EMP001'].map(function(id){
+      const e = empById(id);
+      if(!e) return '';
+      return '<button class="identity-item '+(ui.user===id?'on':'')+'" data-action="pick-identity" data-id="'+id+'">'+
+        avatar(e, 30)+
+        '<div class="meta"><b>'+esc(e.name)+' · '+esc(e.role)+'</b><small>'+esc(deptName(e.dept))+' · '+esc(e.position)+'</small></div>'+
+        (ui.user===id ? icon('check',15) : '')+
+      '</button>';
+    }).join('')+
+  '</div>';
+}
+
+function viewSwitch(){
+  return '<div class="segmented" role="group" aria-label="视图切换">'+
+    '<button class="'+(ui.view==='web'?'active':'')+'" data-action="set-view" data-view="web">'+icon('dashboard',15)+'Web 端</button>'+
+    '<button class="'+(ui.view==='mobile'?'active':'')+'" data-action="set-view" data-view="mobile">'+icon('smartphone',15)+'移动端</button>'+
+  '</div>';
+}
+
+function topbar(){
+  const u = currentUser();
+  return '<header class="topbar">'+
+    '<div class="topbar-left">'+
+      '<span class="org">星海控股集团</span>'+
+      '<span class="topbar-sep"></span>'+
+      '<span>协同办公平台</span>'+
+      '<span class="demo-chip">演示环境 · 前端模拟</span>'+
+    '</div>'+
+    '<div class="topbar-right">'+
+      viewSwitch()+
+      '<div class="identity">'+
+        '<button class="identity-btn" data-action="toggle-identity" aria-label="切换当前登录用户">'+
+          avatar(u, 30)+
+          '<div class="meta"><b>'+esc(u.name)+'</b><small>'+esc(u.role)+' · '+esc(deptName(u.dept))+'</small></div>'+
+          icon('chevronDown',15)+
+        '</button>'+
+        (ui.identityOpen ? identityDrop() : '')+
+      '</div>'+
+    '</div>'+
+  '</header>';
+}
+
+function sidebar(){
+  const role = currentUser().role;
+  return '<aside class="sidebar">'+
+    '<div class="brand">'+
+      '<div class="brand-mark">协</div>'+
+      '<div class="brand-text"><div class="brand-name">协同办公</div><div class="brand-sub">COLLABORATION</div></div>'+
+    '</div>'+
+    '<nav class="nav">'+
+      NAV_GROUPS.map(function(g){
+        const items = g.items.filter(function(it){ return routeAllowed(it.route); });
+        if(!items.length) return '';
+        return '<div class="nav-group"><div class="nav-group-label">'+g.label+'</div>'+
+          items.map(function(it){
+            return '<button class="nav-item '+(ui.route===it.route?'active':'')+'" data-action="nav" data-route="'+it.route+'" title="'+it.label+'">'+
+              icon(it.icon,18)+'<span>'+it.label+'</span>'+navBadge(it.route)+
+            '</button>';
+          }).join('')+
+        '</div>';
+      }).join('')+
+    '</nav>'+
+    '<div class="sidebar-foot">'+
+      '<strong>'+esc(deptName(currentUser().dept))+' · '+esc(role)+'</strong>'+
+      '数据均为前端模拟，本地保存在浏览器<br>版本 v2.4.0 · 演示版'+
+    '</div>'+
+  '</aside>';
+}
+
+/* ================= 页面外壳 ================= */
+function render(){
+  const app = document.getElementById('app');
+  const sy = window.scrollY;
+  const oldM = app.querySelector('.m-content');
+  const msy = oldM ? oldM.scrollTop : 0;
+  if(ui.view === 'mobile'){
+    app.innerHTML = mobileStage();
+  }else{
+    app.innerHTML = '<div class="web-shell">'+sidebar()+'<div class="main">'+topbar()+
+      '<div class="content"><div class="content-inner">'+pageHtml()+'</div></div>'+
+      '</div></div>'+overlayHtml(false);
+  }
+  try{ window.scrollTo(0, sy); }catch(e){}
+  /* 移动端内部滚动位置保持，避免筛选时跳回顶部 */
+  const newM = app.querySelector('.m-content');
+  if(newM && msy) newM.scrollTop = msy;
+  save();
+}
+
+function pageHtml(){
+  if(!routeAllowed(ui.route)) ui.route = 'dashboard';
+  const map = {
+    dashboard: dashboardPage,
+    employees: employeesPage,
+    attendance: attendancePage,
+    anomalies: anomaliesPage,
+    leaves: leavesPage,
+    linkage: linkagePage,
+    announcements: announcementsPage,
+    settings: settingsPage
+  };
+  const fn = map[ui.route] || dashboardPage;
+  return fn();
+}
+
+/* ================= 工作台 ================= */
+function activeEmployees(){
+  return db.employees.filter(function(e){ return e.status !== '离职'; });
+}
+function topDeptId(deptId){
+  let cur = deptById(deptId);
+  while(cur && cur.parent && cur.parent !== 'gm'){ cur = deptById(cur.parent); }
+  if(cur && cur.parent === 'gm') return cur.id;
+  return deptId;
+}
+function todayStats(){
+  const emps = activeEmployees();
+  const recs = emps.map(function(e){ return attRecord(e.id, TODAY); }).filter(Boolean);
+  const present = recs.filter(function(r){ return ['正常','迟到','早退','进行中'].indexOf(r.status) >= 0; }).length;
+  const leave = recs.filter(function(r){ return r.status === '请假'; }).length;
+  const missing = recs.filter(function(r){ return r.status === '缺卡'; }).length;
+  return { total:emps.length, present:present, leave:leave, missing:missing };
+}
+
+function trendChart(){
+  const dates = ATT_DATES.slice(-7);
+  const emps = activeEmployees();
+  const rates = dates.map(function(d){
+    let ok = 0, all = 0;
+    emps.forEach(function(e){
+      const r = attRecord(e.id, d);
+      if(!r) return;
+      all++;
+      if(['正常','迟到','早退','进行中'].indexOf(r.status) >= 0) ok++;
+    });
+    return all ? ok / all : 0;
+  });
+  const W = 340, H = 118, L = 30, R = 10, T = 14, B = 24;
+  const iw = W - L - R, ih = H - T - B;
+  const points = rates.map(function(v, i){
+    const x = L + (rates.length === 1 ? iw/2 : i * iw/(rates.length-1));
+    const y = T + (1 - v) * ih;
+    return [x, y, v];
+  });
+  const line = points.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+  const area = 'M '+points[0][0].toFixed(1)+','+(T+ih)+' L '+line.replace(/ /g, ' L ')+' L '+points[points.length-1][0].toFixed(1)+','+(T+ih)+' Z';
+  let grid = '';
+  [0,0.5,1].forEach(function(v){
+    const y = T + (1-v)*ih;
+    grid += '<line x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'" stroke="#EDF0F4" stroke-width="1"/>';
+  });
+  let labels = '';
+  dates.forEach(function(d, i){
+    const p = points[i];
+    labels += '<text x="'+p[0].toFixed(1)+'" y="'+(H-7)+'" text-anchor="middle" font-size="9" fill="#8B95A4">'+d.slice(5).replace('-','/')+'</text>';
+  });
+  const dots = points.map(function(p, i){
+    return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(i===points.length-1?3.4:2.4)+'" fill="#fff" stroke="'+(i===points.length-1?'#1B4A85':'#7FA0C6')+'" stroke-width="'+(i===points.length-1?2:1.4)+'"/>';
+  }).join('');
+  const last = points[points.length-1];
+  return '<svg class="trend-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img" aria-label="近七日出勤率趋势">'+
+    grid+
+    '<path d="'+area+'" fill="#EAF0F8" opacity=".9"/>'+
+    '<polyline points="'+line+'" fill="none" stroke="#1B4A85" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>'+
+    dots+labels+
+    '<text x="'+last[0].toFixed(1)+'" y="'+(last[1]-9)+'" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1B4A85">'+Math.round(last[2]*100)+'%</text>'+
+  '</svg>';
+}
+
+function dashboardPage(){
+  const u = currentUser();
+  const stats = todayStats();
+  const rec = attRecord(u.id, TODAY);
+  const pending = pendingLeaves();
+  const anomalies = db.anomalies.filter(function(a){ return a.status !== 'effective'; });
+  const anns = sortedAnnouncements().filter(function(a){ return !a.draft; }).slice(0,3);
+  const todos = [];
+  /* 待办审批仅对管理者展示；异常申诉排除本人提交的单据，避免出现「自己审批自己」 */
+  if(isManagerLike()){
+    pending.slice(0,3).forEach(function(l){
+      todos.push({
+        ico:'calendarCheck', tone:'', title:empById(l.empId).name+' · '+l.type+'申请',
+        meta:fmtShort(l.start.split(' ')[0])+' '+l.start.split(' ')[1]+' 起 · '+l.hours+' 小时',
+        tag:'待审批', route:'leaves'
+      });
+    });
+    pendingAnomalies().filter(function(a){ return a.empId !== u.id; }).slice(0,2).forEach(function(a){
+      todos.push({
+        ico:'alert', tone:'warn', title:empById(a.empId).name+' · '+a.type,
+        meta:fmtShort(a.date)+' · '+a.shift, tag:'待审批', route:'anomalies'
+      });
+    });
+  }
+
+  /* 待我审批 = 待审批请假 + 他人提交的待审批异常单 */
+  const myAnoms = isManagerLike() ? pendingAnomalies().filter(function(a){ return a.empId !== u.id; }) : [];
+  const myTodoTotal = isManagerLike() ? pending.length + myAnoms.length : 0;
+
+  const deptRows = ['rd','hr','mkt','fin','adm','gm'].map(function(dep){
+    const emps = activeEmployees().filter(function(e){ return topDeptId(e.dept) === dep; });
+    const ok = emps.filter(function(e){
+      const r = attRecord(e.id, TODAY);
+      return r && ['正常','迟到','早退','进行中'].indexOf(r.status) >= 0;
+    }).length;
+    return {name:deptName(dep), ok:ok, total:emps.length};
+  }).filter(function(d){ return d.total; });
+
+  const clockBlock = rec && rec.status === '请假'
+    ? '<div class="punch-block"><div class="k">今日状态</div><div class="v">请假<small>已通过</small></div><div class="state">'+icon('info',14)+' 请假已同步，当日不判定缺卡</div></div>'+
+      '<div class="punch-block"><div class="k">请假时段</div><div class="v" style="font-size:17px">09:00 – 次日 18:00</div><div class="state">年假 · 16 小时</div></div>'
+    : '<div class="punch-block"><div class="k">上班打卡</div><div class="v">'+(rec && rec.in !== '—' ? rec.in : '—')+'<small>'+(rec && rec.in !== '—' ? '已记录' : '待打卡')+'</small></div><div class="state">'+(rec && rec.in !== '—' ? icon('check',13)+' 已进入考勤范围' : icon('mapPin',13)+' 协同大厦 A 座')+'</div></div>'+
+      '<div class="punch-sep"></div>'+
+      '<div class="punch-block"><div class="k">下班打卡</div><div class="v">'+(rec && rec.out && rec.out !== '—' ? rec.out : '—')+'<small>'+(rec && rec.out && rec.out !== '—' ? '已完成' : '预计 18:00')+'</small></div><div class="state">'+(rec && rec.out && rec.out !== '—' ? icon('check',13)+' 今日考勤已完成' : '以服务端时间为准')+'</div></div>';
+  const canPunch = rec && rec.status !== '请假' && (!rec.out || rec.out === '—');
+  const punchBtn = canPunch
+    ? '<button class="btn btn-primary" data-action="punch">'+icon('clock',16)+'下班打卡</button>'
+    : '<button class="btn btn-primary" disabled>'+icon('check',16)+'今日已完成</button>';
+
+  return '<div class="page-head"><div><h1 class="page-title">工作台</h1><p class="page-sub">你好，'+esc(u.name)+'。今天是 '+fmtCn(TODAY)+' '+weekdayOf(TODAY)+'，'+esc(deptName(u.dept))+' 共有 '+stats.present+' 人在岗。</p></div>'+
+    '<div class="actions"><button class="btn btn-ghost" data-action="nav" data-route="mobile">'+icon('smartphone',15)+'移动端预览</button><button class="btn btn-primary" data-action="open-leave-form">'+icon('plus',15)+'发起请假</button></div></div>'+
+    '<div class="stat-grid">'+
+      '<div class="stat"><div><div class="stat-label">今日出勤</div><div class="stat-value">'+stats.present+'<small>/ '+stats.total+' 人</small></div><div class="stat-note">请假 '+stats.leave+' 人 · 缺卡 '+stats.missing+' 人</div></div><div class="stat-icon">'+icon('users',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">待我审批</div><div class="stat-value">'+myTodoTotal+'<small>项</small></div><div class="stat-note">请假 '+pending.length+' 项 · 异常 '+myAnoms.length+' 项</div></div><div class="stat-icon">'+icon('clipboard',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">考勤异常</div><div class="stat-value">'+db.anomalies.filter(function(a){ return a.status==='pending'||a.status==='draft'; }).length+'<small>条待处理</small></div><div class="stat-note">跨日班次 1 条 · 缺卡 3 条</div></div><div class="stat-icon">'+icon('alert',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">未读公告</div><div class="stat-value">'+unreadAnnouncements().length+'<small>/ '+db.announcements.filter(function(a){return !a.draft;}).length+' 篇</small></div><div class="stat-note">含 1 篇紧急通知</div></div><div class="stat-icon">'+icon('bell',17)+'</div></div>'+
+    '</div>'+
+    '<div class="dash-grid"><div class="dash-col">'+
+      '<section class="card clock-card"><div class="card-head"><div class="card-title">'+icon('clock',16)+'今日打卡</div><div class="tag tag-neutral">正常班 09:00 – 18:00</div></div>'+
+        '<div class="card-body clock-body"><div class="punch-pair">'+clockBlock+'</div>'+
+        '<div class="clock-actions">'+punchBtn+'<button class="btn btn-ghost" data-action="nav" data-route="attendance">'+icon('file',15)+'查看本月记录</button></div>'+
+        '<div class="clock-note">'+icon('info',14)+'<span>考勤时间以服务端时间为准，客户端时间仅作展示。当前定位为「协同大厦 A 座」，已进入考勤范围。</span></div></div>'+
+      '</section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('clipboard',16)+'待办审批<span class="card-sub">按提交时间排序</span></div><button class="btn-text" data-action="nav" data-route="leaves">全部 '+myTodoTotal+' 项 '+icon('chevronRight',13)+'</button></div>'+
+        '<div class="todo-list">'+(todos.length ? todos.map(function(t){
+          return '<div class="todo-item"><div class="todo-ico '+t.tone+'">'+icon(t.ico,16)+'</div><div class="todo-main"><b>'+esc(t.title)+'</b><small>'+esc(t.meta)+'</small></div><div class="todo-meta">'+stateTag(t.tag)+'<button class="btn btn-sm btn-ghost" data-action="go-todo" data-route="'+t.route+'">处理</button></div></div>';
+        }).join('') : '<div class="empty">'+(isManagerLike()?'暂无待办审批':'当前为员工视角，无审批待办')+'</div>')+'</div></section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('alert',16)+'考勤异常提醒</div><button class="btn-text" data-action="nav" data-route="anomalies">查看全部 '+icon('chevronRight',13)+'</button></div>'+
+        '<div class="todo-list">'+anomalies.slice(0,3).map(function(a){
+          const e = empById(a.empId);
+          return '<div class="todo-item"><div class="todo-ico '+(a.status==='rejected'?'danger':'warn')+'">'+icon('alert',16)+'</div><div class="todo-main"><b>'+esc(e.name)+' · '+esc(a.type)+'</b><small>'+fmtShort(a.date)+' '+esc(a.shift)+' · '+esc(a.reason.slice(0,24))+'…</small></div><div class="todo-meta">'+anomStatusTag(a.status)+'</div></div>';
+        }).join('')+'</div></section>'+
+    '</div><div class="dash-col">'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('megaphone',16)+'最新公告</div><button class="btn-text" data-action="nav" data-route="announcements">全部公告 '+icon('chevronRight',13)+'</button></div>'+
+        '<div class="ann-list">'+anns.map(function(a){
+          const unread = (a.readBy||[]).indexOf(ui.user) < 0;
+          return '<div class="ann-item" data-action="open-ann" data-id="'+a.id+'"><span class="ann-dot '+(unread?'unread':'')+'"></span><div class="ann-main"><b>'+esc(a.title)+'</b><small>'+esc(a.author)+' · '+esc(a.time)+'</small><div class="ann-tags">'+levelTag(a.level)+'<span class="tag tag-neutral">'+esc(a.scope)+'</span></div></div></div>';
+        }).join('')+'</div>'+
+        '<div class="anns-mini"><span>共 '+db.announcements.filter(function(a){return !a.draft;}).length+' 篇公告 · 未读 '+unreadAnnouncements().length+' 篇</span><span>发布范围按部门可见</span></div>'+
+      '</section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('users',16)+'团队在岗概览</div><span class="card-sub">'+fmtShort(TODAY)+' 实时</span></div>'+
+        '<div class="team-summary"><div><div class="k">在岗</div><div class="v">'+stats.present+'</div></div><div><div class="k">请假</div><div class="v">'+stats.leave+'</div></div><div><div class="k">缺卡</div><div class="v">'+stats.missing+'</div></div></div>'+
+        '<div class="dept-bars">'+deptRows.map(function(d){
+          const pct = d.total ? Math.round(d.ok/d.total*100) : 0;
+          return '<div class="bar-row"><span class="label">'+esc(d.name)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><span class="val">'+d.ok+'/'+d.total+'</span></div>';
+        }).join('')+'</div>'+
+        '<div class="trend-wrap"><div class="trend-head"><span>近 7 个工作日出勤率</span><span>服务端口径</span></div>'+trendChart()+'</div>'+
+      '</section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('home',16)+'快捷入口</div></div><div class="quick-grid">'+
+        '<button class="quick-btn" data-action="open-leave-form">'+icon('calendarCheck',16)+'发起请假</button>'+
+        '<button class="quick-btn" data-action="open-anom-form">'+icon('alert',16)+'发起补卡</button>'+
+        '<button class="quick-btn" data-action="new-ann">'+icon('megaphone',16)+'新建公告</button>'+
+        '<button class="quick-btn" data-action="nav" data-route="settings">'+icon('shield',16)+'权限说明</button>'+
+      '</div></section>'+
+    '</div></div>';
+}
+
+/* ================= 通用分页 ================= */
+function pagerHtml(page, pages, total, action){
+  let btns = '';
+  const from = pages <= 5 ? 1 : Math.min(Math.max(1, page - 2), pages - 4);
+  const to = Math.min(pages, from + 4);
+  for(let i = from; i <= to; i++){
+    btns += '<button class="pager-btn '+(i===page?'on':'')+'" data-action="'+action+'" data-page="'+i+'">'+i+'</button>';
+  }
+  return '<div class="pager"><span>共 '+total+' 条 · 第 '+page+' / '+pages+' 页</span>'+
+    '<div class="pager-btns">'+
+      '<button class="pager-btn" data-action="'+action+'" data-page="'+(page-1)+'" '+(page<=1?'disabled':'')+'>上一页</button>'+
+      btns+
+      '<button class="pager-btn" data-action="'+action+'" data-page="'+(page+1)+'" '+(page>=pages?'disabled':'')+'>下一页</button>'+
+    '</div></div>';
+}
+function sortedAnnouncements(){
+  return db.announcements.slice().sort(function(a,b){
+    if(a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return a.time < b.time ? 1 : -1;
+  });
+}
+
+/* ================= 员工与部门 ================= */
+const EMP_PAGE_SIZE = 8;
+
+function empFiltered(){
+  const f = ui.filters;
+  const q = f.empSearch.trim().toLowerCase();
+  return db.employees.filter(function(e){
+    if(q){
+      const hay = (e.name+' '+e.id+' '+e.phone+' '+e.email+' '+e.position+' '+deptName(e.dept)).toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    if(f.empDept !== 'all'){
+      const ids = [f.empDept].concat(subDepts(f.empDept).map(function(d){ return d.id; }));
+      if(ids.indexOf(e.dept) < 0) return false;
+    }
+    if(f.empStatus !== 'all' && e.status !== f.empStatus) return false;
+    return true;
+  });
+}
+function empPageData(){
+  const list = empFiltered();
+  const pages = Math.max(1, Math.ceil(list.length / EMP_PAGE_SIZE));
+  if(ui.filters.empPage > pages) ui.filters.empPage = pages;
+  if(ui.filters.empPage < 1) ui.filters.empPage = 1;
+  return { list:list, pages:pages, page:ui.filters.empPage };
+}
+function empRowsHtml(){
+  const d = empPageData();
+  const rows = d.list.slice((d.page-1)*EMP_PAGE_SIZE, (d.page-1)*EMP_PAGE_SIZE + EMP_PAGE_SIZE);
+  if(!rows.length){
+    return '<tr><td colspan="10"><div class="empty"><div class="empty-ico">'+icon('search',20)+'</div>没有符合条件的员工，请调整搜索或筛选条件</div></td></tr>';
+  }
+  return rows.map(function(e){
+    return '<tr>'+
+      '<td class="num muted">'+esc(e.id)+'</td>'+
+      '<td><div class="cell-name">'+avatar(e,30)+'<b>'+esc(e.name)+'</b></div></td>'+
+      '<td>'+esc(deptName(e.dept))+'</td>'+
+      '<td>'+esc(e.position)+'</td>'+
+      '<td class="num">'+esc(e.phone)+'</td>'+
+      '<td><span class="cell-ellipsis">'+esc(e.email)+'</span></td>'+
+      '<td class="num muted">'+esc(e.hire)+'</td>'+
+      '<td>'+stateTag(e.status)+'</td>'+
+      '<td><div class="row-actions"><button class="switch '+(e.account==='启用'?'on':'')+'" role="switch" aria-checked="'+(e.account==='启用')+'" data-action="toggle-account" data-id="'+e.id+'" title="'+(e.account==='启用'?'点击停用账号':'点击启用账号')+'"></button>'+stateTag(e.account)+'</div></td>'+
+      '<td><button class="btn btn-sm btn-ghost" data-action="open-employee" data-id="'+e.id+'">详情</button></td>'+
+    '</tr>';
+  }).join('');
+}
+function empPagerHtml(){
+  const d = empPageData();
+  return pagerHtml(d.page, d.pages, d.list.length, 'emp-page');
+}
+function updateEmpTable(){
+  const body = document.getElementById('empTableBody');
+  const pager = document.getElementById('empPager');
+  const count = document.getElementById('empCount');
+  if(body) body.innerHTML = empRowsHtml();
+  if(pager) pager.innerHTML = empPagerHtml();
+  if(count) count.textContent = '共 ' + empFiltered().length + ' 人';
+}
+function deptCount(id){
+  let n = db.employees.filter(function(e){ return e.dept === id && e.status !== '离职'; }).length;
+  subDepts(id).forEach(function(d){ n += deptCount(d.id); });
+  return n;
+}
+function treeRowsHtml(parent, depth){
+  return DEPARTMENTS.filter(function(d){ return d.parent === parent; }).map(function(d){
+    const kids = subDepts(d.id);
+    const open = !ui.collapsed[d.id];
+    const row = '<button class="tree-row '+(ui.filters.empDept===d.id?'active':'')+'" data-action="set-emp-dept" data-dept="'+d.id+'" style="padding-left:'+(8+depth*14)+'px">'+
+      (kids.length
+        ? '<span class="tree-toggle '+(open?'open':'')+'" data-action="toggle-dept" data-id="'+d.id+'">'+icon('chevronRight',13)+'</span>'
+        : '<span class="tree-toggle">'+icon('file',12)+'</span>')+
+      '<span>'+esc(d.name)+'</span><span class="count">'+deptCount(d.id)+'</span>'+
+    '</button>';
+    return row + (open && kids.length ? treeRowsHtml(d.id, depth+1) : '');
+  }).join('');
+}
+function posListHtml(){
+  const map = {};
+  activeEmployees().forEach(function(e){ map[e.position] = (map[e.position] || 0) + 1; });
+  const list = Object.keys(map).map(function(k){ return {name:k, n:map[k]}; })
+    .sort(function(a,b){ return b.n - a.n; }).slice(0,9);
+  return '<div class="pos-list">'+list.map(function(p){
+    return '<div class="pos-row"><span class="pos-name">'+esc(p.name)+'</span><span class="pos-count">'+p.n+' 人</span></div>';
+  }).join('')+'</div>';
+}
+function visibilityHtml(){
+  const depts = visibleDepts();
+  return '<div class="visibility">'+
+    '<div class="info-strip">'+icon('info',14)+'<span>通讯录可见范围按一级部门控制。被取消的部门在移动端通讯录与员工目录中不可见，已有审批关系不受影响。</span></div>'+
+    '<div class="scope-grid">'+depts.map(function(d){
+      const on = db.visibility.indexOf(d.id) >= 0;
+      return '<label class="scope-check"><input type="checkbox" data-scope="'+d.id+'" '+(on?'checked':'')+'>'+esc(d.name)+'</label>';
+    }).join('')+'</div>'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">'+
+      '<span class="mini-note">已选 '+db.visibility.length+' 个部门 · 保存后立即生效</span>'+
+      '<button class="btn btn-primary btn-sm" data-action="save-scope">'+icon('check',14)+'保存可见范围</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function employeesPage(){
+  const total = db.employees.length;
+  const active = db.employees.filter(function(e){ return e.status !== '离职'; }).length;
+  const trial = db.employees.filter(function(e){ return e.status === '试用'; }).length;
+  const disabled = db.employees.filter(function(e){ return e.account === '停用'; }).length;
+  return '<div class="page-head"><div><h1 class="page-title">员工与部门</h1><p class="page-sub">维护员工花名册、组织架构与账号状态。当前共 '+total+' 名员工，'+active+' 人在职。</p></div>'+
+    '<div class="actions"><button class="btn btn-ghost" data-action="demo-toast" data-msg="演示版已导出员工花名册（CSV）">'+icon('file',15)+'导出名册</button>'+
+    '<button class="btn btn-primary" data-action="demo-toast" data-msg="新增员工为演示占位，暂未开放录入">'+icon('plus',15)+'新增员工</button></div></div>'+
+    '<div class="stat-grid">'+
+      '<div class="stat"><div><div class="stat-label">在职员工</div><div class="stat-value">'+active+'<small>人</small></div><div class="stat-note">含试用期 '+trial+' 人</div></div><div class="stat-icon">'+icon('users',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">部门数量</div><div class="stat-value">'+visibleDepts().length+'<small>个一级部门</small></div><div class="stat-note">共 '+DEPARTMENTS.length+' 个组织节点</div></div><div class="stat-icon">'+icon('building',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">停用账号</div><div class="stat-value">'+disabled+'<small>个</small></div><div class="stat-note">停用后无法登录与打卡</div></div><div class="stat-icon">'+icon('shield',17)+'</div></div>'+
+      '<div class="stat"><div><div class="stat-label">离职员工</div><div class="stat-value">'+(total-active)+'<small>人</small></div><div class="stat-note">保留历史考勤与审批记录</div></div><div class="stat-icon">'+icon('user',17)+'</div></div>'+
+    '</div>'+
+    '<section class="card"><div class="toolbar">'+
+      '<div class="search">'+icon('search',15)+'<input id="empSearch" type="search" placeholder="搜索姓名、工号、手机或邮箱" value="'+esc(ui.filters.empSearch)+'" autocomplete="off"></div>'+
+      '<select class="select" data-field="empDept">'+
+        '<option value="all" '+(ui.filters.empDept==='all'?'selected':'')+'>全部部门</option>'+
+        visibleDepts().map(function(d){ return '<option value="'+d.id+'" '+(ui.filters.empDept===d.id?'selected':'')+'>'+esc(d.name)+'</option>'; }).join('')+
+      '</select>'+
+      '<select class="select" data-field="empStatus">'+
+        ['all:全部状态','在职:在职','试用:试用','离职:离职'].map(function(x){
+          const p = x.split(':');
+          return '<option value="'+p[0]+'" '+(ui.filters.empStatus===p[0]?'selected':'')+'>'+p[1]+'</option>';
+        }).join('')+
+      '</select>'+
+      '<div class="toolbar-right"><span class="mini-note" id="empCount">共 '+empFiltered().length+' 人</span></div>'+
+    '</div>'+
+    '<div class="table-wrap"><table class="table table-nowrap roster-table"><thead><tr>'+
+      '<th>工号</th><th>姓名</th><th>部门</th><th>岗位</th><th>手机</th><th>邮箱</th><th>入职日期</th><th>在职状态</th><th>账号状态</th><th>操作</th>'+
+    '</tr></thead><tbody id="empTableBody">'+empRowsHtml()+'</tbody></table></div>'+
+    '<div id="empPager">'+empPagerHtml()+'</div></section>'+
+    '<div class="split-grid">'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('building',16)+'组织架构<span class="card-sub">点击部门筛选花名册</span></div></div>'+
+        '<div class="tree"><button class="tree-row '+(ui.filters.empDept==='all'?'active':'')+'" data-action="set-emp-dept" data-dept="all" style="padding-left:8px">'+
+          '<span class="tree-toggle">'+icon('users',12)+'</span><span>全部员工</span><span class="count">'+db.employees.length+'</span></button>'+
+          treeRowsHtml(null, 0)+
+        '</div></section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('clipboard',16)+'岗位分布<span class="card-sub">按在职员工统计</span></div></div>'+posListHtml()+'</section>'+
+    '</div>'+
+    '<section class="card section-gap"><div class="card-head"><div class="card-title">'+icon('shield',16)+'通讯录可见范围<span class="card-sub">部门级勾选</span></div><span class="tag tag-neutral">仅管理员/HR 可配置</span></div>'+visibilityHtml()+'</section>';
+}
+
+/* ================= 班次与考勤 ================= */
+const ATT_PAGE_SIZE = 9;
+const WORKDAY_DEFS = [
+  {day:1,label:'周一'},{day:2,label:'周二'},{day:3,label:'周三'},{day:4,label:'周四'},
+  {day:5,label:'周五'},{day:6,label:'周六'},{day:0,label:'周日'}
+];
+function attFiltered(){
+  const f = ui.filters;
+  let list = db.attendance.filter(function(r){ return r.date >= f.attFrom && r.date <= f.attTo; });
+  if(f.attEmp !== 'all') list = list.filter(function(r){ return r.empId === f.attEmp; });
+  return list.sort(function(a,b){
+    if(a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return a.empId < b.empId ? -1 : 1;
+  });
+}
+function attPageData(){
+  const list = attFiltered();
+  const pages = Math.max(1, Math.ceil(list.length / ATT_PAGE_SIZE));
+  if(ui.filters.attPage > pages) ui.filters.attPage = pages;
+  if(ui.filters.attPage < 1) ui.filters.attPage = 1;
+  return { list:list, pages:pages, page:ui.filters.attPage };
+}
+function attStatusHtml(s){
+  const cls = s === '正常' ? 'ok' : (s === '迟到' || s === '早退') ? 'warn' : s === '缺卡' ? 'danger' : s === '请假' ? 'leave' : '';
+  return '<span class="status-dot '+cls+'"><i></i>'+esc(s)+'</span>';
+}
+function attRowsHtml(){
+  const d = attPageData();
+  const rows = d.list.slice((d.page-1)*ATT_PAGE_SIZE, (d.page-1)*ATT_PAGE_SIZE + ATT_PAGE_SIZE);
+  if(!rows.length){
+    return '<tr><td colspan="7"><div class="empty"><div class="empty-ico">'+icon('calendar',20)+'</div>所选日期范围内暂无考勤记录，请调整人员或日期范围</div></td></tr>';
+  }
+  return rows.map(function(r){
+    const e = empById(r.empId);
+    return '<tr><td><b style="font-weight:600">'+esc(fmtShort(r.date))+'</b> <span class="muted">'+weekdayOf(r.date)+'</span></td>'+
+      '<td><div class="cell-name">'+avatar(e,26)+'<b>'+esc(e.name)+'</b></div></td>'+
+      '<td>'+esc(r.shift)+'</td>'+
+      '<td class="num">'+esc(r.in)+'</td>'+
+      '<td class="num">'+esc(r.out)+'</td>'+
+      '<td class="num">'+(r.hours ? r.hours+' h' : '—')+'</td>'+
+      '<td>'+attStatusHtml(r.status)+'</td></tr>';
+  }).join('');
+}
+function attPagerHtml(){
+  const d = attPageData();
+  return pagerHtml(d.page, d.pages, d.list.length, 'att-page');
+}
+function attStatsHtml(){
+  const list = attFiltered();
+  const count = function(s){ return list.filter(function(r){ return r.status === s; }).length; };
+  return '<div class="record-stats" style="padding:14px 18px 0">'+
+    '<span><b>'+list.length+'</b>条记录</span>'+
+    '<span><b>'+count('正常')+'</b>正常</span>'+
+    '<span><b>'+count('迟到')+'</b>迟到</span>'+
+    '<span><b>'+count('早退')+'</b>早退</span>'+
+    '<span><b>'+count('缺卡')+'</b>缺卡</span>'+
+    '<span><b>'+count('请假')+'</b>请假</span></div>';
+}
+
+function attendancePage(){
+  return '<div class="page-head"><div><h1 class="page-title">班次与考勤</h1><p class="page-sub">配置班次、工作日与节假日，查询员工每日打卡记录。跨日班次按班次归属日结算。</p></div>'+
+    '<div class="actions"><button class="btn btn-ghost" data-action="demo-toast" data-msg="已导出当前筛选条件下的考勤明细">'+icon('file',15)+'导出记录</button>'+
+    '<button class="btn btn-primary" data-action="demo-toast" data-msg="排班调整需在管理后台操作，演示版暂未开放">'+icon('calendarCheck',15)+'调整排班</button></div></div>'+
+    '<div class="info-strip">'+icon('info',14)+'<span>考勤时间以服务端时间为准，客户端时间仅作展示。所有打卡记录保留服务端时间戳与门禁设备编号，员工无法自行修改。</span></div>'+
+    '<section class="card"><div class="card-head"><div class="card-title">'+icon('clock',16)+'班次配置<span class="card-sub">共 '+SHIFTS.length+' 个班次</span></div>'+
+      '<button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="班次配置为演示数据，暂不支持在线编辑">'+icon('edit',14)+'编辑班次</button></div>'+
+      '<div class="card-body"><div class="shift-grid">'+SHIFTS.map(function(s){
+        return '<div class="shift-card"><div class="shift-top"><div><div class="shift-name">'+esc(s.name)+'</div><div class="mini-note" style="margin-top:3px">适用：'+esc(s.dept)+'</div></div>'+
+          '<span class="tag '+(s.night?'tag-primary':'tag-neutral')+'">'+(s.night?'跨日':'当日')+'</span></div>'+
+          '<div class="shift-range">'+esc(s.start)+' – '+esc(s.end)+(s.night?'<small>次日</small>':'')+'</div>'+
+          '<div class="shift-meta"><span>工作时长<b>'+s.work+' h</b></span><span>休息时长<b>'+s.rest+' h</b></span>'+
+          '<span>弹性打卡<b>'+s.flex+' 分钟</b></span><span>是否跨日<b>'+(s.night?'是':'否')+'</b></span></div></div>';
+      }).join('')+'</div></div></section>'+
+    '<section class="card section-gap"><div class="card-head"><div class="card-title">'+icon('calendar',16)+'工作日与节假日<span class="card-sub">勾选的工作日参与考勤判定</span></div><span class="tag tag-primary">2026 年 11 月</span></div>'+
+      '<div class="card-body"><div class="workday-grid">'+WORKDAY_DEFS.map(function(w){
+        const on = db.workdays.indexOf(w.day) >= 0;
+        return '<label class="week-check '+(on?'on':'')+'"><input type="checkbox" data-day="'+w.day+'" '+(on?'checked':'')+'>'+w.label+'</label>';
+      }).join('')+'</div>'+
+      '<div class="mini-note" style="margin-bottom:8px">节假日示例（节假日不计入工作日，打卡按加班规则处理）：</div>'+
+      '<div class="holiday-chips">'+db.holidays.slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; }).map(function(h){
+        return '<span class="holiday-chip">'+icon('calendar',12)+esc(fmtShort(h.date))+' · '+esc(h.label)+'</span>';
+      }).join('')+'</div></div></section>'+
+    '<section class="card section-gap"><div class="card-head"><div class="card-title">'+icon('file',16)+'考勤记录<span class="card-sub">服务端口径</span></div><span class="mini-note">有效工时已扣除班次休息时长</span></div>'+
+      '<div class="toolbar">'+
+        '<select class="select" data-field="attEmp">'+
+          '<option value="all" '+(ui.filters.attEmp==='all'?'selected':'')+'>全部员工</option>'+
+          db.employees.filter(function(e){ return e.status !== '离职'; }).map(function(e){
+            return '<option value="'+e.id+'" '+(ui.filters.attEmp===e.id?'selected':'')+'>'+esc(e.name)+'（'+e.id+'）</option>';
+          }).join('')+
+        '</select>'+
+        '<label class="check" style="gap:6px"><span class="mini-note">从</span><input class="input" type="date" value="'+ui.filters.attFrom+'" data-field="attFrom" style="width:148px;height:34px"></label>'+
+        '<label class="check" style="gap:6px"><span class="mini-note">至</span><input class="input" type="date" value="'+ui.filters.attTo+'" data-field="attTo" style="width:148px;height:34px"></label>'+
+        '<div class="toolbar-right"><button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="已导出当前筛选条件下的考勤明细">'+icon('file',14)+'导出</button></div>'+
+      '</div>'+
+      attStatsHtml()+
+      '<div class="table-wrap" style="margin-top:12px"><table class="table table-nowrap"><thead><tr><th>日期</th><th>员工</th><th>班次</th><th>上班打卡</th><th>下班打卡</th><th>有效工时</th><th>状态</th></tr></thead>'+
+      '<tbody>'+attRowsHtml()+'</tbody></table></div>'+
+      attPagerHtml()+
+    '</section>';
+}
+
+/* ================= 异常处理 ================= */
+const ANOM_STATUS_META = {
+  all:{label:'全部异常'}, pending:{label:'待审批'}, draft:{label:'待提交'},
+  effective:{label:'已生效'}, rejected:{label:'已驳回'}
+};
+/* 异常单状态存的是内部枚举值，展示时统一转为中文标签 */
+function anomStatusTag(s){
+  const map = {pending:['待审批','warn'], draft:['待提交','neutral'], effective:['已生效','success'], rejected:['已驳回','danger']};
+  const m = map[s] || [s,'neutral'];
+  return '<span class="tag tag-'+m[1]+'"><span class="dot"></span>'+esc(m[0])+'</span>';
+}
+function anomList(){
+  return db.anomalies.filter(function(a){
+    return ui.filters.anomStatus === 'all' || a.status === ui.filters.anomStatus;
+  });
+}
+function anomActionsHtml(a){
+  if(a.status === 'draft'){
+    return '<div class="anom-actions"><button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="补卡申请编辑为演示占位">'+icon('edit',14)+'编辑申请</button>'+
+      '<button class="btn btn-sm btn-primary" data-action="anom-submit" data-id="'+a.id+'">'+icon('send',14)+'提交审批</button></div>';
+  }
+  if(a.status === 'pending'){
+    if(canApprove()){
+      return '<div class="anom-actions"><button class="btn btn-sm btn-ghost" data-action="anom-reject" data-id="'+a.id+'">'+icon('x',14)+'驳回</button>'+
+        '<button class="btn btn-sm btn-primary" data-action="anom-approve" data-id="'+a.id+'">'+icon('check',14)+'通过并生效</button></div>';
+    }
+    return '<div class="anom-actions"><span class="mini-note">等待直属主管审批，审批通过后自动更新考勤结果</span></div>';
+  }
+  return '<div class="anom-actions"><span class="mini-note">该异常已于 '+esc((a.logs[a.logs.length-1]||{}).time||'—')+' 完成处理，变更记录已归档</span></div>';
+}
+function anomCompareHtml(a){
+  const keys = ['上班打卡','下班打卡','有效工时','考勤状态'];
+  const rows = function(map){
+    return keys.map(function(k){
+      return '<div class="kv-line"><span>'+k+'</span><b>'+(map[k] != null ? esc(map[k]) : '—')+'</b></div>';
+    }).join('');
+  };
+  return '<div class="compare"><div class="compare-box"><div class="k">调整前</div>'+rows(a.before)+'</div>'+
+    '<div class="compare-arrow">'+icon('arrowRight',16)+'</div>'+
+    '<div class="compare-box after"><div class="k">调整后</div>'+rows(a.after)+'</div></div>';
+}
+function anomaliesPage(){
+  const counts = function(s){ return db.anomalies.filter(function(a){ return a.status === s; }).length; };
+  const list = anomList();
+  return '<div class="page-head"><div><h1 class="page-title">异常处理</h1><p class="page-sub">处理跨日班次打卡异常、缺卡与补卡申请。每条异常保留调整前 / 调整后对比、原因与完整操作日志。</p></div>'+
+    '<div class="actions"><button class="btn btn-primary" data-action="open-anom-form">'+icon('plus',15)+'申请补卡</button></div></div>'+
+    '<div class="anom-stats">'+['all','pending','draft','effective','rejected'].map(function(s){
+      return '<button class="anom-stat '+(ui.filters.anomStatus===s?'on':'')+'" data-action="anom-filter" data-status="'+s+'">'+ANOM_STATUS_META[s].label+' <b>'+(s==='all'?db.anomalies.length:counts(s))+'</b></button>';
+    }).join('')+'</div>'+
+    '<div class="anom-list">'+ (list.length ? list.map(function(a){
+      const e = empById(a.empId);
+      const open = ui.filters.anomExpanded === a.id;
+      const tone = a.type === '跨日班次异常' ? '' : a.type === '早退异常' ? 'warn' : 'danger';
+      return '<article class="anom-card '+(open?'open':'')+'">'+
+        '<div class="anom-head" data-action="anom-toggle" data-id="'+a.id+'">'+
+          '<div class="todo-ico '+tone+'">'+icon(a.type === '跨日班次异常' ? 'clock' : 'alert',15)+'</div>'+
+          '<div class="main"><b>'+esc(e.name)+' · '+esc(a.type)+'</b><small>'+esc(fmtCn(a.date))+' '+weekdayOf(a.date)+' · '+esc(a.shift)+' · 单号 '+esc(a.id)+'</small></div>'+
+          '<div class="right">'+anomStatusTag(a.status)+'<span class="anom-chevron">'+icon('chevronDown',16)+'</span></div>'+
+        '</div>'+
+        (open ? '<div class="anom-body">'+anomCompareHtml(a)+
+          '<div class="reason-line"><b>处理原因：</b>'+esc(a.reason)+'</div>'+
+          '<div class="log-block"><div class="log-title">变更记录 / 操作日志</div><div class="log-list">'+a.logs.map(function(l){
+            return '<div class="log-item"><span class="log-time">'+esc(l.time)+'</span><span class="log-dot"></span><span class="log-text"><b>'+esc(l.actor)+'</b> · '+esc(l.text)+'</span></div>';
+          }).join('')+'</div></div>'+
+          anomActionsHtml(a)+
+        '</div>' : '')+
+      '</article>';
+    }).join('') : '<div class="card"><div class="empty"><div class="empty-ico">'+icon('check',20)+'</div>当前筛选下没有异常记录</div></div>')+'</div>';
+}
+
+/* ================= 请假审批 ================= */
+const LEAVE_TABS = [
+  {key:'draft', label:'申请中'},
+  {key:'pending', label:'待审批'},
+  {key:'approved', label:'已通过'},
+  {key:'rejected', label:'已驳回'}
+];
+const LEAVE_META = {
+  '年假':{icon:'calendarCheck', tone:''},
+  '事假':{icon:'file', tone:'neutral'},
+  '病假':{icon:'alert', tone:'warn'},
+  '调休':{icon:'refresh', tone:'success'},
+  '婚假':{icon:'pin', tone:'danger'},
+  '产假':{icon:'user', tone:'success'},
+  '陪产假':{icon:'user', tone:'success'}
+};
+function leaveMeta(type){ return LEAVE_META[type] || {icon:'calendar', tone:''}; }
+function canSeeLeave(l){
+  if(canApprove()) return true;
+  return l.empId === ui.user;
+}
+function leaveTabList(tab){
+  return db.leaves.filter(function(l){ return l.status === tab && canSeeLeave(l); })
+    .sort(function(a,b){ return a.submitted < b.submitted ? 1 : -1; });
+}
+function leaveStatusTag(s){
+  if(s === 'approved') return '<span class="tag tag-success"><span class="dot"></span>已通过</span>';
+  if(s === 'pending') return '<span class="tag tag-warn"><span class="dot"></span>待审批</span>';
+  if(s === 'rejected') return '<span class="tag tag-danger"><span class="dot"></span>已驳回</span>';
+  return '<span class="tag tag-neutral"><span class="dot"></span>草稿</span>';
+}
+function balanceOf(empId, type, totalHours){
+  const used = db.leaves.filter(function(l){
+    return l.empId === empId && l.status === 'approved' && l.type === type;
+  }).reduce(function(s,l){ return s + (l.hours || leaveHours(l.start, l.end)); }, 0);
+  return { used:used, total:totalHours, left:Math.max(0, totalHours - used) };
+}
+function leaveRowsHtml(list){
+  if(!list.length){
+    return '<div class="empty"><div class="empty-ico">'+icon('calendarCheck',20)+'</div>该分类下暂无请假申请</div>';
+  }
+  return '<div class="table-wrap"><table class="table table-nowrap"><thead><tr><th>申请人</th><th>休假类型</th><th>起止时间</th><th>时长</th><th>审批人</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead><tbody>'+
+  list.map(function(l){
+    const e = empById(l.empId);
+    const m = leaveMeta(l.type);
+    return '<tr>'+
+      '<td><div class="cell-name">'+avatar(e,28)+'<div><b>'+esc(e.name)+'</b><small>'+esc(deptName(e.dept))+'</small></div></div></td>'+
+      '<td><div class="leave-type"><span class="type-ico '+m.tone+'">'+icon(m.icon,14)+'</span>'+esc(l.type)+'</div></td>'+
+      '<td><div style="font-size:12.5px">'+esc(fmtShort(l.start.slice(0,10)))+' '+esc(l.start.slice(11))+'<br><span class="muted">至 '+esc(fmtShort(l.end.slice(0,10)))+' '+esc(l.end.slice(11))+'</span></div></td>'+
+      '<td class="duration-cell"><b>'+(l.hours||0)+' 小时</b><small>'+((l.hours||0)/8).toFixed(1)+' 天</small></td>'+
+      '<td>'+esc(empById(l.approver) ? empById(l.approver).name : l.approver)+'</td>'+
+      '<td class="muted num">'+esc(l.submitted)+'</td>'+
+      '<td>'+leaveStatusTag(l.status)+'</td>'+
+      '<td><button class="btn btn-sm btn-ghost" data-action="open-leave" data-id="'+l.id+'">详情</button></td>'+
+    '</tr>';
+  }).join('')+'</tbody></table></div>';
+}
+function leavesPage(){
+  const balances = [
+    {k:'年假余额', v:balanceOf(ui.user,'年假',80).left, unit:'小时', note:'额度 10 天'},
+    {k:'调休余额', v:balanceOf(ui.user,'调休',16).left, unit:'小时', note:'额度 2 天'},
+    {k:'本月请假', v:db.leaves.filter(function(l){ return l.empId===ui.user && l.submitted.slice(0,7)==='2026-11'; }).length, unit:'次', note:'含草稿与审批中'},
+    {k:'待我审批', v:canApprove()?db.leaves.filter(function(l){ return l.status==='pending'; }).length:0, unit:'项', note:'仅主管及以上可见'}
+  ];
+  const list = leaveTabList(ui.filters.leaveTab);
+  return '<div class="page-head"><div><h1 class="page-title">请假审批</h1><p class="page-sub">发起请假、跟踪审批进度。审批通过后请假数据自动回写考勤，按请假覆盖时段判定，不计缺卡。</p></div>'+
+    '<div class="actions"><button class="btn btn-primary" data-action="open-leave-form">'+icon('plus',15)+'发起请假</button></div></div>'+
+    '<div class="stat-grid">'+balances.map(function(b){
+      return '<div class="stat"><div><div class="stat-label">'+esc(b.k)+'</div><div class="stat-value">'+b.v+'<small>'+esc(b.unit)+'</small></div><div class="stat-note">'+esc(b.note)+'</div></div><div class="stat-icon">'+icon('calendarCheck',17)+'</div></div>';
+    }).join('')+'</div>'+
+    '<section class="card"><div class="tabs">'+LEAVE_TABS.map(function(t){
+      const n = leaveTabList(t.key).length;
+      return '<button class="tab '+(ui.filters.leaveTab===t.key?'on':'')+'" data-action="leave-tab" data-tab="'+t.key+'">'+t.label+'<span class="count">'+n+'</span></button>';
+    }).join('')+'</div>'+leaveRowsHtml(list)+'</section>';
+}
+
+/* ================= 考勤联动 ================= */
+function leavesCoverDate(empId, date){
+  return db.leaves.filter(function(l){
+    return l.empId === empId && l.status === 'approved' && date >= l.start.slice(0,10) && date <= l.end.slice(0,10);
+  });
+}
+function unionHours(intervals){
+  const list = intervals.map(function(x){ return {s:x.s, e:x.e}; }).sort(function(a,b){ return a.s - b.s; });
+  let total = 0, curS = null, curE = null;
+  list.forEach(function(x){
+    if(curS === null){ curS = x.s; curE = x.e; return; }
+    if(x.s <= curE){ curE = Math.max(curE, x.e); }
+    else { total += curE - curS; curS = x.s; curE = x.e; }
+  });
+  if(curS !== null) total += curE - curS;
+  return total;
+}
+function linkagePage(){
+  const empId = ui.filters.linkEmp || ui.user;
+  const date = ui.filters.linkDate || TODAY;
+  const emp = empById(empId) || currentUser();
+  const rec = attRecord(empId, date);
+  const leaves = leavesCoverDate(empId, date);
+  const leaveHoursTotal = leaves.reduce(function(s,l){ return s + (l.hours || leaveHours(l.start, l.end)); }, 0);
+  const overlaps = OVERLAP_LEAVES.map(function(l){
+    const s = l.start.slice(11), e = l.end.slice(11);
+    return {s:toMin(s), e:toMin(e), sText:s, eText:e, type:l.type, hours:minutesToHours(toMin(e)-toMin(s))};
+  });
+  const sumH = overlaps.reduce(function(s,o){ return s + o.hours; }, 0);
+  const mergedH = minutesToHours(unionHours(overlaps));
+  return '<div class="page-head"><div><h1 class="page-title">考勤联动</h1><p class="page-sub">已通过的请假自动与考勤结果关联：请假覆盖的时段标记为「请假」，重叠时段按并集计算，跨日按班次归属日结算。</p></div></div>'+
+  '<section class="card"><div class="card-head"><div class="card-title">'+icon('link',16)+'请假与考勤关联查询<span class="card-sub">选择员工与日期查看联动结果</span></div>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap"><select class="select" data-field="linkEmp">'+
+      db.employees.filter(function(e){ return e.status!=='离职'; }).map(function(e){
+        return '<option value="'+e.id+'" '+(empId===e.id?'selected':'')+'>'+esc(e.name)+'（'+e.id+'）</option>';
+      }).join('')+'</select>'+
+      '<select class="select" data-field="linkDate">'+
+        ATT_DATES.slice().sort().map(function(d){
+          return '<option value="'+d+'" '+(date===d?'selected':'')+'>'+esc(fmtShort(d))+' '+weekdayOf(d)+'</option>';
+        }).join('')+'</select></div></div>'+
+    '<div class="card-body"><div class="grid-2">'+
+      '<div class="compare-box" style="border-color:var(--line)"><div class="k" style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text-3);margin-bottom:8px">考勤结果</div>'+
+        '<div class="kv-line"><span>员工</span><b>'+esc(emp.name)+' · '+esc(deptName(emp.dept))+'</b></div>'+
+        '<div class="kv-line"><span>日期</span><b>'+esc(fmtCn(date))+' '+weekdayOf(date)+'</b></div>'+
+        '<div class="kv-line"><span>班次</span><b>'+(rec?esc(rec.shift):'—')+'</b></div>'+
+        '<div class="kv-line"><span>上班 / 下班</span><b>'+(rec?esc(rec.in)+' / '+esc(rec.out):'—')+'</b></div>'+
+        '<div class="kv-line"><span>有效工时</span><b>'+(rec&&rec.hours?rec.hours+' 小时':'—')+'</b></div>'+
+        '<div class="kv-line"><span>考勤状态</span><b>'+(rec?attStatusHtml(rec.status):'无记录')+'</b></div>'+
+      '</div>'+
+      '<div class="compare-box after"><div class="k" style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--success);margin-bottom:8px">请假关联</div>'+
+        (leaves.length ? leaves.map(function(l){
+          return '<div class="kv-line"><span>'+esc(l.type)+'</span><b>'+esc(fmtShort(l.start.slice(0,10)))+' '+esc(l.start.slice(11))+' – '+esc(fmtShort(l.end.slice(0,10)))+' '+esc(l.end.slice(11))+'</b></div>';
+        }).join('')+'<div class="kv-line"><span>覆盖时长</span><b>'+leaveHoursTotal+' 小时</b></div>'+
+        '<div class="kv-line"><span>判定结果</span><b><span class="tag tag-primary">请假，不计缺卡</span></b></div>'
+        : '<div class="empty" style="padding:18px 6px 8px"><div class="empty-ico">'+icon('info',18)+'</div>当日无已通过请假</div>')+
+      '</div>'+
+    '</div>'+
+    (leaves.length
+      ? '<div class="result-callout">'+icon('check',16)+'<span>该日存在已通过的「'+esc(leaves[0].type)+'」，考勤直接标记为「请假」。系统不再判定缺卡，也不会生成新的异常记录。</span></div>'
+      : '<div class="info-strip" style="margin-top:12px;margin-bottom:0">'+icon('info',14)+'<span>该日无已通过请假，考勤按实际打卡与服务端时间判定。</span></div>')+
+    '</div></section>'+
+  '<div class="link-grid">'+
+    '<div class="dash-col">'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('calendarCheck',16)+'重叠请假合并计算<span class="card-sub">同一时段不重复计入</span></div><span class="tag tag-primary">示例 · 11月20日</span></div>'+
+        '<div class="card-body">'+
+          '<div class="timeline-bar">'+
+            '<span class="seg" style="left:'+(60/420*100)+'%;width:'+(180/420*100)+'%;top:4px;bottom:auto;height:11px">年假 09:00–12:00</span>'+
+            '<span class="seg b" style="left:'+(120/420*100)+'%;width:'+(240/420*100)+'%;top:20px;bottom:auto;height:11px">调休 10:00–14:00</span>'+
+          '</div>'+
+          '<div class="timeline-scale"><span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>15:00</span></div>'+
+          '<table class="merge-table" style="margin-top:14px"><thead><tr><th>请假单</th><th>时段</th><th>时长</th></tr></thead><tbody>'+
+            overlaps.map(function(o,i){
+              return '<tr><td>'+esc(OVERLAP_LEAVES[i].type)+' '+esc(OVERLAP_LEAVES[i].id)+'</td><td>'+esc(o.sText)+' – '+esc(o.eText)+'</td><td>'+o.hours+' 小时</td></tr>';
+            }).join('')+
+            '<tr><td><b>简单相加</b></td><td>09:00 – 14:00（含重叠）</td><td><b>'+sumH+' 小时</b></td></tr>'+
+            '<tr><td><b>区间并集</b></td><td>09:00 – 14:00</td><td><b>'+mergedH+' 小时</b></td></tr>'+
+          '</tbody></table>'+
+          '<div class="result-callout">'+icon('check',16)+'<span>合并后按并集计 <b>'+mergedH+' 小时</b>，重叠的 10:00–12:00 仅计算一次，避免重复扣减年假/调休余额。</span></div>'+
+        '</div></section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('clock',16)+'跨班次请假时长算法<span class="card-sub">22:00 – 次日 06:00</span></div></div>'+
+        '<div class="card-body"><div class="night-note">'+
+          '<p><strong>场景：</strong>员工请年假 11-20 22:00 至 11-21 06:00，覆盖夜班（跨日）全部工时。</p>'+
+          '<div class="formula">时长 = (次日 06:00 − 当日 22:00) = 8.0 小时</div>'+
+          '<p><strong>归属日切分：</strong>11-20 22:00–24:00 计 2.0 小时，11-21 00:00–06:00 计 6.0 小时，合计 8.0 小时，全部归属班次开始日 11-20。</p>'+
+          '<p><strong>避免重复：</strong>11-21 的 00:00–06:00 不会再次计入 11-21 的请假额度；若员工 11-21 另请白班假，系统仅计算白班时段，不包含已被夜班覆盖的 6 小时。</p>'+
+        '</div>'+
+        '<div class="timeline-bar" style="margin-top:12px"><span class="seg" style="left:0;width:'+(2/8*100)+'%;top:4px;bottom:auto;height:12px">11-20 22:00–24:00 · 2h</span><span class="seg b" style="left:'+(2/8*100)+'%;width:'+(6/8*100)+'%;top:4px;bottom:auto;height:12px">11-21 00:00–06:00 · 6h</span></div>'+
+        '<div class="timeline-scale"><span>22:00</span><span>00:00</span><span>06:00</span></div></div></section>'+
+    '</div>'+
+    '<section class="card"><div class="card-head"><div class="card-title">'+icon('info',16)+'联动规则说明</div></div>'+
+      '<div class="card-body"><div class="log-list">'+
+        '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>请假优先</b><br>已通过请假覆盖的日期，考勤直接标记「请假」，不再判缺卡。</span></div>'+
+        '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>并集去重</b><br>同一员工同一时段的多条请假按时间并集计算，交叉时段只计一次。</span></div>'+
+        '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>跨日归属</b><br>跨日班次按班次开始日归属，避免次日重复计算。</span></div>'+
+        '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>余额扣减</b><br>仅「已通过」且已生效的请假扣减对应假期余额，驳回与草稿不扣减。</span></div>'+
+        '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>异常生成</b><br>请假覆盖时段内缺卡不生成异常；覆盖时段外的缺卡仍会进入异常处理。</span></div>'+
+      '</div></div></section>'+
+  '</div>';
+}
+
+/* ================= 公告通知 ================= */
+function annLevelIco(level){
+  if(level === '紧急') return '<span class="ann-level-ico 紧急">'+icon('alert',15)+'</span>';
+  if(level === '重要') return '<span class="ann-level-ico 重要">'+icon('megaphone',15)+'</span>';
+  return '<span class="ann-level-ico 普通">'+icon('file',15)+'</span>';
+}
+function annFiltered(){
+  return sortedAnnouncements().filter(function(a){
+    return ui.filters.annLevel === 'all' || a.level === ui.filters.annLevel;
+  });
+}
+function announcementsPage(){
+  const list = annFiltered();
+  const unread = unreadAnnouncements();
+  return '<div class="page-head"><div><h1 class="page-title">公告通知</h1><p class="page-sub">面向全员或指定部门发布通知，支持置顶、重要级别与草稿保存，实时统计已读未读。</p></div>'+
+    '<div class="actions"><button class="btn btn-primary" data-action="open-ann-form">'+icon('plus',15)+'新建公告</button></div></div>'+
+    '<section class="card"><div class="toolbar">'+
+      '<div class="card-title" style="font-size:13px">'+icon('megaphone',16)+'公告列表<span class="card-sub">共 '+list.length+' 条 · 未读 '+unread+' 条</span></div>'+
+      '<select class="select" data-field="annLevel">'+
+        ['all:全部级别','普通:普通','重要:重要','紧急:紧急'].map(function(x){
+          const p = x.split(':');
+          return '<option value="'+p[0]+'" '+(ui.filters.annLevel===p[0]?'selected':'')+'>'+p[1]+'</option>';
+        }).join('')+
+      '</select>'+
+      '<div class="toolbar-right"><span class="mini-note">按置顶与发布时间排序</span></div>'+
+    '</div>'+
+    '<div style="padding:0 18px 8px">'+ (list.length ? list.map(function(a){
+      const pct = a.total ? Math.round((a.read + a.readBy.length) / a.total * 100) : 0;
+      const readable = a.read + a.readBy.length;
+      const unread = (a.readBy || []).indexOf(ui.user) < 0;
+      const summary = a.content.replace(/\n/g, ' ');
+      return '<div class="ann-row" data-action="open-ann" data-id="'+a.id+'">'+
+        annLevelIco(a.level)+
+        '<div class="main"><div class="title-line">'+(a.pinned?'<span class="pin-flag">'+icon('pin',12)+'置顶</span>':'')+
+          '<b class="'+(unread?'unread':'')+'">'+esc(a.title)+'</b>'+(a.draft ? '<span class="tag tag-neutral">草稿</span>' : '')+'</div>'+
+          '<div class="summary">'+esc(summary.slice(0, 72))+(summary.length > 72 ? '…' : '')+'</div>'+
+          '<div class="meta"><span>'+esc(a.author)+'</span><span>'+esc(a.time)+'</span><span>范围：'+esc(a.scope)+'</span></div>'+
+        '</div>'+
+        '<div class="side">'+
+          levelTag(a.level)+
+          '<div><span class="read-ratio">已读 '+readable+' / '+a.total+'</span><div class="read-bar"><i style="width:'+pct+'%"></i></div></div>'+
+          (canApprove() ? '<button class="btn btn-text" data-action="pin-ann" data-id="'+a.id+'">'+(a.pinned?'取消置顶':'置顶')+'</button>' : '')+
+        '</div>'+
+      '</div>';
+    }).join('') : '<div class="empty"><div class="empty-ico">'+icon('megaphone',20)+'</div>当前级别下暂无公告</div>')+'</div></section>';
+}
+
+/* ================= 设置与权限 ================= */
+function permCell(v){
+  if(v === '—') return '<span class="no">—</span>';
+  if(v.indexOf('全部') >= 0 || v.indexOf('全公司') >= 0) return '<span class="yes">'+esc(v)+'</span>';
+  return '<span class="part">'+esc(v)+'</span>';
+}
+function pendingCountFor(id){
+  let n = db.leaves.filter(function(l){ return l.status === 'pending' && l.approver === id; }).length;
+  const emp = empById(id);
+  if(emp && (emp.role === '主管' || emp.role === 'HR' || emp.role === '管理员')){
+    n += db.anomalies.filter(function(a){ return a.status === 'pending'; }).length;
+  }
+  return n;
+}
+function roleUsers(){
+  return ['EMP001','EMP002','EMP003','EMP011'].map(function(id){ return empById(id); }).filter(Boolean);
+}
+function settingsPage(){
+  const me = currentUser();
+  return '<div class="page-head"><div><h1 class="page-title">设置与权限</h1><p class="page-sub">查看角色权限矩阵与当前登录身份。切换身份后，左侧菜单、待办数量与审批权限会同步变化。</p></div></div>'+
+    '<section class="card"><div class="card-head"><div class="card-title">'+icon('users',16)+'当前登录身份<span class="card-sub">演示账号 · 可随时切换</span></div><span class="tag tag-primary">'+esc(me.name)+' · '+esc(me.role)+'</span></div>'+
+      '<div class="card-body"><div class="identity-cards">'+roleUsers().map(function(e){
+        const on = e.id === ui.user;
+        return '<div class="id-card '+(on?'on':'')+'" '+(on?'':'data-action="pick-identity" data-id="'+e.id+'"')+'>'+avatar(e,36)+
+          '<div class="meta"><b>'+esc(e.name)+' · '+esc(e.role)+'</b><small>'+esc(deptName(e.dept))+' · '+esc(e.position)+'<br>'+esc(e.id)+' · 待处理 '+pendingCountFor(e.id)+' 项</small></div>'+
+          (on ? '<span class="check-badge">'+icon('check',16)+'</span>' : '<span class="btn btn-sm btn-ghost">切换</span>')+'</div>';
+      }).join('')+'</div></div></section>'+
+    '<section class="card section-gap"><div class="card-head"><div class="card-title">'+icon('shield',16)+'角色与权限矩阵<span class="card-sub">示意 · 实际以企业授权配置为准</span></div></div>'+
+      '<div class="table-wrap"><table class="table matrix"><thead><tr><th>功能模块</th><th>员工</th><th>主管</th><th>HR</th><th>管理员</th></tr></thead><tbody>'+
+      PERMISSION_MATRIX.map(function(r){
+        return '<tr><td><b>'+esc(r.module)+'</b></td><td>'+permCell(r.emp)+'</td><td>'+permCell(r.mgr)+'</td><td>'+permCell(r.hr)+'</td><td>'+permCell(r.admin)+'</td></tr>';
+      }).join('')+'</tbody></table></div></section>'+
+    '<div class="grid-2 section-gap">'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('settings',16)+'登录与安全</div></div>'+
+        '<div class="card-body"><div class="log-list">'+
+          '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>登录方式</b><br>企业微信扫码 / 工号密码 · <span class="tag tag-success">已绑定</span></span><button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="登录方式配置为演示占位">配置</button></div>'+
+          '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>双因素认证</b><br>管理员与 HR 账号已强制开启短信二次验证</span><button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="安全策略为演示占位">管理</button></div>'+
+          '<div class="log-item"><span class="log-dot"></span><span class="log-text"><b>登录日志</b><br>最近登录 '+esc(DEMO_NOW)+' · 协同大厦 A 座 · 企业微信</span><button class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="已展示最近 10 条登录日志（演示）">查看</button></div>'+
+        '</div></div></section>'+
+      '<section class="card"><div class="card-head"><div class="card-title">'+icon('alert',16)+'演示数据</div></div>'+
+        '<div class="card-body"><div class="danger-zone"><div class="meta"><b>重置演示数据</b><small>清空 localStorage 中的打卡、请假、公告等改动，恢复初始演示数据。</small></div>'+
+        '<button class="btn btn-danger-ghost" data-action="ask-reset">'+icon('refresh',14)+'重置数据</button></div></div></section>'+
+    '</div>';
+}
+
+/* ================= 移动端 ================= */
+function mobileHeader(){
+  const u = currentUser();
+  const titles = {home:'工作台', approvals:'待审批', contacts:'通讯录', profile:'我的'};
+  const subs = {
+    home: fmtCn(TODAY) + ' ' + weekdayOf(TODAY),
+    approvals: (canApprove() ? pendingLeaves().length + pendingAnomalies().length : 0) + ' 项待处理',
+    contacts: '星海控股集团 · ' + activeEmployees().length + ' 人',
+    profile: '个人记录与设置'
+  };
+  const unread = unreadAnnouncements().length;
+  return '<div class="m-header"><div><div class="mtitle">'+titles[ui.tab]+'</div><div class="msub">'+subs[ui.tab]+'</div></div>'+
+    '<div class="hbtns">'+
+      '<button class="m-avatar-btn" data-action="m-announce" title="公告通知" style="padding:6px">'+icon('bell',18)+
+        (unread ? '<span style="position:absolute;margin:-14px 0 0 12px;width:6px;height:6px;border-radius:50%;background:var(--danger)"></span>' : '')+'</button>'+
+      '<button class="m-avatar-btn" data-action="m-identity" title="切换身份">'+avatar(u,24)+'</button>'+
+    '</div></div>';
+}
+function mobileTabbar(){
+  const tabs = [
+    {k:'home', label:'工作台', icon:'dashboard'},
+    {k:'approvals', label:'审批', icon:'clipboard'},
+    {k:'contacts', label:'通讯录', icon:'users'},
+    {k:'profile', label:'我的', icon:'user'}
+  ];
+  const n = canApprove() ? pendingLeaves().length + pendingAnomalies().length : 0;
+  return '<nav class="m-tabbar">'+tabs.map(function(t){
+    return '<button class="m-tab '+(ui.tab===t.k?'on':'')+'" data-action="m-tab" data-tab="'+t.k+'">'+icon(t.icon,20)+'<span>'+t.label+'</span>'+
+      (t.k==='approvals' && n ? '<span class="dotbadge"></span>' : '')+'</button>';
+  }).join('')+'</nav>';
+}
+function mobilePunchHtml(){
+  const rec = attRecord(ui.user, TODAY);
+  const isLeave = rec && rec.status === '请假';
+  const hasIn = rec && rec.in && rec.in !== '—';
+  const hasOut = rec && rec.out && rec.out !== '—';
+  if(ui.mobilePunching){
+    return '<div class="punch-wrap"><button class="punch loading"><span class="big">定位中…</span><span class="small">正在校验考勤范围</span></button>'+
+      '<div class="punch-state">'+icon('mapPin',14)+'正在获取服务端时间与定位</div></div>';
+  }
+  if(ui.punchFlash){
+    return '<div class="punch-success"><div class="success-ring">'+icon('check',38)+'</div><b>打卡成功</b><small>服务端时间 '+esc(DEMO_NOW.slice(11,16))+' · 已同步考勤记录</small></div>';
+  }
+  const label = isLeave ? '请假中' : hasOut ? '今日已打卡' : hasIn ? '下班打卡' : '上班打卡';
+  const small = isLeave ? '无需打卡' : hasOut ? '服务端 '+rec.out : hasIn ? '上班 '+rec.in : '09:00 – 18:00';
+  return '<div class="punch-wrap">'+
+    '<button class="punch '+(hasOut||isLeave?'done':'')+'" data-action="m-punch" '+((hasOut||isLeave)?'disabled':'')+'>'+
+      '<span class="big">'+label+'</span><span class="small">'+small+'</span></button>'+
+    '<div class="punch-state '+(hasOut?'ok':'')+'">'+icon(hasOut?'check':'clock',14)+
+      (isLeave ? '今日为已通过请假，考勤不判缺卡' : hasOut ? '打卡完成 · 服务端 '+esc(rec.out)+' 已记录' : '班次 09:00–18:00 · 服务端时间 '+esc(DEMO_NOW.slice(11,16)))+'</div>'+
+    '</div>'+
+    '<div class="m-loc">'+icon('mapPin',13)+'协同大厦 A 座 <span class="ok">已在考勤范围</span> '+icon('wifi',13)+'公司 Wi-Fi</div>'+
+    '<div class="m-note">打卡时间以服务端时间为准，客户端时间仅作展示；定位为演示模拟。</div>';
+}
+function mobileHome(){
+  const u = currentUser();
+  const leaves = db.leaves.filter(function(l){ return l.empId === ui.user; }).sort(function(a,b){ return a.submitted < b.submitted ? 1 : -1; }).slice(0,2);
+  const anns = sortedAnnouncements().filter(function(a){ return !a.draft; }).slice(0,2);
+  const rec = attRecord(ui.user, TODAY);
+  return '<div class="m-greeting"><div><div class="m-label">下午好</div><div class="m-hi">'+esc(u.name)+'</div><div class="m-sub">'+esc(deptName(u.dept))+' · '+esc(u.position)+'</div></div>'+
+    '<span class="m-role-chip">'+esc(u.role)+'视角</span></div>'+
+    '<div class="m-card m-clock">'+mobilePunchHtml()+'</div>'+
+    '<div class="m-quick">'+
+      '<button class="m-quick-btn" data-action="m-punch">'+icon('clock',19)+'打卡</button>'+
+      '<button class="m-quick-btn" data-action="open-leave-form">'+icon('calendarCheck',19)+'请假</button>'+
+      '<button class="m-quick-btn" data-action="m-tab" data-tab="approvals">'+icon('clipboard',19)+'审批</button>'+
+      '<button class="m-quick-btn" data-action="m-tab" data-tab="contacts">'+icon('users',19)+'通讯录</button>'+
+    '</div>'+
+    '<div class="m-card tight"><div class="m-row-between"><span class="m-label">我的今日</span>'+(rec?stateTag(rec.status):'')+'</div>'+
+      '<div style="display:flex;gap:16px;margin-top:8px">'+
+        '<div><div class="m-label">上班</div><b style="font-size:15px">'+(rec?esc(rec.in):'—')+'</b></div>'+
+        '<div><div class="m-label">下班</div><b style="font-size:15px">'+(rec?esc(rec.out):'—')+'</b></div>'+
+        '<div><div class="m-label">有效工时</div><b style="font-size:15px">'+(rec&&rec.hours?rec.hours+' h':'—')+'</b></div>'+
+      '</div></div>'+
+    '<div class="m-sec-head"><b>我的请假</b><button data-action="open-leave-form">发起'+icon('plus',12)+'</button></div>'+
+    '<div class="m-card tight">'+(leaves.length ? '<div class="m-list">'+leaves.map(function(l){
+      const m = leaveMeta(l.type);
+      return '<div class="m-list-row" data-action="open-leave" data-id="'+l.id+'"><span class="type-ico '+m.tone+'">'+icon(m.icon,13)+'</span>'+
+        '<div class="main"><b>'+esc(l.type)+' · '+(l.hours||0)+' 小时</b><small>'+esc(fmtShort(l.start.slice(0,10)))+' 至 '+esc(fmtShort(l.end.slice(0,10)))+'</small></div>'+
+        leaveStatusTag(l.status)+'</div>';
+    }).join('')+'</div>' : '<div class="m-empty" style="padding:18px 6px">暂无请假记录，点击右上角发起</div>')+'</div>'+
+    (canApprove() ? '<div class="m-sec-head"><b>待我审批</b><button data-action="m-tab" data-tab="approvals">全部'+icon('chevronRight',12)+'</button></div>'+
+      '<div class="m-card tight"><div class="m-list">'+db.leaves.filter(function(l){ return l.status==='pending'; }).slice(0,2).map(function(l){
+        const e = empById(l.empId);
+        return '<div class="m-list-row" data-action="open-leave" data-id="'+l.id+'">'+avatar(e,30)+
+          '<div class="main"><b>'+esc(e.name)+' · '+esc(l.type)+'</b><small>'+esc(fmtShort(l.start.slice(0,10)))+' 至 '+esc(fmtShort(l.end.slice(0,10)))+' · '+(l.hours||0)+' 小时</small></div>'+
+          '<span class="tag tag-warn">待审批</span></div>';
+      }).join('')+'</div></div>' : '')+
+    '<div class="m-sec-head"><b>最新公告</b></div>'+
+    '<div class="m-card tight">'+(anns.length ? anns.map(function(a){
+      return '<div class="m-ann-row" data-action="open-ann" data-id="'+a.id+'"><span class="ann-level-ico '+a.level+'" style="width:26px;height:26px;border-radius:6px">'+icon('file',12)+'</span>'+
+        '<div style="flex:1;min-width:0"><b>'+esc(a.title)+'</b><small>'+esc(a.author)+' · '+esc(a.time)+'</small></div></div>';
+    }).join('') : '<div class="m-empty" style="padding:16px">暂无公告</div>')+'</div>';
+}
+function mobileApprovals(){
+  if(!canApprove()){
+    return '<div class="m-card"><div class="m-empty"><div class="empty-ico">'+icon('shield',18)+'</div>当前为员工视角，无审批权限<br><span style="font-size:10.5px">切换为管理者可查看团队审批</span></div>'+
+      '<button class="btn btn-primary" style="width:100%" data-action="m-identity">'+icon('users',15)+'切换身份</button></div>';
+  }
+  const pending = pendingLeaves();
+  const anoms = pendingAnomalies();
+  const handled = db.leaves.filter(function(l){ return l.status==='approved'||l.status==='rejected'; }).slice(0,4);
+  const isPending = ui.mApprovalTab === 'pending';
+  return '<div class="m-chip-row"><button class="m-chip '+(isPending?'on':'')+'" data-action="m-approval-tab" data-tab="pending">待审批 '+(pending.length+anoms.length)+'</button>'+
+    '<button class="m-chip '+(!isPending?'on':'')+'" data-action="m-approval-tab" data-tab="handled">已处理 '+handled.length+'</button></div>'+
+    (isPending ? (pending.length + anoms.length ? 
+      pending.map(function(l){
+        const e = empById(l.empId); const m = leaveMeta(l.type);
+        return '<div class="m-approval-card"><div class="m-approval-top"><span class="type-ico '+m.tone+'">'+icon(m.icon,14)+'</span>'+
+          '<div class="main"><b>'+esc(e.name)+' · '+esc(l.type)+'<span class="m-role-chip">请假</span></b><small>'+esc(deptName(e.dept))+' · 提交于 '+esc(l.submitted)+'</small></div></div>'+
+          '<div class="m-kv"><span>起止</span><b style="font-weight:500;text-align:right">'+esc(l.start)+'<br>至 '+esc(l.end)+'</b></div>'+
+          '<div class="m-kv"><span>时长</span><b style="font-weight:500">'+(l.hours||0)+' 小时</b></div>'+
+          '<div class="m-comment">'+esc(l.reason)+'</div>'+
+          '<div class="m-actions"><button class="btn btn-ghost" data-action="leave-reject" data-id="'+l.id+'">驳回</button>'+
+          '<button class="btn btn-primary" data-action="leave-approve" data-id="'+l.id+'">通过</button></div></div>';
+      }).join('') + anoms.map(function(a){
+        const e = empById(a.empId);
+        return '<div class="m-approval-card"><div class="m-approval-top"><span class="type-ico warn">'+icon('clock',14)+'</span>'+
+          '<div class="main"><b>'+esc(e.name)+' · '+esc(a.type)+'<span class="m-role-chip">补卡</span></b><small>'+esc(fmtCn(a.date))+' · '+esc(a.shift)+'</small></div></div>'+
+          '<div class="m-kv"><span>调整后</span><b style="font-weight:500">'+esc(a.after['上班打卡'])+' / '+esc(a.after['下班打卡'])+'</b></div>'+
+          '<div class="m-comment">'+esc(a.reason)+'</div>'+
+          '<div class="m-actions"><button class="btn btn-ghost" data-action="anom-reject" data-id="'+a.id+'">驳回</button>'+
+          '<button class="btn btn-primary" data-action="anom-approve" data-id="'+a.id+'">通过</button></div></div>';
+      }).join('') : '<div class="m-card"><div class="m-empty"><div class="empty-ico">'+icon('check',18)+'</div>暂无待审批事项</div></div>')
+      : (handled.length ? handled.map(function(l){
+        const e = empById(l.empId);
+        return '<div class="m-approval-card"><div class="m-approval-top">'+avatar(e,32)+
+          '<div class="main"><b>'+esc(e.name)+' · '+esc(l.type)+'</b><small>'+esc(l.reviewedAt||l.submitted)+' · '+esc(l.comment||'已处理')+'</small></div>'+
+          leaveStatusTag(l.status)+'</div></div>';
+      }).join('') : '<div class="m-card"><div class="m-empty">暂无已处理记录</div></div>'));
+}
+function contactGroups(){
+  const q = ui.filters.mContact.trim().toLowerCase();
+  let list = activeEmployees();
+  if(q) list = list.filter(function(e){ return (e.name+' '+e.position+' '+e.phone+' '+e.email).toLowerCase().indexOf(q) >= 0; });
+  if(ui.filters.mContactDept !== 'all'){
+    const ids = [ui.filters.mContactDept].concat(subDepts(ui.filters.mContactDept).map(function(d){ return d.id; }));
+    list = list.filter(function(e){ return ids.indexOf(e.dept) >= 0; });
+  }
+  const groups = {};
+  list.forEach(function(e){
+    const top = topDeptId(e.dept);
+    (groups[top] = groups[top] || []).push(e);
+  });
+  return visibleDepts().map(function(d){
+    return {dept:d, list:groups[d.id] || []};
+  }).filter(function(g){ return g.list.length; });
+}
+function contactsHtml(){
+  const groups = contactGroups();
+  if(!groups.length) return '<div class="m-empty"><div class="empty-ico">'+icon('search',18)+'</div>没有匹配的联系人</div>';
+  return groups.map(function(g){
+    return '<div class="m-group-title"><span>'+esc(g.dept.name)+'</span><span>'+g.list.length+' 人</span></div>'+
+      g.list.map(function(e){
+        return '<div class="m-contact-row">'+avatar(e,34)+
+          '<div class="meta"><b>'+esc(e.name)+'</b><small>'+esc(e.position)+' · '+esc(e.phone)+'</small></div>'+
+          '<div class="m-contact-actions"><button data-action="contact-call" data-id="'+e.id+'" title="拨号">'+icon('phone',15)+'</button>'+
+          '<button data-action="contact-msg" data-id="'+e.id+'" title="发消息">'+icon('message',15)+'</button></div></div>';
+      }).join('');
+  }).join('');
+}
+function mobileContacts(){
+  return '<div class="m-search">'+icon('search',16)+'<input id="mContactSearch" type="search" placeholder="搜索姓名、岗位或手机号" value="'+esc(ui.filters.mContact)+'" autocomplete="off"></div>'+
+    '<div class="m-chip-row">'+['all'].concat(visibleDepts().map(function(d){ return d.id; })).map(function(id){
+      const label = id === 'all' ? '全部' : deptName(id);
+      return '<button class="m-chip '+(ui.filters.mContactDept===id?'on':'')+'" data-action="m-contact-dept" data-dept="'+id+'">'+esc(label)+'</button>';
+    }).join('')+'</div>'+
+    '<div id="mContactList">'+contactsHtml()+'</div>';
+}
+function mobileProfile(){
+  const u = currentUser();
+  const recs = db.attendance.filter(function(r){ return r.empId === ui.user && r.date.slice(0,7) === TODAY.slice(0,7); });
+  const present = recs.filter(function(r){ return ['正常','迟到','早退'].indexOf(r.status) >= 0; }).length;
+  const leaveCount = db.leaves.filter(function(l){ return l.empId === ui.user && l.status === 'approved' && l.start.slice(0,7) === TODAY.slice(0,7); }).length;
+  const anomCount = db.anomalies.filter(function(a){ return a.empId === ui.user; }).length;
+  const annual = balanceOf(ui.user, '年假', 80);
+  const comp = balanceOf(ui.user, '调休', 16);
+  const anoms = db.anomalies.filter(function(a){ return a.empId === ui.user; }).slice(0,2);
+  return '<div class="m-card"><div class="m-approval-top">'+avatar(u,46)+
+    '<div class="main"><b style="font-size:15px">'+esc(u.name)+' <span class="m-role-chip">'+esc(u.role)+'</span></b><small>'+esc(deptName(u.dept))+' · '+esc(u.position)+' · '+esc(u.id)+'</small></div></div>'+
+    '<div class="m-kv"><span>本月出勤</span><b style="font-weight:500">'+present+' 天</b></div></div>'+
+    '<div class="m-stat-grid">'+
+      '<div class="m-stat"><div class="v">'+present+'<small>天</small></div><div class="k">本月出勤</div></div>'+
+      '<div class="m-stat"><div class="v">'+leaveCount+'<small>次</small></div><div class="k">已通过请假</div></div>'+
+      '<div class="m-stat"><div class="v">'+anomCount+'<small>条</small></div><div class="k">异常记录</div></div>'+
+    '</div>'+
+    '<div class="m-card tight"><div class="m-row-between" style="margin-bottom:10px"><span class="m-label">请假余额</span><span class="mini-note">本月</span></div>'+
+      '<div class="m-balance"><div class="top"><span>年假</span><span>'+annual.left+' / '+annual.total+' 小时</span></div><div class="bar"><i style="width:'+(annual.total?annual.left/annual.total*100:0)+'%"></i></div></div>'+
+      '<div class="m-balance" style="margin-bottom:0"><div class="top"><span>调休</span><span>'+comp.left+' / '+comp.total+' 小时</span></div><div class="bar"><i style="width:'+(comp.total?comp.left/comp.total*100:0)+'%"></i></div></div></div>'+
+    '<div class="m-sec-head"><b>异常记录</b></div>'+
+    '<div class="m-card tight">'+(anoms.length ? '<div class="m-list">'+anoms.map(function(a){
+      return '<div class="m-list-row"><span class="type-ico warn">'+icon('alert',13)+'</span><div class="main"><b>'+esc(a.type)+'</b><small>'+esc(fmtShort(a.date))+' · '+esc(a.shift)+'</small></div>'+anomStatusTag(a.status)+'</div>';
+    }).join('')+'</div>' : '<div class="m-empty" style="padding:16px">暂无异常记录</div>')+'</div>'+
+    '<div class="m-card tight">'+
+      '<button class="m-profile-row" data-action="open-leave-form"><span class="left">'+icon('calendarCheck',17)+'发起请假</span><span class="chev">'+icon('chevronRight',14)+'</span></button>'+
+      '<button class="m-profile-row" data-action="demo-toast" data-msg="考勤规则：正常班 09:00–18:00，弹性 30 分钟，夜班跨日按归属日结算"><span class="left">'+icon('clock',17)+'考勤规则说明</span><span class="chev">'+icon('chevronRight',14)+'</span></button>'+
+      '<button class="m-profile-row" data-action="m-identity"><span class="left">'+icon('users',17)+'切换员工 / 管理者视角</span><span class="chev">'+icon('chevronRight',14)+'</span></button>'+
+      '<button class="m-profile-row" data-action="ask-reset"><span class="left">'+icon('refresh',17)+'重置演示数据</span><span class="chev">'+icon('chevronRight',14)+'</span></button>'+
+    '</div>';
+}
+function mobileStage(){
+  const content = ui.tab === 'approvals' ? mobileApprovals() : ui.tab === 'contacts' ? mobileContacts() : ui.tab === 'profile' ? mobileProfile() : mobileHome();
+  return '<div class="stage">'+
+    '<div class="stage-topbar"><div style="display:flex;align-items:center;gap:10px">'+
+      '<div class="brand-mark" style="width:30px;height:30px;font-size:13px">协</div>'+
+      '<div class="stage-brand-text"><b style="font-size:13px">协同办公 · 移动端</b><div class="stage-brand-sub" style="font-size:11px;color:var(--text-3)">手机壳预览 · 与 Web 端共用同一份数据</div></div>'+
+    '</div>'+viewSwitch()+'</div>'+
+    '<div class="stage-body"><div class="stage-caption"><div class="stage-kicker">MOBILE WORKSPACE</div>'+
+      '<h2>随时随地<br>完成打卡与审批</h2><p>移动端与 Web 后台共用同一套考勤与审批数据。演示「员工 / 管理者」双视角，切换后可见范围与待办实时变化。</p>'+
+      '<div class="stage-points">'+
+        '<div class="stage-point"><span class="ico">'+icon('clock',14)+'</span><div><b>一键打卡</b><br>服务端时间 + 考勤范围校验</div></div>'+
+        '<div class="stage-point"><span class="ico">'+icon('check',14)+'</span><div><b>移动审批</b><br>通过 / 驳回后 Web 端同步更新</div></div>'+
+        '<div class="stage-point"><span class="ico">'+icon('users',14)+'</span><div><b>双重视角</b><br>员工本人记录与团队记录</div></div>'+
+      '</div></div>'+
+      '<div class="phone"><div class="phone-badge"><span class="dot"></span>演示账号 · '+esc(currentUser().name)+'</div>'+
+        '<div class="phone-screen">'+
+          '<div class="status-bar"><span class="status-time">'+esc(DEMO_NOW.slice(11,16))+'</span><span class="status-icons">'+icon('wifi',15)+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M20 10v4"/><rect x="4" y="9" width="10" height="6" rx="1" fill="currentColor" stroke="none"/></svg>'+
+          '</span></div>'+
+          mobileHeader()+
+          '<div class="m-content">'+content+'</div>'+
+          mobileTabbar()+
+          overlayHtml(true)+
+        '</div></div>'+
+    '</div></div>';
+}
+
+/* ================= 弹层与抽屉 ================= */
+function overlayHtml(isMobile){
+  let html = '';
+  if(ui.drawer) html += drawerHtml(ui.drawer, isMobile);
+  if(ui.modal) html += modalHtml(ui.modal, isMobile);
+  return html;
+}
+function drawerShell(title, sub, body, foot, isMobile){
+  if(isMobile){
+    return '<div class="m-overlay" data-action="close-overlay"><div class="m-sheet">'+
+      '<div class="sheet-handle"></div><div class="m-sheet-title">'+title+'</div><div class="m-sheet-sub">'+sub+'</div>'+
+      '<div style="max-height:52vh;overflow-y:auto">'+body+'</div>'+
+      '<div class="m-actions" style="margin-top:14px">'+foot+'</div></div></div>';
+  }
+  return '<div class="overlay" data-action="close-overlay"><aside class="drawer">'+
+    '<div class="drawer-head"><div><div class="drawer-title">'+title+'</div><div class="drawer-sub">'+sub+'</div></div>'+
+    '<button class="icon-btn" data-action="close-drawer" aria-label="关闭">'+icon('x',18)+'</button></div>'+
+    '<div class="drawer-body">'+body+'</div><div class="drawer-foot">'+foot+'</div></aside></div>';
+}
+function drawerHtml(d, isMobile){
+  if(d.type === 'employee'){
+    const e = empById(d.id);
+    if(!e) return '';
+    const recs = db.attendance.filter(function(r){ return r.empId === e.id; }).sort(function(a,b){ return a.date < b.date ? 1 : -1; }).slice(0,4);
+    const present = db.attendance.filter(function(r){ return r.empId === e.id && ['正常','迟到','早退','进行中'].indexOf(r.status) >= 0; }).length;
+    const leaveCount = db.leaves.filter(function(l){ return l.empId === e.id && l.status === 'approved'; }).length;
+    const anomCount = db.anomalies.filter(function(a){ return a.empId === e.id; }).length;
+    const body = '<div class="emp-hero">'+avatar(e,52)+'<div><div class="name">'+esc(e.name)+stateTag(e.status)+'</div>'+
+      '<div class="sub">'+esc(deptName(e.dept))+' · '+esc(e.position)+' · '+esc(e.id)+'</div>'+
+      '<div style="margin-top:7px"><span class="tag '+(e.role==='员工'?'tag-neutral':'tag-primary')+'">'+esc(e.role)+'</span> '+stateTag(e.account)+'</div></div></div>'+
+      '<div class="detail-grid">'+
+        '<div class="detail-item"><div class="k">工号</div><div class="v">'+esc(e.id)+'</div></div>'+
+        '<div class="detail-item"><div class="k">手机</div><div class="v">'+esc(e.phone)+'</div></div>'+
+        '<div class="detail-item"><div class="k">邮箱</div><div class="v">'+esc(e.email)+'</div></div>'+
+        '<div class="detail-item"><div class="k">入职日期</div><div class="v">'+esc(e.hire)+'</div></div>'+
+        '<div class="detail-item"><div class="k">所属部门</div><div class="v">'+esc(deptName(e.dept))+'</div></div>'+
+        '<div class="detail-item"><div class="k">账号状态</div><div class="v">'+esc(e.account)+'</div></div>'+
+      '</div>'+
+      '<div class="mini-stat"><div><div class="k">本月出勤</div><div class="v">'+present+' <small style="font-size:11px;color:var(--text-3)">天</small></div></div>'+
+        '<div><div class="k">已通过请假</div><div class="v">'+leaveCount+' <small style="font-size:11px;color:var(--text-3)">次</small></div></div>'+
+        '<div><div class="k">异常记录</div><div class="v">'+anomCount+' <small style="font-size:11px;color:var(--text-3)">条</small></div></div></div>'+
+      '<div style="margin:18px 0 8px;font-size:12px;font-weight:600;color:var(--text-2)">最近考勤</div>'+
+      '<div class="m-list">'+recs.map(function(r){
+        return '<div class="m-list-row"><div class="main"><b>'+esc(fmtShort(r.date))+' '+weekdayOf(r.date)+' · '+esc(r.shift)+'</b><small>'+esc(r.in)+' / '+esc(r.out)+' · '+(r.hours?r.hours+' 小时':'—')+'</small></div>'+attStatusHtml(r.status)+'</div>';
+      }).join('')+'</div>';
+    return drawerShell('员工详情', '工号 '+esc(e.id), body,
+      '<button class="btn btn-ghost" data-action="close-drawer">关闭</button>'+
+      '<button class="btn btn-ghost" data-action="demo-toast" data-msg="已发起会话（演示占位）">'+icon('message',14)+'发消息</button>'+
+      '<button class="btn btn-primary" data-action="emp-att" data-id="'+e.id+'">'+icon('clock',14)+'查看考勤</button>', isMobile);
+  }
+  if(d.type === 'leave'){
+    const l = db.leaves.find(function(x){ return x.id === d.id; });
+    if(!l) return '';
+    const e = empById(l.empId);
+    const m = leaveMeta(l.type);
+    const appr = empById(l.approver);
+    const body = '<div class="emp-hero">'+avatar(e,46)+'<div><div class="name">'+esc(e.name)+leaveStatusTag(l.status)+'</div>'+
+      '<div class="sub">'+esc(deptName(e.dept))+' · '+esc(e.id)+' · 单号 '+esc(l.id)+'</div></div></div>'+
+      '<div class="detail-grid">'+
+        '<div class="detail-item"><div class="k">休假类型</div><div class="v"><div class="leave-type"><span class="type-ico '+m.tone+'">'+icon(m.icon,14)+'</span>'+esc(l.type)+'</div></div></div>'+
+        '<div class="detail-item"><div class="k">时长</div><div class="v"><b>'+(l.hours||0)+' 小时</b> · '+((l.hours||0)/8).toFixed(1)+' 天</div></div>'+
+        '<div class="detail-item"><div class="k">开始时间</div><div class="v">'+esc(l.start)+'</div></div>'+
+        '<div class="detail-item"><div class="k">结束时间</div><div class="v">'+esc(l.end)+'</div></div>'+
+        '<div class="detail-item"><div class="k">审批人</div><div class="v">'+esc(appr?appr.name:l.approver)+'</div></div>'+
+        '<div class="detail-item"><div class="k">提交时间</div><div class="v">'+esc(l.submitted)+'</div></div>'+
+      '</div>'+
+      '<div class="detail-item"><div class="k">请假事由</div><div class="v" style="line-height:1.7">'+esc(l.reason)+'</div></div>'+
+      '<div class="attach-box" style="margin-top:14px">'+icon('paperclip',15)+'<span>'+esc(l.attachment||'无附件')+'</span></div>'+
+      '<div style="margin:18px 0 8px;font-size:12px;font-weight:600;color:var(--text-2)">审批进度</div>'+
+      '<div class="approval-timeline">'+
+        '<div class="tl-item done"><b>提交申请</b><small>'+esc(l.submitted)+' · '+esc(e.name)+'</small></div>'+
+        '<div class="tl-item '+(l.status==='pending'?'now':'done')+'"><b>直属主管审批</b><small>'+
+          (l.status==='pending' ? '等待 '+esc(appr?appr.name:'审批人')+' 处理' : esc(l.reviewedAt||'—')+' · '+esc(appr?appr.name:'—'))+'</small>'+
+          (l.comment ? '<div class="comment">意见：'+esc(l.comment)+'</div>' : '')+'</div>'+
+        '<div class="tl-item '+(l.status==='approved'?'done':'')+'"><b>生效并同步考勤</b><small>'+
+          (l.status==='approved' ? '审批通过，考勤已标记为「请假」' : l.status==='rejected' ? '审批未通过，不同步考勤' : '审批通过后自动生效')+'</small></div>'+
+      '</div>';
+    let foot = '<button class="btn btn-ghost" data-action="close-drawer">关闭</button>';
+    if(l.status === 'draft' && l.empId === ui.user){
+      foot += '<button class="btn btn-primary" data-action="leave-submit-draft" data-id="'+l.id+'">'+icon('send',14)+'提交审批</button>';
+    }
+    if(l.status === 'pending' && canApprove()){
+      foot += '<button class="btn btn-ghost" data-action="leave-reject" data-id="'+l.id+'">驳回</button>'+
+        '<button class="btn btn-primary" data-action="leave-approve" data-id="'+l.id+'">'+icon('check',14)+'批准</button>';
+    }
+    return drawerShell('请假详情', '审批流程与变更记录', body, foot, isMobile);
+  }
+  return '';
+}
+function modalShell(title, sub, body, foot, isMobile, sheet){
+  if(isMobile){
+    if(sheet){
+      return '<div class="m-overlay" data-action="close-overlay"><div class="m-sheet"><div class="sheet-handle"></div>'+
+        '<div class="m-sheet-title">'+title+'</div><div class="m-sheet-sub">'+sub+'</div>'+body+'</div></div>';
+    }
+    return '<div class="m-overlay m-overlay--center" data-action="close-overlay"><div class="modal">'+
+      '<div class="modal-head"><div><div class="modal-title">'+title+'</div><div class="modal-sub">'+sub+'</div></div>'+
+      '<button class="icon-btn" data-action="close-modal">'+icon('x',18)+'</button></div>'+
+      '<div class="modal-body">'+body+'</div><div class="modal-foot">'+foot+'</div></div></div>';
+  }
+  return '<div class="modal-wrap" data-action="close-overlay"><div class="modal">'+
+    '<div class="modal-head"><div><div class="modal-title">'+title+'</div><div class="modal-sub">'+sub+'</div></div>'+
+    '<button class="icon-btn" data-action="close-modal">'+icon('x',18)+'</button></div>'+
+    '<div class="modal-body">'+body+'</div><div class="modal-foot">'+foot+'</div></div></div>';
+}
+function leaveFormBody(){
+  let approvers = db.employees.filter(function(x){ return ['主管','HR','管理员'].indexOf(x.role) >= 0 && x.id !== ui.user; });
+  if(!approvers.length) approvers = db.employees.filter(function(x){ return x.id === 'EMP002'; });
+  return '<form id="leaveForm" autocomplete="off">'+
+    '<div class="form-grid">'+
+      '<div class="field"><label>休假类型</label><select class="select" id="lfType">'+
+        ['年假','事假','病假','调休','婚假','产假','陪产假'].map(function(t){ return '<option value="'+t+'">'+t+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field"><label>审批人</label><select class="select" id="lfApprover">'+
+        approvers.map(function(x){ return '<option value="'+x.id+'">'+esc(x.name)+' · '+esc(x.role)+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field"><label>开始日期</label><input class="input" type="date" id="lfStartDate" value="'+TODAY+'"></div>'+
+      '<div class="field"><label>开始时间</label><input class="input" type="time" id="lfStartTime" value="09:00"></div>'+
+      '<div class="field"><label>结束日期</label><input class="input" type="date" id="lfEndDate" value="'+TODAY+'"></div>'+
+      '<div class="field"><label>结束时间</label><input class="input" type="time" id="lfEndTime" value="18:00"></div>'+
+    '</div>'+
+    '<div class="field" style="margin-bottom:12px"><div class="duration-preview">'+icon('clock',14)+'<span>自动计算时长</span><b id="lfDuration">9.0 小时</b><span class="mini-note">跨日按自然时间累计</span></div></div>'+
+    '<div class="field"><label>请假事由</label><textarea class="input" id="lfReason" rows="3" style="height:76px;resize:vertical" placeholder="请填写请假原因，审批人可见"></textarea></div>'+
+    '<div class="field" style="margin-top:12px"><label>附件（选填）</label><div class="attach-box">'+icon('paperclip',15)+'<span>支持 PDF / JPG / PNG，单个不超过 5 MB（演示占位）</span>'+
+      '<button type="button" class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="附件上传为演示占位，不会真实上传">选择附件</button></div></div>'+
+    '<div class="mini-note" style="margin-top:10px">提交后进入审批流：直属主管审批 → 通过后自动生效并回写考勤；年假与调休按小时扣减余额。</div>'+
+  '</form>';
+}
+function anomFormBody(){
+  const emps = activeEmployees();
+  return '<form id="anomForm" autocomplete="off">'+
+    '<div class="form-grid">'+
+      '<div class="field"><label>员工</label><select class="select" id="afEmp">'+emps.map(function(e){
+        return '<option value="'+e.id+'" '+(e.id===ui.user?'selected':'')+'>'+esc(e.name)+'（'+e.id+'）</option>';
+      }).join('')+'</select></div>'+
+      '<div class="field"><label>日期</label><input class="input" type="date" id="afDate" value="'+TODAY+'"></div>'+
+      '<div class="field"><label>班次</label><select class="select" id="afShift">'+SHIFTS.map(function(s){
+        return '<option value="'+esc(s.name)+'">'+esc(s.name)+' '+esc(s.start)+'–'+esc(s.end)+'</option>';
+      }).join('')+'</select></div>'+
+      '<div class="field"><label>异常类型</label><select class="select" id="afType">'+
+        ['缺卡补卡','跨日班次异常','早退异常'].map(function(t){ return '<option value="'+t+'">'+t+'</option>'; }).join('')+'</select></div>'+
+      '<div class="field"><label>补登上班时间</label><input class="input" type="time" id="afIn" value="09:00"></div>'+
+      '<div class="field"><label>补登下班时间</label><input class="input" type="time" id="afOut" value="18:00"></div>'+
+    '</div>'+
+    '<div class="field" style="margin-top:12px"><label>申请原因</label><textarea class="input" id="afReason" rows="3" style="height:70px;resize:vertical" placeholder="例如：门禁设备故障导致下班打卡未记录，已核实监控与工位记录"></textarea></div>'+
+    '<div class="info-strip" style="margin-top:12px;margin-bottom:0">'+icon('info',14)+'<span>提交后由直属主管审批，审批通过后系统按「调整后」时间回写考勤，并保留调整前 / 调整后对比与操作日志。</span></div>'+
+  '</form>';
+}
+function annFormBody(){
+  return '<form id="annForm" autocomplete="off">'+
+    '<div class="field" style="margin-bottom:12px"><label>公告标题</label><input class="input" id="annTitle" placeholder="例如：关于 11 月薪酬发放时间调整的通知"></div>'+
+    '<div class="field" style="margin-bottom:12px"><label>公告内容</label><textarea class="input" id="annContent" rows="5" style="height:108px;resize:vertical" placeholder="请填写公告正文，支持换行分段"></textarea></div>'+
+    '<div class="form-grid">'+
+      '<div class="field"><label>发布范围</label><select class="select" id="annScope"><option>全体员工</option><option>本部门（'+esc(deptName(currentUser().dept))+'）</option><option>指定人员（8 人）</option></select></div>'+
+      '<div class="field"><label>重要级别</label><select class="select" id="annLevel"><option>普通</option><option>重要</option><option>紧急</option></select></div>'+
+      '<div class="field"><label>发布时间</label><select class="select" id="annTime"><option value="now">立即发布</option><option value="later">定时 11-06 09:00</option></select></div>'+
+      '<div class="field"><label>置顶</label><label class="check" style="height:38px"><input type="checkbox" id="annPin"> 发布后置顶显示</label></div>'+
+    '</div>'+
+    '<div class="attach-box" style="margin-top:12px">'+icon('paperclip',15)+'<span>可附加 PDF 通知文件（演示占位）</span><button type="button" class="btn btn-sm btn-ghost" data-action="demo-toast" data-msg="公告附件为演示占位">添加附件</button></div>'+
+  '</form>';
+}
+function annDetailBody(a){
+  return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'+annLevelIco(a.level)+
+    '<div><b style="font-size:15px">'+esc(a.title)+'</b><div class="mini-note" style="margin-top:3px">'+esc(a.author)+' · '+esc(a.time)+' · 范围：'+esc(a.scope)+'</div></div></div>'+
+    '<div class="ann-content">'+a.content.split('\n').map(function(p){ return '<p>'+esc(p)+'</p>'; }).join('')+'</div>'+
+    '<div class="info-strip" style="margin-top:14px;margin-bottom:0">'+icon('info',14)+'<span>已读 '+readCount(a)+' / '+a.total+' · 重要公告会同步推送至移动端消息中心</span></div>';
+}
+function modalHtml(m, isMobile){
+  if(m.type === 'leaveForm'){
+    return modalShell('发起请假', '填写休假信息，提交后进入审批流', leaveFormBody(),
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn btn-ghost" data-action="submit-leave" data-mode="draft">存为草稿</button>'+
+      '<button class="btn btn-primary" data-action="submit-leave" data-mode="submit">'+icon('send',14)+'提交审批</button>', isMobile);
+  }
+  if(m.type === 'leaveDecision'){
+    const l = db.leaves.find(function(x){ return x.id === m.id; });
+    if(!l) return '';
+    const e = empById(l.empId);
+    const isApprove = m.act === 'approve';
+    const body = '<div class="compare-box" style="border-color:var(--line);margin-bottom:14px">'+
+      '<div class="kv-line"><span>申请人</span><b>'+esc(e.name)+' · '+esc(deptName(e.dept))+'</b></div>'+
+      '<div class="kv-line"><span>类型</span><b>'+esc(l.type)+' · '+(l.hours||0)+' 小时</b></div>'+
+      '<div class="kv-line"><span>起止</span><b>'+esc(l.start)+' 至 '+esc(l.end)+'</b></div>'+
+      '<div class="kv-line"><span>事由</span><b style="max-width:60%;text-align:right;font-weight:500">'+esc(l.reason)+'</b></div></div>'+
+      '<div class="field"><label>审批意见</label><textarea class="input" id="decisionComment" rows="3" style="height:74px;resize:vertical" placeholder="'+(isApprove?'同意，请做好工作交接':'请说明驳回原因')+'"></textarea></div>'+
+      '<div class="mini-note" style="margin-top:8px">'+(isApprove?'批准后自动生效，并回写考勤与假期余额。':'驳回后申请人可修改后重新提交。')+'</div>';
+    return modalShell(isApprove?'批准请假':'驳回请假', esc(e.name)+' · '+esc(l.type),
+      body,
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn '+(isApprove?'btn-primary':'btn-danger-ghost')+'" data-action="leave-decision-submit" data-id="'+l.id+'" data-act="'+m.act+'">'+
+      icon(isApprove?'check':'x',14)+(isApprove?'确认批准':'确认驳回')+'</button>', isMobile);
+  }
+  if(m.type === 'anomForm'){
+    return modalShell('申请补卡', '提交后由直属主管审批，通过后回写考勤', anomFormBody(),
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn btn-primary" data-action="submit-anom">'+icon('send',14)+'提交申请</button>', isMobile);
+  }
+  if(m.type === 'anomDecision'){
+    const a = db.anomalies.find(function(x){ return x.id === m.id; });
+    if(!a) return '';
+    const isApprove = m.act === 'approve';
+    const body = '<div class="mini-note" style="margin-bottom:10px">'+esc(empById(a.empId).name)+' · '+esc(a.type)+' · '+esc(fmtCn(a.date))+'</div>'+
+      anomCompareHtml(a)+'<div class="reason-line" style="margin-top:12px"><b>申请原因：</b>'+esc(a.reason)+'</div>'+
+      '<div class="field" style="margin-top:12px"><label>审批意见</label><textarea class="input" id="decisionComment" rows="3" style="height:70px;resize:vertical" placeholder="'+(isApprove?'同意补登，已核实门禁记录':'请说明驳回原因')+'"></textarea></div>';
+    return modalShell(isApprove?'通过补卡申请':'驳回补卡申请', '单号 '+esc(a.id), body,
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn '+(isApprove?'btn-primary':'btn-danger-ghost')+'" data-action="anom-decision-submit" data-id="'+a.id+'" data-act="'+m.act+'">'+
+      icon(isApprove?'check':'x',14)+(isApprove?'确认通过并生效':'确认驳回')+'</button>', isMobile);
+  }
+  if(m.type === 'annForm'){
+    return modalShell('新建公告', '发布后同步至 Web 与移动端公告栏', annFormBody(),
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn btn-ghost" data-action="submit-ann" data-mode="draft">存为草稿</button>'+
+      '<button class="btn btn-primary" data-action="submit-ann" data-mode="publish">'+icon('send',14)+'发布公告</button>', isMobile);
+  }
+  if(m.type === 'annDetail'){
+    const a = db.announcements.find(function(x){ return x.id === m.id; });
+    if(!a) return '';
+    return modalShell('公告详情', a.draft ? '草稿预览' : esc(a.level)+' · '+esc(a.scope), annDetailBody(a),
+      '<button class="btn btn-ghost" data-action="close-modal">关闭</button>'+
+      (canApprove() ? '<button class="btn btn-ghost" data-action="pin-ann" data-id="'+a.id+'">'+icon('pin',14)+(a.pinned?'取消置顶':'置顶')+'</button>' : '')+
+      '<button class="btn btn-primary" data-action="demo-toast" data-msg="已标记全部已读（演示）">'+icon('check',14)+'标记已读</button>', isMobile);
+  }
+  if(m.type === 'confirm'){
+    return modalShell(m.title || '请确认', m.sub || '该操作会立即生效', '<div style="font-size:13px;line-height:1.8;color:var(--text-2)">'+esc(m.text||'')+'</div>',
+      '<button class="btn btn-ghost" data-action="close-modal">取消</button>'+
+      '<button class="btn '+(m.danger?'btn-danger-ghost':'btn-primary')+'" data-action="confirm-ok">'+esc(m.okText||'确认')+'</button>', isMobile);
+  }
+  if(m.type === 'contactAction'){
+    const e = empById(m.id);
+    if(!e) return '';
+    const body = '<div class="m-sheet-item" style="border-bottom:1px solid var(--line);padding:10px 0">'+avatar(e,44)+
+      '<div class="main"><b>'+esc(e.name)+'</b><small>'+esc(e.position)+' · '+esc(deptName(e.dept))+'</small><small style="display:block;margin-top:2px">'+esc(e.phone)+'</small></div></div>'+
+      '<button class="m-sheet-item" data-action="contact-call" data-id="'+e.id+'">'+icon('phone',17)+'<div class="main"><b>拨打电话</b><small>'+esc(e.phone)+'</small></div>'+icon('chevronRight',14)+'</button>'+
+      '<button class="m-sheet-item" data-action="contact-msg" data-id="'+e.id+'">'+icon('message',17)+'<div class="main"><b>发送消息</b><small>企业微信 / 短信（演示占位）</small></div>'+icon('chevronRight',14)+'</button>'+
+      '<button class="m-sheet-item" data-action="demo-toast" data-msg="号码已复制：'+esc(e.phone)+'">'+icon('file',17)+'<div class="main"><b>复制号码</b><small>'+esc(e.phone)+'</small></div>'+icon('chevronRight',14)+'</button>';
+    return modalShell('联系人', esc(e.name)+' · '+esc(deptName(e.dept)), body, '', isMobile, true);
+  }
+  if(m.type === 'identitySheet'){
+    const body = roleUsers().map(function(e){
+      return '<button class="m-sheet-item '+(ui.user===e.id?'':'')+'" data-action="pick-identity" data-id="'+e.id+'">'+avatar(e,36)+
+        '<div class="main"><b>'+esc(e.name)+' · '+esc(e.role)+'</b><small>'+esc(deptName(e.dept))+' · '+esc(e.position)+' · '+esc(e.id)+'</small></div>'+
+        (ui.user===e.id ? icon('check',16) : '')+'</button>';
+    }).join('');
+    return modalShell('切换身份', '切换后待办数量与可见范围同步变化', body+
+      '<div class="mini-note" style="margin-top:10px">当前：'+esc(currentUser().name)+'（'+esc(currentUser().role)+'）· 员工视角仅可查看本人记录；管理者视角可审批团队申请。</div>', '', isMobile, true);
+  }
+  return '';
+}
+
+/* ================= 业务动作 ================= */
+let confirmAction = null;
+
+function switchUser(id){
+  const emp = empById(id);
+  if(!emp) return;
+  ui.user = id;
+  ui.identityOpen = false;
+  ui.modal = null;
+  ui.drawer = null;
+  ui.punchFlash = false;
+  ui.mobilePunching = false;
+  ui.filters.attEmp = id;
+  ui.filters.attPage = 1;
+  ui.filters.empPage = 1;
+  ui.filters.leaveTab = 'pending';
+  if(!routeAllowed(ui.route)) ui.route = 'dashboard';
+  toast('已切换为 ' + emp.name + '（' + emp.role + '）', 'success');
+  render();
+}
+
+function openLeaveDecision(id, act){
+  ui.drawer = null;
+  ui.identityOpen = false;
+  ui.modal = {type:'leaveDecision', id:id, act:act};
+  render();
+}
+function openAnomDecision(id, act){
+  ui.drawer = null;
+  ui.identityOpen = false;
+  ui.modal = {type:'anomDecision', id:id, act:act};
+  render();
+}
+function openAnnouncement(id){
+  const a = db.announcements.find(function(x){ return x.id === id; });
+  if(!a) return;
+  if(!a.draft){
+    a.readBy = a.readBy || [];
+    if(a.readBy.indexOf(ui.user) < 0) a.readBy.push(ui.user);
+  }
+  ui.modal = {type:'annDetail', id:a.id};
+  ui.identityOpen = false;
+  render();
+}
+
+function fieldVal(id){
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+/* 计算跨日班次有效工时：下班早于上班视为次日 */
+function calcWorkHours(inT, outT){
+  const a = toMin(inT), b = toMin(outT);
+  if(a == null || b == null) return 0;
+  const span = b >= a ? b - a : b + 1440 - a;
+  return minutesToHours(Math.max(0, span - 60));
+}
+function updateLeaveDuration(){
+  const start = fieldVal('lfStartDate') + ' ' + fieldVal('lfStartTime');
+  const end = fieldVal('lfEndDate') + ' ' + fieldVal('lfEndTime');
+  const h = leaveHours(start, end);
+  const out = document.getElementById('lfDuration');
+  if(!out) return;
+  out.textContent = h > 0 ? h.toFixed(1) + ' 小时 · ' + (Math.round((h/8)*10)/10) + ' 天' : '时间无效';
+}
+
+function submitLeaveForm(mode){
+  const type = fieldVal('lfType');
+  const approver = fieldVal('lfApprover');
+  const start = fieldVal('lfStartDate') + ' ' + fieldVal('lfStartTime');
+  const end = fieldVal('lfEndDate') + ' ' + fieldVal('lfEndTime');
+  const reason = fieldVal('lfReason').trim();
+  const hours = leaveHours(start, end);
+  if(!fieldVal('lfStartDate') || !fieldVal('lfEndDate') || hours <= 0){
+    toast('请检查起止时间，结束时间需晚于开始时间', 'warn');
+    return;
+  }
+  if(mode === 'submit' && !reason){
+    toast('请填写请假事由后再提交审批', 'warn');
+    return;
+  }
+  db.leaves.push({
+    id: 'LV-' + TODAY.replace(/-/g,'') + '-' + pad2(db.leaves.length + 1),
+    empId: ui.user, type: type, start: start, end: end, hours: hours,
+    reason: reason || '（草稿，事由待补充）', approver: approver,
+    status: mode === 'submit' ? 'pending' : 'draft',
+    submitted: DEMO_NOW, attachment: ''
+  });
+  ui.modal = null;
+  ui.filters.leaveTab = mode === 'submit' ? 'pending' : 'draft';
+  const who = empById(approver) ? empById(approver).name : '审批人';
+  render();
+  toast(mode === 'submit' ? '请假申请已提交，等待 ' + who + ' 审批' : '已保存为草稿，可在「申请中」继续提交', 'success');
+}
+
+function submitAnomalyForm(){
+  const empId = fieldVal('afEmp');
+  const date = fieldVal('afDate');
+  const shift = fieldVal('afShift');
+  const type = fieldVal('afType');
+  const inT = fieldVal('afIn');
+  const outT = fieldVal('afOut');
+  const reason = fieldVal('afReason').trim();
+  if(!date){ toast('请选择异常日期', 'warn'); return; }
+  if(!reason){ toast('请填写申请原因，便于主管核实', 'warn'); return; }
+  const rec = attRecord(empId, date);
+  const before = rec
+    ? {'上班打卡':rec.in, '下班打卡':rec.out, '有效工时':(rec.hours ? rec.hours + ' 小时' : '0 小时'), '考勤状态':rec.status}
+    : {'上班打卡':'—', '下班打卡':'—', '有效工时':'0 小时', '考勤状态':'无记录'};
+  const crossDay = toMin(inT) != null && toMin(outT) != null && toMin(outT) < toMin(inT);
+  const after = {
+    '上班打卡': inT,
+    '下班打卡': crossDay ? '次日 ' + outT : outT,
+    '有效工时': calcWorkHours(inT, outT) + ' 小时',
+    '考勤状态': '正常'
+  };
+  const id = 'AN-' + TODAY.replace(/-/g,'') + '-' + pad2(db.anomalies.length + 1);
+  db.anomalies.push({
+    id:id, empId:empId, date:date, shift:shift, type:type, status:'pending',
+    before:before, after:after, reason:reason,
+    logs:[{time:DEMO_NOW, actor:currentUser().name, text:'提交' + type + '申请，等待直属主管审批'}]
+  });
+  ui.modal = null;
+  ui.filters.anomStatus = 'all';
+  ui.filters.anomExpanded = id;
+  render();
+  toast('补卡申请已提交，单号 ' + id, 'success');
+}
+
+function submitAnnForm(mode){
+  const title = fieldVal('annTitle').trim();
+  const content = fieldVal('annContent').trim();
+  const scope = fieldVal('annScope');
+  const level = fieldVal('annLevel');
+  const timeMode = fieldVal('annTime');
+  const pinned = document.getElementById('annPin') ? document.getElementById('annPin').checked : false;
+  if(!title){ toast('请填写公告标题', 'warn'); return; }
+  if(!content){ toast('请填写公告内容', 'warn'); return; }
+  const draft = mode === 'draft';
+  const total = scope === '全体员工' ? 82 : (scope.indexOf('本部门') === 0 ? 14 : 8);
+  const id = 'ANNO-' + pad2(db.announcements.length + 1);
+  db.announcements.push({
+    id:id, title:title, content:content, author:currentUser().name,
+    time: (!draft && timeMode === 'later') ? '2026-11-06 09:00' : DEMO_NOW,
+    scope:scope, level:level, total:total, read:0, readBy:[],
+    pinned: draft ? false : pinned, draft:draft
+  });
+  ui.modal = null;
+  ui.filters.annLevel = 'all';
+  render();
+  toast(draft ? '公告已保存为草稿' : '公告已发布，并同步至移动端公告栏', 'success');
+}
+
+function submitDraftLeave(id){
+  const l = db.leaves.find(function(x){ return x.id === id; });
+  if(!l) return;
+  l.status = 'pending';
+  l.submitted = DEMO_NOW;
+  ui.drawer = null;
+  ui.filters.leaveTab = 'pending';
+  render();
+  toast('请假申请已提交审批', 'success');
+}
+
+function decideLeave(id, act){
+  const l = db.leaves.find(function(x){ return x.id === id; });
+  if(!l) return;
+  const box = document.getElementById('decisionComment');
+  const comment = box ? box.value.trim() : '';
+  l.status = act === 'approve' ? 'approved' : 'rejected';
+  l.reviewedBy = ui.user;
+  l.reviewedAt = DEMO_NOW;
+  l.comment = comment || (act === 'approve' ? '同意，按流程生效。' : '当前业务节点不便休假，请调整后重新提交。');
+  if(act === 'approve'){
+    /* 审批通过后按覆盖日期回写考勤，避免被判定为缺卡 */
+    let d = l.start.slice(0, 10);
+    let guard = 0;
+    while(d <= l.end.slice(0, 10) && guard < 60){
+      const rec = attRecord(l.empId, d);
+      if(rec){ rec.status = '请假'; rec.in = '—'; rec.out = '—'; rec.hours = 0; }
+      d = addDays(d, 1);
+      guard++;
+    }
+  }
+  ui.modal = null;
+  ui.drawer = null;
+  ui.filters.leaveTab = act === 'approve' ? 'approved' : 'rejected';
+  render();
+  toast(act === 'approve' ? '已批准并同步考勤' : '已驳回，申请人可修改后重新提交', act === 'approve' ? 'success' : 'warn');
+}
+
+function decideAnomaly(id, act){
+  const a = db.anomalies.find(function(x){ return x.id === id; });
+  if(!a) return;
+  const box = document.getElementById('decisionComment');
+  const comment = box ? box.value.trim() : '';
+  a.status = act === 'approve' ? 'effective' : 'rejected';
+  a.logs.push({
+    time: DEMO_NOW, actor: currentUser().name,
+    text: (act === 'approve' ? '审批通过，按调整后时间生效' : '驳回申请') + (comment ? '：' + comment : '')
+  });
+  if(act === 'approve'){
+    const rec = attRecord(a.empId, a.date);
+    if(rec){
+      rec.in = a.after['上班打卡'];
+      rec.out = a.after['下班打卡'];
+      rec.status = a.after['考勤状态'];
+      const h = parseFloat(a.after['有效工时']);
+      rec.hours = isNaN(h) ? rec.hours : h;
+      a.logs.push({time:DEMO_NOW, actor:'系统', text:'考勤结果已按「调整后」回写并归档变更记录'});
+    }
+  }
+  ui.modal = null;
+  ui.filters.anomStatus = act === 'approve' ? 'effective' : 'rejected';
+  render();
+  toast(act === 'approve' ? '补卡已通过，考勤结果已更新' : '补卡申请已驳回', act === 'approve' ? 'success' : 'warn');
+}
+
+/* 打卡：共用同一套考勤数据，Web 与移动端结果一致 */
+function punchRecord(){
+  const rec = attRecord(ui.user, TODAY);
+  if(!rec) return {ok:false, msg:'未找到今日考勤记录，请联系 HR'};
+  if(rec.status === '请假') return {ok:false, msg:'今日为已通过请假，无需打卡'};
+  if(rec.out && rec.out !== '—') return {ok:false, msg:'今日考勤已完成，无需重复打卡'};
+  const now = DEMO_NOW.slice(11, 16);
+  if(!rec.in || rec.in === '—'){
+    rec.in = now;
+    rec.status = '进行中';
+    save();
+    return {ok:true, msg:'上班打卡成功 · 服务端 ' + now};
+  }
+  rec.out = now;
+  rec.hours = minutesToHours(Math.max(0, toMin(rec.out) - toMin(rec.in) - 60));
+  rec.status = '正常';
+  save();
+  return {ok:true, msg:'下班打卡成功 · 服务端 ' + now + ' · 有效工时 ' + rec.hours + ' 小时'};
+}
+
+function doPunch(){
+  const r = punchRecord();
+  toast(r.msg, r.ok ? 'success' : 'warn');
+  render();
+}
+function mobilePunch(){
+  const rec = attRecord(ui.user, TODAY);
+  if(rec && rec.status === '请假'){ toast('今日为已通过请假，无需打卡', 'warn'); return; }
+  if(rec && rec.out && rec.out !== '—'){ toast('今日已完成打卡', 'warn'); return; }
+  ui.mobilePunching = true;
+  ui.punchFlash = false;
+  render();
+  window.setTimeout(function(){
+    const r = punchRecord();
+    ui.mobilePunching = false;
+    if(!r.ok){ render(); toast(r.msg, 'warn'); return; }
+    ui.punchFlash = true;
+    render();
+    toast(r.msg, 'success');
+    window.setTimeout(function(){
+      ui.punchFlash = false;
+      render();
+    }, 2000);
+  }, 1200);
+}
+
+/* ================= 事件委托 ================= */
+document.addEventListener('click', function(e){
+  const el = e.target.closest ? e.target.closest('[data-action]') : null;
+  if(!el){
+    if(ui && ui.identityOpen){ ui.identityOpen = false; render(); }
+    return;
+  }
+  const action = el.getAttribute('data-action');
+  const ds = el.dataset;
+  /* 遮罩仅在点击遮罩本身时关闭，点击弹层内容不关闭 */
+  if(action === 'close-overlay' && e.target !== el) return;
+
+  switch(action){
+    case 'set-view':
+      ui.view = ds.view;
+      ui.identityOpen = false;
+      if(ui.view === 'mobile') ui.tab = ui.tab || 'home';
+      render();
+      break;
+    case 'nav':
+    case 'go-todo': {
+      const route = ds.route;
+      ui.identityOpen = false;
+      ui.modal = null;
+      if(route === 'mobile'){ ui.view = 'mobile'; ui.tab = 'home'; ui.drawer = null; }
+      else { ui.route = route; ui.drawer = null; }
+      render();
+      break;
+    }
+    case 'toggle-identity':
+      ui.identityOpen = !ui.identityOpen;
+      render();
+      break;
+    case 'pick-identity':
+      switchUser(ds.id);
+      break;
+    case 'm-identity':
+      ui.modal = {type:'identitySheet'};
+      ui.identityOpen = false;
+      render();
+      break;
+    case 'm-tab':
+      ui.tab = ds.tab;
+      render();
+      break;
+    case 'm-approval-tab':
+      ui.mApprovalTab = ds.tab;
+      render();
+      break;
+    case 'm-contact-dept':
+      ui.filters.mContactDept = ds.dept;
+      render();
+      break;
+    case 'm-announce': {
+      const latest = sortedAnnouncements().filter(function(a){ return !a.draft; })[0];
+      if(latest) openAnnouncement(latest.id);
+      else toast('暂无公告', 'warn');
+      break;
+    }
+    case 'm-punch':
+      mobilePunch();
+      break;
+    case 'punch':
+      doPunch();
+      break;
+
+    case 'open-employee':
+      ui.drawer = {type:'employee', id:ds.id};
+      render();
+      break;
+    case 'open-leave':
+      ui.drawer = {type:'leave', id:ds.id};
+      render();
+      break;
+    case 'emp-att':
+      ui.filters.attEmp = ds.id;
+      ui.filters.attPage = 1;
+      ui.drawer = null;
+      ui.route = 'attendance';
+      ui.view = 'web';
+      render();
+      toast('已跳转到该员工的考勤记录', 'success');
+      break;
+    case 'emp-page':
+      ui.filters.empPage = +ds.page;
+      render();
+      break;
+    case 'att-page':
+      ui.filters.attPage = +ds.page;
+      render();
+      break;
+    case 'set-emp-dept':
+      ui.filters.empDept = ds.dept;
+      ui.filters.empPage = 1;
+      render();
+      break;
+    case 'toggle-dept':
+      ui.collapsed[ds.id] = !ui.collapsed[ds.id];
+      render();
+      break;
+    case 'save-scope': {
+      const boxes = document.querySelectorAll('[data-scope]');
+      db.visibility = Array.prototype.slice.call(boxes)
+        .filter(function(b){ return b.checked; })
+        .map(function(b){ return b.getAttribute('data-scope'); });
+      render();
+      toast('通讯录可见范围已保存', 'success');
+      break;
+    }
+    case 'toggle-account': {
+      const emp = empById(ds.id);
+      if(!emp) break;
+      const willEnable = emp.account !== '启用';
+      confirmAction = function(){
+        emp.account = willEnable ? '启用' : '停用';
+        toast('已' + (willEnable ? '启用' : '停用') + ' ' + emp.name + ' 的账号');
+      };
+      ui.modal = {
+        type:'confirm', title:'账号状态变更', sub:emp.name + '（' + emp.id + '）',
+        text: willEnable ? '启用后该员工可正常登录协同办公平台，并接收待办与公告。' : '停用后该员工将无法登录，历史审批与考勤记录不受影响。',
+        okText: willEnable ? '启用账号' : '停用账号', danger: !willEnable
+      };
+      render();
+      break;
+    }
+
+    case 'anom-filter':
+      ui.filters.anomStatus = ds.status;
+      ui.filters.anomExpanded = null;
+      render();
+      break;
+    case 'anom-toggle':
+      ui.filters.anomExpanded = ui.filters.anomExpanded === ds.id ? null : ds.id;
+      render();
+      break;
+    case 'open-anom-form':
+      ui.modal = {type:'anomForm'};
+      ui.identityOpen = false;
+      render();
+      break;
+    case 'submit-anom': {
+      const a = db.anomalies.find(function(x){ return x.id === ds.id; });
+      if(!a) break;
+      a.status = 'pending';
+      a.logs.push({time:DEMO_NOW, actor:currentUser().name, text:'提交补卡申请，等待直属主管审批'});
+      render();
+      toast('补卡申请已提交审批', 'success');
+      break;
+    }
+    case 'anom-approve':
+      openAnomDecision(ds.id, 'approve');
+      break;
+    case 'anom-reject':
+      openAnomDecision(ds.id, 'reject');
+      break;
+    case 'anom-decision-submit':
+    case 'leave-decision-submit':
+      if(action === 'anom-decision-submit') decideAnomaly(ds.id, ds.act);
+      else decideLeave(ds.id, ds.act);
+      break;
+
+    case 'leave-tab':
+      ui.filters.leaveTab = ds.tab;
+      render();
+      break;
+    case 'open-leave-form':
+      ui.modal = {type:'leaveForm'};
+      ui.identityOpen = false;
+      render();
+      break;
+    case 'submit-leave':
+      submitLeaveForm(ds.mode);
+      break;
+    case 'leave-submit-draft':
+      submitDraftLeave(ds.id);
+      break;
+    case 'leave-approve':
+      openLeaveDecision(ds.id, 'approve');
+      break;
+    case 'leave-reject':
+      openLeaveDecision(ds.id, 'reject');
+      break;
+
+    case 'open-ann':
+      openAnnouncement(ds.id);
+      break;
+    case 'open-ann-form':
+    case 'new-ann':
+      ui.modal = {type:'annForm'};
+      ui.identityOpen = false;
+      render();
+      break;
+    case 'pin-ann': {
+      const a = db.announcements.find(function(x){ return x.id === ds.id; });
+      if(!a) break;
+      a.pinned = !a.pinned;
+      render();
+      toast(a.pinned ? '公告已置顶' : '已取消置顶', 'success');
+      break;
+    }
+    case 'submit-ann':
+      submitAnnForm(ds.mode);
+      break;
+
+    case 'contact-call': {
+      const emp = empById(ds.id);
+      if(emp) toast('正在拨打 ' + emp.phone + '（演示模拟，不会真实外呼）', 'success');
+      ui.modal = null;
+      render();
+      break;
+    }
+    case 'contact-msg': {
+      const emp = empById(ds.id);
+      if(emp) toast('已打开与 ' + emp.name + ' 的会话（演示占位）', 'success');
+      ui.modal = null;
+      render();
+      break;
+    }
+
+    case 'ask-reset':
+      confirmAction = function(){ resetAll(); };
+      ui.modal = {
+        type:'confirm', title:'重置演示数据', sub:'清空本地保存的全部改动',
+        text:'打卡、请假、公告、账号状态等演示改动将恢复为初始数据，页面随后自动刷新。',
+        okText:'确认重置', danger:true
+      };
+      render();
+      break;
+    case 'confirm-ok': {
+      const fn = confirmAction;
+      confirmAction = null;
+      ui.modal = null;
+      if(fn) fn();
+      render();
+      break;
+    }
+
+    case 'close-modal':
+      ui.modal = null;
+      confirmAction = null;
+      render();
+      break;
+    case 'close-drawer':
+      ui.drawer = null;
+      render();
+      break;
+    case 'close-overlay':
+      ui.modal = null;
+      ui.drawer = null;
+      confirmAction = null;
+      render();
+      break;
+    case 'demo-toast':
+      toast(ds.msg || '该操作在演示环境中为占位', 'success');
+      break;
+    default:
+      break;
+  }
+});
+
+document.addEventListener('input', function(e){
+  const t = e.target;
+  if(t.id === 'empSearch'){
+    ui.filters.empSearch = t.value;
+    ui.filters.empPage = 1;
+    updateEmpTable();
+    save();
+    return;
+  }
+  if(t.id === 'mContactSearch'){
+    ui.filters.mContact = t.value;
+    const box = document.getElementById('mContactList');
+    if(box) box.innerHTML = contactsHtml();
+    save();
+    return;
+  }
+  if(t.closest && t.closest('#leaveForm')) updateLeaveDuration();
+});
+
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(t.hasAttribute('data-field')){
+    const field = t.getAttribute('data-field');
+    ui.filters[field] = t.value;
+    if(field === 'empDept' || field === 'empStatus') ui.filters.empPage = 1;
+    if(field === 'attEmp' || field === 'attFrom' || field === 'attTo') ui.filters.attPage = 1;
+    render();
+    return;
+  }
+  if(t.hasAttribute('data-scope')){
+    const id = t.getAttribute('data-scope');
+    const i = db.visibility.indexOf(id);
+    if(t.checked && i < 0) db.visibility.push(id);
+    if(!t.checked && i >= 0) db.visibility.splice(i, 1);
+    save();
+    return;
+  }
+  if(t.hasAttribute('data-day')){
+    const day = Number(t.getAttribute('data-day'));
+    const i = db.workdays.indexOf(day);
+    if(t.checked && i < 0) db.workdays.push(day);
+    if(!t.checked && i >= 0) db.workdays.splice(i, 1);
+    save();
+    const label = t.closest('.week-check');
+    if(label) label.classList.toggle('on', t.checked);
+    return;
+  }
+  if(t.closest && t.closest('#leaveForm')) updateLeaveDuration();
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && (ui.modal || ui.drawer)){
+    ui.modal = null;
+    ui.drawer = null;
+    confirmAction = null;
+    render();
+  }
+});
+
+/* ================= 初始化 ================= */
+loadState();
+render();
+
+})();
+</script>
+</body>
+</html>
