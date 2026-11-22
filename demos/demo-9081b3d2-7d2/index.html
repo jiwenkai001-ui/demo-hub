@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>西安区域 · 降租扶持智能汇总看板</title>
+<style>
+:root{
+  --bg:#f5f6f8;
+  --panel:#ffffff;
+  --ink:#14181f;
+  --ink2:#3c4553;
+  --muted:#7b8494;
+  --line:#e7eaef;
+  --line2:#eff1f5;
+  --brand:#1f5fd6;
+  --brand-soft:#eef4ff;
+  --teal:#0d9488;
+  --amber:#d98218;
+  --red:#d24b45;
+  --green:#2f9e63;
+  --purple:#7457c8;
+  --shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.10);
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",system-ui,-apple-system,sans-serif;
+  font-size:13.5px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.num{font-variant-numeric:tabular-nums}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
+  padding:0 26px;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-in{display:flex;align-items:center;gap:18px;height:62px;max-width:1560px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.mark{
+  width:32px;height:32px;border-radius:9px;flex:0 0 auto;
+  background:linear-gradient(135deg,#2557c7,#1f8f8a);
+  display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;letter-spacing:.5px;
+}
+.brand h1{font-size:15.5px;font-weight:650;letter-spacing:.2px;white-space:nowrap}
+.brand .sub{font-size:11.5px;color:var(--muted);margin-top:1px;white-space:nowrap}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{
+  height:33px;padding:0 13px;border-radius:8px;border:1px solid var(--line);
+  background:#fff;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;transition:.15s;white-space:nowrap;
+}
+.btn:hover{border-color:#cdd4de;background:#fbfcfd}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:#1a53bd;border-color:#1a53bd}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:#f2f4f7;color:var(--ink2)}
+.btn svg{width:14px;height:14px}
+.stamp{font-size:11.5px;color:var(--muted);margin-right:4px;white-space:nowrap}
+
+/* ---------- tabs ---------- */
+.tabs{background:var(--panel);border-bottom:1px solid var(--line);padding:0 26px;position:sticky;top:62px;z-index:39}
+.tabs-in{display:flex;gap:2px;max-width:1560px;margin:0 auto}
+.tab{padding:9px 2px 10px;margin-right:22px;font-size:13.5px;color:var(--muted);border-bottom:2px solid transparent;transition:.15s}
+.tab:hover{color:var(--ink2)}
+.tab.on{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+.tab .cnt{
+  display:inline-block;margin-left:5px;font-size:11px;padding:0 5px;border-radius:20px;
+  background:#eef1f5;color:var(--muted);font-weight:500;line-height:16px;
+}
+.tab.on .cnt{background:var(--brand-soft);color:var(--brand)}
+
+/* ---------- layout ---------- */
+main{max-width:1560px;margin:0 auto;padding:22px 26px 60px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.p-head{display:flex;align-items:center;gap:10px;padding:15px 18px 0}
+.p-head h2{font-size:14px;font-weight:650}
+.p-head .hint{font-size:11.5px;color:var(--muted);font-weight:400}
+.p-head .r{margin-left:auto;display:flex;gap:6px;align-items:center}
+.p-body{padding:14px 18px 18px}
+.grid{display:grid;gap:16px}
+.g-2{grid-template-columns:1.55fr 1fr}
+.g-2b{grid-template-columns:1fr 1fr}
+.g-3{grid-template-columns:1fr 1fr 1fr}
+.sec-title{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.6px;margin:26px 0 10px;text-transform:uppercase}
+.sec-title:first-child{margin-top:0}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px 13px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .k{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.kpi .v{font-size:25px;font-weight:660;letter-spacing:-.4px;margin-top:7px;line-height:1.1}
+.kpi .v small{font-size:12.5px;font-weight:500;color:var(--muted);margin-left:2px}
+.kpi .f{font-size:11.5px;color:var(--muted);margin-top:6px}
+.kpi .f b{color:var(--ink2);font-weight:600}
+.kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand);opacity:.85}
+.kpi.k2::after{background:var(--teal)}
+.kpi.k3::after{background:var(--amber)}
+.kpi.k4::after{background:var(--red)}
+.kpi.k5::after{background:var(--purple)}
+.kpi.k6::after{background:#5b6b82}
+
+/* ---------- table ---------- */
+.tbl-wrap{overflow:auto;border-radius:10px;border:1px solid var(--line2)}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th,td{padding:9px 11px;text-align:left;white-space:nowrap;font-size:13px}
+thead th{
+  background:#fafbfc;color:var(--muted);font-weight:600;font-size:11.5px;
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;letter-spacing:.3px;
+}
+thead th.s{color:var(--ink);}
+tbody tr{border-bottom:1px solid var(--line2)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fafbfd}
+tbody tr.click{cursor:pointer}
+td.r,th.r{text-align:right}
+tfoot td{background:#fafbfc;font-weight:650;border-top:1px solid var(--line);font-size:13px}
+.bar-cell{position:relative;min-width:120px}
+.bar-bg{position:absolute;left:0;top:5px;bottom:5px;background:linear-gradient(90deg,#fde8d7,#fbd5b5);border-radius:4px;z-index:0}
+.bar-cell span{position:relative;z-index:1}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:20px;font-size:11.5px;line-height:18px;font-weight:500;white-space:nowrap}
+.tag.blue{background:#eaf1ff;color:#2258bd}
+.tag.orange{background:#fdf1e3;color:#a8630d}
+.tag.grey{background:#f0f2f5;color:#5d6775}
+.tag.red{background:#fdecea;color:#b83b34}
+.tag.green{background:#e9f7ef;color:#1f7d4c}
+.tag.teal{background:#e6f6f5;color:#0b7c72}
+.tag.purple{background:#f0ecfb;color:#5b41a8}
+.dot{width:7px;height:7px;border-radius:3px;display:inline-block;margin-right:6px;flex:0 0 auto}
+.neg{color:var(--red)}
+.pos{color:var(--green)}
+.muted{color:var(--muted)}
+
+/* ---------- filters ---------- */
+.filters{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:0 18px 13px}
+.filters select,.filters input[type=text]{
+  height:32px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:#fff;font-size:12.5px;color:var(--ink2);
+  outline:none;
+}
+.filters select:focus,.filters input:focus{border-color:#b9c6dd}
+.filters .search{width:210px;padding-left:30px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237b8494' stroke-width='2'><circle cx='11' cy='11' r='7'/><path d='m20 20-3.5-3.5'/></svg>") no-repeat 10px center}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);cursor:pointer;user-select:none}
+.chk input{accent-color:var(--brand);width:14px;height:14px}
+.filters .count{margin-left:auto;font-size:12px;color:var(--muted)}
+
+/* ---------- charts ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.legend span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.chart-months{display:flex;align-items:flex-end;gap:14px;height:238px;padding:8px 6px 0;border-bottom:1px solid var(--line)}
+.mcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.mval{font-size:11.5px;color:var(--ink2);font-weight:600;margin-bottom:5px}
+.mbar{width:100%;max-width:72px;display:flex;flex-direction:column-reverse;border-radius:5px 5px 0 0;overflow:hidden;transition:height .5s}
+.mseg{width:100%;transition:.2s}
+.mseg:hover{filter:brightness(1.12)}
+.mlabel{font-size:12px;color:var(--muted);padding:8px 0 10px}
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:4px 0}
+.donut{position:relative;flex:0 0 150px;height:150px}
+.donut .ctr{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.donut .ctr b{display:block;font-size:21px;font-weight:660;letter-spacing:-.3px}
+.donut .ctr i{font-style:normal;font-size:11.5px;color:var(--muted)}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:11px}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.dl-row .n{color:var(--ink2)}
+.dl-row .v{margin-left:auto;font-weight:650;font-variant-numeric:tabular-nums}
+.dl-row .p{color:var(--muted);font-size:11.5px;width:46px;text-align:right}
+.hbars{display:flex;flex-direction:column;gap:12px;padding:2px 0 4px}
+.hb{display:grid;grid-template-columns:96px 1fr 96px;align-items:center;gap:10px;font-size:12.5px}
+.hb .lb{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .track{height:16px;background:#f2f4f7;border-radius:4px;overflow:hidden}
+.hb .fill{height:100%;border-radius:4px;transition:width .5s}
+.hb .vv{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink2)}
+
+/* ---------- focus list ---------- */
+.focus{display:flex;flex-direction:column}
+.focus .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line2);font-size:12.5px}
+.focus .row:last-child{border-bottom:none}
+.focus .rk{width:19px;height:19px;border-radius:6px;background:#f2f4f7;color:var(--muted);display:grid;place-items:center;font-size:11px;font-weight:600;flex:0 0 auto}
+.focus .row:nth-child(1) .rk{background:#fdecea;color:#b83b34}
+.focus .nm{font-weight:600;color:var(--ink)}
+.focus .pj{color:var(--muted);font-size:11.5px;margin-left:2px}
+.focus .amt{margin-left:auto;text-align:right;font-weight:650;font-variant-numeric:tabular-nums}
+.focus .amt i{display:block;font-style:normal;font-weight:400;font-size:11px;color:var(--muted)}
+
+/* ---------- drop zone ---------- */
+.drop{
+  border:1.5px dashed #cfd7e3;border-radius:12px;padding:30px 22px;text-align:center;background:#fbfcfe;
+  transition:.15s;cursor:pointer;
+}
+.drop:hover,.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.drop .ic{width:40px;height:40px;border-radius:11px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 10px;color:var(--brand)}
+.drop h3{font-size:13.5px;font-weight:650;margin-bottom:4px}
+.drop p{font-size:12px;color:var(--muted);line-height:1.7}
+.drop code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:11.5px;font-family:Consolas,monospace;color:var(--ink2)}
+
+/* ---------- sources ---------- */
+.src-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2)}
+.src-row:last-child{border-bottom:none}
+.src-ic{width:32px;height:32px;border-radius:8px;background:#f0f6f1;color:#2f8a55;display:grid;place-items:center;flex:0 0 auto}
+.src-ic.up{background:#eef4ff;color:var(--brand)}
+.src-ic.fd{background:#fdf1e3;color:var(--amber)}
+.src-nm{font-weight:600;font-size:12.5px}
+.src-meta{font-size:11.5px;color:var(--muted);margin-top:1px}
+.src-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.mini{font-size:11.5px;color:var(--muted)}
+.x-btn{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:var(--muted)}
+.x-btn:hover{background:#fdecea;color:var(--red)}
+
+/* ---------- health ---------- */
+.health{display:flex;flex-direction:column;gap:9px}
+.hrow{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;padding:9px 11px;border-radius:9px;background:#fbfcfd;border:1px solid var(--line2)}
+.hrow .hi{flex:0 0 auto;margin-top:1px}
+.hrow.warn{background:#fffaf2;border-color:#f6e6cf}
+.hrow.err{background:#fdf6f5;border-color:#f6dcd9}
+.hrow b{font-weight:650}
+.hrow .d{color:var(--muted);font-size:11.5px;margin-top:1px}
+
+/* ---------- rules ---------- */
+.rule-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.rule-tbl th,.rule-tbl td{padding:8px 10px;border-bottom:1px solid var(--line2);text-align:left;vertical-align:top}
+.rule-tbl th{font-size:11.5px;color:var(--muted);font-weight:600;background:#fafbfc}
+.rule-tbl td code{background:#f4f6f9;padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:11.5px}
+.kv{display:grid;grid-template-columns:86px 1fr;gap:7px 10px;font-size:12.5px;align-items:baseline}
+.kv dt{color:var(--muted)}
+.kv dd{color:var(--ink2)}
+.note-box{background:#fbfcfd;border:1px solid var(--line2);border-left:3px solid var(--brand);border-radius:8px;padding:11px 13px;font-size:12.5px;color:var(--ink2);line-height:1.75}
+.note-box b{color:var(--ink)}
+
+/* ---------- drawer ---------- */
+.mask{position:fixed;inset:0;background:rgba(16,24,40,.28);opacity:0;pointer-events:none;transition:.2s;z-index:60}
+.mask.on{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:520px;max-width:92vw;background:#fff;z-index:61;
+  transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(16,24,40,.14);
+}
+.drawer.on{transform:none}
+.dw-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+.dw-head h3{font-size:15.5px;font-weight:660}
+.dw-head .sb{font-size:12px;color:var(--muted);margin-top:2px}
+.dw-body{overflow:auto;padding:16px 20px 40px;flex:1}
+.dw-sec{margin-bottom:18px}
+.dw-sec h4{font-size:11.5px;color:var(--muted);letter-spacing:.5px;margin-bottom:8px;font-weight:600}
+.dw-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line2);border-radius:9px;overflow:hidden}
+.dw-cell{padding:8px 11px;border-bottom:1px solid var(--line2);font-size:12.5px;display:flex;gap:8px;justify-content:space-between;align-items:baseline}
+.dw-cell:nth-child(odd){border-right:1px solid var(--line2);background:#fcfcfd}
+.dw-cell:last-child:nth-child(odd){grid-column:span 2;background:#fcfcfd}
+.dw-cell span{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.dw-cell b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.dw-text{font-size:12.5px;line-height:1.8;color:var(--ink2);background:#fbfcfd;border:1px solid var(--line2);border-radius:9px;padding:11px 13px;white-space:pre-wrap}
+.dw-edit{display:flex;gap:8px;align-items:center;margin-top:8px}
+.dw-edit select{height:30px;border:1px solid var(--line);border-radius:7px;padding:0 8px;font-size:12.5px;background:#fff}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#14181f;color:#fff;
+  padding:9px 16px;border-radius:9px;font-size:12.5px;opacity:0;pointer-events:none;transition:.25s;z-index:80;
+  box-shadow:0 8px 24px rgba(16,24,40,.25);max-width:80vw;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:#a8322c}
+
+/* ---------- drag overlay ---------- */
+.dropmask{position:fixed;inset:0;z-index:70;background:rgba(31,95,214,.10);backdrop-filter:blur(1.5px);display:none;place-items:center}
+.dropmask.on{display:grid}
+.dropmask .box{background:#fff;border:2px dashed var(--brand);border-radius:16px;padding:38px 54px;text-align:center;box-shadow:0 20px 60px rgba(16,24,40,.18)}
+.dropmask .box b{display:block;font-size:16px;margin-bottom:6px}
+.dropmask .box span{font-size:12.5px;color:var(--muted)}
+
+#projTable{min-width:760px}
+#detailTable{min-width:1160px}
+.hide{display:none!important}
+@media (max-width:1360px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .g-2,.g-2b,.g-3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="mark">XZ</div>
+      <div>
+        <h1>西安区域 · 降租扶持智能汇总看板</h1>
+        <div class="sub">按「西安减免」汇总口径自动归集 · 新增表格拖入即汇总</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="stamp" id="stamp"></span>
+      <button class="btn" id="btnFolder" title="选择一个文件夹，之后放进去的表格点同步即可汇总">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        文件夹同步
+      </button>
+      <button class="btn" id="btnExport">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        导出汇总
+      </button>
+      <button class="btn primary" id="btnImport">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0 4 4M12 9 8 13M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>
+        导入表格
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-in">
+    <button class="tab on" data-tab="overview">汇总总览</button>
+    <button class="tab" data-tab="detail">商户明细<span class="cnt" id="tabDetailCnt">0</span></button>
+    <button class="tab" data-tab="sources">数据源与自动汇总<span class="cnt" id="tabSrcCnt">0</span></button>
+    <button class="tab" data-tab="rules">汇总规则</button>
+  </div>
+</nav>
+
+<main>
+  <!-- ============ 总览 ============ -->
+  <section id="tab-overview">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="sec-title">按项目维度</div>
+    <div class="grid g-2">
+      <div class="panel">
+        <div class="p-head">
+          <h2>项目汇总表</h2>
+          <span class="hint">沿「西安减免」统计口径：笔数 / 月优惠 / 7–12月优惠损失 / 折后租售比</span>
+        </div>
+        <div class="p-body" style="padding-top:12px">
+          <div class="tbl-wrap">
+            <table id="projTable">
+              <thead>
+                <tr>
+                  <th>项目名称</th>
+                  <th class="r">申请笔数</th>
+                  <th class="r">商户数</th>
+                  <th class="r">建筑面积㎡</th>
+                  <th class="r">月优惠金额</th>
+                  <th class="r">7-12月优惠损失</th>
+                  <th class="r">损失占比</th>
+                  <th class="r">平均折后租售比</th>
+                  <th class="r">折后仍亏损</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="p-head"><h2>降租类型结构</h2><span class="hint">核心减免分类</span></div>
+        <div class="p-body">
+          <div class="donut-wrap">
+            <div class="donut"><svg viewBox="0 0 160 160" width="150" height="150"></svg>
+              <div class="ctr"><div><b id="donutTotal">0</b><i>申请笔数</i></div></div>
+            </div>
+            <div class="donut-legend" id="donutLegend"></div>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)">
+            <div class="kv" id="typeKv"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">时间与业态分布</div>
+    <div class="grid g-2">
+      <div class="panel">
+        <div class="p-head"><h2>7–12月优惠损失月度分布</h2><span class="hint">按项目堆叠，单位：元</span></div>
+        <div class="p-body">
+          <div class="chart-months" id="monthChart"></div>
+          <div class="legend" id="monthLegend"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="p-head"><h2>经营业态 / 一级品类</h2><span class="hint">笔数与优惠损失</span></div>
+        <div class="p-body">
+          <div class="hbars" id="bizChart"></div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)">
+            <div class="hbars" id="catChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">重点关注</div>
+    <div class="grid g-2b">
+      <div class="panel">
+        <div class="p-head"><h2>优惠损失金额 TOP 6</h2><span class="hint">7–12月合计</span></div>
+        <div class="p-body"><div class="focus" id="focusLoss"></div></div>
+      </div>
+      <div class="panel">
+        <div class="p-head"><h2>折后仍亏损 TOP 6</h2><span class="hint">折后商户盈亏为负，按亏损额排序</span></div>
+        <div class="p-body"><div class="focus" id="focusProfit"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 明细 ============ -->
+  <section id="tab-detail" class="hide">
+    <div class="panel">
+      <div class="p-head" style="padding-bottom:12px">
+        <h2>商户申请明细</h2>
+        <span class="hint">点击任意行查看完整字段来源</span>
+      </div>
+      <div class="filters">
+        <input type="text" class="search" id="fSearch" placeholder="搜索商户 / 商铺号 / 品类" />
+        <select id="fProject"><option value="">全部项目</option></select>
+        <select id="fBiz"><option value="">全部业态</option></select>
+        <select id="fType"><option value="">全部降租类型</option></select>
+        <select id="fStatus">
+          <option value="">全部状态</option>
+          <option value="loss">折后仍亏损</option>
+          <option value="profit">折后为正</option>
+          <option value="nodate">缺合同日期</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="fHideDup" checked /> 隐藏重复记录</label>
+        <span class="count" id="fCount"></span>
+      </div>
+      <div class="p-body" style="padding-top:0">
+        <div class="tbl-wrap" style="max-height:calc(100vh - 290px)">
+          <table id="detailTable">
+            <thead>
+              <tr>
+                <th data-sort="merchant">商户名称</th>
+                <th data-sort="project">项目</th>
+                <th data-sort="shop">商铺号</th>
+                <th data-sort="bizType">业态</th>
+                <th data-sort="cat1">一级品类</th>
+                <th class="r" data-sort="area">面积㎡</th>
+                <th class="r" data-sort="sales">月均销售</th>
+                <th class="r" data-sort="rentRatio">当前租售比</th>
+                <th class="r" data-sort="ratioAfter">折后租售比</th>
+                <th class="r" data-sort="monthDiscount">月优惠</th>
+                <th class="r" data-sort="lossTotal">7-12月损失</th>
+                <th data-sort="reduceType">降租类型</th>
+                <th data-sort="period">申请周期</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 数据源 ============ -->
+  <section id="tab-sources" class="hide">
+    <div class="grid g-2b">
+      <div class="panel">
+        <div class="p-head"><h2>导入表格</h2><span class="hint">支持 .xlsx / .xls / .csv，可多选</span></div>
+        <div class="p-body">
+          <div class="drop" id="dropZone">
+            <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0 4 4m-4-4L8 8"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+            <h3>把新的降租申请表格拖到这里</h3>
+            <p>也可以点击选择文件。系统会自动识别表头、把列名映射到统一口径，<br/>并按「商户 + 商铺号 + 申请周期 + 月优惠金额」自动去重合并。</p>
+          </div>
+          <div style="margin-top:14px" class="note-box">
+            <b>为什么要做列名映射？</b> 各项目报上来的表格式不统一，比如「综合管理费」在申请表里叫
+            <code>运维/运营平台使用费</code>、「近3个月月均销售」可能写成 <code>近2个月月均销售</code>。
+            看板按语义识别列名，所以格式不同也能汇总到同一张表里。
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" id="btnFolder2">选择文件夹自动同步</button>
+            <button class="btn" id="btnExportJson">备份当前数据</button>
+            <button class="btn" id="btnImportJson">从备份恢复</button>
+            <button class="btn ghost" id="btnReset" style="margin-left:auto;color:#b83b34">重置为初始数据</button>
+          </div>
+          <div id="folderBox" class="note-box hide" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="p-head"><h2>数据源清单</h2><span class="hint" id="srcSum"></span></div>
+        <div class="p-body"><div id="srcList"></div></div>
+      </div>
+    </div>
+
+    <div class="sec-title">数据校验提醒</div>
+    <div class="panel"><div class="p-body"><div class="health" id="health"></div></div></div>
+  </section>
+
+  <!-- ============ 规则 ============ -->
+  <section id="tab-rules" class="hide">
+    <div class="grid g-2b">
+      <div class="panel">
+        <div class="p-head"><h2>汇总口径</h2><span class="hint">与「西安减免.xlsx」保持一致</span></div>
+        <div class="p-body">
+          <div class="note-box" style="margin-bottom:14px">
+            一行 = 一个商户的一次降租申请。同一商户出现多行是正常的（不同申请周期分别成行），
+            汇总时可切换「按笔数」或「按商户」查看。
+          </div>
+          <dl class="kv">
+            <dt>行维度</dt><dd>城市公司 → 项目名称 → 商户 / 商铺号</dd>
+            <dt>分类维度</dt><dd>经营业态 → 一级品类 → 二级品类；降租类型（降租扶持 / 续签降租）</dd>
+            <dt>金额维度</dt><dd>月优惠金额、7–12月分月优惠损失及合计</dd>
+            <dt>效率维度</dt><dd>近3个月月均销售、坪效、租售比、折后租售比</dd>
+            <dt>去重键</dt><dd>商户名称 + 商铺号 + 申请折扣周期 + 月优惠金额</dd>
+          </dl>
+          <div style="margin-top:16px">
+            <table class="rule-tbl">
+              <thead><tr><th>派生指标</th><th>计算方式</th></tr></thead>
+              <tbody>
+                <tr><td>租售比</td><td><code>(租金 + 综合管理费) ÷ 月均销售</code></td></tr>
+                <tr><td>销售坪效</td><td><code>月均销售 ÷ 建筑面积</code></td></tr>
+                <tr><td>月优惠金额</td><td><code>租金 + 综合管理费 − 折后月租管费</code></td></tr>
+                <tr><td>7-12月优惠损失</td><td><code>Σ(7月…12月)</code>，缺失时按申请周期自动推算</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="p-head"><h2>列名识别规则</h2><span class="hint">导入新表时按此匹配</span></div>
+        <div class="p-body">
+          <div class="tbl-wrap" style="max-height:520px">
+            <table class="rule-tbl">
+              <thead><tr><th style="width:130px">统一口径</th><th>可识别的表头写法</th></tr></thead>
+              <tbody id="ruleTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <div class="dw-head">
+    <div style="flex:1;min-width:0">
+      <h3 id="dwName">—</h3>
+      <div class="sb" id="dwSub"></div>
+    </div>
+    <button class="x-btn" id="dwClose">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="dw-body" id="dwBody"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+<div class="dropmask" id="dropmask"><div class="box"><b>松开即可导入</b><span>自动识别表头 · 映射口径 · 去重合并</span></div></div>
+<input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" class="hide" />
+<input type="file" id="jsonInput" accept=".json" class="hide" />
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script>
+/* =========================================================
+   1. 统一口径字段定义
+   ========================================================= */
+const FIELD_META = [
+  ['city','城市公司','base','text'],
+  ['project','项目名称','base','text'],
+  ['merchant','商户名称','base','text'],
+  ['shop','商铺号','base','text'],
+  ['bizType','经营业态','base','text'],
+  ['cat1','一级品类','base','text'],
+  ['cat2','二级品类','base','text'],
+  ['supLevel','供应商等级','extra','text'],
+  ['brandLevel','品牌等级','extra','text'],
+  ['area','建筑面积','base','num'],
+  ['sales','月均销售','sale','num'],
+  ['eff','月均销售坪效','sale','num'],
+  ['rentRatio','当前租售比','sale','pct'],
+  ['rent','租金','cost','num'],
+  ['mgmt','综合管理费','cost','num'],
+  ['elec','电费','cost','num'],
+  ['water','水费','cost','num'],
+  ['pos','POS租金','cost','num'],
+  ['warehouse','仓库租金','cost','num'],
+  ['ad','广告宣传','cost','num'],
+  ['labor','人工成本','cost','num'],
+  ['dorm','员工住宿成本','cost','num'],
+  ['other','其他成本','cost','num'],
+  ['costTotal','成本合计','cost','num'],
+  ['avgSalary','平均薪资','perf','num'],
+  ['staff','员工数','perf','num'],
+  ['gross','毛利率','perf','pct'],
+  ['profit','月净利润','perf','num'],
+  ['bep','月盈亏平衡点','perf','num'],
+  ['period','申请折扣周期','plan','text'],
+  ['ratioAfter','折后租售比','plan','pct'],
+  ['profitAfter','折后商户盈亏','plan','num'],
+  ['monthDiscount','月优惠金额','plan','num'],
+  ['mgmtAfter','折后月租管费','plan','num'],
+  ['reduceType','降租类型','plan','text'],
+  ['l7','7月优惠损失','loss','num'],
+  ['l8','8月优惠损失','loss','num'],
+  ['l9','9月优惠损失','loss','num'],
+  ['l10','10月优惠损失','loss','num'],
+  ['l11','11月优惠损失','loss','num'],
+  ['l12','12月优惠损失','loss','num'],
+  ['lossTotal','优惠损失合计','loss','num'],
+  ['cStart','合同起始','contract','text'],
+  ['cEnd','合同截止','contract','text'],
+  ['deposit','租赁保证金','contract','num'],
+  ['note','备注','contract','text'],
+  ['opinion','产品运营中心意见','extra','text']
+];
+const KEYS = FIELD_META.map(f=>f[0]);
+const LABEL = Object.fromEntries(FIELD_META.map(f=>[f[0],f[1]]));
+const TYPE  = Object.fromEntries(FIELD_META.map(f=>[f[0],f[3]]));
+const GROUP_OF = Object.fromEntries(FIELD_META.map(f=>[f[0],f[2]]));
+const GROUP_NAME = {base:'基础信息',sale:'销售指标',cost:'月度成本',perf:'经营测算',plan:'优惠方案',loss:'优惠损失',contract:'合同信息',extra:'补充信息'};
+const MONTH_KEYS = ['l7','l8','l9','l10','l11','l12'];
+
+/* =========================================================
+   2. 表头识别规则（按顺序匹配，先命中者优先）
+   ========================================================= */
+const RULES = [
+  ['ratioAfter',  /折后.*租售比|租售比.*折后/],
+  ['profitAfter', /折后.*(盈亏|利润)/],
+  ['mgmtAfter',   /折后.*(租管|管理费|运维|平台|运营|物业)/],
+  ['period',      /申请折扣周期|折扣周期|优惠周期|减免周期|申请周期|优惠期间|减免期间/],
+  ['monthDiscount',/月优惠金额|优惠金额|月减免金额|减免金额|月优惠额/],
+  ['reduceType',  /降租类型|减免类型|优惠类型|扶持类型/],
+  ['lossTotal',   /(优惠|减免|损失).*合计|合计.*(优惠|减免|损失)/],
+  ['eff',         /坪效/],
+  ['rentRatio',   /租售比/],
+  ['sales',       /(近\d+个月|月均).*销售|月均销售额|销售额|月销售/],
+  ['avgSalary',   /平均薪资|人均工资|平均工资/],
+  ['staff',       /员工数|人数|员工人数/],
+  ['gross',       /毛利率/],
+  ['bep',         /盈亏平衡点|保本点/],
+  ['profit',      /净利|月盈亏|商户盈亏/],
+  ['cStart',      /合同(起始|开始|起)|起租日|开始日期|合同起/],
+  ['cEnd',        /合同(截止|到期|结束)|截止日期|到期日|合同止/],
+  ['deposit',     /保证金|押金/],
+  ['opinion',     /产品运营中心意见|运营意见|审批意见|审核意见/],
+  ['note',        /备注|说明|申请理由|情况说明/],
+  ['supLevel',    /供应商等级/],
+  ['brandLevel',  /品牌等级/],
+  ['city',        /城市公司|所属城市|^城市$/],
+  ['project',     /项目名称|所属项目|^项目$|门店项目/],
+  ['merchant',    /商户名称|商户$|店铺名称|品牌名称|租户名称|^商户/],
+  ['shop',        /商铺号|铺位号|房号|^商铺$|铺号/],
+  ['bizType',     /经营业态|^业态$/],
+  ['cat1',        /一级品类|一级分类/],
+  ['cat2',        /二级品类|二级分类/],
+  ['area',        /建筑面积|计租面积|^面积$/],
+  ['rent',        /^租金$|月租金/],
+  ['mgmt',        /综合管理费|运维|运营平台使用费|平台使用费|管理费|物业费|租管费/],
+  ['elec',        /电费/],
+  ['water',       /水费/],
+  ['pos',         /^pos|pos(机)?租金|pos(机)?费用/],
+  ['warehouse',   /仓库|仓储/],
+  ['ad',          /广告|宣传/],
+  ['labor',       /人工成本|^人工$|工资/],
+  ['dorm',        /住宿/],
+  ['other',       /其他/]
+];
+/* 备注：'合计' 这类会被多个组共用的表头，在解析时按列位置兜底判定 */
+
+/* =========================================================
+   3. 基础工具
+   ========================================================= */
+function normHead(v){
+  if(v===null||v===undefined) return '';
+  return String(v).replace(/[\s\u3000]/g,'').replace(/[（）()【】\[\]／\\·・.,，、:：*#%]/g,'').toLowerCase();
+}
+function parseNum(v){
+  if(v===null||v===undefined||v==='') return null;
+  if(typeof v==='number') return isFinite(v)?v:null;
+  let s=String(v).trim();
+  if(!s||/^[-—–\/\\]+$/.test(s)) return null;
+  let neg=false;
+  if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+  if(/^-/.test(s)){neg=true;s=s.slice(1);}
+  let pct=false;
+  if(s.endsWith('%')){pct=true;s=s.slice(0,-1);}
+  s=s.replace(/[¥￥,，\s元]/g,'');
+  const n=parseFloat(s);
+  if(!isFinite(n)) return null;
+  return (neg?-1:1)*(pct?n/100:n);
+}
+function excelDate(n){
+  const ms=Math.round((n-25569)*86400*1000);
+  const d=new Date(ms);
+  if(isNaN(d)) return '';
+  const p=x=>String(x).padStart(2,'0');
+  return d.getUTCFullYear()+'.'+p(d.getUTCMonth()+1)+'.'+p(d.getUTCDate());
+}
+function parseDate(v){
+  if(v===null||v===undefined||v==='') return '';
+  if(typeof v==='number') return v>20000&&v<80000?excelDate(v):String(v);
+  const s=String(v).trim();
+  if(/^\d{5}(\.\d+)?$/.test(s)){const n=parseFloat(s);return n>20000&&n<80000?excelDate(n):s;}
+  const m=s.match(/(\d{4})\s*[.\-\/年]\s*(\d{1,2})\s*[.\-\/月]\s*(\d{1,2})/);
+  if(m) return m[1]+'.'+String(m[2]).padStart(2,'0')+'.'+String(m[3]).padStart(2,'0');
+  const m2=s.match(/(\d{4})\s*[.\-\/年]\s*(\d{1,2})/);
+  if(m2) return m2[1]+'.'+String(m2[2]).padStart(2,'0');
+  return s;
+}
+/* 解析申请周期文本 → 月份列表 */
+function parsePeriodMonths(p){
+  if(!p) return null;
+  const s=String(p);
+  const re=/(\d{4})\s*[.\-\/年]\s*(\d{1,2})/g;
+  const toks=[]; let m;
+  while((m=re.exec(s))!==null) toks.push({y:+m[1],mo:+m[2]});
+  if(!toks.length) return null;
+  const start=toks[0], end=toks[toks.length-1];
+  let idx=start.y*12+(start.mo-1), endIdx=end.y*12+(end.mo-1);
+  if(endIdx<idx) endIdx=idx;
+  if(endIdx-idx>60) endIdx=idx;
+  const out=[];
+  for(let i=idx;i<=endIdx;i++) out.push({y:Math.floor(i/12),mo:i%12+1});
+  return out;
+}
+const fmtMoney=n=>{
+  if(n===null||n===undefined||!isFinite(n)) return '—';
+  return n.toLocaleString('zh-CN',{minimumFractionDigits:0,maximumFractionDigits:0});
+};
+const fmtMoney2=n=>{
+  if(n===null||n===undefined||!isFinite(n)) return '—';
+  return n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+};
+const fmtWan=n=>{
+  if(n===null||n===undefined||!isFinite(n)) return '—';
+  if(Math.abs(n)>=10000) return (n/10000).toFixed(2)+'万';
+  return Math.round(n).toLocaleString('zh-CN');
+};
+const fmtPct=n=>(n===null||n===undefined||!isFinite(n))?'—':(n*100).toFixed(1)+'%';
+const fmtPct2=n=>(n===null||n===undefined||!isFinite(n))?'—':(n*100).toFixed(2)+'%';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* =========================================================
+   4. 初始种子数据（来自两份原始表格）
+   ========================================================= */
+const SEED_T = [
+'西安|3号零星|名创优品|ZZBL001|零售|综合零售|日用百货|||389.94|166772.26|427.69|0.3549|46793|12392.29|1800|0|0|0|0|18500|1500|0|80985.29|4625|4|0.35|-22615|231386.54|2026.01-2026.09|0.2427|-3897.8|18717.2|40468.09|降租扶持|18717.2|18717.2|18717.2|18717.2|||74868.8|2018.10.28|2026.10.27|111132||',
+'西安|鱼化寨|阿田妈妈|A003|餐饮|小吃|花甲米线|||80.6|37055|459.74|0.4242|9269|6448|2000|60|0|0|0|9000|0|0|26777|4500|2|0.5|-8249.5|53554|2026.7.28-2027.7.27|0.2721|-2614.5|5635|10082|续签降租|5635|5635|5635|5635|5635|5635|33810|2025.7.28|2026.7.27|37076||',
+'西安|三号零星|读酥人|DYT006|餐饮|烘焙|中式糕点|||169.38|207348|1224.16|0.2451|33876|16938|5500|120|0|0|0|77000|0|0|133434|5500|14|0.5|-29760|266868|2026.7-2026.9|0.1727|-14760|15000|35814|降租扶持|15000|15000|15000||||45000|2025.10.21|2028.10.20|189380||',
+'西安|三号零星|蜜雪冰城|DYT002|餐饮|轻饮|饮品|||64.5|120964|1875.41|0.2787|28551.74|5158.4|120|430|0|0|0|23000|0|6000|63260.14|4500|5|0.5|-2778.14|126520.29|2026.9-2026.11|0.2612|-663.2|2114.94|31595.2|降租扶持|2114.94|2114.94|2114.94||||6344.83|2025.6.6|2028.6.5|105747.2||',
+'西安|余家寨|茶瀑布|B10|餐饮|轻饮|饮品|||55.2|50325|911.68|0.1042|5244|0|1100|200|0|0|0|13500|0|2000|22044|4500|3|0.4|-1914|55110|2026.07.31-2027.07.30|0.0987|-1638|276|4968|续签降租|276|276|276|276|276|276|1656|2025.07.31|2026.07.30|15456||',
+'西安|鱼化寨|鸭巷|C12|餐饮|卤味|鸭脖|||19.2|26700|1390.63|0.3642|7804.99|1920|900|50|0|700|0|4500|0|50|15924.99|4500|1|0.35|-6579.99|45499.97|2026.10.16-2027.10.15|0.2247|-2855|3724.99|6000|续签降租||||3724.99|3724.99|3724.99|11174.97|2023.10.16|2026.10.15|41485.06||',
+'西安|行政中心|星河咖啡|A005|餐饮|饮品|饮品|||52|1340|25.77|3.7313|5000|0|500|50|0|0|0|8000|0|0|13550|4000|2|0.5|-12880|27100|2026.09-2026.11|2.9851|-11880|1000|4000|降租扶持|1000|1000|||||2000|2026.04.01|2029.03.31|5400||',
+'西安|行政中心|库迪咖啡|A03a|餐饮|咖啡|饮品|||69.6|14000|201.15|0.2734|3828|0|500|50|0|0|0|8000|0|2000|14378|4000|2|0.4|-8778|35945|2026.9.1-2026.11.30|0.2237|-8082|696|3132|降租扶持|||696|696|696||2088|2026.04.01|2029.03.31|32320||',
+'西安|余家寨|名创优品|B012|零售|日用百货|日用百货|||304.6|154768|508.1|0.1615|0|25001.57|800|0|0|0|0|21000|0|1000|47801.57|5250|4|0.3|-1371.17|159338.57|2026.9.9-2027.9.8|0.1163|5630.4|7001.57|18000|续签降租|||7001.57|7001.57|7001.57|7001.57|28006.28|2024.8.9|2026.8.8|60920||',
+'西安|余家寨|膳阿文黄焖鸡米饭|A012|餐饮|中式快餐|中式快餐|||64.8|14150|218.36|0.3664|0|5184|1100|100|0|0|0|8000|0|0|14384|4000|2|0.4|-8724|35960|2026.10.1-2026.12.31|0.3435|-8400|324|4860|降租扶持|||324|324|324||972|2025.06.01|2027.05.31|12960||',
+'西安|余家寨|萧县卷面皮|YJZC008|餐饮|小吃|卷面皮|||48.68|21022|431.84|0.2431|1217|3894.4|520|30|0|0|0|9000|0|136|14797.4|4500|2|0.6|-2184.2|24662.33|2026.9.26-2027.9.25|0.1861|-984.2|1200|3911.4|续签降租|||1200|1200|1200|1200|4800|2025.9.26|2026.9.25|9736||',
+'西安|余家寨|袁记云饺|B020|餐饮|中式快餐|中式快餐|||135.9|100000|1400|0.1087|0|10872|6000|350|0|0|0|26000|0|2000|45722|4333|6|0.4|-5722|114305|2026.11.1-2028.10.19|0.08|-2850|2872|8000|降租扶持|||||2872|2872|5744|2026.11.1|2028.10.19|35000||',
+'西安|鱼化寨|樱花寿司|C10|餐饮|日式料理|寿司|||20.2|15524|768.51|0.4333|5110.6|1616|520|56|0|0|0|5000|0|0|12302.6|5000|1|0.5|-4540.6|24605.2|2026.10.12-2027.10.11|0.2899|-2314|2226.6|4500|续签降租||||2226.6|2226.6|2226.6|6679.8|2023.10.12|2026.10.11|24432||',
+'西安|三号零星|蜜雪冰城|DYT002|餐饮|轻饮|饮品|||64.5|118297|1834.06|0.285|28551.74|5158.4|120|430|0|0|0|23000|0|6000|63260.14|4500|5|0.5|-4111.64|126520.29|2026.12-2027.5|0.2671|-1996.7|2114.94|31595.2|降租扶持||||2114.94|2114.94|2114.94|6344.83|2025.6.6|2028.6.5|105747.2||',
+'西安|行政中心|库迪咖啡|A03a|餐饮|咖啡|饮品|||69.6|12486|179.4|0.3066|3828|0|500|50|0|0|0|8000|0|2000|14378|4000|2|0.4|-9383.6|35945|2026.12-2027.2|0.1864|-7883.6|1500|2328|降租扶持|||696|696|696||2088|2026.04.01|2029.03.31|32320|11月30日撤场|',
+'西安|余家寨|三旬街舞|A20|娱乐服务|舞蹈|儿童街舞|||281|22800|81.14|0.3697|0|8430|360|0|0|0|0|22000|0|200|30990|5500|4|1|-8190|30990|2026.11-2027.5|0.307|-6760|1430|7000|降租扶持|||||1430|1430|2860|2024.3.21|2027.5.20|10000|11月5日撤场|',
+'西安|余家寨|三旬街舞|A20|娱乐服务|舞蹈|儿童街舞|||281|22800|81.14|0.3697|0|8430|360|0|0|0|0|22000|0|200|30990|5500|4|1|-8190|30990|2027.5.21-2028.5.20|0.307|-6760|1430|7000|续签降租|||||||0|2024.3.21|2027.5.20|10000||',
+'西安|余家寨|太太好粥|B019|餐饮|中式快餐|小吃|||68.8|44285|81|0.37|0|5800|2700|100|0|0|0|10500|0|3800|22900|3500|3|0.45|-2971.75|50888.89|2027.1.19-2028.1.18|0.1|-1671.75|1300|4500|续签降租||||||||0||||',
+'西安|余家寨|时光桌游|YJZB036|娱乐服务|悠闲娱乐|桌游|||185.8|7985|42.98|0.5009|0|4000|200|0|0|0|65|4000|0|0|8265|4000|1|0.9|-1078.5|9183.33|2026.11.20-2027.11.19|0.4383|-578.5|500|3500|续签降租|||||500|500|1000|||||',
+'西安|鱼化寨|乐摩吧|C002A|娱乐配套|娱乐配套|按摩椅|||27.4|3157|115.22|1.0328|520.6|2740|46|0|0|0|0|0|0|0|3306.6|0|0|0.4|-2043.8|8266.5|2027.03.11-2028.03.10|0.9113|-1660.2|383.6|2877|续签降租||||||||0||||'
+];
+const SEED_A = [
+'西安公司|三号零星|蜜雪冰城|DYT002|餐饮|轻饮|饮品|五级|B|64.5|118297|1834.06|0.285|28551.74|5158.4|120|430|0|0|0|23000|0|6000|63260.14|4500|5|0.5|-4111.64|126520.29|2026.9-2026.11|0.2671|-1996.7|2114.94|31595.2|降租扶持|||2114.94|2114.94|2114.94||6344.83|2025.6.6|2028.6.5|105747.2|租管费优惠申请：申请减免2026.12.1-2027.5.31期间租管费递增部分2114.94元/月，合计12689.64元。|',
+'西安公司|余家寨|柳姑姑麻辣烫|B05|餐饮|中式快餐|餐饮|五级|B|61|30904|1000|0.2|0|5000|2500|150|0|0|500|12000|500|2000|22150|4000|3|0.45|-8243.2|49222.22|2026.12-2027.7|0.1456|-7243.2|500|4500|降租扶持||||||500|500|2026.08.10|2027.08.09|10000|租管费优惠申请：商户2026年9月开业，日均销售约0.1万元，申请2026.12.1-2027.7.31期间减免租管费500元/月，合计4000元。|'
+];
+
+/* =========================================================
+   5. 状态与持久化
+   ========================================================= */
+const LS='rentdash.xz.v1';
+const state={rows:[],sources:[],folder:{name:'',at:''},filter:{q:'',project:'',biz:'',type:'',status:'',hideDup:true},sort:{key:'lossTotal',dir:-1}};
+
+function uid(){return Math.random().toString(36).slice(2,9);}
+function rowFromPipe(line){
+  const p=line.split('|');
+  if(p.length!==KEYS.length) console.warn('字段数量不匹配',p.length,line.slice(0,40));
+  const o={};
+  KEYS.forEach((k,i)=>{
+    const raw=p[i];
+    if(TYPE[k]==='num'||TYPE[k]==='pct') o[k]=parseNum(raw);
+    else if(k==='cStart'||k==='cEnd') o[k]=parseDate(raw);
+    else o[k]=raw===''? '' : raw;
+  });
+  normalizeText(o);
+  o.id=uid();
+  o._flags=[];
+  return o;
+}
+/* 文本字段清洗：项目名称/城市公司统一写法，短文本去掉换行 */
+function normalizeText(o){
+  if(o.city) o.city=String(o.city).replace(/公司$/,'').trim();
+  if(o.project) o.project=normProject(String(o.project).trim());
+  KEYS.forEach(k=>{
+    if(TYPE[k]!=='text') return;
+    if(k==='note'||k==='opinion') return;
+    if(typeof o[k]==='string') o[k]=o[k].replace(/\s*[\r\n]+\s*/g,' ').trim();
+  });
+}
+function seed(){
+  state.sources=[];
+  state.rows=[];
+  const s1={id:'src-seed-t',name:'西安减免.xlsx',kind:'template',from:'seed',at:'2026-11-12 09:48',added:0,dup:0,rowIds:[]};
+  const s2={id:'src-seed-a',name:'余家寨柳姑姑麻辣烫降租扶持申请(1).xlsx',kind:'apply',from:'seed',at:'2026-11-12 09:48',added:0,dup:0,rowIds:[]};
+  SEED_T.forEach(l=>{const r=rowFromPipe(l);r._src=s1.id;state.rows.push(r);s1.rowIds.push(r.id);s1.added++;});
+  SEED_A.forEach(l=>{
+    const r=rowFromPipe(l);r._src=s2.id;r._flags=['inferType'];
+    const key=dedupeKey(r);
+    const hit=state.rows.find(x=>dedupeKey(x)===key && !x._dup);
+    if(hit){r._dup=true;r._dupOf=hit.id;s2.dup++;}
+    else {s2.added++;}
+    state.rows.push(r);s2.rowIds.push(r.id);
+  });
+  s1.added=SEED_T.length;
+  state.sources=[s1,s2];
+  state.folder={name:'',at:''};
+}
+function dedupeKey(r){
+  return [normHead(r.merchant),normHead(r.shop),normHead(r.period),Math.round((r.monthDiscount||0)*100)].join('|');
+}
+function save(){
+  try{
+    localStorage.setItem(LS,JSON.stringify({rows:state.rows,sources:state.sources,folder:state.folder}));
+  }catch(e){console.warn('保存失败',e);}
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(LS);
+    if(!raw){seed();return false;}
+    const d=JSON.parse(raw);
+    if(!d.rows||!d.rows.length){seed();return false;}
+    state.rows=d.rows;state.sources=d.sources||[];state.folder=d.folder||{name:'',at:''};
+    return true;
+  }catch(e){seed();return false;}
+}
+
+/* =========================================================
+   6. 表格解析 → 统一行
+   ========================================================= */
+function sheetToAOA(ws){
+  return XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null,blankrows:false});
+}
+function matchField(head){
+  const h=normHead(head);
+  if(!h) return null;
+  // 分月优惠损失列：7月 / 8月 ... / 12月（含「7月优惠损失」等写法）
+  const m1=h.match(/^(\d{1,2})月份?$/), m2=h.match(/^(\d{1,2})月份?(优惠|减免|损失)/);
+  const mo = m1? +m1[1] : (m2? +m2[1] : null);
+  if(mo!==null && mo>=7 && mo<=12) return 'l'+mo;
+  for(const [k,re] of RULES){ if(re.test(h)) return k; }
+  return null;
+}
+function detectHeader(aoa){
+  const lim=Math.min(8,aoa.length);
+  const scores=[];
+  for(let i=0;i<lim;i++){
+    let s=0;
+    (aoa[i]||[]).forEach(c=>{ if(matchField(c)) s++; });
+    scores.push(s);
+  }
+  let best=-1,bestScore=0;
+  scores.forEach((s,i)=>{ if(s>bestScore){bestScore=s;best=i;} });
+  if(bestScore<3) return null;
+  // 多级表头：命中最多的是子表头行时，把表头起点上移到上一行（组标题行）
+  if(best>0 && scores[best-1]>=3) return best-1;
+  return best;
+}
+function buildColMap(aoa,hIdx){
+  const h1=aoa[hIdx]||[];
+  const h2=aoa[hIdx+1]||[];
+  const width=Math.max(h1.length,h2.length);
+  // 判断下一行是否是子表头（子表头行的匹配度 >=2 且数据行在其后）
+  let subMatches=0;
+  for(let c=0;c<width;c++){ if(matchField(h2[c])&&!matchField(h1[c])) subMatches++; }
+  const hasSub=subMatches>=2;
+  const map={};              // key -> col
+  const used=new Set();
+  const ambiguous=[];
+  for(let c=0;c<width;c++){
+    const top=normHead(h1[c]), sub=normHead(h2[c]);
+    let field=null;
+    // 先看子表头（更具体），再退回主表头
+    if(hasSub&&sub&&(!top||matchField(sub))) field=matchField(sub);
+    if(!field&&top) field=matchField(top);
+    if(!field&&/^合计$|^总合计$/.test(sub||top)){ambiguous.push(c);continue;}
+    if(field&&!map[field]&&!used.has(c)){ map[field]=c; used.add(c); }
+  }
+  // 「合计」兜底：按列顺序，先成本合计后优惠损失合计
+  ambiguous.forEach(c=>{
+    if(map.costTotal===undefined){map.costTotal=c;}
+    else if(map.lossTotal===undefined){map.lossTotal=c;}
+  });
+  return {map,hasSub,headerRows:hasSub?2:1};
+}
+function extractRows(aoa,fileName,kindHint){
+  const hIdx=detectHeader(aoa);
+  if(hIdx===null) return {rows:[],error:'未识别到表头（前 8 行里找不到「商户名称」「项目名称」等关键列）'};
+  const {map,hasSub}=buildColMap(aoa,hIdx);
+  if(map.merchant===undefined) return {rows:[],error:'未找到「商户名称」列'};
+  const kind = map.reduceType!==undefined||map.lossTotal!==undefined ? 'template':'apply';
+  const out=[];
+  for(let i=hIdx+(hasSub?2:1);i<aoa.length;i++){
+    const r=aoa[i]; if(!r||!r.length) continue;
+    const get=k=>map[k]===undefined?null:r[map[k]];
+    const merchant=String(get('merchant')||'').trim();
+    if(!merchant) continue;
+    if(/^(合计|小计|总计|总合计)/.test(merchant)) continue;
+    const o={};
+    KEYS.forEach(k=>{
+      const v=get(k);
+      if(TYPE[k]==='num'||TYPE[k]==='pct') o[k]=parseNum(v);
+      else if(k==='cStart'||k==='cEnd') o[k]=parseDate(v);
+      else o[k]=v===null||v===undefined?'':String(v).trim();
+    });
+    o.id=uid(); o._flags=[]; o._kind=kind; o._file=fileName;
+    if(!o.city) o.city='西安';
+    normalizeText(o);
+    // 成本合计校验
+    const sumCost=['rent','mgmt','elec','water','pos','warehouse','ad','labor','dorm','other']
+      .reduce((a,k)=>a+(o[k]||0),0);
+    if(o.costTotal==null&&sumCost>0) o.costTotal=sumCost;
+    // 优惠损失：缺失则按周期推算
+    const monthSum=MONTH_KEYS.reduce((a,k)=>a+(o[k]||0),0);
+    if(o.lossTotal==null){ o.lossTotal=monthSum; }
+    if(monthSum===0&&(o.monthDiscount||0)>0){
+      const ms=parsePeriodMonths(o.period);
+      if(ms){
+        const year=2026;
+        ms.forEach(m=>{
+          if(m.y===year&&m.mo>=7&&m.mo<=12){ o['l'+m.mo]=o.monthDiscount; o._flags.push('deriveLoss'); }
+        });
+        const s2=MONTH_KEYS.reduce((a,k)=>a+(o[k]||0),0);
+        if(s2>0&&!o.lossTotal) o.lossTotal=s2;
+      }
+    }
+    // 降租类型：缺失则推断
+    if(!o.reduceType){
+      o.reduceType=inferReduceType(o);
+      o._flags.push('inferType');
+    }
+    out.push(o);
+  }
+  return {rows:out,kind,map};
+}
+function inferReduceType(o){
+  const note=String(o.note||'');
+  if(/扶持|开业|新店|筹备|培育|装修|免租/.test(note)) return '降租扶持';
+  const cm=String(o.cStart||'').match(/(\d{4})\.(\d{1,2})/);
+  const pm=String(o.period||'').match(/(\d{4})\s*[.\-\/年]\s*(\d{1,2})/);
+  if(cm&&pm){
+    const ci=+cm[1]*12+ +cm[2], pi=+pm[1]*12+ +pm[2];
+    if(pi-ci<=8) return '降租扶持';
+  }
+  return '续签降租';
+}
+
+/* =========================================================
+   7. 聚合
+   ========================================================= */
+const effective=()=>state.rows.filter(r=>!r._dup);
+const sum=(arr,f)=>arr.reduce((a,r)=>a+(f(r)||0),0);
+const avg=(arr,f)=>{const v=arr.map(f).filter(x=>x!=null&&isFinite(x));return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;};
+const PROJECT_COLORS={'余家寨':'#1f5fd6','三号零星':'#0d9488','3号零星':'#0d9488','鱼化寨':'#d98218','行政中心':'#7457c8'};
+const PALETTE=['#1f5fd6','#0d9488','#d98218','#7457c8','#d24b45','#5b6b82'];
+function projColor(name,i){return PROJECT_COLORS[name]||PALETTE[i%PALETTE.length];}
+function normProject(p){
+  if(!p) return '未标注';
+  return p.replace(/^三号零星$/,'三号零星').replace(/^3号零星$/,'三号零星');
+}
+function aggregate(rows){
+  const byProj={};
+  rows.forEach(r=>{
+    const p=normProject(r.project);
+    byProj[p]=byProj[p]||{name:p,rows:[],merchants:new Set()};
+    byProj[p].rows.push(r);
+    byProj[p].merchants.add(r.merchant);
+  });
+  return Object.values(byProj).map(g=>{
+    const n=g.rows.length;
+    const loss=sum(g.rows,r=>r.lossTotal);
+    return {
+      name:g.name, count:n, merchantCount:g.merchants.size,
+      area:sum(g.rows,r=>r.area), sales:sum(g.rows,r=>r.sales),
+      monthDiscount:sum(g.rows,r=>r.monthDiscount), loss,
+      avgRatio:avg(g.rows,r=>r.ratioAfter),
+      losing:g.rows.filter(r=>(r.profitAfter||0)<0).length
+    };
+  }).sort((a,b)=>b.loss-a.loss);
+}
+
+/* =========================================================
+   8. 渲染
+   ========================================================= */
+function renderKPI(){
+  const rows=effective();
+  const merchants=new Set(rows.map(r=>r.merchant));
+  const monthD=sum(rows,r=>r.monthDiscount);
+  const loss=sum(rows,r=>r.lossTotal);
+  const ratio=avg(rows,r=>r.ratioAfter);
+  const losing=rows.filter(r=>(r.profitAfter||0)<0).length;
+  const projN=new Set(rows.map(r=>normProject(r.project))).size;
+  const items=[
+    {k:'申请笔数',v:rows.length,u:'笔',f:`覆盖 <b>${projN}</b> 个项目 · <b>${merchants.size}</b> 家商户`,cls:''},
+    {k:'涉及商户',v:merchants.size,u:'家',f:`其中 <b>${new Set(rows.filter(r=>(r.profitAfter||0)<0).map(r=>r.merchant)).size}</b> 家折后仍亏损`,cls:'k2'},
+    {k:'月优惠金额合计',v:fmtWan(monthD),u:'元',f:`约占月均销售 <b>${fmtPct(monthD/(sum(rows,r=>r.sales)||1))}</b>`,cls:'k3'},
+    {k:'7–12月优惠损失',v:fmtWan(loss),u:'元',f:`单笔均值 <b>${fmtMoney(loss/(rows.length||1))}</b> 元`,cls:'k4'},
+    {k:'平均折后租售比',v:fmtPct(ratio),u:'',f:`当前 <b>${fmtPct(avg(rows,r=>r.rentRatio))}</b> · 简单平均`,cls:'k5'},
+    {k:'折后仍亏损',v:losing,u:'笔',f:`占比 <b>${fmtPct(losing/(rows.length||1))}</b>，需重点复核`,cls:'k6'}
+  ];
+  document.getElementById('kpis').innerHTML=items.map(i=>`
+    <div class="kpi ${i.cls}">
+      <div class="k">${i.k}</div>
+      <div class="v num">${i.v}${i.u?`<small>${i.u}</small>`:''}</div>
+      <div class="f">${i.f}</div>
+    </div>`).join('');
+}
+
+function renderProjectTable(){
+  const rows=effective();
+  const agg=aggregate(rows);
+  const total=agg.reduce((a,g)=>({
+    count:a.count+g.count,merchantCount:a.merchantCount+g.merchantCount,area:a.area+g.area,
+    sales:a.sales+g.sales,monthDiscount:a.monthDiscount+g.monthDiscount,loss:a.loss+g.loss,losing:a.losing+g.losing
+  }),{count:0,merchantCount:0,area:0,sales:0,monthDiscount:0,loss:0,losing:0});
+  const maxLoss=Math.max(...agg.map(g=>g.loss),1);
+  const tb=document.querySelector('#projTable tbody');
+  const tf=document.querySelector('#projTable tfoot');
+  tb.innerHTML=agg.map((g,i)=>`
+    <tr class="click" data-proj="${esc(g.name)}">
+      <td><span class="dot" style="background:${projColor(g.name,i)}"></span>${esc(g.name)}</td>
+      <td class="r num">${g.count}</td>
+      <td class="r num">${g.merchantCount}</td>
+      <td class="r num">${fmtMoney(g.area)}</td>
+      <td class="r num">${fmtMoney(g.monthDiscount)}</td>
+      <td class="r num" style="font-weight:600">${fmtMoney(g.loss)}</td>
+      <td class="bar-cell r"><div class="bar-bg" style="width:${Math.max(4,g.loss/maxLoss*100)}%"></div><span class="num">${fmtPct(g.loss/(total.loss||1))}</span></td>
+      <td class="r num">${fmtPct(g.avgRatio)}</td>
+      <td class="r num">${g.losing?`<span class="tag red">${g.losing} 笔</span>`:'<span class="muted">—</span>'}</td>
+    </tr>`).join('');
+  tf.innerHTML=`<tr>
+      <td>合计</td><td class="r num">${total.count}</td><td class="r num">${total.merchantCount}</td>
+      <td class="r num">${fmtMoney(total.area)}</td><td class="r num">${fmtMoney(total.monthDiscount)}</td>
+      <td class="r num">${fmtMoney(total.loss)}</td><td class="r num">100%</td>
+      <td class="r num">${fmtPct(avg(rows,r=>r.ratioAfter))}</td><td class="r num">${total.losing} 笔</td>
+    </tr>`;
+}
+
+function renderType(){
+  const rows=effective();
+  const types=[...new Set(rows.map(r=>r.reduceType||'未标注'))];
+  const data=types.map(t=>({
+    name:t, count:rows.filter(r=>r.reduceType===t).length,
+    loss:sum(rows.filter(r=>r.reduceType===t),r=>r.lossTotal),
+    md:sum(rows.filter(r=>r.reduceType===t),r=>r.monthDiscount)
+  })).sort((a,b)=>b.count-a.count);
+  const total=rows.length||1;
+  const colors={'降租扶持':'#1f5fd6','续签降租':'#0d9488','未标注':'#9aa3b2'};
+  const svg=document.querySelector('#donut svg')||document.querySelector('.donut svg');
+  const R=58,C=2*Math.PI*R;
+  let off=0;
+  svg.innerHTML=data.map((d,i)=>{
+    const frac=d.count/total;
+    const dash=frac*C;
+    const el=`<circle cx="80" cy="80" r="${R}" fill="none" stroke="${colors[d.name]||PALETTE[i%PALETTE.length]}"
+      stroke-width="22" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-off}"
+      transform="rotate(-90 80 80)"></circle>`;
+    off+=dash;
+    return el;
+  }).join('');
+  document.getElementById('donutTotal').textContent=rows.length;
+  document.getElementById('donutLegend').innerHTML=data.map((d,i)=>`
+    <div class="dl-row">
+      <span class="dot" style="background:${colors[d.name]||PALETTE[i%PALETTE.length]}"></span>
+      <span class="n">${esc(d.name)}</span>
+      <span class="v num">${d.count} 笔</span>
+      <span class="p num">${fmtPct(d.count/total)}</span>
+    </div>`).join('');
+  document.getElementById('typeKv').innerHTML=data.map(d=>`
+    <dt>${esc(d.name)}</dt>
+    <dd>月优惠 <b>${fmtMoney(d.md)}</b> 元 · 7-12月损失 <b>${fmtMoney(d.loss)}</b> 元</dd>`).join('');
+}
+
+function renderMonthly(){
+  const rows=effective();
+  const projs=[...new Set(rows.map(r=>normProject(r.project)))];
+  const months=[7,8,9,10,11,12];
+  const data=months.map(m=>{
+    const per={};
+    projs.forEach(p=>per[p]=0);
+    rows.forEach(r=>{ if(r.project){per[normProject(r.project)]+=(r['l'+m]||0);} });
+    return {m,per,total:Object.values(per).reduce((a,b)=>a+b,0)};
+  });
+  const max=Math.max(...data.map(d=>d.total),1);
+  const H=170;
+  document.getElementById('monthChart').innerHTML=data.map(d=>`
+    <div class="mcol">
+      <div class="mval num">${d.total?fmtWan(d.total):''}</div>
+      <div class="mbar" style="height:${Math.max(d.total/max*H,d.total?2:0)}px">
+        ${projs.map((p,i)=>d.per[p]>0?`<div class="mseg" title="${esc(p)} · ${d.m}月 · ${fmtMoney2(d.per[p])} 元"
+            style="height:${d.per[p]/d.total*100}%;background:${projColor(p,i)}"></div>`:'').join('')}
+      </div>
+      <div class="mlabel">${d.m}月</div>
+    </div>`).join('');
+  document.getElementById('monthLegend').innerHTML=projs.map((p,i)=>
+    `<span><i class="dot" style="background:${projColor(p,i)}"></i>${esc(p)}</span>`).join('')
+    +`<span style="margin-left:auto;color:var(--muted)">合计 ${fmtMoney(sum(rows,r=>r.lossTotal))} 元</span>`;
+}
+
+function renderBizCat(){
+  const rows=effective();
+  function group(key){
+    const m={};
+    rows.forEach(r=>{
+      const k=String(r[key]||'未标注').trim()||'未标注';
+      m[k]=m[k]||{name:k,count:0,loss:0};
+      m[k].count++; m[k].loss+=(r.lossTotal||0);
+    });
+    return Object.values(m).sort((a,b)=>b.count-a.count||b.loss-a.loss);
+  }
+  function bars(list,color){
+    const max=Math.max(...list.map(x=>x.count),1);
+    return list.map(x=>`
+      <div class="hb">
+        <div class="lb" title="${esc(x.name)}">${esc(x.name)}</div>
+        <div class="track"><div class="fill" style="width:${x.count/max*100}%;background:${color}"></div></div>
+        <div class="vv num">${x.count} 笔 · ${fmtWan(x.loss)}</div>
+      </div>`).join('');
+  }
+  const biz=group('bizType'), cat=group('cat1');
+  document.getElementById('bizChart').innerHTML=
+    `<div style="font-size:11.5px;color:var(--muted);margin-bottom:2px">按经营业态</div>`+bars(biz,'#1f5fd6');
+  document.getElementById('catChart').innerHTML=
+    `<div style="font-size:11.5px;color:var(--muted);margin-bottom:2px">按一级品类（前 7）</div>`+bars(cat.slice(0,7),'#0d9488');
+}
+
+function renderFocus(){
+  const rows=effective();
+  const byLoss=[...rows].sort((a,b)=>(b.lossTotal||0)-(a.lossTotal||0)).slice(0,6);
+  document.getElementById('focusLoss').innerHTML=byLoss.map((r,i)=>`
+    <div class="row">
+      <div class="rk">${i+1}</div>
+      <div style="min-width:0">
+        <div class="nm">${esc(r.merchant)} <span class="pj">${esc(normProject(r.project))} · ${esc(r.shop)}</span></div>
+        <div class="pj">${esc(r.reduceType||'')} · 月优惠 ${fmtMoney(r.monthDiscount)} · 折后租售比 ${fmtPct(r.ratioAfter)}</div>
+      </div>
+      <div class="amt num">${fmtMoney(r.lossTotal)}<i>7-12月损失</i></div>
+    </div>`).join('');
+  const byProfit=[...rows].filter(r=>(r.profitAfter||0)<0).sort((a,b)=>(a.profitAfter)-(b.profitAfter)).slice(0,6);
+  document.getElementById('focusProfit').innerHTML=byProfit.map((r,i)=>`
+    <div class="row">
+      <div class="rk">${i+1}</div>
+      <div style="min-width:0">
+        <div class="nm">${esc(r.merchant)} <span class="pj">${esc(normProject(r.project))} · ${esc(r.shop)}</span></div>
+        <div class="pj">折后租售比 ${fmtPct(r.ratioAfter)} · 月均销售 ${fmtWan(r.sales)}</div>
+      </div>
+      <div class="amt num neg">${fmtMoney(r.profitAfter)}<i>折后月盈亏</i></div>
+    </div>`).join('')||'<div class="muted" style="padding:12px 0">暂无折后亏损记录</div>';
+}
+
+function filteredRows(){
+  const f=state.filter;
+  return state.rows.filter(r=>{
+    if(f.hideDup&&r._dup) return false;
+    if(f.project&&normProject(r.project)!==f.project) return false;
+    if(f.biz&&r.bizType!==f.biz) return false;
+    if(f.type&&(r.reduceType||'未标注')!==f.type) return false;
+    if(f.status==='loss'&&!(r.profitAfter<0)) return false;
+    if(f.status==='profit'&&!(r.profitAfter>=0)) return false;
+    if(f.status==='nodate'&&(r.cStart||r.cEnd)) return false;
+    if(f.q){
+      const q=f.q.toLowerCase();
+      const hay=[r.merchant,r.shop,r.cat1,r.cat2,r.project,r.note].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function renderDetail(){
+  let rows=filteredRows();
+  const {key,dir}=state.sort;
+  rows=rows.slice().sort((a,b)=>{
+    const va=a[key],vb=b[key];
+    if(typeof va==='string'||typeof vb==='string'){
+      return String(va||'').localeCompare(String(vb||''),'zh')*dir;
+    }
+    return ((va||0)-(vb||0))*dir;
+  });
+  const tb=document.querySelector('#detailTable tbody');
+  tb.innerHTML=rows.map(r=>{
+    const flags=(r._flags||[]).includes('deriveLoss')?'<span class="tag orange" title="按申请周期自动推算">推算</span> ':'';
+    const dup=r._dup?'<span class="tag grey">重复</span> ':'';
+    return `<tr class="click" data-id="${r.id}">
+      <td>${dup}${flags}<b style="font-weight:600">${esc(r.merchant)}</b></td>
+      <td><span class="dot" style="background:${projColor(normProject(r.project),0)}"></span>${esc(normProject(r.project))}</td>
+      <td class="num">${esc(r.shop)}</td>
+      <td>${esc(r.bizType||'—')}</td>
+      <td>${esc(r.cat1||'—')}${r.cat2?` <span class="muted">/ ${esc(r.cat2)}</span>`:''}</td>
+      <td class="r num">${r.area?fmtMoney2(r.area):'—'}</td>
+      <td class="r num">${fmtWan(r.sales)}</td>
+      <td class="r num">${fmtPct2(r.rentRatio)}</td>
+      <td class="r num" style="font-weight:600">${fmtPct2(r.ratioAfter)}</td>
+      <td class="r num">${fmtMoney(r.monthDiscount)}</td>
+      <td class="r num" style="font-weight:600">${fmtMoney(r.lossTotal)}</td>
+      <td><span class="tag ${r.reduceType==='降租扶持'?'blue':'teal'}">${esc(r.reduceType||'未标注')}</span></td>
+      <td class="muted" style="font-size:12px">${esc(r.period||'—')}</td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--muted)">没有符合条件的数据</td></tr>`;
+  const tf=document.querySelector('#detailTable tfoot');
+  tf.innerHTML=`<tr>
+    <td colspan="5">当前筛选 ${rows.length} 笔</td>
+    <td class="r num">${fmtMoney(sum(rows,r=>r.area))}</td>
+    <td class="r num">${fmtWan(sum(rows,r=>r.sales))}</td>
+    <td></td><td></td>
+    <td class="r num">${fmtMoney(sum(rows,r=>r.monthDiscount))}</td>
+    <td class="r num">${fmtMoney(sum(rows,r=>r.lossTotal))}</td>
+    <td colspan="2"></td>
+  </tr>`;
+  document.getElementById('fCount').textContent=`共 ${rows.length} 条`;
+  document.getElementById('tabDetailCnt').textContent=effective().length;
+}
+
+function renderSources(){
+  const el=document.getElementById('srcList');
+  el.innerHTML=state.sources.map(s=>{
+    const ic=s.from==='folder'?'fd':(s.from==='upload'?'up':'');
+    const icon=s.from==='folder'
+      ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>'
+      : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6"/></svg>';
+    return `<div class="src-row">
+      <div class="src-ic ${ic}">${icon}</div>
+      <div style="min-width:0">
+        <div class="src-nm" title="${esc(s.name)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px">${esc(s.name)}</div>
+        <div class="src-meta">${s.kind==='template'?'汇总表模板':'申请表'} · 新增 ${s.added} 条${s.dup?` · 去重 ${s.dup} 条`:''} · ${esc(s.at||'')}</div>
+      </div>
+      <div class="src-right">
+        <span class="tag ${s.from==='folder'?'orange':(s.from==='upload'?'blue':'grey')}">${s.from==='folder'?'文件夹同步':(s.from==='upload'?'手动导入':'初始数据')}</span>
+        ${s.from!=='seed'?`<button class="x-btn" data-del="${s.id}" title="移除该来源及其记录">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>`:''}
+      </div>
+    </div>`;
+  }).join('')||'<div class="muted" style="padding:16px 0">还没有数据源</div>';
+  const tot=state.sources.reduce((a,s)=>a+s.added,0);
+  document.getElementById('srcSum').textContent=`${state.sources.length} 个来源 · 有效 ${tot} 条`;
+  document.getElementById('tabSrcCnt').textContent=state.sources.length;
+}
+
+function renderHealth(){
+  const rows=state.rows;
+  const eff=effective();
+  const issues=[];
+  const dupN=rows.filter(r=>r._dup).length;
+  if(dupN) issues.push({t:'ok',b:`已自动去重 ${dupN} 条`,d:'同一商户、同一商铺号、同一申请周期且月优惠金额相同的记录视为重复，只保留一条参与统计。'});
+  const noDate=eff.filter(r=>!r.cStart||!r.cEnd);
+  if(noDate.length) issues.push({t:'warn',b:`${noDate.length} 笔缺少合同起止日期`,d:noDate.map(r=>r.merchant).slice(0,6).join('、')+(noDate.length>6?' 等':'')});
+  const ghost=eff.filter(r=>(r.monthDiscount||0)>0&&!(r.lossTotal>0));
+  if(ghost.length) issues.push({t:'warn',b:`${ghost.length} 笔有月优惠金额，但 7–12 月优惠损失为 0`,d:'通常是因为申请期完全落在本年度 7–12 月窗口之外（如 2027 年才起算），'+ghost.map(r=>r.merchant).slice(0,5).join('、')});
+  const derived=eff.filter(r=>(r._flags||[]).includes('deriveLoss'));
+  if(derived.length) issues.push({t:'warn',b:`${derived.length} 笔的月度优惠损失为系统推算`,d:derived.map(r=>r.merchant).join('、')+'：原表未提供分月数据，已按申请周期与月优惠金额平均推算，建议向项目复核。'});
+  const inferred=eff.filter(r=>(r._flags||[]).includes('inferType'));
+  if(inferred.length) issues.push({t:'warn',b:`${inferred.length} 笔的降租类型为系统判定`,d:inferred.map(r=>r.merchant+'（'+r.reduceType+'）').join('、')+'：原表无「降租类型」列，点击明细行可手动改。'});
+  const noRatio=eff.filter(r=>r.ratioAfter==null);
+  if(noRatio.length) issues.push({t:'warn',b:`${noRatio.length} 笔缺少折后租售比`,d:noRatio.map(r=>r.merchant).join('、')});
+  if(!issues.length) issues.push({t:'ok',b:'未发现异常',d:'所有记录字段完整。'});
+  document.getElementById('health').innerHTML=issues.map(x=>`
+    <div class="hrow ${x.t}">
+      <span class="hi">${x.t==='ok'?'<span class="tag green">正常</span>':'<span class="tag orange">提示</span>'}</span>
+      <div><b>${esc(x.b)}</b><div class="d">${esc(x.d)}</div></div>
+    </div>`).join('');
+}
+
+function renderFilters(){
+  const rows=state.rows;
+  const fill=(id,vals,ph)=>{
+    const el=document.getElementById(id);
+    const cur=el.value;
+    el.innerHTML=`<option value="">${ph}</option>`+[...new Set(vals)].filter(Boolean).sort().map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    el.value=cur;
+  };
+  fill('fProject',rows.map(r=>normProject(r.project)),'全部项目');
+  fill('fBiz',rows.map(r=>r.bizType),'全部业态');
+  fill('fType',rows.map(r=>r.reduceType||'未标注'),'全部降租类型');
+}
+
+function renderRules(){
+  const rows=RULES.map(([k,re])=>{
+    const ex={'ratioAfter':'折后租售比','profitAfter':'折后商户盈亏','mgmtAfter':'折后月租管费 / 运维/运营平台使用费','period':'申请折扣周期、优惠期间',
+      'monthDiscount':'月优惠金额、优惠金额','reduceType':'降租类型、减免类型','lossTotal':'优惠损失合计','eff':'近9个月月均销售坪效',
+      'rentRatio':'近3个月月均租售比、租售比','sales':'近2个月月均销售、月均销售','avgSalary':'平均薪资','staff':'员工数','gross':'毛利率',
+      'bep':'月盈亏平衡点','profit':'月净利润、月盈亏','cStart':'合同起始','cEnd':'合同截止','deposit':'租赁保证金、押金',
+      'opinion':'产品运营中心意见','note':'备注、申请理由','supLevel':'供应商等级','brandLevel':'品牌等级','city':'城市公司',
+      'project':'项目名称','merchant':'商户名称','shop':'商铺号','bizType':'经营业态','cat1':'一级品类','cat2':'二级品类',
+      'area':'建筑面积','rent':'租金','mgmt':'综合管理费、运维运营平台使用费','elec':'电费','water':'水费','pos':'POS租金',
+      'warehouse':'仓库租金','ad':'广告宣传','labor':'人工成本','dorm':'员工住宿成本','other':'其他成本'}[k]||'—';
+    return `<tr><td><b>${LABEL[k]}</b></td><td>${esc(ex)}</td></tr>`;
+  }).join('');
+  document.getElementById('ruleTable').innerHTML=rows;
+}
+
+function renderFolder(){
+  const box=document.getElementById('folderBox');
+  if(!state.folder||!state.folder.name){ box.classList.add('hide'); return; }
+  const n=state.sources.filter(s=>s.from==='folder').length;
+  box.classList.remove('hide');
+  box.innerHTML=`<b>已绑定同步文件夹：${esc(state.folder.name)}</b><br/>
+    上次同步 ${esc(state.folder.at||'—')} · 当前收录 ${n} 个文件<br/>
+    把新的降租申请表格保存进这个文件夹后，点下面的按钮（或重新打开页面）就会自动汇总进来。
+    <div style="margin-top:9px"><button class="btn primary" id="btnSyncNow" style="height:29px">立即同步</button></div>`;
+  const b=document.getElementById('btnSyncNow');
+  if(b) b.onclick=async()=>{
+    if(!dirHandle){ toast('请先重新选择文件夹（浏览器需要重新授权）'); pickFolder(); return; }
+    await syncFolder();
+  };
+}
+
+function renderAll(){
+  renderKPI();renderProjectTable();renderType();renderMonthly();renderBizCat();
+  renderFocus();renderDetail();renderSources();renderHealth();renderFilters();renderRules();renderFolder();
+  document.getElementById('stamp').textContent='数据更新：'+new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+/* =========================================================
+   9. 明细抽屉
+   ========================================================= */
+function openDrawer(id){
+  const r=state.rows.find(x=>x.id===id); if(!r) return;
+  document.getElementById('dwName').textContent=r.merchant;
+  document.getElementById('dwSub').innerHTML=`${esc(normProject(r.project))} · ${esc(r.shop)} · ${esc(r.reduceType||'')}
+    ${r._dup?' <span class="tag grey">重复记录（未计入统计）</span>':''}`;
+  const groups={base:[],sale:[],cost:[],perf:[],plan:[],loss:[],contract:[],extra:[]};
+  FIELD_META.forEach(([k,l,g,t])=>{
+    if(['note','opinion'].includes(k)) return;
+    if(!['base','sale','cost','perf','plan','loss','contract','extra'].includes(g)) return;
+    let v=r[k];
+    if(v===null||v===undefined||v==='') v='—';
+    else if(t==='num') v=(k==='staff'?String(v):fmtMoney2(v));
+    else if(t==='pct') v=fmtPct2(v);
+    groups[g].push([l,v,k]);
+  });
+  const order=['base','sale','cost','perf','plan','loss','contract','extra'];
+  let html='';
+  order.forEach(g=>{
+    if(!groups[g].length) return;
+    if(g==='extra'&&!groups[g].some(x=>x[1]!=='—')) return;
+    html+=`<div class="dw-sec"><h4>${GROUP_NAME[g]}</h4><div class="dw-grid">
+      ${groups[g].map(([l,v])=>`<div class="dw-cell"><span>${l}</span><b>${esc(v)}</b></div>`).join('')}
+    </div></div>`;
+  });
+  html+=`<div class="dw-sec"><h4>降租类型（可修改）</h4>
+    <div class="dw-edit">
+      <select id="dwType">
+        <option${r.reduceType==='降租扶持'?' selected':''}>降租扶持</option>
+        <option${r.reduceType==='续签降租'?' selected':''}>续签降租</option>
+      </select>
+      <button class="btn" id="dwSave" style="height:30px">保存</button>
+      ${(r._flags||[]).includes('inferType')?'<span class="tag orange">系统判定</span>':''}
+    </div></div>`;
+  if(r.note) html+=`<div class="dw-sec"><h4>备注 / 申请理由</h4><div class="dw-text">${esc(r.note)}</div></div>`;
+  if(r.opinion) html+=`<div class="dw-sec"><h4>产品运营中心意见</h4><div class="dw-text">${esc(r.opinion)}</div></div>`;
+  const src=state.sources.find(s=>s.id===r._src);
+  html+=`<div class="dw-sec" style="color:var(--muted);font-size:11.5px">数据来源：${esc(src?src.name:'手动导入')}</div>`;
+  document.getElementById('dwBody').innerHTML=html;
+  document.getElementById('dwSave').onclick=()=>{
+    r.reduceType=document.getElementById('dwType').value;
+    r._flags=(r._flags||[]).filter(f=>f!=='inferType');
+    save();renderAll();openDrawer(id);toast('已更新降租类型');
+  };
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('mask').classList.add('on');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('mask').classList.remove('on');
+}
+
+/* =========================================================
+   10. 导入
+   ========================================================= */
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast on'+(err?' err':'');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.className='toast'+(err?' err':''),2600);
+}
+async function readFile(file){
+  const name=file.name;
+  if(/\.csv$/i.test(name)){
+    const text=await file.text();
+    const rows=parseCSV(text);
+    return {aoa:rows};
+  }
+  if(typeof XLSX==='undefined') throw new Error('表格解析组件未加载，请刷新页面重试（或将文件另存为 CSV）');
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:'array',cellDates:false});
+  const all=[];
+  wb.SheetNames.forEach(n=>{
+    const aoa=sheetToAOA(wb.Sheets[n]);
+    const nonEmpty=aoa.filter(r=>r&&r.some(c=>c!==null&&c!==''));
+    if(nonEmpty.length>=3) all.push(aoa);
+  });
+  if(!all.length) return {aoa:[]};
+  // 多 sheet 时逐个解析，由调用方处理
+  return {sheets:all,wb};
+}
+function parseCSV(text){
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===','){row.push(cur);cur='';}
+      else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';}
+      else if(c==='\r'){}
+      else cur+=c;
+    }
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+
+function ingest(parsed,name,from){
+  const src={id:uid(),name,kind:'apply',from:from||'upload',
+    at:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    added:0,dup:0,rowIds:[]};
+  const sheets=parsed.sheets||[parsed.aoa];
+  let total=0,errors=[];
+  sheets.forEach(aoa=>{
+    if(!aoa||aoa.length<3) return;
+    const res=extractRows(aoa,name);
+    if(res.error){errors.push(res.error);return;}
+    if(res.kind==='template') src.kind='template';
+    res.rows.forEach(r=>{
+      r._src=src.id;
+      const key=dedupeKey(r);
+      const hit=state.rows.find(x=>!x._dup&&dedupeKey(x)===key);
+      if(hit){r._dup=true;r._dupOf=hit.id;src.dup++;}
+      else src.added++;
+      state.rows.push(r);src.rowIds.push(r.id);
+      total++;
+    });
+  });
+  if(!total){ return {src:null,error:errors.join('；')||'没有读到有效数据行'}; }
+  state.sources.push(src);
+  return {src,total};
+}
+async function handleFiles(files){
+  const list=[...files].filter(f=>/\.(xlsx|xls|csv)$/i.test(f.name));
+  if(!list.length){ toast('请选择 .xlsx / .xls / .csv 文件',true); return; }
+  let ok=0,dup=0,fail=0;
+  for(const f of list){
+    try{
+      const parsed=await readFile(f);
+      const r=ingest(parsed,f.name,'upload');
+      if(r.error){ fail++; toast(`${f.name}：${r.error}`,true); }
+      else { ok++; dup+=r.src.dup; }
+    }catch(e){ fail++; console.error(e); toast(`${f.name} 解析失败：${e.message}`,true); }
+  }
+  save();renderAll();
+  if(ok) toast(`已汇总 ${ok} 个文件，其中重复 ${dup} 条已自动合并${fail?`，${fail} 个失败`:''}`);
+}
+
+/* 文件夹同步 */
+let dirHandle=null;
+async function idbSet(key,val){
+  return new Promise((res,rej)=>{
+    const rq=indexedDB.open('rentdash',1);
+    rq.onupgradeneeded=()=>rq.result.createObjectStore('h');
+    rq.onsuccess=()=>{const tx=rq.result.transaction('h','readwrite');tx.objectStore('h').put(val,key);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);};
+    rq.onerror=()=>rej(rq.error);
+  });
+}
+async function idbGet(key){
+  return new Promise((res)=>{
+    const rq=indexedDB.open('rentdash',1);
+    rq.onupgradeneeded=()=>rq.result.createObjectStore('h');
+    rq.onsuccess=()=>{const tx=rq.result.transaction('h','readonly');const g=tx.objectStore('h').get(key);g.onsuccess=()=>res(g.result);g.onerror=()=>res(null);};
+    rq.onerror=()=>res(null);
+  });
+}
+async function pickFolder(){
+  if(!window.showDirectoryPicker){ toast('当前预览环境不支持文件夹同步，请用「导入表格」拖入文件',true); return; }
+  try{
+    dirHandle=await window.showDirectoryPicker({mode:'read'});
+    await idbSet('dir',dirHandle).catch(()=>{});
+    toast('已选择文件夹：'+dirHandle.name);
+    await syncFolder();
+  }catch(e){ if(e.name!=='AbortError') toast('选择文件夹失败：'+e.message,true); }
+}
+async function syncFolder(){
+  if(!dirHandle){ toast('请先选择文件夹',true); return; }
+  // 清空旧的文件夹来源
+  const old=state.sources.filter(s=>s.from==='folder');
+  const oldIds=new Set(old.flatMap(s=>s.rowIds||[]));
+  state.rows=state.rows.filter(r=>!oldIds.has(r.id));
+  state.sources=state.sources.filter(s=>s.from!=='folder');
+  let n=0,added=0,dup=0;
+  for await(const [name,handle] of dirHandle.entries()){
+    if(handle.kind!=='file') continue;
+    if(!/\.(xlsx|xls|csv)$/i.test(name)) continue;
+    if(name.startsWith('~$')) continue;
+    try{
+      const f=await handle.getFile();
+      const parsed=await readFile(f);
+      const r=ingest(parsed,name,'folder');
+      if(r.src){n++;added+=r.src.added;dup+=r.src.dup;}
+    }catch(e){ console.warn(name,e); }
+  }
+  state.folder={name:dirHandle.name,at:new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})};
+  save();renderAll();
+  toast(`同步完成：${n} 个文件，新增 ${added} 条，去重 ${dup} 条`);
+}
+
+/* 导出 */
+function exportCSV(){
+  const rows=filteredRows();
+  const head=KEYS.map(k=>LABEL[k]).join(',');
+  const body=rows.map(r=>KEYS.map(k=>{
+    let v=r[k];
+    if(v===null||v===undefined) v='';
+    const s=String(v).replace(/"/g,'""');
+    return /[",\n]/.test(s)?`"${s}"`:s;
+  }).join(','));
+  const blob=new Blob(['\ufeff'+[head].concat(body).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='降租扶持汇总_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast(`已导出 ${rows.length} 条记录`);
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify({rows:state.rows,sources:state.sources,folder:state.folder},null,0)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='降租看板备份_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();toast('备份已导出');
+}
+
+/* =========================================================
+   11. 事件绑定
+   ========================================================= */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    ['overview','detail','sources','rules'].forEach(k=>{
+      document.getElementById('tab-'+k).classList.toggle('hide',k!==t.dataset.tab);
+    });
+  };
+});
+document.getElementById('btnImport').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('dropZone').onclick=()=>document.getElementById('fileInput').click();
+document.getElementById('fileInput').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
+document.getElementById('btnFolder').onclick=pickFolder;
+document.getElementById('btnFolder2').onclick=pickFolder;
+document.getElementById('btnExport').onclick=exportCSV;
+document.getElementById('btnExportJson').onclick=exportJSON;
+document.getElementById('btnImportJson').onclick=()=>document.getElementById('jsonInput').click();
+document.getElementById('jsonInput').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!d.rows) throw new Error('文件格式不正确');
+    state.rows=d.rows;state.sources=d.sources||[];state.folder=d.folder||{name:'',at:''};
+    save();renderAll();toast(`已恢复 ${d.rows.length} 条记录`);
+  }catch(err){toast('恢复失败：'+err.message,true);}
+  e.target.value='';
+};
+document.getElementById('btnReset').onclick=()=>{
+  if(!confirm('将清空所有导入的表格，恢复到初始两份表格的数据。确定？')) return;
+  seed();save();renderAll();toast('已重置为初始数据');
+};
+document.getElementById('mask').onclick=closeDrawer;
+document.getElementById('dwClose').onclick=closeDrawer;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+
+// 拖拽
+let dragDepth=0;
+window.addEventListener('dragenter',e=>{
+  if(![...(e.dataTransfer?.types||[])].includes('Files')) return;
+  dragDepth++;document.getElementById('dropmask').classList.add('on');
+});
+window.addEventListener('dragover',e=>{e.preventDefault();});
+window.addEventListener('dragleave',e=>{
+  dragDepth--;if(dragDepth<=0){dragDepth=0;document.getElementById('dropmask').classList.remove('on');}
+});
+window.addEventListener('drop',e=>{
+  e.preventDefault();dragDepth=0;document.getElementById('dropmask').classList.remove('on');
+  if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+// 明细行点击
+document.querySelectorAll('#detailTable thead th').forEach(th=>{
+  if(!th.dataset.sort) return;
+  th.style.cursor='pointer';
+  th.onclick=()=>{
+    const k=th.dataset.sort;
+    if(state.sort.key===k) state.sort.dir*=-1;
+    else state.sort={key:k,dir:-1};
+    renderDetail();
+  };
+});
+document.addEventListener('click',e=>{
+  const tr=e.target.closest('#detailTable tbody tr[data-id]');
+  if(tr) openDrawer(tr.dataset.id);
+  const pj=e.target.closest('#projTable tbody tr[data-proj]');
+  if(pj){
+    state.filter.project=pj.dataset.proj;
+    document.querySelector('.tab[data-tab="detail"]').click();
+    document.getElementById('fProject').value=pj.dataset.proj;
+    renderDetail();
+  }
+  const del=e.target.closest('[data-del]');
+  if(del){
+    const s=state.sources.find(x=>x.id===del.dataset.del);
+    if(!s) return;
+    if(!confirm(`移除「${s.name}」及其 ${s.rowIds.length} 条记录？`)) return;
+    const ids=new Set(s.rowIds);
+    state.rows=state.rows.filter(r=>!ids.has(r.id));
+    state.sources=state.sources.filter(x=>x.id!==s.id);
+    // 解除因该来源被判定为重复的记录
+    state.rows.forEach(r=>{ if(r._dupOf&&ids.has(r._dupOf)){r._dup=false;delete r._dupOf;} });
+    save();renderAll();toast('已移除');
+  }
+});
+['fSearch','fProject','fBiz','fType','fStatus'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.oninput=el.onchange=()=>{
+    state.filter.q=document.getElementById('fSearch').value;
+    state.filter.project=document.getElementById('fProject').value;
+    state.filter.biz=document.getElementById('fBiz').value;
+    state.filter.type=document.getElementById('fType').value;
+    state.filter.status=document.getElementById('fStatus').value;
+    renderDetail();
+  };
+});
+document.getElementById('fHideDup').onchange=e=>{state.filter.hideDup=e.target.checked;renderDetail();};
+
+/* =========================================================
+   12. 启动
+   ========================================================= */
+(function init(){
+  const restored=load();
+  if(!restored) save();
+  renderAll();
+  // 尝试恢复文件夹句柄
+  if(window.showDirectoryPicker){
+    idbGet('dir').then(async h=>{
+      if(!h) return;
+      try{
+        const q=await h.queryPermission({mode:'read'});
+        if(q==='granted'){dirHandle=h;await syncFolder();}
+        else {
+          const s=document.getElementById('srcList');
+          // 仅提示，不自动唤起权限弹窗
+          console.info('已保存文件夹句柄，点击「文件夹同步」可重新授权');
+        }
+      }catch(e){}
+    }).catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
