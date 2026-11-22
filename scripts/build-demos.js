@@ -73,6 +73,22 @@ function copyProject(source, target) {
   }
 }
 
+// 当前发布与过期迁移复用同一构建过程；历史构建仍必须通过原公开成品摘要才能使用。
+function prepareProject(root, candidate, plan, workName) {
+  if (plan.type!=='framework') {copyProject(root,candidate);return;}
+  const work=path.join(temp,'work-'+workName);copyProject(root,work);
+  for (const dir of ['dist','build','out']) moveAside(path.join(work,dir));
+  const childEnv={...process.env};
+  for (const key of Object.keys(childEnv)) if (/TOKEN|PASSWORD|SECRET|PRIVATE_KEY/i.test(key)) delete childEnv[key];
+  try {execSync('npm ci --no-audit --no-fund',{cwd:work,env:childEnv,stdio:'inherit',timeout:180000});}
+  catch {throw new Error('依赖安装失败，请检查锁文件和依赖版本（npm ci）');}
+  try {execSync('npm run build',{cwd:work,env:childEnv,stdio:'inherit',timeout:180000});}
+  catch {throw new Error('项目编译失败，请检查build命令及项目源码');}
+  const built=['dist','build','out'].map(dir=>path.join(work,dir)).find(dir=>fs.existsSync(path.join(dir,'index.html')));
+  if(!built)throw new Error('构建完成但dist/build/out中没有可发布的index.html');
+  copyProject(built,candidate);
+}
+
 // 从最近成功的正式发布恢复产物，确保某个更新构建失败时不会删掉它的旧页面。
 async function restorePublished() {
   if (process.env.PAGES_PREVIOUS_SITE_DIR && process.env.GITHUB_ACTIONS !== 'true') {
@@ -155,7 +171,7 @@ async function restorePublished() {
     throw new Error('历史发布备份不可用，且无法确认线上版本，已停止发布以保护现有页面');
   }
 
-  // 迁移空档只重建已发布版本的纯静态文件，逐项验证原报告摘要；不能用当前源码替代旧页面。
+  // 迁移空档只重建原报告对应的历史源码，逐项验证旧成品摘要；不能用当前源码替代旧页面。
   const response=await get('/zipball/'+liveReport.revision);
   const zipPath=path.join(temp,'previous-source.zip');fs.writeFileSync(zipPath,Buffer.from(await response.arrayBuffer()));
   const source=path.join(temp,'previous-source');fs.mkdirSync(source,{recursive:true});execFileSync('unzip',['-q',zipPath,'-d',source]);
@@ -167,11 +183,14 @@ async function restorePublished() {
     if (!/^[a-zA-Z0-9_-]+$/.test(name) || item.state!=='published') throw new Error('历史版本含无法重建的保留页面，请恢复完整站点备份');
     const root=path.join(source,roots[0].name,'demos',name),files=projectFiles(root),plan=inspectProject(files);
     const index=files.find(file=>file.path==='index.html');
-    if (plan.type!=='static' || plan.issue || !index || digest(index.content)!==item.indexHash || digest(index.content)!==item.sourceIndexHash) throw new Error('历史页面无法按原摘要安全恢复：'+name+'；已停止发布以保护现有页面');
-    copyProject(root,path.join(siteDir,'demos',name));visible.push(name);
+    if (plan.issue || !index || digest(index.content)!==item.sourceIndexHash) throw new Error('历史页面无法按原摘要安全恢复：'+name+'；已停止发布以保护现有页面');
+    const candidate=path.join(temp,'restore-'+name);prepareProject(root,candidate,plan,'restore-'+name);
+    const builtIndex=path.join(candidate,'index.html');
+    if (!fs.existsSync(builtIndex) || digest(fs.readFileSync(builtIndex,'utf8'))!==item.indexHash) throw new Error('历史页面无法按原摘要安全恢复：'+name+'；已停止发布以保护现有页面');
+    copyProject(candidate,path.join(siteDir,'demos',name));visible.push(name);
   }
   fs.writeFileSync(path.join(siteDir,'index.html'),generateIndex(visible));fs.writeFileSync(path.join(siteDir,'deploy-results.json'),JSON.stringify(liveReport));
-  console.log('Recovered expired-artifact gap from verified static revision:',liveReport.revision,visible.length,'demos');
+  console.log('Recovered expired-artifact gap from verified historical revision:',liveReport.revision,visible.length,'demos');
 }
 
 function generateIndex(demos) {
@@ -200,20 +219,7 @@ async function main() {
       const plan = inspectProject(files);
       if (plan.issue) throw new Error(plan.issue);
       const candidate = path.join(temp,'output-'+entry.name);
-      if (plan.type === 'framework') {
-        const work = path.join(temp,'work-'+entry.name);
-        copyProject(root,work);
-        for (const dir of ['dist','build','out']) moveAside(path.join(work,dir));
-        const childEnv = {...process.env};
-        for (const key of Object.keys(childEnv)) if (/TOKEN|PASSWORD|SECRET|PRIVATE_KEY/i.test(key)) delete childEnv[key];
-        try { execSync('npm ci --no-audit --no-fund',{cwd:work,env:childEnv,stdio:'inherit',timeout:180000}); }
-        catch { throw new Error('依赖安装失败，请检查锁文件和依赖版本（npm ci）'); }
-        try { execSync('npm run build',{cwd:work,env:childEnv,stdio:'inherit',timeout:180000}); }
-        catch { throw new Error('项目编译失败，请检查build命令及项目源码'); }
-        const built = ['dist','build','out'].map(dir=>path.join(work,dir)).find(dir=>fs.existsSync(path.join(dir,'index.html')));
-        if (!built) throw new Error('构建完成但dist/build/out中没有可发布的index.html');
-        copyProject(built,candidate);
-      } else copyProject(root,candidate);
+      prepareProject(root,candidate,plan,'current-'+entry.name);
       const indexPath = path.join(candidate,'index.html');
       if (!fs.existsSync(indexPath) || !fs.readFileSync(indexPath,'utf8').trim()) throw new Error('静态发布目录缺少有效的index.html首页');
       result.indexHash = digest(fs.readFileSync(indexPath,'utf8'));
