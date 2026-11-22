@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>收银机 Web 端 - 演示</title>
+  <link rel="stylesheet" href="./assets/common.css">
+  <link rel="stylesheet" href="./assets/cashier-web.css">
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="cashierLoginView" class="login-shell">
+    <div class="login-panel">
+      <p class="eyebrow">Cashier Console Demo</p>
+      <h2>收银机登录</h2>
+      <p class="desc">登录后可查看订单、状态流转，并模拟收银与后厨打印机同时出票。</p>
+      <div class="helper-card">
+        <p><strong>演示账号（登录页直出）</strong></p>
+        <p>账号：<code>cashier_demo</code></p>
+        <p>密码：<code>Cashier@2026</code></p>
+      </div>
+      <div class="field">
+        <label for="cashierUser">账号</label>
+        <input id="cashierUser" type="text" placeholder="请输入账号">
+      </div>
+      <div class="field">
+        <label for="cashierPass">密码</label>
+        <input id="cashierPass" type="password" placeholder="请输入密码">
+      </div>
+      <div class="action-row">
+        <button id="cashierLoginBtn" class="btn btn-accent" type="button">登录收银机端</button>
+        <a class="btn btn-ghost" href="./index.html">返回总入口</a>
+      </div>
+    </div>
+  </section>
+
+  <main id="cashierAppView" class="dual-shell hidden">
+    <header class="top-nav">
+      <div class="title-wrap">
+        <h1>收银机联动控制台</h1>
+        <p>订单接收后自动生成收银联与后厨联，两台打印机同时出票（演示模拟）</p>
+      </div>
+      <div class="nav-actions">
+        <span class="pill tag-success">双打印联动已启用</span>
+        <button id="clearDataBtn" class="btn btn-ghost" type="button">清空演示数据</button>
+        <button id="cashierLogoutBtn" class="btn btn-ghost" type="button">退出登录</button>
+      </div>
+    </header>
+
+    <section class="cashier-layout">
+      <article class="screen-panel stack">
+        <h3>实时订单队列</h3>
+        <div id="orderList" class="order-list"></div>
+      </article>
+
+      <article class="screen-panel stack">
+        <h3>收银打印机（顾客联）</h3>
+        <div id="cashierPrintList" class="print-list"></div>
+      </article>
+
+      <article class="screen-panel stack">
+        <h3>后厨打印机（后厨联）</h3>
+        <div id="kitchenPrintList" class="print-list"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="./assets/shared.js"></script>
+  <script src="./assets/cashier-web.js"></script>
+</body>
+</html>
