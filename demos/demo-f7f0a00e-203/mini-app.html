@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>顾客点餐端 - 演示</title>
+  <link rel="stylesheet" href="./assets/common.css">
+  <link rel="stylesheet" href="./assets/mini-app.css">
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="loginView" class="login-shell">
+    <div class="login-panel">
+      <p class="eyebrow">Mini Program Demo</p>
+      <h2>微信手机号授权登录</h2>
+      <p class="desc">本演示端不需要账号密码，模拟微信与手机号绑定后一键进入点餐页。</p>
+      <div class="helper-card">
+        <p><strong>演示说明</strong></p>
+        <p>1. 可直接输入手机号后点击授权登录</p>
+        <p>2. 若带有桌位参数（如 <code>?table=A01</code>），将自动绑定桌号</p>
+      </div>
+      <div class="field">
+        <label for="phoneInput">手机号（演示）</label>
+        <input id="phoneInput" type="tel" maxlength="11" placeholder="例如 13800138000">
+      </div>
+      <div class="action-row">
+        <button id="wechatLoginBtn" class="btn btn-primary" type="button">模拟微信授权并登录</button>
+        <a class="btn btn-ghost" href="./index.html">返回总入口</a>
+      </div>
+    </div>
+  </section>
+
+  <main id="appView" class="dual-shell hidden">
+    <header class="top-nav">
+      <div class="title-wrap">
+        <h1>门店扫码点餐</h1>
+        <p id="greetingText">欢迎使用点餐服务</p>
+      </div>
+      <div class="nav-actions">
+        <span id="tableTag" class="pill"></span>
+        <button id="switchTableBtn" class="btn btn-ghost" type="button">切换桌号</button>
+        <button id="miniLogoutBtn" class="btn btn-ghost" type="button">退出登录</button>
+      </div>
+    </header>
+
+    <section class="mini-overview">
+      <article class="overview-card">
+        <p>当前桌位</p>
+        <strong id="overviewTable">A01</strong>
+      </article>
+      <article class="overview-card">
+        <p>菜单分类</p>
+        <strong id="overviewCategoryCount">0</strong>
+      </article>
+      <article class="overview-card">
+        <p>购物车菜品</p>
+        <strong id="overviewCartCount">0</strong>
+      </article>
+      <article class="overview-card">
+        <p>待支付金额</p>
+        <strong id="overviewCartTotal">¥0.00</strong>
+      </article>
+    </section>
+
+    <section id="paidNotice" class="paid-notice hidden">
+      <div class="paid-notice-head">
+        <p class="paid-badge">支付成功</p>
+        <h2>请留意自己的流水号、桌位号、取餐号</h2>
+      </div>
+      <div class="paid-meta-grid">
+        <article class="paid-meta-item">
+          <p>流水号</p>
+          <strong id="paidSerialNo">-</strong>
+        </article>
+        <article class="paid-meta-item">
+          <p>桌位号</p>
+          <strong id="paidTableNo">-</strong>
+        </article>
+        <article class="paid-meta-item">
+          <p>取餐号</p>
+          <strong id="paidQueueNo">-</strong>
+        </article>
+      </div>
+      <p class="paid-tip">请将以上号码提供给服务人员，便于快速核单与出餐。</p>
+    </section>
+
+    <section class="member-module screen-panel">
+      <div class="member-head">
+        <div>
+          <h3>会员中心（预留模块）</h3>
+          <p>先展示入口，不做实质交互。后续可扩展积分、储值、优惠券、会员等级。</p>
+        </div>
+        <span class="pill member-pill">即将上线</span>
+      </div>
+      <div class="member-grid">
+        <article class="member-item">
+          <strong>会员等级</strong>
+          <p>普通会员 / 银卡 / 金卡</p>
+        </article>
+        <article class="member-item">
+          <strong>积分中心</strong>
+          <p>消费累计积分，支持抵扣</p>
+        </article>
+        <article class="member-item">
+          <strong>储值余额</strong>
+          <p>预留充值与余额支付能力</p>
+        </article>
+        <article class="member-item">
+          <strong>优惠券包</strong>
+          <p>满减券、折扣券、生日券</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="mini-layout">
+      <section class="screen-panel stack">
+        <div class="table-bar">
+          <div class="field">
+            <label for="tableSelect">桌位号</label>
+            <select id="tableSelect"></select>
+          </div>
+          <div class="field">
+            <label for="orderRemark">备注</label>
+            <textarea id="orderRemark" placeholder="例如：少辣、不要葱"></textarea>
+          </div>
+        </div>
+
+        <div class="category-wrap">
+          <h3>菜单分类</h3>
+          <div id="categoryTabs" class="category-tabs"></div>
+        </div>
+
+        <div>
+          <h3 id="menuTitle">菜单</h3>
+          <div id="menuList" class="menu-grid"></div>
+        </div>
+      </section>
+
+      <aside class="screen-panel stack">
+        <div>
+          <h3>购物车</h3>
+          <div id="cartList"></div>
+        </div>
+        <div class="cart-summary">
+          <p>菜品数量：<strong id="cartCount">0</strong></p>
+          <p>待支付金额：<strong id="cartTotal">¥0.00</strong></p>
+        </div>
+        <div id="orderResult" class="result-card hidden"></div>
+      </aside>
+    </div>
+
+    <section class="sticky-checkout">
+      <div class="sticky-checkout-inner">
+        <div class="sticky-summary">
+          <p>已选 <strong id="stickyCartCount">0</strong> 份</p>
+          <p class="sticky-amount">合计 <strong id="stickyCartTotal">¥0.00</strong></p>
+        </div>
+        <button id="submitOrderBtn" class="btn btn-primary sticky-btn" type="button">去结算</button>
+      </div>
+    </section>
+  </main>
+
+  <section id="paymentView" class="dual-shell hidden">
+    <header class="top-nav">
+      <div class="title-wrap">
+        <h1>订单支付</h1>
+        <p>请选择支付方式，支付成功后系统会自动通知收银机和后厨出票</p>
+      </div>
+      <div class="nav-actions">
+        <button id="backToOrderBtn" class="btn btn-ghost" type="button">返回点餐页</button>
+      </div>
+    </header>
+
+    <div class="payment-layout">
+      <section class="screen-panel stack">
+        <h3>支付订单信息</h3>
+        <div id="paymentOrderInfo" class="payment-order-card"></div>
+      </section>
+
+      <section class="screen-panel stack">
+        <h3>支付方式</h3>
+        <div id="paymentMethods" class="payment-methods"></div>
+        <button id="confirmPayBtn" class="btn btn-accent" type="button">确认支付并完成下单</button>
+      </section>
+    </div>
+  </section>
+
+  <script src="./assets/shared.js"></script>
+  <script src="./assets/mini-app.js"></script>
+</body>
+</html>

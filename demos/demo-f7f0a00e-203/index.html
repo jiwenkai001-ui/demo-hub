@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>扫码点餐双端演示</title>
+  <link rel="stylesheet" href="./assets/common.css">
+</head>
+<body class="landing-page">
+  <main class="landing-shell">
+    <section class="hero-card">
+      <p class="eyebrow">Restaurant Demo Suite</p>
+      <h1>扫码点餐 + 收银双端联动演示</h1>
+      <p class="hero-desc">
+        同一个静态项目中包含顾客点餐端与收银机 Web 端。顾客支付成功后，模拟收银打印机与后厨打印机同时出票，
+        且小票突出显示桌位号与流水号。
+      </p>
+      <div class="status-row">
+        <span class="status-dot"></span>
+        <span>本地双击启动 / 服务器静态部署均可演示</span>
+      </div>
+    </section>
+
+    <section class="entry-grid">
+      <article class="entry-card">
+        <h2>顾客小程序端（H5模拟）</h2>
+        <p>免账号密码，模拟微信手机号授权登录。支持桌号参数进入对应餐桌点餐页。</p>
+        <a class="btn btn-primary" href="./mini-app.html">进入小程序端</a>
+        <div class="hint-block">
+          <strong>登录方式</strong>
+          <p>微信手机号一键授权（演示版，无需账号密码）</p>
+        </div>
+      </article>
+
+      <article class="entry-card">
+        <h2>收银机 Web 端</h2>
+        <p>账号密码登录，实时接收订单，订单支付后自动生成收银联与后厨联，模拟双打印机同时出票。</p>
+        <a class="btn btn-accent" href="./cashier-web.html">进入收银机端</a>
+        <div class="hint-block">
+          <strong>演示账号</strong>
+          <p>账号：<code>cashier_demo</code></p>
+          <p>密码：<code>Cashier@2026</code></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="tables-card">
+      <h2>餐桌扫码入口（演示）</h2>
+      <p>请先设置一个手机可访问的演示地址，然后系统会为每个桌位生成一个通用二维码。顾客用微信或支付宝扫码都可进入点餐页。</p>
+      <div class="qr-config">
+        <div class="field qr-field">
+          <label for="baseUrlInput">演示地址（手机可访问）</label>
+          <input id="baseUrlInput" type="text" placeholder="例如：http://192.168.1.20:8800">
+        </div>
+        <button id="refreshQrBtn" class="btn btn-ghost" type="button">更新二维码</button>
+      </div>
+      <div id="baseUrlAlert" class="base-url-alert hidden"></div>
+      <p class="muted">建议使用本机局域网地址部署并打开本页，这样客户手机扫码后可直接进入点餐端。</p>
+      <p class="muted">若要手机端与收银端跨设备实时同步，请使用 <code>py -3 serve_demo.py --host 0.0.0.0 --port 8800</code> 启动服务。</p>
+      <div id="qrWall" class="qr-wall"></div>
+    </section>
+  </main>
+
+  <script>
+    (function renderTableQRCodes() {
+      const tables = ["A01", "A02", "A03", "B01", "B02", "VIP1"];
+      const container = document.getElementById("qrWall");
+      const baseUrlInput = document.getElementById("baseUrlInput");
+      const refreshButton = document.getElementById("refreshQrBtn");
+      const baseUrlAlert = document.getElementById("baseUrlAlert");
+
+      function getDefaultBaseUrl() {
+        if (window.location.protocol.indexOf("http") === 0) {
+          const hostname = window.location.hostname.toLowerCase();
+          if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+            return "";
+          }
+          const pathPrefix = window.location.pathname.replace(/\/[^/]*$/, "");
+          return window.location.origin + pathPrefix;
+        }
+        return "";
+      }
+
+      function isLoopbackAddress(baseUrl) {
+        const lower = baseUrl.toLowerCase();
+        return (
+          lower.indexOf("://localhost") >= 0 ||
+          lower.indexOf("://127.0.0.1") >= 0 ||
+          lower.indexOf("://::1") >= 0
+        );
+      }
+
+      function buildEntryUrl(baseUrl, tableNo) {
+        const normalized = baseUrl.replace(/\/+$/, "");
+        return normalized + "/mini-app.html?table=" + encodeURIComponent(tableNo);
+      }
+
+      function buildQrUrl(entryUrl) {
+        return (
+          "https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=12&format=png&data=" +
+          encodeURIComponent(entryUrl)
+        );
+      }
+
+      function render() {
+        const baseUrl = baseUrlInput.value.trim();
+        container.innerHTML = "";
+
+        if (!baseUrl) {
+          baseUrlAlert.classList.add("hidden");
+          container.innerHTML = '<div class="empty-card">请先输入可被手机访问的演示地址，再生成二维码。</div>';
+          return;
+        }
+
+        if (isLoopbackAddress(baseUrl)) {
+          baseUrlAlert.classList.remove("hidden");
+          baseUrlAlert.innerHTML =
+            "当前地址是 <code>localhost / 127.0.0.1</code>，手机扫码无法访问。请改为电脑局域网地址，例如 <code>http://192.168.x.x:8800</code>。";
+          container.innerHTML = '<div class="empty-card">请修正演示地址后重新生成二维码。</div>';
+          return;
+        }
+
+        baseUrlAlert.classList.add("hidden");
+        tables.forEach(function (tableNo) {
+          const entryUrl = buildEntryUrl(baseUrl, tableNo);
+          const card = document.createElement("article");
+          card.className = "qr-table-card";
+          card.innerHTML =
+            "<h3>桌位 " +
+            tableNo +
+            "</h3>" +
+            '<div class="qr-channel">' +
+            '<p class="qr-label">通用扫码入口（微信/支付宝均可）</p>' +
+            '<img class="qr-image" src="' +
+            buildQrUrl(entryUrl) +
+            '" alt="' +
+            tableNo +
+            ' 通用二维码">' +
+            '<a class="table-link-chip" href="' +
+            entryUrl +
+            '" target="_blank" rel="noreferrer">打开链接测试</a>' +
+            '<p class="qr-url">' +
+            entryUrl +
+            "</p>" +
+            "</div>";
+          container.appendChild(card);
+        });
+      }
+
+      baseUrlInput.value = getDefaultBaseUrl();
+      refreshButton.addEventListener("click", render);
+      baseUrlInput.addEventListener("change", render);
+      baseUrlInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+          render();
+        }
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

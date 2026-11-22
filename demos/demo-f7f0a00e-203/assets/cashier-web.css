@@ -1,0 +1,120 @@
+.hidden {
+  display: none !important;
+}
+
+.cashier-layout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr) minmax(0, 1.5fr);
+}
+
+.order-list,
+.print-list {
+  display: grid;
+  gap: 10px;
+  max-height: 72vh;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.order-card {
+  border-radius: 16px;
+  border: 1px solid #ead4be;
+  background: #fffdf9;
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+}
+
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-head h4 {
+  margin: 0;
+}
+
+.order-meta {
+  margin: 6px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.order-meta span {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: #fff5ec;
+  border: 1px solid #ffd8bc;
+  color: #8c4d20;
+}
+
+.order-items {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.order-items p {
+  margin: 5px 0;
+}
+
+.order-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.order-total {
+  font-weight: 800;
+  color: #9f3f13;
+}
+
+.receipt {
+  border: 1px dashed #2f2419;
+  border-radius: 8px;
+  background: #fff;
+  color: #20160f;
+  font-family: "Courier New", "Microsoft YaHei UI", monospace;
+  padding: 10px;
+}
+
+.receipt h4 {
+  margin: 0 0 8px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.receipt .line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 3px 0;
+  font-size: 12px;
+}
+
+.receipt .line strong {
+  font-size: 13px;
+}
+
+.receipt .split {
+  margin: 8px 0;
+  border-top: 1px dashed #473a2f;
+}
+
+.receipt .stamp {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #147149;
+}
+
+@media (max-width: 1120px) {
+  .cashier-layout {
+    grid-template-columns: 1fr;
+  }
+}
