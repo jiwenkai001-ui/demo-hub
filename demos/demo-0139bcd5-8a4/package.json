@@ -1,0 +1,11 @@
+{
+  "name": "yumiaomiao-fresh-static-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "育苗苗学校生鲜供应链纯静态 HTML 演示",
+  "scripts": {
+    "start": "node scripts/serve.cjs",
+    "check": "node scripts/check.cjs",
+    "test": "node tests/domain.cjs"
+  }
+}
