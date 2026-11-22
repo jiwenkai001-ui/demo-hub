@@ -84,27 +84,94 @@ async function restorePublished() {
   const token = process.env.PAGES_READ_TOKEN;
   if (!repository || !token) throw new Error('缺少读取上次成功发布产物的权限，已停止发布以保护现有页面');
   const api = 'https://api.github.com/repos/' + repository;
-  const get = async route => {
-    const response = await fetch(api + route,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
-    if (!response.ok) throw new Error('读取历史发布产物失败（HTTP '+response.status+'），已停止发布以保护现有页面');
-    return response;
+  const get = async (route, optional = false, accept = 'application/vnd.github+json') => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const response = await fetch(api + route,{headers:{Authorization:'Bearer '+token,Accept:accept},signal:AbortSignal.timeout(30000)});
+        if (optional && [404,410].includes(response.status)) return null;
+        if (!response.ok) {
+          if ((response.status === 429 || response.status >= 500) && attempt < 2) {await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));continue;}
+          throw new Error('读取历史发布备份失败（HTTP '+response.status+'），已停止发布以保护现有页面');
+        }
+        return response;
+      } catch (error) {
+        if (attempt === 2 || /HTTP 4\d\d/.test(error.message)) throw error;
+        await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));
+      }
+    }
   };
+  let liveReport;
+  const parts = repository.split('/');
+  try {
+    const response = await fetch('https://'+parts[0]+'.github.io/'+parts[1]+'/deploy-results.json?backup-check='+Date.now(),{cache:'no-store',signal:AbortSignal.timeout(15000)});
+    if (response.ok) {const data=await response.json();if(data.version===1 && /^[a-f0-9]{40}$/.test(data.revision) && data.demos)liveReport=data;}
+  } catch {}
+
+  // Release中的完整站点备份不会随Pages短期artifact过期；摘要和版本均通过才使用。
+  const releases = await (await get('/releases?per_page=20')).json();
+  for (const release of releases.filter(item=>!item.draft && item.tag_name.startsWith('pages-backup-'))) {
+    let meta;
+    try {meta=JSON.parse(release.body);} catch {continue;}
+    if (meta.type!=='demo-hub-pages-backup' || meta.version!==1 || !/^[a-f0-9]{40}$/.test(meta.revision) || !/^[a-f0-9]{64}$/.test(meta.sha256)) continue;
+    if (liveReport && meta.revision!==liveReport.revision) {
+      const comparison=await (await get('/compare/'+liveReport.revision+'...'+meta.revision)).json();
+      if (!['ahead','identical'].includes(comparison.status)) continue;
+    }
+    const asset=release.assets.find(item=>item.name==='site-'+meta.sha256+'.tar.gz');
+    if (!asset) continue;
+    const response=await get('/releases/assets/'+asset.id,true,'application/octet-stream');
+    if (!response) continue;
+    const bytes=Buffer.from(await response.arrayBuffer());
+    if (crypto.createHash('sha256').update(bytes).digest('hex')!==meta.sha256) throw new Error('长期发布备份摘要不一致，已停止发布以保护现有页面');
+    const archive=path.join(temp,'published-site.tar.gz');fs.writeFileSync(archive,bytes);
+    execFileSync('tar',['-xzf',archive,'-C',siteDir]);
+    const restored=JSON.parse(fs.readFileSync(path.join(siteDir,'deploy-results.json'),'utf8'));
+    if (restored.revision!==meta.revision || !fs.existsSync(path.join(siteDir,'index.html'))) throw new Error('长期发布备份版本或首页异常，已停止发布以保护现有页面');
+    console.log('Restored durable published backup:',meta.revision);
+    return;
+  }
   const runs = await (await get('/actions/workflows/deploy.yml/runs?status=success&branch=main&per_page=1')).json();
   const previous = runs.workflow_runs.find(run=>run.name === process.env.GITHUB_WORKFLOW && String(run.id) !== process.env.GITHUB_RUN_ID);
-  if (!previous) return;
-  const artifacts = await (await get('/actions/runs/'+previous.id+'/artifacts')).json();
-  const artifact = artifacts.artifacts.find(item=>item.name === 'github-pages' && !item.expired);
-  if (!artifact) throw new Error('上次成功发布产物已过期或不可读取，已停止发布以保护现有页面');
-  const zipPath = path.join(temp,'previous.zip');
-  const response = await get('/actions/artifacts/'+artifact.id+'/zip');
-  fs.writeFileSync(zipPath,Buffer.from(await response.arrayBuffer()));
-  const extracted = path.join(temp,'previous-artifact');
-  fs.mkdirSync(extracted,{recursive:true});
-  execFileSync('unzip',['-q',zipPath,'-d',extracted]);
-  const archive = path.join(extracted,'artifact.tar');
-  if (!fs.existsSync(archive)) throw new Error('历史发布产物格式异常，已停止发布以保护现有页面');
-  execFileSync('tar',['-xf',archive,'-C',siteDir]);
-  if (!fs.existsSync(path.join(siteDir,'index.html'))) throw new Error('历史发布产物缺少首页，已停止发布以保护现有页面');
+  if (previous && (!liveReport || liveReport.revision===previous.head_sha)) {
+    const artifacts = await (await get('/actions/runs/'+previous.id+'/artifacts')).json();
+    const artifact = artifacts.artifacts.find(item=>item.name === 'github-pages' && !item.expired);
+    if (artifact) {
+      const response=await get('/actions/artifacts/'+artifact.id+'/zip',true);
+      if (response) {
+        const zipPath=path.join(temp,'previous.zip');fs.writeFileSync(zipPath,Buffer.from(await response.arrayBuffer()));
+        const extracted=path.join(temp,'previous-artifact');fs.mkdirSync(extracted,{recursive:true});
+        execFileSync('unzip',['-q',zipPath,'-d',extracted]);
+        const archive=path.join(extracted,'artifact.tar');
+        if (!fs.existsSync(archive)) throw new Error('历史发布产物格式异常，已停止发布以保护现有页面');
+        execFileSync('tar',['-xf',archive,'-C',siteDir]);
+        if (!fs.existsSync(path.join(siteDir,'index.html'))) throw new Error('历史发布产物缺少首页，已停止发布以保护现有页面');
+        console.log('Restored unexpired Pages artifact:',previous.head_sha);
+        return;
+      }
+    }
+  }
+  if (!liveReport) {
+    if (!previous) return;
+    throw new Error('历史发布备份不可用，且无法确认线上版本，已停止发布以保护现有页面');
+  }
+
+  // 迁移空档只重建已发布版本的纯静态文件，逐项验证原报告摘要；不能用当前源码替代旧页面。
+  const response=await get('/zipball/'+liveReport.revision);
+  const zipPath=path.join(temp,'previous-source.zip');fs.writeFileSync(zipPath,Buffer.from(await response.arrayBuffer()));
+  const source=path.join(temp,'previous-source');fs.mkdirSync(source,{recursive:true});execFileSync('unzip',['-q',zipPath,'-d',source]);
+  const roots=fs.readdirSync(source,{withFileTypes:true}).filter(item=>item.isDirectory());
+  if (roots.length!==1) throw new Error('历史源码归档结构异常，已停止发布以保护现有页面');
+  const visible=[];
+  for (const [name,item] of Object.entries(liveReport.demos)) {
+    if (item.state==='failed') continue;
+    if (!/^[a-zA-Z0-9_-]+$/.test(name) || item.state!=='published') throw new Error('历史版本含无法重建的保留页面，请恢复完整站点备份');
+    const root=path.join(source,roots[0].name,'demos',name),files=projectFiles(root),plan=inspectProject(files);
+    const index=files.find(file=>file.path==='index.html');
+    if (plan.type!=='static' || plan.issue || !index || digest(index.content)!==item.indexHash || digest(index.content)!==item.sourceIndexHash) throw new Error('历史页面无法按原摘要安全恢复：'+name+'；已停止发布以保护现有页面');
+    copyProject(root,path.join(siteDir,'demos',name));visible.push(name);
+  }
+  fs.writeFileSync(path.join(siteDir,'index.html'),generateIndex(visible));fs.writeFileSync(path.join(siteDir,'deploy-results.json'),JSON.stringify(liveReport));
+  console.log('Recovered expired-artifact gap from verified static revision:',liveReport.revision,visible.length,'demos');
 }
 
 function generateIndex(demos) {

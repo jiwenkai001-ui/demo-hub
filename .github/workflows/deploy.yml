@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: false
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -31,12 +33,30 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site
+          retention-days: 90
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: false
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .codex-tmp/pages-artifact
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Save published site backup
+        env:
+          PAGES_BACKUP_TOKEN: ${{ github.token }}
+        run: node scripts/backup-pages.cjs
