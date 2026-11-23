@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1F3A8A">
+<title>微醺小酒馆 · 扫码点餐</title>
+<style>
+:root{
+  --red:#E8453C; --red-d:#C8322A; --red-l:#FFF0EE;
+  --blue:#1F3A8A; --blue-2:#2E55C6; --blue-l:#EEF2FF;
+  --gold:#F5B942;
+  --bg:#F5F6FA; --card:#fff; --text:#1B2340; --sub:#6B748C; --mute:#9AA2B5;
+  --line:#ECEEF4; --shadow:0 6px 22px rgba(31,58,138,.08);
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#E9ECF3;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.5}
+body{overflow-x:hidden}
+button,input,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0}
+.app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;box-shadow:0 0 40px rgba(20,30,60,.08);padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+.content{min-height:60vh}
+svg{display:block;flex:none}
+
+/* 顶部 */
+.top{background:linear-gradient(125deg,#1B3278 0%,#2C54C4 62%,#3A67D8 100%);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 16px;position:relative;overflow:hidden}
+.top:after{content:"";position:absolute;right:-46px;top:-58px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.07)}
+.top:before{content:"";position:absolute;right:36px;bottom:-70px;width:120px;height:120px;border-radius:50%;background:rgba(232,69,60,.16)}
+.top-row{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(140deg,#FF6B5E,var(--red));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(232,69,60,.35)}
+.brand-txt strong{display:block;font-size:17px;letter-spacing:.5px;line-height:1.2}
+.brand-txt small{display:block;font-size:9px;opacity:.72;letter-spacing:2.2px;text-transform:uppercase;margin-top:2px}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff}
+.store-row{display:flex;align-items:center;gap:8px;margin-top:15px;position:relative;z-index:1;flex-wrap:wrap}
+.table-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.store-name{font-size:12px;opacity:.85}
+.slogan{margin-top:12px;position:relative;z-index:1;font-size:11px;letter-spacing:1.5px;opacity:.75}
+
+/* 搜索 */
+.search-wrap{padding:12px 14px 4px;position:sticky;top:0;background:var(--bg);z-index:20}
+.search-box{height:38px;border-radius:19px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 14px;color:var(--mute);box-shadow:var(--shadow)}
+.search-box input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:13px;color:var(--text)}
+.search-box input::placeholder{color:var(--mute)}
+
+/* 横幅 */
+.banner{margin:12px 14px 4px;border-radius:var(--r);background:linear-gradient(115deg,#E8453C 0%,#F0694B 55%,#F5A35C 100%);color:#fff;padding:15px 17px;position:relative;overflow:hidden;min-height:96px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.banner:after{content:"🍻";position:absolute;right:8px;bottom:-18px;font-size:86px;opacity:.22;transform:rotate(-14deg)}
+.banner-tag{display:inline-block;background:rgba(255,255,255,.22);border-radius:5px;padding:2px 7px;font-size:10px;letter-spacing:1px;margin-bottom:6px}
+.banner h3{margin:0;font-size:17px;letter-spacing:.3px;white-space:nowrap}
+.banner p{margin:6px 0 0;font-size:10.5px;opacity:.9;max-width:220px;line-height:1.5}
+.banner .go{position:absolute;right:13px;bottom:12px;background:#fff;color:var(--red);font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;z-index:1}
+
+/* 分类吸顶 */
+.cats{position:sticky;top:0;z-index:25;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding:10px 14px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex:none;padding:7px 13px;border-radius:18px;background:#fff;color:var(--sub);font-size:12.5px;font-weight:600;white-space:nowrap;border:1px solid transparent;transition:.18s}
+.cat.on{background:var(--blue);color:#fff;box-shadow:0 5px 14px rgba(31,58,138,.24)}
+
+/* 商品列表 */
+.section-title{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 8px;font-size:14px;font-weight:700}
+.section-title span{font-size:11px;color:var(--mute);font-weight:400}
+.list{padding:0 14px}
+.item{background:#fff;border-radius:14px;padding:12px;display:flex;gap:12px;margin-bottom:10px;box-shadow:0 2px 10px rgba(30,40,80,.035);align-items:center}
+.pimg{width:82px;height:82px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:39px;position:relative;overflow:hidden}
+.pimg:after{content:"BISTRO";position:absolute;bottom:3px;right:5px;font-size:7px;letter-spacing:.6px;color:rgba(255,255,255,.75);font-weight:700}
+.gpink{background:linear-gradient(140deg,#FFD9E6,#FF8FAE)}.gpurple{background:linear-gradient(140deg,#E6D6FF,#A77BEF)}.gpeach{background:linear-gradient(140deg,#FFE6CF,#FFAF78)}
+.ggold{background:linear-gradient(140deg,#FFEDBE,#F5C254)}.gcream{background:linear-gradient(140deg,#FFF6E0,#EBD9AC)}.gbeer{background:linear-gradient(140deg,#FFE7A8,#E9A93B)}
+.gblue{background:linear-gradient(140deg,#D7EAFF,#7BAEF0)}.gred{background:linear-gradient(140deg,#FFD6D2,#EE7B70)}.ggreen{background:linear-gradient(140deg,#D6F3DC,#85CF9A)}
+.gmint{background:linear-gradient(140deg,#D5F5EC,#6FCBB2)}.gamber{background:linear-gradient(140deg,#FFE0BC,#EE9A55)}.gorange{background:linear-gradient(140deg,#FFE0B8,#FF9E4B)}
+.gdark{background:linear-gradient(140deg,#4B4E6B,#23263B)}.gdark:after{color:rgba(255,255,255,.5)}
+.info{flex:1;min-width:0}
+.info h4{margin:0;font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info .en{font-size:9.5px;color:var(--mute);letter-spacing:.4px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info .desc{font-size:11px;color:var(--sub);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tagline{display:inline-block;font-size:9.5px;color:var(--red);background:var(--red-l);padding:1px 6px;border-radius:4px;margin-top:5px;font-weight:600}
+.price-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px}
+.price{color:var(--red);font-weight:800;font-size:17px;line-height:1}
+.price small{font-size:11px;margin-right:1px}
+.old{color:var(--mute);font-size:10px;text-decoration:line-through;margin-left:5px}
+.add{width:28px;height:28px;border-radius:50%;background:linear-gradient(140deg,#F0554B,var(--red));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(232,69,60,.3)}
+
+/* 底部 */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;z-index:60;box-shadow:0 -4px 18px rgba(30,40,80,.05)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--mute);font-size:10px;position:relative}
+.tab.on{color:var(--blue);font-weight:700}
+.tab.on svg{stroke-width:2.2}
+.tab .dot{position:absolute;top:7px;right:calc(50% - 20px);min-width:15px;height:15px;border-radius:9px;background:var(--red);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid #fff}
+.cartbar{position:fixed;bottom:calc(70px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:402px;height:56px;background:#202644;border-radius:28px;display:flex;align-items:center;padding:0 7px 0 15px;z-index:55;box-shadow:0 10px 28px rgba(20,25,55,.3);color:#fff}
+.cart-ico{position:relative;margin-right:12px;color:#fff}
+.cart-ico .n{position:absolute;top:-7px;right:-8px;min-width:17px;height:17px;border-radius:9px;background:var(--red);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.cart-sum{flex:1;min-width:0}
+.cart-sum b{font-size:19px;color:#fff}
+.cart-sum small{display:block;font-size:9.5px;color:rgba(255,255,255,.5);margin-top:-2px}
+.pay-btn{height:42px;padding:0 20px;border-radius:21px;background:linear-gradient(120deg,#F0554B,var(--red));font-weight:800;font-size:14px;color:#fff;white-space:nowrap}
+
+/* 弹层 */
+.mask{position:fixed;inset:0;background:rgba(16,20,40,.5);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:translateY(0);opacity:1}}
+.sheet{width:100%;max-width:430px;max-height:82vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;animation:up .24s ease-out;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.sheet-h h3{margin:0;font-size:16px}
+.sheet-h .sub{font-size:11px;color:var(--mute);font-weight:400;margin-left:6px}
+.x{width:28px;height:28px;border-radius:50%;background:#F2F3F7;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.sheet-body{padding:14px 18px}
+.sheet-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;position:sticky;bottom:0;background:#fff}
+
+/* 购物车条目 */
+.cart-line{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.cart-line:last-child{border-bottom:0}
+.cart-line .thumb{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:25px;flex:none}
+.cl-info{flex:1;min-width:0}
+.cl-info b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-info small{color:var(--mute);font-size:10.5px}
+.cl-info .p{color:var(--red);font-weight:700;font-size:14px;margin-top:2px}
+.stepper{display:flex;align-items:center;gap:10px;flex:none}
+.stepper button{width:25px;height:25px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.stepper button.plus{background:var(--blue);color:#fff;border-color:var(--blue)}
+.stepper span{min-width:14px;text-align:center;font-weight:700;font-size:13px}
+
+/* 商品详情 */
+.detail-img{height:184px;margin:-14px -18px 16px;display:flex;align-items:center;justify-content:center;font-size:88px;position:relative}
+.detail-img:after{content:"BISTRO";position:absolute;bottom:10px;right:16px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.8);font-weight:700}
+.detail-title{display:flex;justify-content:space-between;align-items:flex-start}
+.detail-title h3{margin:0;font-size:19px}
+.detail-title .p{color:var(--red);font-size:21px;font-weight:800}
+.detail-en{font-size:10px;color:var(--mute);letter-spacing:1px;margin-top:2px}
+.detail-desc{font-size:12px;color:var(--sub);margin-top:10px;line-height:1.6}
+.spec-t{font-size:12px;font-weight:700;margin:18px 0 8px}
+.specs{display:flex;gap:8px;flex-wrap:wrap}
+.spec{border:1.5px solid var(--line);border-radius:9px;padding:7px 13px;font-size:12px;color:var(--sub);background:#fff}
+.spec.on{border-color:var(--blue);color:var(--blue);background:var(--blue-l);font-weight:700}
+
+/* 通用页面 */
+.page-head{background:linear-gradient(125deg,#1B3278,#2E55C6);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 16px;display:flex;align-items:center;gap:12px;position:relative}
+.page-head h2{margin:0;font-size:17px;flex:1;text-align:center;margin-right:30px}
+.page-head .icon-btn{background:rgba(255,255,255,.14)}
+.card{background:#fff;border-radius:var(--r);margin:12px 14px;padding:15px;box-shadow:var(--shadow)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.row + .row{margin-top:14px}
+.row .lbl{color:var(--sub);font-size:13px}
+.row .val{font-size:13px;font-weight:600;text-align:right}
+.chev{color:var(--mute)}
+.primary{background:linear-gradient(120deg,#F0554B,var(--red));color:#fff;border-radius:12px;padding:12px;text-align:center;font-weight:700}
+.blue-btn{background:var(--blue);color:#fff;border-radius:10px;padding:9px 15px;font-size:12px;font-weight:700}
+.ghost{border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:9px 15px;font-size:12px;font-weight:600}
+
+/* 会员 */
+.mcard{margin:14px;border-radius:18px;background:linear-gradient(125deg,#1B2F72,#2D55C4 60%,#3E70DD);color:#fff;padding:19px;position:relative;overflow:hidden}
+.mcard:after{content:"";position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+.mcard .lv{display:inline-flex;align-items:center;gap:5px;background:rgba(245,185,66,.2);color:#FFD980;border:1px solid rgba(255,217,128,.4);border-radius:12px;padding:3px 10px;font-size:10.5px;font-weight:700}
+.mcard h3{margin:12px 0 2px;font-size:20px}
+.mcard p{margin:0;font-size:11px;opacity:.7}
+.mnum{display:flex;gap:30px;margin-top:18px;position:relative;z-index:1}
+.mnum div b{display:block;font-size:21px;line-height:1.2}
+.mnum div small{font-size:10px;opacity:.7}
+.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.2);margin-top:14px;overflow:hidden}
+.prog i{display:block;height:100%;width:64%;background:linear-gradient(90deg,#FFD980,#F5B942);border-radius:3px}
+.coupon{background:#fff;border-radius:14px;margin:0 14px 10px;display:flex;overflow:hidden;box-shadow:var(--shadow)}
+.coupon .amt{width:92px;flex:none;background:linear-gradient(150deg,#FFF0EE,#FFE1DD);color:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1.5px dashed #FFC9C3}
+.coupon .amt b{font-size:24px;line-height:1}
+.coupon .amt b small{font-size:12px}
+.coupon .amt span{font-size:9.5px;margin-top:3px;opacity:.8}
+.coupon .cinfo{flex:1;padding:13px;min-width:0}
+.coupon .cinfo b{font-size:13px}
+.coupon .cinfo small{display:block;color:var(--mute);font-size:10.5px;margin-top:3px}
+.coupon .cbtn{align-self:center;margin-right:12px;font-size:11px;font-weight:700;color:#fff;background:var(--red);border-radius:12px;padding:5px 11px;white-space:nowrap}
+.coupon.used{opacity:.62}
+.coupon.used .cbtn{background:#E3E6EE;color:var(--sub)}
+
+/* 订单 */
+.order-card{background:#fff;border-radius:var(--r);margin:12px 14px;padding:15px;box-shadow:var(--shadow)}
+.oc-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:11px}
+.oc-top b{font-size:13px}
+.st{font-size:11px;font-weight:700;padding:3px 9px;border-radius:11px}
+.st0{background:var(--blue-l);color:var(--blue)}.st1{background:#FFF4DE;color:#B97B12}.st2{background:#E9F8EF;color:#188A4E}.st3{background:#F1F2F6;color:var(--mute)}
+.oc-body{padding:11px 0;font-size:12px;color:var(--sub);line-height:1.7}
+.oc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:11px;border-top:1px solid var(--line)}
+.oc-foot .tot{font-size:12px;color:var(--sub)}
+.oc-foot .tot b{color:var(--red);font-size:17px}
+.empty{text-align:center;padding:70px 20px;color:var(--mute)}
+.empty .e{font-size:56px;display:block;margin-bottom:12px;filter:grayscale(.3)}
+.empty b{display:block;color:var(--sub);font-size:14px;margin-bottom:6px}
+
+/* 时间轴 */
+.timeline{padding:4px 0 0}
+.tl{display:flex;gap:12px;position:relative;padding-bottom:20px}
+.tl:last-child{padding-bottom:0}
+.tl:not(:last-child):before{content:"";position:absolute;left:9px;top:20px;bottom:0;width:2px;background:var(--line)}
+.tl.done:not(:last-child):before{background:var(--blue)}
+.tl .dotc{width:20px;height:20px;border-radius:50%;background:#E8EAF1;color:#fff;display:flex;align-items:center;justify-content:center;z-index:1;flex:none}
+.tl.done .dotc{background:var(--blue)}
+.tl.now .dotc{background:var(--red);box-shadow:0 0 0 4px var(--red-l)}
+.tl b{font-size:13px}
+.tl small{display:block;color:var(--mute);font-size:11px;margin-top:2px}
+.tl.done b,.tl.now b{color:var(--text)}
+
+/* 结算 */
+.pay-line{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line)}
+.pay-line:last-child{border-bottom:0}
+.pay-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.radio{width:19px;height:19px;border-radius:50%;border:1.5px solid #CFD4E0;display:flex;align-items:center;justify-content:center;flex:none}
+.radio.on{border-color:var(--blue);background:var(--blue)}
+.radio.on:after{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+.remark{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:none;outline:0;background:#FAFBFD;height:62px;font-size:12px}
+.pay-footer{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:14px;z-index:70}
+.pay-footer .amt{flex:1}
+.pay-footer .amt b{font-size:21px;color:var(--red)}
+.pay-footer .amt small{display:block;color:var(--mute);font-size:10px}
+.pay-footer .go{background:linear-gradient(120deg,#F0554B,var(--red));color:#fff;border-radius:24px;padding:13px 26px;font-weight:800}
+
+/* 成功 */
+.success{text-align:center;padding:48px 26px 20px}
+.sicon{width:78px;height:78px;border-radius:50%;background:linear-gradient(140deg,#48C88A,#1DA96B);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 10px 24px rgba(29,169,107,.26);animation:pop .4s cubic-bezier(.2,1.4,.5,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.success h2{margin:0;font-size:21px}
+.success p{color:var(--sub);font-size:12px;margin:9px 0 24px}
+.sinfo{background:#fff;border-radius:var(--r);padding:16px;text-align:left;box-shadow:var(--shadow)}
+.sinfo .row{padding:5px 0}
+.sbtns{display:flex;gap:10px;margin-top:20px}
+.sbtns button{flex:1;border-radius:12px;padding:12px;font-weight:700;font-size:13px}
+
+/* 表格选择 */
+.table-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.table-grid button{border:1.5px solid var(--line);border-radius:10px;padding:11px 0;font-size:12px;font-weight:600;color:var(--sub)}
+.table-grid button.on{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+
+/* 提示 */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(25,30,55,.9);color:#fff;padding:11px 20px;border-radius:22px;font-size:13px;z-index:200;animation:fade .18s;white-space:nowrap}
+
+/* 年龄门 */
+.gate{position:fixed;inset:0;background:linear-gradient(150deg,#162A68,#2E55C6 60%,#E8453C);z-index:300;display:flex;align-items:center;justify-content:center;padding:28px;color:#fff;text-align:center}
+.gate-in{max-width:330px}
+.gate .gm{font-size:62px;display:block;margin-bottom:14px}
+.gate h1{font-size:27px;margin:0 0 8px;letter-spacing:2px}
+.gate .gen{font-size:11px;letter-spacing:5px;opacity:.7;margin-bottom:22px}
+.gate p{font-size:12.5px;line-height:1.9;opacity:.85;margin-bottom:26px}
+.gate button{background:#fff;color:var(--blue);border-radius:26px;padding:13px 30px;font-weight:800;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.gate small{display:block;margin-top:16px;font-size:10px;opacity:.6}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ========== 基础工具 ========== */
+function ic(d,s=22){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'}
+var I={
+ menu:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+ order:'<path d="M6 3h9l3 3v15H6z"/><path d="M9 9h6M9 13h6M9 17h4"/>',
+ member:'<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',
+ me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+ cart:'<path d="M3 5h2l2.3 11h10.4L20 8H6"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ close:'<path d="M6 6l12 12M18 6L6 18"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ minus:'<path d="M5 12h14"/>',
+ pin:'<path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ check:'<path d="M5 12l5 5L20 7"/>',
+ ticket:'<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/>',
+ chev:'<path d="M9 5l7 7-7 7"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'
+};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function money(n){return (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'')}
+
+/* ========== 数据 ========== */
+var CATS=[
+ {id:'hot',n:'必点榜'},{id:'craft',n:'精酿啤酒'},{id:'fruit',n:'果味啤酒'},{id:'brand',n:'大牌啤酒'},
+ {id:'cocktail',n:'鸡尾酒'},{id:'bucket',n:'分享桶'},{id:'snack',n:'小食'}, {id:'drink',n:'软饮'}
+];
+var P=[
+ {id:'p1',n:'草莓果啤',e:'Strawberry Beer',d:'酸甜果香 · 2.5度 · 女生必点',p:9.3,o:12,c:'fruit',em:'🍓',g:'gpink',hot:1,sales:2841},
+ {id:'p2',n:'葡萄果啤',e:'Grape Beer',d:'巨峰葡萄风味 · 2.5度 · 微甜',p:9.3,o:12,c:'fruit',em:'🍇',g:'gpurple',hot:1,sales:2610},
+ {id:'p3',n:'白桃果啤',e:'Peach Beer',d:'白桃清香 · 2.5度 · 清爽解腻',p:9.3,o:12,c:'fruit',em:'🍑',g:'gpeach',hot:1,sales:1980},
+ {id:'p4',n:'天生荔质',e:'Lychee Wine',d:'荔枝风味预调酒 · 甜而不腻',p:9.9,o:13,c:'fruit',em:'🍒',g:'gpink'},
+ {id:'p5',n:'桃里桃气',e:'Peachy Wine',d:'水蜜桃气泡酒 · 低度易饮',p:9.9,o:13,c:'fruit',em:'🍑',g:'gpeach'},
+ {id:'p6',n:'招牌精酿',e:'Signature Craft Beer',d:'招牌精酿 · 麦香浓郁 · 8.2元经典',p:8.2,o:10,c:'craft',em:'🍺',g:'ggold',hot:1,sales:3520},
+ {id:'p7',n:'皮尔森精酿啤酒',e:'Pilsner Beer',d:'清爽皮尔森 · 口感干净',p:8.99,o:11,c:'craft',em:'🍺',g:'ggold'},
+ {id:'p8',n:'奶啤',e:'Milk Beer',d:'奶香柔和 · 无酒精也能微醺',p:9.3,o:12,c:'craft',em:'🥛',g:'gcream',hot:1,sales:1420},
+ {id:'p9',n:'1L大扎啤',e:'Draft Beer 1L',d:'聚会首选 · 德国小麦风味',p:19.9,o:29.9,c:'craft',em:'🍻',g:'gbeer',hot:1,specs:[{n:'1L 单人',d:0},{n:'2L 分享装',d:15}]},
+ {id:'p10',n:'科罗娜',e:'Corona',d:'经典墨西哥啤酒 · 配柠檬',p:9.99,o:13,c:'brand',em:'🍺',g:'gblue',hot:1,sales:2230},
+ {id:'p11',n:'1664 白啤',e:'1664 Blanc',d:'法式白啤 · 柑橘花香',p:9.99,o:13,c:'brand',em:'🍺',g:'gblue'},
+ {id:'p12',n:'百威',e:'Budweiser',d:'经典美式啤酒 · 清爽顺口',p:9.99,o:12,c:'brand',em:'🍻',g:'gred'},
+ {id:'p13',n:'喜力',e:'Heineken',d:'荷兰经典 · 麦香饱满',p:9.99,o:12,c:'brand',em:'🍺',g:'ggreen'},
+ {id:'p14',n:'莫吉托',e:'Mojito',d:'薄荷青柠 · 夏夜必点',p:26,o:32,c:'cocktail',em:'🍸',g:'gmint',hot:1,specs:[{n:'冰镇',d:0},{n:'去冰',d:0}]},
+ {id:'p15',n:'长岛冰茶',e:'Long Island Iced Tea',d:'经典配方 · 后劲十足',p:29,o:36,c:'cocktail',em:'🍹',g:'gamber',hot:1,specs:[{n:'标准',d:0},{n:'加倍',d:12}]},
+ {id:'p16',n:'橙风破浪',e:'Orange Wave',d:'香橙风味 · 果味鸡尾酒',p:9.99,o:13,c:'cocktail',em:'🍊',g:'gorange'},
+ {id:'p17',n:'吃瓜群众',e:'Lime Cucumber Wine',d:'青瓜青柠 · 清新到底',p:9.99,o:13,c:'cocktail',em:'🥝',g:'ggreen'},
+ {id:'p18',n:'飘仙果茶',e:'Floating Fairy Fruit Tea',d:'混合果茶 · 微醺特调',p:39.9,o:49,c:'cocktail',em:'🍹',g:'gpink'},
+ {id:'p19',n:'威士忌可乐桶',e:'Whiskey & Coke Bucket',d:'人气分享桶 · 氛围担当',p:29,o:39,c:'bucket',em:'🥃',g:'gdark',hot:1,specs:[{n:'小桶 2L',d:0},{n:'大桶 3L',d:20}]},
+ {id:'p20',n:'伏特加红牛桶',e:'Vodka Red Bull Barrel',d:'能量拉满 · 组队必点',p:39.9,o:49,c:'bucket',em:'🍸',g:'gdark'},
+ {id:'p21',n:'威士忌可乐扎',e:'Whiskey & Coke Draft',d:'整扎分享 · 派对首选',p:79.9,o:99,c:'bucket',em:'🍺',g:'gdark'},
+ {id:'p22',n:'奥尔良烤翅',e:'Chicken Wings',d:'外焦里嫩 · 下酒神器',p:18,o:24,c:'snack',em:'🍗',g:'gamber',hot:1,specs:[{n:'微辣',d:0},{n:'中辣',d:0},{n:'特辣',d:0}]},
+ {id:'p23',n:'酒鬼花生',e:'Fried Peanut',d:'香脆可口 · 越吃越上头',p:12,o:16,c:'snack',em:'🥜',g:'ggold'},
+ {id:'p24',n:'香辣豆皮',e:'Spicy Bean Curd',d:'麻辣鲜香 · 招牌小食',p:16,o:20,c:'snack',em:'🌶️',g:'gred'},
+ {id:'p25',n:'车仔面',e:'Cart Noodles',d:'深夜治愈 · 9.9元经典',p:9.9,o:13,c:'snack',em:'🍜',g:'gcream',hot:1},
+ {id:'p26',n:'玉米片',e:'Corn Chips',d:'酥脆咸香 · 追剧搭配',p:12,o:16,c:'snack',em:'🌽',g:'ggold'},
+ {id:'p27',n:'鸭脖',e:'Duck Neck',d:'卤香入味 · 越嚼越香',p:25.9,o:30,c:'snack',em:'🦆',g:'gamber'},
+ {id:'p28',n:'酥肉',e:'Crispy Meat',d:'现炸酥脆 · 必点小食',p:22,o:28,c:'snack',em:'🍖',g:'gamber'},
+ {id:'p29',n:'水果沙拉',e:'Fruit Salad',d:'清爽解酒 · 分享装',p:18,o:24,c:'snack',em:'🥗',g:'ggreen'},
+ {id:'p30',n:'农夫山泉',e:'Nongfu Spring',d:'天然矿泉水 550ml',p:4,o:5,c:'drink',em:'💧',g:'gblue'},
+ {id:'p31',n:'冰红茶',e:'Iced Black Tea',d:'冰爽解渴',p:8.8,o:10,c:'drink',em:'🧃',g:'gamber'},
+ {id:'p32',n:'红牛',e:'Red Bull',d:'能量饮料',p:12,o:15,c:'drink',em:'🥫',g:'ggold'},
+ {id:'p33',n:'热牛奶',e:'Hot Milk',d:'暖胃助眠',p:8.8,o:10,c:'drink',em:'🥛',g:'gcream'},
+ {id:'p34',n:'可乐 2L',e:'Coke 2L',d:'分享装 · 气泡畅快',p:12.8,o:16,c:'drink',em:'🥤',g:'gdark'}
+];
+var COUPONS=[
+ {id:'c1',t:'66元无门槛券',d:'全场酒水小食通用 · 限到店核销',th:0,a:66,claim:0},
+ {id:'c2',t:'满50减10',d:'订单满50元可用',th:50,a:10,claim:1},
+ {id:'c3',t:'满30减5',d:'订单满30元可用',th:30,a:5,claim:1}
+];
+var STEPS=['已接单','制作中','待取餐','已完成'];
+var STEP_D=['门店已收到您的订单','吧台正在精心准备中','请到吧台报桌号取餐','祝您饮用愉快，理性饮酒'];
+
+/* ========== 状态 ========== */
+var KEY='bistro_order_app_v1';
+var S={tab:'order',cat:'hot',cart:{},orders:[],table:'A12',couponClaim:{c2:1,c3:1},selCoupon:'auto',point:1280,ageOk:false,view:'main',modal:null,cartOpen:false,tableOpen:false,pay:'wechat',remark:'',search:'',currentOrder:null};
+try{var raw=localStorage.getItem(KEY);if(raw){var sv=JSON.parse(raw);for(var k in sv){if(S.hasOwnProperty(k))S[k]=sv[k]}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({cart:S.cart,orders:S.orders,table:S.table,couponClaim:S.couponClaim,point:S.point,ageOk:S.ageOk}))}catch(e){}}
+function prod(id){for(var i=0;i<P.length;i++)if(P[i].id===id)return P[i];return null}
+function cartList(){var a=[];for(var key in S.cart){var v=S.cart[key];if(v.q>0){var pr=prod(v.id);if(pr)a.push({key:key,id:v.id,spec:v.spec,q:v.q,unit:v.unit,p:pr})}}return a}
+function cartCount(){var n=0;cartList().forEach(function(x){n+=x.q});return n}
+function cartTotal(){var n=0;cartList().forEach(function(x){n+=x.unit*x.q});return n}
+function bestCoupon(total){var best=null;COUPONS.forEach(function(c){if(S.couponClaim[c.id]&&total>=c.th&&(!best||c.a>best.a))best=c});return best}
+function discount(total){var c=null;if(S.selCoupon==='auto')c=bestCoupon(total);else if(S.selCoupon!=='none')COUPONS.forEach(function(x){if(x.id===S.selCoupon&&S.couponClaim[x.id]&&total>=x.th)c=x});return c?Math.min(c.a,total):0}
+function orderStatus(o){var s=(Date.now()-o.createdAt)/1000;if(s<12)return 0;if(s<30)return 1;if(s<60)return 2;return 3}
+function toast(msg){var d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(function(){d.remove()},1500)}
+
+/* ========== 渲染 ========== */
+var app=document.getElementById('app');
+var lastRenderKey='';
+function render(){
+  var rk=S.view+':'+(S.tab||'')+':'+(S.modal?'m':'')+':'+(S.cartOpen?'c':'')+':'+(S.tableOpen?'t':'')+':'+(S.couponToggle?'p':'');
+  var keepScroll=rk===lastRenderKey;
+  var top=window.pageYOffset||document.documentElement.scrollTop||0;
+  var h='';
+  if(!S.ageOk){h=gateHtml()}
+  else if(S.view==='checkout'){h=checkoutHtml()}
+  else if(S.view==='success'){h=successHtml()}
+  else if(S.view==='orderDetail'){h=orderDetailHtml()}
+  else if(S.view==='search'){h=searchHtml()}
+  else{
+    h=mainHtml();
+    if(S.orders.length||S.point)h+='';
+  }
+  app.innerHTML=h;
+  lastRenderKey=rk;
+  if(keepScroll)window.scrollTo(0,top);else window.scrollTo(0,0);
+  if(S.view==='search'&&S.search){var si=document.getElementById('searchInput');if(si){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
+}
+function gateHtml(){return '<div class="gate"><div class="gate-in"><span class="gm">🍻</span><h1>微醺小酒馆</h1><div class="gen">BISTRO BAR</div><p>年轻人的线下社交平台<br>理性饮酒 · 适量饮酒<br>未满 18 周岁禁止饮酒</p><button data-act="age-ok">我已满 18 周岁，进入点餐</button><small>进入即表示您已阅读并同意饮酒须知</small></div></div>'}
+
+function mainHtml(){
+  var h='';
+  if(S.tab==='order')h+=topHtml()+bannerHtml()+searchBarHtml()+catsHtml()+productsHtml()+cartBarHtml();
+  else if(S.tab==='orders')h+=pageHeadHtml('我的订单')+ordersHtml();
+  else if(S.tab==='member')h+=pageHeadHtml('会员中心')+memberHtml();
+  else h+=pageHeadHtml('我的')+profileHtml();
+  h+=tabbarHtml();
+  return h;
+}
+function topHtml(){return '<div class="top"><div class="top-row"><div class="brand"><div class="brand-mark">🥂</div><div class="brand-txt"><strong>微醺小酒馆</strong><small>Bistro Bar</small></div></div><button class="icon-btn" data-act="table-open">'+ic(I.pin,18)+'</button></div><div class="store-row"><span class="table-pill">'+ic(I.pin,13)+' 桌号 '+esc(S.table)+'</span><span class="store-name">微醺小酒馆 · 欢迎光临</span></div><div class="slogan">年轻人的线下社交平台 · 无低消 自由微醺</div></div>'}
+function bannerHtml(){return '<div class="banner"><span class="banner-tag">夏日限定 · HOT</span><h3>酒水第二份半价</h3><p>人气果啤 / 精酿 / 鸡尾酒 全线参与</p><span class="go">去点餐 ›</span></div>'}
+function searchBarHtml(){return '<div class="search-wrap"><div class="search-box">'+ic(I.search,16)+'<input id="searchInput" type="text" placeholder="搜索酒水、小食，例如：草莓果啤" value="'+esc(S.search)+'" data-act="search-input"><span style="font-size:10px;color:var(--mute)">共 '+P.length+' 款</span></div></div>'}
+function catsHtml(){var h='<div class="cats">';CATS.forEach(function(c){h+='<button class="cat '+(S.cat===c.id?'on':'')+'" data-act="cat" data-id="'+c.id+'">'+c.n+'</button>'});return h+'</div>'}
+function productsHtml(){
+  var list=S.cat==='hot'?P.filter(function(p){return p.hot}):P.filter(function(p){return p.c===S.cat});
+  if(!list.length)list=P;
+  var h='<div class="section-title">'+(S.cat==='hot'?'人气必点榜':(CATS.filter(function(c){return c.id===S.cat})[0]||{}).n)+'<span>已选 '+cartCount()+' 件</span></div><div class="list" id="productList">';
+  list.forEach(function(p){
+    h+='<div class="item" data-act="detail" data-id="'+p.id+'"><div class="pimg '+p.g+'">'+p.em+'</div><div class="info"><h4>'+p.n+'</h4><div class="en">'+p.e+'</div><div class="desc">'+p.d+'</div>'+(p.hot?'<span class="tagline">🔥 热卖 '+p.sales+'</span>':'')+'<div class="price-row"><div><span class="price"><small>¥</small>'+money(p.p)+'</span><span class="old">¥'+money(p.o)+'</span></div><button class="add" data-act="quick-add" data-id="'+p.id+'">'+ic(I.plus,16)+'</button></div></div></div>';
+  });
+  return h+'</div>';
+}
+function cartBarHtml(){
+  if(!cartCount())return '';
+  return '<div class="cartbar"><div class="cart-ico" data-act="cart-open">'+ic(I.cart,24)+'<span class="n">'+cartCount()+'</span></div><div class="cart-sum" data-act="cart-open"><b>¥'+money(cartTotal())+'</b><small>已省 ¥'+money(cartList().reduce(function(s,x){return s+(x.p.o-x.unit)*x.q},0))+'</small></div><button class="pay-btn" data-act="checkout">去结算</button></div>';
+}
+function tabbarHtml(){
+  var tabs=[{id:'order',n:'点餐',i:I.menu},{id:'orders',n:'订单',i:I.order},{id:'member',n:'会员',i:I.member},{id:'me',n:'我的',i:I.me}];
+  var h='<div class="tabbar">';
+  tabs.forEach(function(t){h+='<button class="tab '+(S.tab===t.id?'on':'')+'" data-act="tab" data-id="'+t.id+'">'+ic(t.i,21)+(t.id==='orders'&&S.orders.length?'<span class="dot">'+S.orders.length+'</span>':'')+'<span>'+t.n+'</span></button>'});
+  return h+'</div>';
+}
+function pageHeadHtml(title){return '<div class="page-head"><button class="icon-btn" data-act="back">'+ic(I.back,19)+'</button><h2>'+title+'</h2><button class="icon-btn" data-act="table-open">'+ic(I.pin,17)+'</button></div>'}
+
+function ordersHtml(){
+  if(!S.orders.length)return '<div class="empty"><span class="e">🧾</span><b>还没有订单哦</b><span>选几杯喜欢的酒，开启今晚的微醺时光</span><div style="margin-top:22px"><button class="blue-btn" data-act="tab" data-id="order">去点餐</button></div></div>';
+  var h='';
+  S.orders.slice().reverse().forEach(function(o){
+    var st=orderStatus(o);
+    var names=o.items.map(function(x){return x.n+' ×'+x.q}).join('、');
+    h+='<div class="order-card"><div class="oc-top"><b>桌号 '+esc(o.table)+' · '+esc(o.id.slice(-6))+'</b><span class="st st'+st+'">'+STEPS[st]+'</span></div><div class="oc-body">'+esc(names)+(o.remark?'<br>备注：'+esc(o.remark):'')+'<br>'+new Date(o.createdAt).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+'</div><div class="oc-foot"><div class="tot">实付 <b>¥'+money(o.paid)+'</b></div><div><button class="ghost" data-act="reorder" data-id="'+o.id+'">再来一单</button> <button class="blue-btn" data-act="order-detail" data-id="'+o.id+'">查看详情</button></div></div></div>';
+  });
+  return h;
+}
+function memberHtml(){
+  var claimed=COUPONS.filter(function(c){return S.couponClaim[c.id]}).length;
+  var h='<div class="mcard"><span class="lv">'+ic(I.star,12)+' 微醺会员 · LV2</span><h3>Hi，酒友</h3><p>会员编号 BP'+(100000+Math.floor(S.point*7)%899999)+'</p><div class="mnum"><div><b>'+S.point+'</b><small>当前积分</small></div><div><b>'+claimed+'</b><small>可用卡券</small></div><div><b>'+S.orders.length+'</b><small>累计订单</small></div></div><div class="prog"><i></i></div><p style="margin-top:7px;font-size:10px">再消费 ¥'+(2000-S.point)+' 升级 LV3 享受 9 折</p></div>';
+  h+='<div class="section-title">我的卡券 <span>下单自动优选最优惠券</span></div>';
+  COUPONS.forEach(function(c){
+    var has=S.couponClaim[c.id];
+    h+='<div class="coupon '+(has?'':'used')+'"><div class="amt"><b><small>¥</small>'+c.a+'</b><span>'+(c.th?'满'+c.th+'可用':'无门槛')+'</span></div><div class="cinfo"><b>'+c.t+'</b><small>'+c.d+'</small><small>有效期至 2026-12-31</small></div><button class="cbtn" data-act="claim" data-id="'+c.id+'">'+(has?'已领取':'立即领取')+'</button></div>';
+  });
+  h+='<div class="card"><div class="row"><div><b style="font-size:13px">会员权益</b><div style="font-size:11px;color:var(--sub);margin-top:5px">消费 1 元 = 1 积分 · 积分可兑换酒水</div></div></div><div class="row"><div><b style="font-size:13px">第二份半价</b><div style="font-size:11px;color:var(--sub);margin-top:5px">门店活动自动生效，结算时直接减免</div></div><span class="st st2">进行中</span></div></div>';
+  return h;
+}
+function profileHtml(){
+  function row(icon,txt,act,extra){return '<div class="row" data-act="'+act+'"><div style="display:flex;align-items:center;gap:11px"><span style="width:30px;height:30px;border-radius:9px;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center">'+ic(icon,17)+'</span><span style="font-size:13px">'+txt+'</span></div><span class="val chev">'+(extra||'')+ic(I.chev,15)+'</span></div>'}
+  var h='<div class="card" style="margin-top:14px"><div class="row"><div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(140deg,#FFD9E6,#F5B942);display:flex;align-items:center;justify-content:center;font-size:25px">😎</div><div><b style="font-size:15px">小酒馆酒友</b><div style="font-size:11px;color:var(--mute)">LV2 微醺会员 · 积分 '+S.point+'</div></div></div><span class="chev">'+ic(I.chev,17)+'</span></div></div>';
+  h+='<div class="card">'+row(I.pin,'当前桌号','table-open',esc(S.table))+row(I.order,'我的订单','tab-orders',S.orders.length+' 笔')+row(I.ticket,'优惠券','tab-member')+row(I.star,'积分明细','tab-member')+'</div>';
+  h+='<div class="card">'+row(I.menu,'帮助中心','info','')+row(I.me,'关于我们','info','')+'</div>';
+  h+='<div style="text-align:center;color:var(--mute);font-size:10px;padding:18px 0;line-height:1.8">微醺小酒馆 · 年轻人的线下社交平台<br>理性饮酒 · 未满18周岁禁止饮酒<br>不吃回头酒 · 开车不喝酒</div>';
+  return h;
+}
+function searchHtml(){
+  var q=S.search.trim().toLowerCase();
+  var list=q?P.filter(function(p){return (p.n+p.e+p.d).toLowerCase().indexOf(q)>-1}):[];
+  var h='<div class="page-head"><button class="icon-btn" data-act="back">'+ic(I.back,19)+'</button><h2>搜索酒水</h2><button class="icon-btn" data-act="clear-search">'+ic(I.close,17)+'</button></div>';
+  h+='<div class="search-wrap"><div class="search-box">'+ic(I.search,16)+'<input id="searchInput" type="text" placeholder="搜索品牌、口味、小食" value="'+esc(S.search)+'" data-act="search-input"></div></div>';
+  h+='<div id="searchResults">'+searchResultsHtml(list,q)+'</div>';
+  return h+cartBarHtml();
+}
+function searchResultsHtml(list,q){
+  var h='';
+  if(!q)h='<div class="empty"><span class="e">🔍</span><b>想喝点什么？</b><span>试试搜索「果啤」「莫吉托」「烤翅」</span></div>';
+  else if(!list.length)h='<div class="empty"><span class="e">🍹</span><b>没有找到相关商品</b><span>换个关键词试试吧</span></div>';
+  else{h='<div class="section-title">找到 '+list.length+' 款商品</div><div class="list">';list.forEach(function(p){h+='<div class="item" data-act="detail" data-id="'+p.id+'"><div class="pimg '+p.g+'">'+p.em+'</div><div class="info"><h4>'+p.n+'</h4><div class="en">'+p.e+'</div><div class="desc">'+p.d+'</div><div class="price-row"><span class="price"><small>¥</small>'+money(p.p)+'</span><button class="add" data-act="quick-add" data-id="'+p.id+'">'+ic(I.plus,16)+'</button></div></div></div>'});h+='</div>'}
+  return h;
+}
+
+/* ---------- 弹层 ---------- */
+function modalHtml(){
+  var h='';
+  if(S.modal){
+    var p=prod(S.modal.id),sp=p.specs?p.specs[S.modal.spec]:null;
+    var unit=p.p+(sp?sp.d:0);
+    h+='<div class="mask" data-act="close-mask"><div class="sheet" data-stop="1"><div class="sheet-body"><div class="detail-img '+p.g+'">'+p.em+'</div><div class="detail-title"><div><h3>'+p.n+'</h3><div class="detail-en">'+p.e+'</div></div><div class="p">¥'+money(unit)+'</div></div><div class="detail-desc">'+p.d+'</div>';
+    if(p.specs){h+='<div class="spec-t">选择规格</div><div class="specs">';p.specs.forEach(function(s,i){h+='<button class="spec '+(S.modal.spec===i?'on':'')+'" data-act="spec" data-i="'+i+'">'+(s.n)+(s.d?' +¥'+s.d:'')+'</button>'});h+='</div>'}
+    h+='<div class="spec-t">数量</div><div class="stepper"><button data-act="m-qty" data-d="-1">'+ic(I.minus,15)+'</button><span>'+S.modal.q+'</span><button class="plus" data-act="m-qty" data-d="1">'+ic(I.plus,15)+'</button></div></div><div class="sheet-foot"><div style="flex:1"><div style="font-size:11px;color:var(--mute)">合计</div><b style="color:var(--red);font-size:22px">¥'+money(unit*S.modal.q)+'</b></div><button class="primary" style="flex:1" data-act="m-add">加入购物车</button></div></div></div>';
+  }
+  if(S.cartOpen){
+    var items=cartList();
+    h+='<div class="mask" data-act="close-mask"><div class="sheet" data-stop="1"><div class="sheet-h"><h3>购物车 <span class="sub">'+cartCount()+' 件</span></h3><button class="x" data-act="close-cart">'+ic(I.close,16)+'</button></div><div class="sheet-body">';
+    if(!items.length)h+='<div class="empty" style="padding:36px 0"><span class="e">🛒</span><b>购物车是空的</b></div>';
+    items.forEach(function(x){h+='<div class="cart-line"><div class="thumb '+x.p.g+'">'+x.p.em+'</div><div class="cl-info"><b>'+x.p.n+'</b><small>'+(x.spec||'标准')+'</small><div class="p">¥'+money(x.unit)+'</div></div><div class="stepper"><button data-act="c-qty" data-key="'+esc(x.key)+'" data-d="-1">'+ic(I.minus,14)+'</button><span>'+x.q+'</span><button class="plus" data-act="c-qty" data-key="'+esc(x.key)+'" data-d="1">'+ic(I.plus,14)+'</button></div></div>'});
+    h+='</div>'+(items.length?'<div class="sheet-foot"><div style="flex:1"><div style="font-size:11px;color:var(--mute)">合计（不含优惠）</div><b style="color:var(--red);font-size:22px">¥'+money(cartTotal())+'</b></div><button class="primary" style="flex:1" data-act="checkout">去结算</button></div>':'')+'</div></div>';
+  }
+  if(S.tableOpen){
+    h+='<div class="mask" data-act="close-mask"><div class="sheet" data-stop="1"><div class="sheet-h"><h3>选择桌号</h3><button class="x" data-act="close-table">'+ic(I.close,16)+'</button></div><div class="sheet-body"><p style="font-size:12px;color:var(--sub);margin:0 0 14px">请选择您所在的桌号，方便吧台准确送餐</p><div class="table-grid">';
+    ['A01','A02','A03','A05','A06','A08','B01','B02','B03','B05','B06','B08'].forEach(function(t){h+='<button class="'+(S.table===t?'on':'')+'" data-act="pick-table" data-t="'+t+'">'+t+'</button>'});
+    h+='</div></div></div></div>';
+  }
+  return h;
+}
+
+function checkoutHtml(){
+  var items=cartList(),total=cartTotal(),dis=discount(total),c=bestCoupon(total);
+  var h='<div class="page-head"><button class="icon-btn" data-act="checkout-back">'+ic(I.back,19)+'</button><h2>确认订单</h2><button class="icon-btn" data-act="table-open">'+ic(I.pin,17)+'</button></div><div class="content" style="padding-bottom:100px">';
+  h+='<div class="card"><div class="row" data-act="table-open"><div class="lbl">取餐桌号</div><div class="val">'+esc(S.table)+' <span class="chev">'+ic(I.chev,15)+'</span></div></div><div class="row"><div class="lbl">门店</div><div class="val">微醺小酒馆 · 到店取餐</div></div></div>';
+  h+='<div class="card"><div class="section-title" style="padding:0 0 8px">商品清单 <span>共 '+cartCount()+' 件</span></div>';
+  items.forEach(function(x){h+='<div class="pay-line"><div class="thumb '+x.p.g+'" style="width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px">'+x.p.em+'</div><div style="flex:1;min-width:0"><b style="font-size:12.5px">'+x.p.n+'</b><div style="font-size:10px;color:var(--mute)">'+(x.spec||'标准')+' ×'+x.q+'</div></div><b style="font-size:13px">¥'+money(x.unit*x.q)+'</b></div>'});
+  h+='<div class="pay-line"><div class="lbl">商品小计</div><div style="margin-left:auto;font-weight:700">¥'+money(total)+'</div></div>';
+  h+='<div class="pay-line" data-act="coupon-toggle"><div class="lbl">优惠券</div><div style="margin-left:auto;color:'+(dis?'var(--red)':'var(--mute)')+';font-size:12px;font-weight:600">'+(dis?'-¥'+money(dis)+'（'+(S.selCoupon==='auto'?'自动优选':'手动选择')+'）':'未使用')+' '+ic(I.chev,13)+'</div></div>';
+  h+='<div class="pay-line"><div class="lbl">第二份半价活动</div><div style="margin-left:auto;color:var(--red);font-size:12px;font-weight:600">已自动计算</div></div></div>';
+  h+='<div class="card"><div class="section-title" style="padding:0 0 8px">订单备注</div><textarea class="remark" id="remarkInput" placeholder="例如：少冰、不要香菜、到店后联系我…">'+esc(S.remark)+'</textarea></div>';
+  h+='<div class="card"><div class="section-title" style="padding:0 0 8px">支付方式</div><div class="pay-line" data-act="pay" data-p="wechat"><div class="pay-ico" style="background:#E8F8EF;color:#1DA96B">💬</div><div style="flex:1;font-size:13px">微信支付 <span style="color:var(--mute);font-size:10px">推荐</span></div><span class="radio '+(S.pay==='wechat'?'on':'')+'"></span></div><div class="pay-line" data-act="pay" data-p="alipay"><div class="pay-ico" style="background:#EAF2FF;color:#1677FF">支</div><div style="flex:1;font-size:13px">支付宝</div><span class="radio '+(S.pay==='alipay'?'on':'')+'"></span></div></div>';
+  h+='<div style="text-align:center;font-size:10px;color:var(--mute);padding:4px 20px 20px;line-height:1.7">提交订单即表示同意《点餐服务条款》<br>理性饮酒 · 未满18周岁禁止饮酒 · 开车不喝酒</div></div>';
+  h+='<div class="pay-footer"><div class="amt"><b>¥'+money(Math.max(0,total-dis))+'</b><small>'+(dis?'已优惠 ¥'+money(dis):'共 '+cartCount()+' 件商品')+'</small></div><button class="go" data-act="submit-order">提交订单</button></div>';
+  if(S.couponToggle){h+='<div class="mask" data-act="close-mask"><div class="sheet" data-stop="1"><div class="sheet-h"><h3>选择优惠券</h3><button class="x" data-act="close-coupon">'+ic(I.close,16)+'</button></div><div class="sheet-body"><div class="pay-line" data-act="sel-coupon" data-c="auto"><div style="flex:1"><b style="font-size:13px">自动优选</b><div style="font-size:10.5px;color:var(--mute)">为您选择最优惠的可用卡券</div></div><span class="radio '+(S.selCoupon==='auto'?'on':'')+'"></span></div><div class="pay-line" data-act="sel-coupon" data-c="none"><div style="flex:1"><b style="font-size:13px">不使用优惠券</b></div><span class="radio '+(S.selCoupon==='none'?'on':'')+'"></span></div>';
+    COUPONS.forEach(function(x){var ok=S.couponClaim[x.id]&&total>=x.th;h+='<div class="pay-line" data-act="sel-coupon" data-c="'+x.id+'" style="opacity:'+(ok?1:.45)+'"><div style="flex:1"><b style="font-size:13px;color:'+(ok?'var(--text)':'var(--mute)')+'">'+x.t+'</b><div style="font-size:10.5px;color:var(--mute)">'+(S.couponClaim[x.id]?(ok?'满'+x.th+'元可用':'差 ¥'+money(x.th-total)):'未领取 · 前往会员中心领取')+'</div></div><span class="radio '+(S.selCoupon===x.id?'on':'')+'"></span></div>'});
+    h+='</div></div></div>'}
+  return h;
+}
+function successHtml(){
+  var o=null;S.orders.forEach(function(x){if(x.id===S.currentOrder)o=x});
+  if(!o)return mainHtml();
+  return '<div class="page-head"><button class="icon-btn" data-act="go-order">'+ic(I.back,19)+'</button><h2>下单成功</h2><button class="icon-btn" data-act="go-order">'+ic(I.close,17)+'</button></div><div class="content"><div class="success"><div class="sicon">'+ic(I.check,42)+'</div><h2>下单成功，坐等微醺</h2><p>已通知吧台，预计 5-8 分钟为您备好</p><div class="sinfo"><div class="row"><div class="lbl">订单编号</div><div class="val">'+esc(o.id)+'</div></div><div class="row"><div class="lbl">取餐桌号</div><div class="val" style="color:var(--blue)">'+esc(o.table)+'</div></div><div class="row"><div class="lbl">商品数量</div><div class="val">'+o.items.reduce(function(s,x){return s+x.q},0)+' 件</div></div><div class="row"><div class="lbl">实付金额</div><div class="val" style="color:var(--red);font-size:17px">¥'+money(o.paid)+'</div></div><div class="row"><div class="lbl">支付方式</div><div class="val">'+(o.pay==='wechat'?'微信支付':'支付宝')+'</div></div></div><div class="sbtns"><button class="ghost" data-act="go-order">查看订单</button><button class="primary" data-act="go-menu">继续点餐</button></div></div></div>';
+}
+function orderDetailHtml(){
+  var o=null;S.orders.forEach(function(x){if(x.id===S.currentOrder)o=x});
+  if(!o)return ordersHtml();
+  var st=orderStatus(o);
+  var h='<div class="page-head"><button class="icon-btn" data-act="back">'+ic(I.back,19)+'</button><h2>订单详情</h2><button class="icon-btn" data-act="table-open">'+ic(I.pin,17)+'</button></div><div class="content">';
+  h+='<div class="card"><div style="text-align:center;padding:8px 0 16px"><div style="font-size:38px">'+['📥','🍸','🔔','✅'][st]+'</div><b style="font-size:17px;display:block;margin-top:6px">'+STEPS[st]+'</b><small style="color:var(--mute)">'+STEP_D[st]+'</small></div><div class="timeline">';
+  STEPS.forEach(function(s,i){h+='<div class="tl '+(i<st?'done':(i===st?'now':''))+'"><div class="dotc">'+(i<=st?ic(I.check,12):'')+'</div><div><b>'+s+'</b><small>'+STEP_D[i]+(i<=st?' · '+new Date(o.createdAt+i*12000).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}):'')+'</small></div></div>'});
+  h+='</div></div>';
+  h+='<div class="card"><div class="section-title" style="padding:0 0 8px">商品清单</div>';
+  o.items.forEach(function(x){h+='<div class="pay-line"><div style="flex:1;font-size:12.5px">'+esc(x.n)+' <span style="color:var(--mute)">'+esc(x.spec||'')+' ×'+x.q+'</span></div><b>¥'+money(x.unit*x.q)+'</b></div>'});
+  h+='<div class="pay-line"><div class="lbl">商品小计</div><div style="margin-left:auto">¥'+money(o.total)+'</div></div>'+(o.dis?'<div class="pay-line"><div class="lbl">优惠减免</div><div style="margin-left:auto;color:var(--red)">-¥'+money(o.dis)+'</div></div>':'')+'<div class="pay-line"><div class="lbl">实付</div><div style="margin-left:auto;color:var(--red);font-weight:800;font-size:17px">¥'+money(o.paid)+'</div></div></div>';
+  h+='<div class="card"><div class="row"><div class="lbl">订单编号</div><div class="val">'+esc(o.id)+'</div></div><div class="row"><div class="lbl">下单时间</div><div class="val">'+new Date(o.createdAt).toLocaleString('zh-CN')+'</div></div><div class="row"><div class="lbl">取餐桌号</div><div class="val">'+esc(o.table)+'</div></div><div class="row"><div class="lbl">支付方式</div><div class="val">'+(o.pay==='wechat'?'微信支付':'支付宝')+'</div></div>'+(o.remark?'<div class="row"><div class="lbl">备注</div><div class="val">'+esc(o.remark)+'</div></div>':'')+'</div>';
+  h+='<div style="padding:6px 14px 24px"><button class="ghost" style="width:100%" data-act="reorder" data-id="'+o.id+'">再来一单</button></div></div>';
+  return h;
+}
+
+/* ========== 交互 ========== */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.getAttribute('data-act'),id=t.getAttribute('data-id');
+  if(a==='close-mask'&&e.target!==t)return;
+  switch(a){
+    case 'age-ok':S.ageOk=true;save();render();break;
+    case 'tab':S.tab=id;S.view='main';S.modal=null;S.cartOpen=false;S.tableOpen=false;render();break;
+    case 'tab-orders':S.tab='orders';S.view='main';render();break;
+    case 'tab-member':S.tab='member';S.view='main';render();break;
+    case 'back':S.view='main';render();break;
+    case 'cat':S.cat=id;render();break;
+    case 'detail':S.modal={id:id,spec:0,q:1};render();break;
+    case 'quick-add':{
+      var p=prod(id);var key=p.id+'|标准';
+      if(S.cart[key])S.cart[key].q++;else S.cart[key]={id:p.id,spec:'标准',unit:p.p,q:1};
+      save();render();toast('已加入购物车');break;
+    }
+    case 'spec':S.modal.spec=parseInt(t.getAttribute('data-i'));render();break;
+    case 'm-qty':S.modal.q=Math.max(1,S.modal.q+parseInt(t.getAttribute('data-d')));render();break;
+    case 'm-add':{
+      var p2=prod(S.modal.id),sp=p2.specs?p2.specs[S.modal.spec]:null;
+      var key2=p2.id+'|'+(sp?sp.n:'标准');
+      if(S.cart[key2])S.cart[key2].q+=S.modal.q;else S.cart[key2]={id:p2.id,spec:sp?sp.n:'标准',unit:p2.p+(sp?sp.d:0),q:S.modal.q};
+      S.modal=null;save();render();toast('已加入购物车');break;
+    }
+    case 'close-mask':S.modal=null;S.cartOpen=false;S.tableOpen=false;S.couponToggle=false;render();break;
+    case 'close-cart':S.cartOpen=false;render();break;
+    case 'close-table':S.tableOpen=false;render();break;
+    case 'cart-open':S.cartOpen=true;render();break;
+    case 'c-qty':{
+      var k=t.getAttribute('data-key'),d=parseInt(t.getAttribute('data-d'));
+      if(S.cart[k]){S.cart[k].q+=d;if(S.cart[k].q<=0)delete S.cart[k]}
+      save();render();break;
+    }
+    case 'table-open':S.tableOpen=true;render();break;
+    case 'pick-table':S.table=t.getAttribute('data-t');S.tableOpen=false;save();render();toast('已切换至 '+S.table+' 桌');break;
+    case 'checkout':S.cartOpen=false;S.modal=null;S.view='checkout';S.couponToggle=false;render();break;
+    case 'checkout-back':S.view='main';S.tab='order';render();break;
+    case 'pay':S.pay=t.getAttribute('data-p');render();break;
+    case 'coupon-toggle':S.couponToggle=true;render();break;
+    case 'close-coupon':S.couponToggle=false;render();break;
+    case 'sel-coupon':S.selCoupon=t.getAttribute('data-c');S.couponToggle=false;render();break;
+    case 'claim':S.couponClaim[id]=1;save();render();toast('领取成功，下单自动抵扣');break;
+    case 'submit-order':{
+      var items=cartList();if(!items.length){toast('购物车是空的');return}
+      var total=cartTotal(),dis=discount(total),paid=Math.max(0,total-dis);
+      var o={id:'BP'+Date.now().toString().slice(-9),items:items.map(function(x){return {n:x.p.n,spec:x.spec,q:x.q,unit:x.unit}}),total:total,dis:dis,paid:paid,table:S.table,pay:S.pay,remark:S.remark,createdAt:Date.now()};
+      S.orders.push(o);S.point+=Math.floor(paid);S.cart={};S.remark='';S.currentOrder=o.id;S.view='success';save();render();break;
+    }
+    case 'go-order':S.view='main';S.tab='orders';render();break;
+    case 'go-menu':S.view='main';S.tab='order';render();break;
+    case 'order-detail':S.currentOrder=id;S.view='orderDetail';render();break;
+    case 'reorder':{
+      var ord=null;S.orders.forEach(function(x){if(x.id===id)ord=x});
+      if(ord){S.cart={};ord.items.forEach(function(x){var p3=null;P.forEach(function(y){if(y.n===x.n)p3=y});if(p3){var k3=p3.id+'|'+x.spec;S.cart[k3]={id:p3.id,spec:x.spec,unit:x.unit,q:x.q}}});save();S.view='main';S.tab='order';render();toast('已将商品加入购物车')}
+      break;
+    }
+    case 'clear-search':S.search='';S.view='main';render();break;
+    case 'info':toast('理性饮酒 · 未满18周岁禁止饮酒');break;
+  }
+});
+document.addEventListener('input',function(e){
+  if(e.target&&e.target.getAttribute('data-act')==='search-input'){
+    S.search=e.target.value;
+    var list=P.filter(function(p){var q=S.search.trim().toLowerCase();return !q||(p.n+p.e+p.d).toLowerCase().indexOf(q)>-1});
+    var box=document.getElementById('productList')||document.querySelector('.list');
+    if(S.view==='search'){
+      var sr=document.getElementById('searchResults');if(sr)sr.innerHTML=searchResultsHtml(list,S.search.trim());
+    }else if(box){
+      box.innerHTML=list.map(function(p){return '<div class="item" data-act="detail" data-id="'+p.id+'"><div class="pimg '+p.g+'">'+p.em+'</div><div class="info"><h4>'+p.n+'</h4><div class="en">'+p.e+'</div><div class="desc">'+p.d+'</div>'+(p.hot?'<span class="tagline">🔥 热卖 '+p.sales+'</span>':'')+'<div class="price-row"><div><span class="price"><small>¥</small>'+money(p.p)+'</span><span class="old">¥'+money(p.o)+'</span></div><button class="add" data-act="quick-add" data-id="'+p.id+'">'+ic(I.plus,16)+'</button></div></div></div>'}).join('');
+    }
+  }
+  if(e.target&&e.target.id==='remarkInput')S.remark=e.target.value;
+});
+/* 定时刷新订单状态 */
+setInterval(function(){if(S.orders.length&&(S.tab==='orders'||S.view==='orderDetail'||S.view==='success'))render()},5000);
+render();
+</script>
+</body>
+</html>
