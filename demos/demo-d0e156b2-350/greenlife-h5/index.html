@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F5EE">
+<title>植间 · 绿植生活馆</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232A4A34'/%3E%3Cpath d='M23 8C13 8 8 13 8 21c0 2 1 3 3 3 8 0 12-6 12-16z' fill='none' stroke='%23DFEAD9' stroke-width='1.8'/%3E%3Cpath d='M9 25c3-7 7-10 13-13' stroke='%23DFEAD9' stroke-width='1.8' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --green-900:#1E3A29; --green-800:#2A4A34; --green-700:#3B6247;
+  --green-600:#507B58; --green-500:#6E9A6E; --sage:#A9C0A3; --sage-l:#DCE7D6;
+  --cream:#F7F5EE; --cream-2:#FBFAF5; --paper:#FFFFFF;
+  --wood:#B9946A; --wood-l:#E4D3BA;
+  --ink:#26332A; --ink-2:#5C6B5E; --ink-3:#94A094;
+  --line:#E8E9E0; --shadow:0 8px 28px rgba(31,61,43,.08);
+  --radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--ink); background:#E9EBE2;
+  display:flex; align-items:center; justify-content:center;
+  background-image:radial-gradient(circle at 18% 22%,rgba(169,192,163,.55),transparent 42%),radial-gradient(circle at 82% 78%,rgba(185,148,106,.28),transparent 45%);
+}
+.serif{font-family:"Noto Serif CJK SC","Songti SC","STSong",Georgia,serif}
+svg.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ic.sm{width:17px;height:17px}
+svg.ic.lg{width:26px;height:26px}
+
+/* ===== 手机外壳 ===== */
+.phone{
+  width:390px;height:min(844px,calc(100dvh - 36px));min-height:600px;background:var(--cream);
+  border-radius:44px;border:9px solid #16241B;
+  box-shadow:0 40px 90px rgba(20,40,27,.35),0 0 0 1px #3d5646;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;
+}
+@media (max-width:430px){
+  body{background:var(--cream)}
+  .phone{width:100vw;height:100dvh;min-height:0;border:0;border-radius:0;box-shadow:none}
+}
+.statusbar{
+  height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px 0 30px;font-size:13px;font-weight:700;letter-spacing:.2px;
+  background:var(--cream);color:var(--ink);position:relative;z-index:20;
+}
+.statusbar .sb-r{display:flex;align-items:center;gap:6px}
+.statusbar .bat{width:22px;height:11px;border:1.5px solid var(--ink);border-radius:3px;position:relative;padding:1.5px}
+.statusbar .bat::after{content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:5px;background:var(--ink);border-radius:0 1px 1px 0}
+.statusbar .bat i{display:block;height:100%;width:78%;background:var(--ink);border-radius:1px}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:104px;height:26px;background:#16241B;border-radius:16px;z-index:21}
+@media (max-width:430px){.notch{display:none}}
+
+/* 滚动容器 */
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:24px}
+.screen::-webkit-scrollbar{display:none}
+.page{display:none;animation:fade .28s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* 通用 */
+.pad{padding:0 20px}
+.sec{margin-top:26px}
+.sec-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:13px}
+.sec-hd h3{font-size:18px;font-weight:700;letter-spacing:.3px}
+.sec-hd .en{font-size:10px;letter-spacing:2px;color:var(--ink-3);text-transform:uppercase;margin-bottom:3px}
+.sec-hd .more{font-size:12px;color:var(--green-600);display:flex;align-items:center;gap:2px}
+.muted{color:var(--ink-2)}
+.tiny{font-size:11px}
+.card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow)}
+.tag{display:inline-block;font-size:10px;padding:3px 8px;border-radius:20px;background:var(--sage-l);color:var(--green-700);font-weight:600}
+.tag.wood{background:#F3E7D5;color:#96713F}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--green-800);color:#fff;border:0;border-radius:14px;padding:13px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn.block{width:100%}
+.btn.ghost{background:transparent;color:var(--green-700);border:1.5px solid var(--sage)}
+.btn.sm{padding:9px 13px;font-size:12px;border-radius:11px}
+.chip{flex:none;padding:8px 15px;border-radius:20px;background:#fff;border:1px solid var(--line);font-size:12.5px;color:var(--ink-2);cursor:pointer;white-space:nowrap;transition:.2s}
+.chip.on{background:var(--green-800);color:#fff;border-color:var(--green-800)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 20px 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.empty{text-align:center;padding:50px 20px;color:var(--ink-3);font-size:13px}
+
+/* 首页头部 */
+.home-hd{padding:8px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .logo{width:34px;height:34px;border-radius:11px;background:var(--green-800);display:grid;place-items:center;color:#DFEAD9}
+.brand b{font-size:17px;letter-spacing:1px;display:block;line-height:1.1}
+.brand span{font-size:9px;letter-spacing:2.2px;color:var(--ink-3);text-transform:uppercase}
+.icon-btn{width:36px;height:36px;border-radius:12px;background:#fff;display:grid;place-items:center;color:var(--green-800);box-shadow:var(--shadow);position:relative;cursor:pointer}
+.icon-btn .dot{position:absolute;right:7px;top:7px;width:7px;height:7px;background:#C96A4A;border-radius:50%;border:1.5px solid #fff}
+.hello{padding:22px 20px 0}
+.hello .hi{font-size:12px;color:var(--ink-3);letter-spacing:1px}
+.hello h1{font-size:26px;line-height:1.45;margin-top:5px;letter-spacing:.5px;font-weight:600}
+.hello h1 em{font-style:normal;color:var(--green-600)}
+.search{margin:16px 20px 0;height:44px;background:#fff;border-radius:14px;display:flex;align-items:center;gap:9px;padding:0 14px;box-shadow:var(--shadow);color:var(--ink-3)}
+.search input{border:0;outline:0;background:transparent;flex:1;font-size:13px;color:var(--ink);font-family:inherit}
+.search input::placeholder{color:var(--ink-3)}
+.hero{margin:20px 20px 0;height:214px;border-radius:24px;overflow:hidden;position:relative;background:linear-gradient(125deg,#1F3B2A 0%,#356044 62%,#4A7550 100%);color:#fff}
+.hero::before{content:"";position:absolute;width:220px;height:220px;border:1px solid rgba(255,255,255,.13);border-radius:50%;right:-70px;top:-90px}
+.hero::after{content:"";position:absolute;width:160px;height:160px;border:1px solid rgba(255,255,255,.1);border-radius:50%;right:-30px;top:-50px}
+.hero img{position:absolute;right:-8px;bottom:-18px;width:60%;height:116%;object-fit:cover;object-position:center 62%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 42%);mask-image:linear-gradient(to right,transparent 0%,#000 42%);opacity:.96}
+.hero .txt{position:relative;z-index:2;padding:23px 0 0 22px;width:66%}
+.hero .txt .kicker{font-size:10px;letter-spacing:2.5px;opacity:.72}
+.hero .txt h2{font-size:22px;line-height:1.4;margin:9px 0 7px;font-weight:600}
+.hero .txt p{font-size:11px;line-height:1.6;opacity:.8}
+.hero .txt .go{margin-top:12px;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;background:rgba(255,255,255,.16);padding:7px 12px;border-radius:20px;backdrop-filter:blur(4px);cursor:pointer}
+.quick{margin:20px 20px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quick .q{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer}
+.quick .q .icbox{width:100%;aspect-ratio:1;border-radius:17px;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;color:var(--green-700)}
+.quick .q .icbox.a{background:#E9F0E5}.quick .q .icbox.b{background:#F5EADB;color:#A67C4B}.quick .q .icbox.c{background:#E6EDE8}.quick .q .icbox.d{background:#E3E9DC;color:#5E7353}
+.quick .q span{font-size:11px;color:var(--ink-2)}
+
+/* 今日提醒 */
+.remind{margin:0 20px;background:linear-gradient(110deg,#EDF3E8,#F7F5EA);border-radius:18px;padding:16px;display:flex;gap:12px;align-items:center;border:1px solid #E2EADD}
+.remind .rimg{width:44px;height:44px;border-radius:14px;background:#fff;display:grid;place-items:center;color:var(--green-600);flex:none}
+.remind .rtxt{flex:1;min-width:0}
+.remind .rtxt b{font-size:13px;display:block}
+.remind .rtxt p{font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+.switch{width:40px;height:23px;border-radius:20px;background:#D6DDD2;position:relative;flex:none;cursor:pointer;transition:.25s}
+.switch i{position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:.25s}
+.switch.on{background:var(--green-600)}.switch.on i{left:20px}
+
+/* 商品卡 */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px}
+.pcard{background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;position:relative}
+.pcard .ph{height:130px;overflow:hidden;background:#EEF1E9;position:relative}
+.pcard .ph img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.pcard:active .ph img{transform:scale(1.06)}
+.pcard .badge{position:absolute;left:9px;top:9px;background:rgba(255,255,255,.92);color:var(--green-700);font-size:9.5px;font-weight:700;padding:4px 8px;border-radius:20px}
+.pcard .fav{position:absolute;right:8px;top:8px;width:27px;height:27px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;color:var(--ink-3)}
+.pcard .fav.on{color:#C96A4A}
+.pcard .pb{padding:10px 11px 12px}
+.pcard .pb b{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .pb .spec{font-size:10px;color:var(--ink-3);margin-top:4px}
+.pcard .pb .row{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+.price{color:var(--green-800);font-weight:700;font-size:15px}
+.price small{font-size:10px;font-weight:500;color:var(--ink-3)}
+.add{width:26px;height:26px;border-radius:9px;background:var(--green-800);color:#fff;display:grid;place-items:center;cursor:pointer}
+.art{width:100%;height:100%;display:grid;place-items:center;position:relative;overflow:hidden}
+.art.a1{background:linear-gradient(150deg,#DDE8D6,#B9D0AE)}
+.art.a2{background:linear-gradient(150deg,#F1E4D0,#DCC4A0)}
+
+/* 养护知识 */
+.care-hero{margin:0 20px;border-radius:22px;background:var(--green-800);color:#fff;padding:22px;position:relative;overflow:hidden}
+.care-hero::after{content:"";position:absolute;right:-46px;bottom:-70px;width:170px;height:170px;border:1px solid rgba(255,255,255,.16);border-radius:50%}
+.care-hero .k{font-size:10px;letter-spacing:2.5px;opacity:.7}
+.care-hero h2{font-size:21px;margin:8px 0 7px;font-weight:600}
+.care-hero p{font-size:11.5px;line-height:1.7;opacity:.78;width:80%}
+.care-hero .st{display:flex;gap:22px;margin-top:17px;position:relative;z-index:2}
+.care-hero .st b{font-size:17px;display:block}.care-hero .st span{font-size:10px;opacity:.7}
+.kcard{margin:0 20px 12px;background:#fff;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.kcard .kh{display:flex;gap:13px;padding:13px;cursor:pointer;align-items:center}
+.kcard .kh .kimg{width:66px;height:66px;border-radius:13px;overflow:hidden;flex:none;background:#EDF1E9}
+.kcard .kh .kimg img{width:100%;height:100%;object-fit:cover}
+.kcard .kh .ki{flex:1;min-width:0}
+.kcard .kh .ki b{font-size:14px;display:block}
+.kcard .kh .ki .lat{font-size:10px;color:var(--ink-3);font-style:italic;margin-top:2px}
+.kcard .kh .ki .meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.kcard .kh .arw{color:var(--ink-3);transition:.25s}
+.kcard.open .kh .arw{transform:rotate(180deg)}
+.kbody{display:none;padding:0 15px 16px;border-top:1px solid var(--line)}
+.kcard.open .kbody{display:block;animation:fade .25s}
+.kbody .kv{display:flex;gap:10px;padding-top:12px;align-items:flex-start}
+.kbody .kv .kic{width:28px;height:28px;border-radius:9px;background:#EDF3E8;color:var(--green-600);display:grid;place-items:center;flex:none}
+.kbody .kv b{font-size:11.5px;display:block;margin-bottom:2px}
+.kbody .kv p{font-size:11.5px;color:var(--ink-2);line-height:1.65}
+.kbody .qa{margin-top:13px;background:#F7F8F3;border-radius:12px;padding:11px 12px}
+.kbody .qa b{font-size:11px;color:var(--green-700)}
+.kbody .qa p{font-size:11px;color:var(--ink-2);line-height:1.6;margin-top:4px}
+
+/* 案例 */
+.case-card{margin:0 20px 15px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+.case-card .cimg{height:168px;position:relative;overflow:hidden;background:#E8EDE4}
+.case-card .cimg img{width:100%;height:100%;object-fit:cover;transition:.4s}
+.case-card:active .cimg img{transform:scale(1.04)}
+.case-card .cimg .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,40,27,.72),transparent 62%)}
+.case-card .cimg .cnum{position:absolute;left:14px;top:13px;font-size:10px;letter-spacing:2px;color:#fff;opacity:.95;text-shadow:0 1px 5px rgba(0,0,0,.5)}
+.case-card .cimg .ct{position:absolute;left:15px;bottom:13px;color:#fff}
+.case-card .cimg .ct b{font-size:17px;display:block;font-weight:600}
+.case-card .cimg .ct span{font-size:10.5px;opacity:.85;margin-top:3px;display:block}
+.case-card .cb{padding:13px 15px 15px;display:flex;align-items:center;justify-content:space-between}
+.case-card .cb .stats{display:flex;gap:18px}
+.case-card .cb .stats b{font-size:14px;color:var(--green-800);display:block}
+.case-card .cb .stats span{font-size:10px;color:var(--ink-3)}
+.case-card .cb .lk{font-size:11.5px;color:var(--green-600);display:flex;align-items:center;gap:3px}
+.cquote{margin:0 20px;background:#EDF2E8;border-radius:18px;padding:18px;position:relative}
+.cquote .qm{font-size:38px;color:var(--sage);line-height:.7;font-family:Georgia,serif}
+.cquote p{font-size:12.5px;line-height:1.85;color:var(--ink-2);margin-top:6px}
+.cquote .by{font-size:11px;color:var(--green-700);margin-top:11px;font-weight:600}
+.scene{width:100%;height:100%}
+
+/* 咨询 */
+.con-hero{margin:0 20px;padding:26px 22px;border-radius:22px;background:linear-gradient(140deg,#24432F,#3D6A48);color:#fff;position:relative;overflow:hidden}
+.con-hero::before{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border:1px solid rgba(255,255,255,.14);border-radius:50%}
+.con-hero .k{font-size:10px;letter-spacing:2.5px;opacity:.7}
+.con-hero h2{font-size:23px;margin:9px 0;font-weight:600}
+.con-hero p{font-size:11.5px;opacity:.8;line-height:1.7;width:85%}
+.ways{margin:0 20px;display:grid;gap:10px}
+.way{background:#fff;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer}
+.way .wic{width:40px;height:40px;border-radius:13px;background:#EDF3E8;color:var(--green-700);display:grid;place-items:center;flex:none}
+.way .wic.w{background:#E8F3EA;color:#3F9156}.way .wic.o{background:#F5EADB;color:#A67C4B}
+.way .wt{flex:1;min-width:0}
+.way .wt b{font-size:13px;display:block}
+.way .wt span{font-size:11px;color:var(--ink-3);margin-top:3px;display:block}
+.way .wa{color:var(--green-600);font-size:11px;font-weight:600;white-space:nowrap}
+.form{margin:0 20px;background:#fff;border-radius:20px;padding:18px 16px;box-shadow:var(--shadow)}
+.form label{font-size:11.5px;font-weight:600;color:var(--ink-2);display:block;margin:14px 0 7px}
+.form label:first-child{margin-top:0}
+.form label i{color:#C96A4A;font-style:normal}
+.form input,.form textarea,.form select{width:100%;border:1.5px solid var(--line);background:#FBFCF9;border-radius:12px;padding:11px 12px;font-size:12.5px;font-family:inherit;color:var(--ink);outline:0;transition:.2s}
+.form input:focus,.form textarea:focus,.form select:focus{border-color:var(--sage);background:#fff}
+.form textarea{resize:none;height:78px;line-height:1.6}
+.form .opts{display:flex;gap:7px;flex-wrap:wrap}
+.form .opt{padding:8px 12px;border-radius:10px;border:1.5px solid var(--line);font-size:11.5px;color:var(--ink-2);cursor:pointer}
+.form .opt.on{border-color:var(--green-600);background:#EDF3E8;color:var(--green-800);font-weight:600}
+.form .btn{margin-top:18px}
+.faq{margin:0 20px;background:#fff;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.faq .fi{padding:14px 15px;border-bottom:1px solid var(--line);cursor:pointer}
+.faq .fi:last-child{border-bottom:0}
+.faq .fi .fq{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600}
+.faq .fi .fa{font-size:11.5px;color:var(--ink-2);line-height:1.7;display:none;margin-top:8px}
+.faq .fi.open .fa{display:block;animation:fade .2s}
+.faq .fi.open .arw{transform:rotate(180deg)}
+.foot{text-align:center;padding:26px 20px 10px;color:var(--ink-3);font-size:10px;line-height:1.9}
+
+/* tabbar */
+.tabbar{height:74px;flex:none;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:8px;position:relative;z-index:30}
+.tabbar .t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--ink-3);cursor:pointer;font-size:10px;position:relative}
+.tabbar .t.on{color:var(--green-700);font-weight:700}
+.tabbar .t.on::before{content:"";position:absolute;top:0;width:22px;height:3px;border-radius:0 0 4px 4px;background:var(--green-700)}
+.tabbar .t .cbadge{position:absolute;top:6px;right:24px;min-width:15px;height:15px;border-radius:9px;background:#C96A4A;color:#fff;font-size:9px;display:grid;place-items:center;padding:0 3px}
+
+/* 弹层 / toast / 购物车 */
+.mask{position:absolute;inset:0;background:rgba(18,32,23,.45);z-index:40;opacity:0;pointer-events:none;transition:.25s;display:flex;align-items:flex-end}
+.mask.on{opacity:1;pointer-events:auto}
+.sheet{width:100%;background:var(--cream-2);border-radius:26px 26px 0 0;max-height:82%;overflow-y:auto;transform:translateY(100%);transition:.32s cubic-bezier(.2,.8,.3,1);scrollbar-width:none}
+.sheet::-webkit-scrollbar{display:none}
+.mask.on .sheet{transform:none}
+.sheet .sh{position:sticky;top:0;background:var(--cream-2);padding:8px 0 12px;text-align:center;z-index:2}
+.sheet .sh i{display:block;width:36px;height:4px;background:#D8DDD3;border-radius:4px;margin:0 auto 12px}
+.sheet .sh b{font-size:15px}
+.sheet .close{position:absolute;right:18px;top:14px;color:var(--ink-3);cursor:pointer}
+.sheet .sbody{padding:0 20px 28px}
+.detail-img{width:100%;height:210px;border-radius:18px;object-fit:cover;background:#E8EDE4}
+.detail-h{display:flex;justify-content:space-between;align-items:flex-start;margin-top:16px}
+.detail-h b{font-size:19px}.detail-h .lat{font-size:11px;color:var(--ink-3);font-style:italic;margin-top:3px;display:block}
+.detail-price{color:var(--green-800);font-size:22px;font-weight:700;margin-top:12px}
+.detail-price small{font-size:12px;color:var(--ink-3);font-weight:400}
+.detail-desc{font-size:12px;color:var(--ink-2);line-height:1.85;margin-top:12px}
+.kv2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.kv2 div{background:#fff;border-radius:13px;padding:12px}
+.kv2 b{font-size:10px;color:var(--ink-3);display:block;font-weight:500}
+.kv2 span{font-size:12.5px;font-weight:600;margin-top:5px;display:block}
+.cart-item{display:flex;gap:12px;background:#fff;border-radius:15px;padding:10px;margin-bottom:10px;align-items:center}
+.cart-item img{width:58px;height:58px;border-radius:11px;object-fit:cover;flex:none}
+.cart-item .ci{flex:1;min-width:0}
+.cart-item .ci b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item .ci span{font-size:10.5px;color:var(--ink-3);display:block;margin-top:3px}
+.cart-item .ci .qty{display:flex;align-items:center;gap:9px;margin-top:7px;font-size:12px}
+.cart-item .ci .qty button{width:20px;height:20px;border:1px solid var(--line);background:#F7F8F4;border-radius:6px;color:var(--green-700);cursor:pointer;font-size:13px;line-height:1}
+.cart-item .cp{font-size:13px;font-weight:700;color:var(--green-800);align-self:flex-end}
+.cart-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.cart-foot .tot small{font-size:10px;color:var(--ink-3);display:block}
+.cart-foot .tot b{font-size:21px;color:var(--green-800)}
+.toast{position:absolute;left:50%;bottom:100px;transform:translate(-50%,14px);background:rgba(30,58,41,.95);color:#fff;padding:11px 18px;border-radius:22px;font-size:12px;z-index:60;opacity:0;pointer-events:none;transition:.28s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.success{text-align:center;padding:26px 10px}
+.success .ok{width:62px;height:62px;border-radius:50%;background:#E4F0E2;color:var(--green-700);display:grid;place-items:center;margin:0 auto 16px}
+.success b{font-size:17px}.success p{font-size:12px;color:var(--ink-2);line-height:1.8;margin-top:9px}
+.success .no{display:inline-block;margin-top:14px;background:#EDF3E8;color:var(--green-700);font-size:11px;padding:7px 14px;border-radius:20px}
+</style>
+</head>
+<body>
+
+<!-- 图标库 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13C4 7 9 3 20 3c0 11-4 16-10 16a7 7 0 0 1-3-.5"/><path d="M4 21c2-5 6-9 12-12"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21v-7h6v7"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.9-.9L3 21l1.9-4.6A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7S5.5 10 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 10 12 2.7 12 2.7z"/></symbol>
+<symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/></symbol>
+<symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 22V10"/><path d="M12 14C7 14 4 11 4 6c5 0 8 3 8 8z"/><path d="M12 12c0-5 3-8 8-8 0 5-3 8-8 8z"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-scissor" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+</defs></svg>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span id="clock">9:41</span>
+    <div class="sb-r">
+      <svg class="ic sm" style="stroke-width:2"><use href="#i-sun"/></svg>
+      <span style="font-size:11px">●●●</span>
+      <div class="bat"><i></i></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen">
+
+    <!-- ============ 首页 ============ -->
+    <div class="page on" id="page-home">
+      <div class="home-hd">
+        <div class="brand">
+          <div class="logo"><svg class="ic"><use href="#i-leaf"/></svg></div>
+          <div><b class="serif">植间</b><span>ZHIJIAN GREEN</span></div>
+        </div>
+        <div class="icon-btn" onclick="openCart()"><svg class="ic sm"><use href="#i-bag"/></svg><i class="dot" id="homeDot" style="display:none"></i></div>
+      </div>
+
+      <div class="hello">
+        <div class="hi">GOOD MORNING · 让生活慢一点</div>
+        <h1 class="serif">把一整个<em>春天</em><br>搬进你的房间</h1>
+      </div>
+
+      <div class="search" onclick="go('shop')">
+        <svg class="ic sm"><use href="#i-search"/></svg>
+        <input placeholder="搜一搜：龟背竹 / 好养 / 送礼" readonly>
+        <span class="tag">搜索</span>
+      </div>
+
+      <div class="hero" onclick="go('shop')">
+        <img src="assets/img/plant-monstera.jpg" alt="龟背竹">
+        <div class="txt">
+          <div class="kicker">NEW ARRIVAL · 春日上新</div>
+          <h2 class="serif">一盆绿意<br>治愈整个角落</h2>
+          <p >精选 30+ 室内观叶植物<br>同城配送 · 附养护卡</p>
+          <div class="go">去逛逛 <svg class="ic sm"><use href="#i-chev"/></svg></div>
+        </div>
+      </div>
+
+      <div class="quick">
+        <div class="q" onclick="go('care')"><div class="icbox a"><svg class="ic lg"><use href="#i-book"/></svg></div><span>养护百科</span></div>
+        <div class="q" onclick="go('cases')"><div class="icbox b"><svg class="ic lg"><use href="#i-grid"/></svg></div><span>实景案例</span></div>
+        <div class="q" onclick="go('contact')"><div class="icbox c"><svg class="ic lg"><use href="#i-chat"/></svg></div><span>免费咨询</span></div>
+        <div class="q" onclick="go('shop')"><div class="icbox d"><svg class="ic lg"><use href="#i-bag"/></svg></div><span>全部绿植</span></div>
+      </div>
+
+      <div class="sec">
+        <div class="pad sec-hd"><div><div class="en">TODAY'S CARE</div><h3 class="serif">今日养护提醒</h3></div></div>
+        <div class="remind">
+          <div class="rimg"><svg class="ic lg"><use href="#i-drop"/></svg></div>
+          <div class="rtxt"><b>该给龟背竹浇水啦</b><p>距上次浇水 8 天 · 表层土已干，浇透即可</p></div>
+          <div class="switch on" id="remindSw" onclick="toggleRemind()"><i></i></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="pad sec-hd"><div><div class="en">BEST SELLERS</div><h3 class="serif">人气绿植</h3></div><div class="more" onclick="go('shop')">查看全部 <svg class="ic sm"><use href="#i-chev"/></svg></div></div>
+        <div class="pgrid" id="homeProducts"></div>
+      </div>
+
+      <div class="sec">
+        <div class="pad sec-hd"><div><div class="en">CARE TIPS</div><h3 class="serif">养护小贴士</h3></div><div class="more" onclick="go('care')">更多 <svg class="ic sm"><use href="#i-chev"/></svg></div></div>
+        <div style="padding:0 20px;display:grid;gap:10px" id="homeTips"></div>
+      </div>
+
+      <div class="sec" style="padding:0 20px">
+        <div style="background:#EDF2E8;border-radius:18px;padding:18px;display:flex;gap:12px;align-items:center">
+          <svg class="ic lg" style="color:var(--green-600)"><use href="#i-truck"/></svg>
+          <div style="flex:1"><b style="font-size:12.5px">同城专车配送 · 30 天养死包换</b><p style="font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.6">专业打包，送达附赠手写养护卡</p></div>
+        </div>
+      </div>
+      <div class="foot">植间 ZHIJIAN GREEN · 让每一片叶子都被好好对待<br>© 2026 植间绿植生活馆</div>
+    </div>
+
+    <!-- ============ 养护 ============ -->
+    <div class="page" id="page-care">
+      <div class="pad" style="padding-top:12px"><div class="en" style="font-size:10px;letter-spacing:2px;color:var(--ink-3)">CARE GUIDE</div><h1 class="serif" style="font-size:25px;margin-top:5px">养护百科</h1></div>
+      <div class="care-hero" style="margin-top:16px">
+        <div class="k">PLANT DOCTOR · 植物医生在线</div>
+        <h2 class="serif">养不活？先别急着扔</h2>
+        <p>30 种常见室内植物的光照、浇水、温度全解析，还有黄叶烂根急救指南。</p>
+        <div class="st"><div><b>30+</b><span>植物图鉴</span></div><div><b>6</b><span>养护维度</span></div><div><b>1v1</b><span>在线问诊</span></div></div>
+      </div>
+      <div class="sec"><div class="chips" id="careChips"></div></div>
+      <div class="sec" id="careList"></div>
+      <div class="sec" style="padding:0 20px">
+        <div class="card" style="padding:16px;display:flex;gap:12px;align-items:center" onclick="go('contact')">
+          <div style="width:40px;height:40px;border-radius:13px;background:#EDF3E8;display:grid;place-items:center;color:var(--green-700);flex:none"><svg class="ic"><use href="#i-chat"/></svg></div>
+          <div style="flex:1"><b style="font-size:13px">没找到答案？问问植物医生</b><p style="font-size:11px;color:var(--ink-2);margin-top:4px">拍张照片，1 个工作日内回复</p></div>
+          <svg class="ic sm" style="color:var(--green-600)"><use href="#i-chev"/></svg>
+        </div>
+      </div>
+      <div class="foot">内容由植间养护团队整理 · 仅供参考</div>
+    </div>
+
+    <!-- ============ 商城 ============ -->
+    <div class="page" id="page-shop">
+      <div class="pad" style="padding-top:12px;display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="en" style="font-size:10px;letter-spacing:2px;color:var(--ink-3)">PLANT SHOP</div><h1 class="serif" style="font-size:25px;margin-top:5px">挑一盆带回家</h1></div>
+        <div class="icon-btn" onclick="openCart()"><svg class="ic sm"><use href="#i-bag"/></svg><i class="dot" id="shopDot" style="display:none"></i></div>
+      </div>
+      <div class="search" style="margin-top:14px"><svg class="ic sm"><use href="#i-search"/></svg><input id="shopSearch" placeholder="搜索植物名称或标签" oninput="renderShop()"></div>
+      <div class="sec" style="margin-top:16px"><div class="chips" id="shopChips"></div></div>
+      <div style="margin:14px 20px 0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none">
+        <div style="flex:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 11px;display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--ink-2)"><svg class="ic sm" style="color:var(--green-600)"><use href="#i-shield"/></svg>30 天包活</div>
+        <div style="flex:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 11px;display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--ink-2)"><svg class="ic sm" style="color:var(--green-600)"><use href="#i-truck"/></svg>同城专送</div>
+        <div style="flex:none;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 11px;display:flex;gap:6px;align-items:center;font-size:10.5px;color:var(--ink-2)"><svg class="ic sm" style="color:var(--green-600)"><use href="#i-book"/></svg>附养护卡</div>
+      </div>
+      <div class="sec"><div class="pgrid" id="shopGrid"></div></div>
+      <div class="foot">所有植物均为实拍挑选 · 因季节略有差异</div>
+    </div>
+
+    <!-- ============ 案例 ============ -->
+    <div class="page" id="page-cases">
+      <div class="pad" style="padding-top:12px"><div class="en" style="font-size:10px;letter-spacing:2px;color:var(--ink-3)">OUR PROJECTS</div><h1 class="serif" style="font-size:25px;margin-top:5px">他们把绿意带回了家</h1><p style="font-size:11.5px;color:var(--ink-2);margin-top:7px;line-height:1.7">从 20㎡ 的出租屋到 500㎡ 的办公空间，每一个角落都值得被认真对待。</p></div>
+      <div class="sec"><div class="chips" id="caseChips"></div></div>
+      <div class="sec" id="caseList"></div>
+      <div class="sec">
+        <div class="pad sec-hd"><div><div class="en">WHAT THEY SAY</div><h3 class="serif">客户说</h3></div></div>
+        <div class="cquote"><div class="qm">“</div><p>以前买过好几次绿植，最长撑不过两个月。这次植间上门看完采光，直接给了一份搭配清单，连哪盆放哪个位置都标好了。半年过去，龟背竹还冒了新叶。</p><div class="by">— 徐汇区 · 林女士 / 住宅全屋配置</div></div>
+      </div>
+      <div class="sec" style="padding:0 20px"><button class="btn block" onclick="go('contact')"><svg class="ic sm"><use href="#i-chat"/></svg> 我也想要一份搭配方案</button></div>
+      <div class="foot">案例照片经客户授权发布 · 请勿转载</div>
+    </div>
+
+    <!-- ============ 咨询 ============ -->
+    <div class="page" id="page-contact">
+      <div class="con-hero">
+        <div class="k">LET'S TALK · 我们在这里</div>
+        <h2 class="serif">聊聊你的绿植需求</h2>
+        <p>选品拿不准、植物状态不好、想给空间做整体配置，都可以找我们。</p>
+      </div>
+      <div class="sec"><div class="pad sec-hd"><div><div class="en">QUICK CONTACT</div><h3 class="serif">直接找我们</h3></div></div>
+        <div class="ways">
+          <div class="way" onclick="callUs()"><div class="wic"><svg class="ic"><use href="#i-phone"/></svg></div><div class="wt"><b>电话咨询</b><span>400-820-6688 · 9:00-20:00</span></div><div class="wa">拨打</div></div>
+          <div class="way" onclick="copyWechat()"><div class="wic w"><svg class="ic"><use href="#i-chat"/></svg></div><div class="wt"><b>微信客服</b><span>zhijian_green · 拍照问诊更方便</span></div><div class="wa"><svg class="ic sm" style="vertical-align:-3px"><use href="#i-copy"/></svg> 复制</div></div>
+          <div class="way" onclick="toast('门店地址：上海市徐汇区武康路 118 号')"><div class="wic o"><svg class="ic"><use href="#i-pin"/></svg></div><div class="wt"><b>到店逛逛</b><span>上海徐汇 · 武康路 118 号</span></div><div class="wa">查看</div></div>
+        </div>
+      </div>
+      <div class="sec"><div class="pad sec-hd"><div><div class="en">LEAVE A MESSAGE</div><h3 class="serif">说说你的需求</h3></div><span class="tiny muted">24h 内回复</span></div>
+        <div class="form">
+          <label>怎么称呼你 <i>*</i></label><input id="fName" placeholder="例如：林女士">
+          <label>联系电话 <i>*</i></label><input id="fPhone" type="tel" maxlength="11" placeholder="方便我们联系你">
+          <label>你想咨询</label>
+          <div class="opts" id="fOpts"></div>
+          <label>补充说明</label><textarea id="fMsg" placeholder="比如：客厅朝北、采光一般，想要好养的大型绿植…"></textarea>
+          <button class="btn block" onclick="submitForm()"><svg class="ic sm"><use href="#i-check"/></svg> 提交需求</button>
+          <p style="font-size:10px;color:var(--ink-3);text-align:center;margin-top:11px;line-height:1.6">提交即表示同意我们使用该信息与你联系，不会用于其他用途</p>
+        </div>
+      </div>
+      <div class="sec"><div class="pad sec-hd"><div><div class="en">FAQ</div><h3 class="serif">常见问题</h3></div></div>
+        <div class="faq" id="faqList"></div>
+      </div>
+      <div class="foot">植间绿植生活馆 · 周一至周日 9:00-20:00<br>上海市徐汇区武康路 118 号 · 400-820-6688</div>
+    </div>
+
+  </div>
+
+  <!-- tabbar -->
+  <div class="tabbar" id="tabbar"></div>
+
+  <!-- 弹层 -->
+  <div class="mask" id="mask" onclick="if(event.target===this)closeSheet()">
+    <div class="sheet">
+      <div class="sh"><i></i><b id="sheetTitle">详情</b><span class="close" onclick="closeSheet()"><svg class="ic"><use href="#i-close"/></svg></span></div>
+      <div class="sbody" id="sheetBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============ 数据 ============ */
+const PLANTS = [
+  {id:'p1',name:'龟背竹',lat:'Monstera deliciosa',cat:'观叶',level:'新手友好',img:'assets/img/plant-monstera.jpg',
+   light:'明亮散射光，忌长时间直射暴晒',water:'表层土干 2–3cm 再浇透，约 7–10 天一次',temp:'18–28℃，冬季不低于 10℃',humid:'喜湿润，每周擦叶并喷雾',
+   qa:'叶片发黄多是浇水过多或光照不足；不开裂通常是植株还小或光线太弱。'},
+  {id:'p2',name:'琴叶榕',lat:'Ficus lyrata',cat:'观叶',level:'有点讲究',img:'assets/img/plant-fiddle.jpg',
+   light:'靠窗明亮散射光，需要稳定光源',water:'见干见湿，7–10 天浇透一次',temp:'18–30℃，怕冷风直吹',humid:'保持通风，避免频繁挪动位置',
+   qa:'一换位置就掉叶是它的"脾气"，选定位置后尽量不要移动；底部落叶也可能是浇水不均。'},
+  {id:'p3',name:'虎皮兰',lat:'Sansevieria trifasciata',cat:'耐旱',level:'懒人首选',img:'assets/img/plant-snake.jpg',
+   light:'耐阴也喜光，散射光下长势最好',water:'15–20 天一次，宁干勿湿',temp:'15–30℃，冬季控水',humid:'极耐干燥，无需喷雾',
+   qa:'叶片发软、基部腐烂几乎都是低温 + 积水造成，冬季一个月浇一次即可。'},
+  {id:'p4',name:'粉掌万年青',lat:'Aglaonema "Pink"',cat:'观叶',level:'新手友好',img:'assets/img/plant-aglaonema.jpg',
+   light:'散射光或半阴，忌强光灼叶',water:'7–10 天一次，保持微润',temp:'18–28℃，冬季注意保暖',humid:'喜湿润，干燥时叶尖易枯',
+   qa:'叶尖干枯多为空气干燥或水中氯氟含量高，可用静置过的水并常向周围喷雾。'},
+  {id:'p5',name:'金钱树',lat:'Zamioculcas zamiifolia',cat:'耐旱',level:'懒人首选',img:'',
+   light:'耐阴，明亮散射光更佳',water:'15–20 天一次，块根极怕涝',temp:'18–30℃，低于 10℃ 需断水',humid:'耐干燥，保持通风',
+   qa:'整株发黄先检查盆底是否积水；金钱树地下有块状根茎，浇水过多最难救。'},
+  {id:'p6',name:'绿萝',lat:'Epipremnum aureum',cat:'水培',level:'新手友好',img:'',
+   light:'散射光，水培避免阳光直射',water:'土培 5–7 天；水培 7 天换水一次',temp:'15–28℃，冬季别放窗边',humid:'喜湿，可常喷叶面',
+   qa:'水培水浑、根系发黑要立刻洗根换水；土培黄叶多是盆土长期潮湿不透气。'}
+];
+
+const PRODUCTS = [
+  {id:'m1',name:'龟背竹 · 北欧陶盆',spec:'45–60cm / 含托盘',price:168,old:228,badge:'人气 TOP1',cat:'大型',img:'assets/img/plant-monstera.jpg',desc:'叶片开裂自然，配哑光米白陶盆。适应力强、耐半阴，是客厅与书房最不容易出错的第一盆大型绿植。',light:'散射光',water:'7–10 天',level:'新手友好'},
+  {id:'m2',name:'琴叶榕 · 橡木套盆',spec:'80–100cm / 落地款',price:298,old:368,badge:'设计师推荐',cat:'大型',img:'assets/img/plant-fiddle.jpg',desc:'大叶片自带雕塑感，配原色橡木套盆。适合采光好的客厅、玄关，一盆就能撑起整个角落的气质。',light:'明亮散射光',water:'7–10 天',level:'有点讲究'},
+  {id:'m3',name:'虎皮兰 · 赤陶盆',spec:'35–45cm / 桌面款',price:89,old:119,badge:'懒人首选',cat:'桌面',img:'assets/img/plant-snake.jpg',desc:'半个月浇一次水也能活得很好，夜间释放氧气，很适合放卧室、书桌和玄关柜。',light:'耐阴',water:'15–20 天',level:'懒人首选'},
+  {id:'m4',name:'粉掌万年青 · 白纹盆',spec:'30–40cm / 桌面款',price:128,old:168,badge:'新色到店',cat:'桌面',img:'assets/img/plant-aglaonema.jpg',desc:'绿底粉纹，一盆就有高级感。耐阴性好，卫生间、北向房间、办公桌都能养。',light:'半阴',water:'7–10 天',level:'新手友好'},
+  {id:'m5',name:'金钱树 · 圆筒盆',spec:'50–60cm / 送礼款',price:156,old:198,badge:'开业送礼',cat:'大型',img:'',art:'a1',desc:'叶片油亮整齐，寓意好又几乎不用管。乔迁、开业送礼最稳妥的一盆。',light:'耐阴',water:'15–20 天',level:'懒人首选'},
+  {id:'m6',name:'懒人养护组合',spec:'吸水盆 + 营养土 + 养护卡',price:69,old:99,badge:'配件',cat:'配件',img:'',art:'a2',desc:'自动吸水盆配透气营养土，出差旅行也不怕干。附植间手写养护卡与 30 天包活卡。',light:'—',water:'视植物',level:'通用'}
+];
+
+const CASES = [
+  {id:'c1',cat:'住宅',title:'把森林搬进客厅',sub:'上海 · 徐汇区 · 90㎡ 公寓',img:'assets/img/case-living.jpg',area:'90㎡',count:'12 株',cycle:'季度养护',
+   desc:'朝南客厅 + 北向书房，采光差异很大。我们按每个角落的光照条件分区配置：客厅用龟背竹与琴叶榕做视觉主景，书房放耐阴的万年青与虎皮兰，卧室选夜间释氧的虎皮兰。全部配送上门并摆放到位，每季度回访一次。',
+   list:'龟背竹 ×2 / 琴叶榕 ×1 / 粉掌万年青 ×3 / 虎皮兰 ×4 / 垂吊绿萝 ×2',
+   quote:'"最惊喜的是他们连哪盆放哪个位置都标好了，半年过去还冒了新叶。"',by:'林女士'},
+  {id:'c2',cat:'办公',title:'会呼吸的办公区',sub:'上海 · 静安区 · 320㎡ 联合办公',img:'',area:'320㎡',count:'46 株',cycle:'每月 2 次上门',
+   desc:'开放工位、会议室、前台三种场景。用大型落地植物做软隔断，桌面配小型耐阴盆栽，前台做季节主题更换。包含租摆、定期上门养护、黄叶即时更换，企业无需安排专人打理。',
+   list:'天堂鸟 ×6 / 橡皮树 ×8 / 金钱树 ×12 / 桌面小盆栽 ×20',
+   quote:'"不用自己记浇水，每月有人上门打理，黄了直接换，省心。"',by:'行政负责人 · 陈先生'},
+  {id:'c3',cat:'商业',title:'转角那片绿',sub:'上海 · 长宁区 · 85㎡ 社区咖啡馆',img:'',area:'85㎡',count:'23 株',cycle:'养护培训 + 月度回访',
+   desc:'临街西晒，普通绿植很难撑过夏天。我们用耐晒植物做窗边缓冲带，室内以垂吊与层架组合营造包围感，并为店员做了 1 次养护培训，日常自己就能打理。',
+   list:'垂吊绿萝 ×8 / 虎皮兰 ×6 / 龟背竹 ×3 / 蕨类组合 ×6',
+   quote:'"客人总问植物在哪买的，现在是店里的招牌角落了。"',by:'主理人 · 阿哲'}
+];
+
+const TIPS = [
+  {t:'浇水前先摸土，别按日历死记',d:'手指插入土中 2–3cm，干了再浇。多数家养绿植死于浇水过多，而非缺水。'},
+  {t:'黄叶先看位置和形态',d:'老叶整体发黄多是缺光或缺肥；叶尖焦枯多是空气干燥；叶片发软发黑则是烂根信号。'},
+  {t:'新植物到家先缓苗 7 天',d:'别急着换盆施肥，放散射光通风处适应环境，能大幅降低掉叶风险。'}
+];
+const FAQ = [
+  {q:'植物到家后养死了怎么办？',a:'所有零售盆栽享 30 天包活。保留原盆与购买记录，拍照联系微信客服，我们确认后补发同款或等额抵扣，来回运费由我们承担。'},
+  {q:'可以开发票吗？',a:'可以。零售与租摆服务均可开具增值税普通发票或专用发票，下单时备注抬头与税号，或联系客服补开。'},
+  {q:'同城配送范围与费用？',a:'上海市外环内免费专车配送，一般下单后 1–2 个工作日送达；外环外及江浙沪其他城市发顺丰专线，大件花盆建议自提或专车。'},
+  {q:'办公室租摆怎么收费？',a:'按植物数量与上门频次报价，含配送、摆放、定期养护与枯黄更换。填写上方需求表后，我们会在 24 小时内给出免费勘场与报价方案。'}
+];
+
+/* ============ 状态 ============ */
+let tab='home', careCat='全部', shopCat='全部', caseCat='全部', need='选植物/搭配';
+let cart={}, favs={};
+const TABS=[{k:'home',n:'首页',i:'i-home'},{k:'care',n:'养护',i:'i-book'},{k:'shop',n:'商城',i:'i-bag'},{k:'cases',n:'案例',i:'i-grid'},{k:'contact',n:'咨询',i:'i-chat'}];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const icon=(n,cls='ic sm')=>`<svg class="${cls}"><use href="#${n}"/></svg>`;
+
+/* ============ 渲染 ============ */
+function renderTabs(){
+  $('#tabbar').innerHTML=TABS.map(t=>`<div class="t ${tab===t.k?'on':''}" onclick="go('${t.k}')">${icon(t.i,'ic')}<span>${t.n}</span><span id="tabBadge_${t.k}"></span></div>`).join('');
+}
+function go(k){
+  tab=k;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('#page-'+k).classList.add('on');
+  renderTabs();updateBadges();
+  $('#screen').scrollTo({top:0,behavior:'instant'});
+  try{if(location.hash.slice(1)!==k)history.replaceState(null,'','#'+k)}catch(e){}
+}
+function artHTML(p){
+  if(p.img) return `<img src="${p.img}" alt="${esc(p.name)}">`;
+  return `<div class="art ${p.art||'a1'}"><svg viewBox="0 0 120 120" width="96" height="96" fill="none" stroke="#3B6247" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".78"><path d="M60 100V52"/><path d="M60 72C40 72 30 62 30 44c18 0 30 10 30 28z"/><path d="M60 62c0-18 10-28 28-28 0 18-10 28-28 28z"/><path d="M42 100h36l-4 14H46z"/></svg></div>`;
+}
+function pcard(p){
+  return `<div class="pcard" onclick="openProduct('${p.id}')">
+    <div class="ph">${artHTML(p)}<span class="badge">${esc(p.badge)}</span><span class="fav ${favs[p.id]?'on':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${icon('i-heart','ic sm')}</span></div>
+    <div class="pb"><b>${esc(p.name)}</b><div class="spec">${esc(p.spec)}</div>
+      <div class="row"><span class="price">¥${p.price} <small>¥${p.old}</small></span><span class="add" onclick="event.stopPropagation();addCart('${p.id}')">${icon('i-plus','ic sm')}</span></div>
+    </div></div>`;
+}
+function renderHome(){
+  $('#homeProducts').innerHTML=PRODUCTS.slice(0,4).map(pcard).join('');
+  $('#homeTips').innerHTML=TIPS.map((t,i)=>`<div class="card" style="padding:14px;display:flex;gap:11px;align-items:flex-start" onclick="go('care')"><div style="width:26px;height:26px;border-radius:9px;background:#EDF3E8;color:var(--green-700);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none">${i+1}</div><div><b style="font-size:12.5px">${t.t}</b><p style="font-size:11px;color:var(--ink-2);line-height:1.65;margin-top:4px">${t.d}</p></div></div>`).join('');
+}
+function renderCare(){
+  const cats=['全部','观叶','耐旱','水培'];
+  $('#careChips').innerHTML=cats.map(c=>`<div class="chip ${careCat===c?'on':''}" onclick="careCat='${c}';renderCare()">${c}</div>`).join('');
+  const list=PLANTS.filter(p=>careCat==='全部'||p.cat===careCat);
+  $('#careList').innerHTML=list.map(p=>`<div class="kcard" id="kc_${p.id}">
+    <div class="kh" onclick="document.getElementById('kc_${p.id}').classList.toggle('open')">
+      <div class="kimg">${p.img?`<img src="${p.img}" alt="${esc(p.name)}">`:`<div class="art a1" style="height:100%">${icon('i-sprout','ic lg')}</div>`}</div>
+      <div class="ki"><b>${esc(p.name)}</b><div class="lat">${esc(p.lat)}</div><div class="meta"><span class="tag">${p.cat}</span><span class="tag wood">${p.level}</span></div></div>
+      <span class="arw">${icon('i-down','ic sm')}</span>
+    </div>
+    <div class="kbody">
+      <div class="kv"><div class="kic">${icon('i-sun')}</div><div><b>光照</b><p>${p.light}</p></div></div>
+      <div class="kv"><div class="kic">${icon('i-drop')}</div><div><b>浇水</b><p>${p.water}</p></div></div>
+      <div class="kv"><div class="kic">${icon('i-thermo')}</div><div><b>温度</b><p>${p.temp}</p></div></div>
+      <div class="kv"><div class="kic">${icon('i-leaf')}</div><div><b>湿度与通风</b><p>${p.humid}</p></div></div>
+      <div class="qa"><b>Q · 常见问题</b><p>${p.qa}</p></div>
+    </div></div>`).join('');
+}
+function sceneSVG(kind){
+  const office=kind==='office';
+  const wall=office?'#CBDCC6':'#E7D6B6', floor=office?'#B9AE92':'#C9AC83';
+  const pot=office?'#9A7458':'#AE7C52', potD=office?'#7E5C44':'#8E6039';
+  const cols=['#2C5539','#3A6B48','#4C8155','#659B67'];
+  const plant=(x,y,s,t)=>{
+    let lv='';
+    for(let i=0;i<9;i++){const a=-72+i*18,ry=15+(i%3)*3;
+      lv+=`<ellipse cx="0" cy="-25" rx="6.4" ry="${ry}" transform="rotate(${a})" fill="${cols[(i+t)%4]}"/>`;}
+    return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="5" rx="21" ry="5" fill="#233D2A" opacity=".13"/><path d="M0 0V-36" stroke="#2C5539" stroke-width="2.6"/>${lv}<path d="M-13 0h26l-3.5 18h-19z" fill="${pot}"/><path d="M-14 0h28v3.5h-28z" fill="${potD}"/></g>`;
+  };
+  const small=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0v-13" stroke="#2C5539" stroke-width="1.8"/><ellipse cx="-5" cy="-15" rx="4" ry="8" transform="rotate(-38)" fill="#4C8155"/><ellipse cx="5" cy="-16" rx="4" ry="8" transform="rotate(38)" fill="#3A6B48"/><ellipse cx="0" cy="-19" rx="4" ry="8" fill="#659B67"/><path d="M-7 0h14l-2 9h-10z" fill="${pot}"/></g>`;
+  const id='tg'+(office?'1':'2');
+  return `<svg class="scene" viewBox="0 0 390 168" preserveAspectRatio="xMidYMid slice">
+  <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14281B" stop-opacity=".55"/><stop offset="1" stop-color="#14281B" stop-opacity="0"/></linearGradient></defs>
+  <rect width="390" height="168" fill="${wall}"/>
+  <rect x="0" y="126" width="390" height="42" fill="${floor}"/>
+  <rect x="14" y="10" width="96" height="90" rx="2" fill="#F7F6EC" stroke="${office?'#A9BEA6':'#CDB68F'}" stroke-width="3"/>
+  <path d="M62 10v90M14 55h96" stroke="${office?'#A9BEA6':'#CDB68F'}" stroke-width="3"/>
+  <path d="M110 62 200 168H110z" fill="#FFFFFF" opacity=".14"/>
+  <path d="M110 84 168 168h-58z" fill="#FFFFFF" opacity=".10"/>
+  <rect x="252" y="46" width="124" height="4" rx="2" fill="${office?'#9DB397':'#C3A579'}"/>
+  <rect x="252" y="84" width="124" height="4" rx="2" fill="${office?'#9DB397':'#C3A579'}"/>
+  ${small(272,46,.8)}${small(318,46,.72)}${small(358,46,.9)}
+  ${small(286,84,.72)}${small(344,84,.8)}
+  ${office
+    ? `<rect x="126" y="98" width="122" height="7" rx="2" fill="#8FA98C"/><path d="M134 105v21M240 105v21" stroke="#7B9578" stroke-width="4"/><rect x="150" y="82" width="34" height="15" rx="2" fill="#F1F2E9"/>`
+    : `<ellipse cx="186" cy="100" rx="54" ry="9" fill="#B48C63"/><path d="M186 100v24" stroke="#9A7550" stroke-width="5"/><path d="M162 124h48" stroke="#9A7550" stroke-width="4"/>`}
+  <rect x="118" y="126" width="272" height="4" fill="#000" opacity=".06"/>
+  ${plant(146,150,1.02,0)}${plant(226,152,.82,2)}${plant(316,154,1.16,1)}${plant(370,150,.7,3)}
+  <rect x="0" y="0" width="390" height="58" fill="url(#${id})"/>
+  </svg>`;
+}
+function renderCases(){
+  const cats=['全部','住宅','办公','商业'];
+  $('#caseChips').innerHTML=cats.map(c=>`<div class="chip ${caseCat===c?'on':''}" onclick="caseCat='${c}';renderCases()">${c}</div>`).join('');
+  const list=CASES.filter(c=>caseCat==='全部'||c.cat===caseCat);
+  $('#caseList').innerHTML=list.map((c,i)=>`<div class="case-card" onclick="openCase('${c.id}')">
+    <div class="cimg">${c.img?`<img src="${c.img}" alt="${esc(c.title)}">`:sceneSVG(c.cat==='办公'?'office':'cafe')}<div class="ov"></div><div class="cnum">CASE 0${CASES.indexOf(c)+1} · ${c.cat}</div><div class="ct"><b class="serif">${esc(c.title)}</b><span>${esc(c.sub)}</span></div></div>
+    <div class="cb"><div class="stats"><div><b>${c.area}</b><span>空间面积</span></div><div><b>${c.count}</b><span>绿植配置</span></div><div><b>${c.cycle}</b><span>服务周期</span></div></div><div class="lk">详情 ${icon('i-chev','ic sm')}</div></div>
+  </div>`).join('');
+}
+function renderShop(){
+  const cats=['全部','大型','桌面','配件'];
+  $('#shopChips').innerHTML=cats.map(c=>`<div class="chip ${shopCat===c?'on':''}" onclick="shopCat='${c}';renderShop()">${c}</div>`).join('');
+  const q=($('#shopSearch').value||'').trim().toLowerCase();
+  const list=PRODUCTS.filter(p=>(shopCat==='全部'||p.cat===shopCat)&&(!q||(p.name+p.spec+p.badge+p.level).toLowerCase().includes(q)));
+  $('#shopGrid').innerHTML=list.length?list.map(pcard).join(''):`<div class="empty" style="grid-column:1/-1">没找到相关绿植，换个词试试 🌿</div>`;
+}
+function renderContact(){
+  const opts=['选植物/搭配','办公室配置','养护问诊','门店与售后'];
+  $('#fOpts').innerHTML=opts.map(o=>`<div class="opt ${need===o?'on':''}" onclick="need='${o}';renderContact()">${o}</div>`).join('');
+  $('#faqList').innerHTML=FAQ.map(f=>`<div class="fi" onclick="this.classList.toggle('open')"><div class="fq"><span>${f.q}</span><span class="arw" style="color:var(--ink-3)">${icon('i-down','ic sm')}</span></div><div class="fa">${f.a}</div></div>`).join('');
+}
+
+/* ============ 交互 ============ */
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
+function toggleRemind(){const s=$('#remindSw');s.classList.toggle('on');toast(s.classList.contains('on')?'已开启养护提醒':'已关闭养护提醒')}
+function toggleFav(id){favs[id]=!favs[id];toast(favs[id]?'已收藏 ♥':'已取消收藏');renderHome();renderShop()}
+function addCart(id){cart[id]=(cart[id]||0)+1;updateBadges();toast('已加入购物车')}
+function cartCount(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+function cartTotal(){return Object.entries(cart).reduce((s,[id,n])=>s+(PRODUCTS.find(p=>p.id===id)?.price||0)*n,0)}
+function updateBadges(){
+  const n=cartCount();
+  ['homeDot','shopDot'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=n?'block':'none'});
+  const b=document.getElementById('tabBadge_shop');
+  if(b)b.innerHTML=n?`<span class="cbadge">${n}</span>`:'';
+}
+function openSheet(title,html){$('#sheetTitle').textContent=title;$('#sheetBody').innerHTML=html;$('#mask').classList.add('on')}
+function closeSheet(){$('#mask').classList.remove('on')}
+function openProduct(id){
+  const p=PRODUCTS.find(x=>x.id===id);
+  openSheet('商品详情',`
+    <div style="height:210px;border-radius:18px;overflow:hidden;background:#EEF1E9">${artHTML(p)}</div>
+    <div class="detail-h"><div><b class="serif">${esc(p.name)}</b><span class="lat">含专属养护卡 · 30 天包活</span></div><span class="tag">${p.cat}</span></div>
+    <div class="detail-price">¥${p.price} <small>原价 ¥${p.old}</small></div>
+    <p class="detail-desc">${p.desc}</p>
+    <div class="kv2"><div><b>光照需求</b><span>${p.light}</span></div><div><b>浇水频率</b><span>${p.water}</span></div><div><b>养护难度</b><span>${p.level}</span></div><div><b>规格</b><span>${p.spec}</span></div></div>
+    <div style="display:flex;gap:10px;margin-top:20px"><button class="btn ghost" style="flex:1" onclick="toggleFav('${p.id}');openProduct('${p.id}')">${icon('i-heart','ic sm')} 收藏</button><button class="btn" style="flex:2" onclick="addCart('${p.id}');closeSheet()">${icon('i-bag','ic sm')} 加入购物车 · ¥${p.price}</button></div>
+    <p style="font-size:10.5px;color:var(--ink-3);text-align:center;margin-top:13px;line-height:1.7">同城专车配送 · 送达附手写养护卡 · 30 天养死包换</p>`);
+}
+function openCase(id){
+  const c=CASES.find(x=>x.id===id);
+  openSheet('案例详情',`
+    <div style="height:180px;border-radius:18px;overflow:hidden;background:#E8EDE4">${c.img?`<img class="detail-img" src="${c.img}" alt="${esc(c.title)}">`:sceneSVG(c.cat==='办公'?'office':'cafe')}</div>
+    <div class="detail-h"><div><b class="serif" style="font-size:21px">${esc(c.title)}</b><span class="lat">${esc(c.sub)}</span></div><span class="tag wood">${c.cat}空间</span></div>
+    <div class="kv2"><div><b>空间面积</b><span>${c.area}</span></div><div><b>绿植数量</b><span>${c.count}</span></div><div><b>服务内容</b><span>${c.cycle}</span></div><div><b>项目地点</b><span>上海</span></div></div>
+    <p class="detail-desc">${c.desc}</p>
+    <div style="background:#EDF2E8;border-radius:14px;padding:13px;margin-top:14px"><b style="font-size:11px;color:var(--green-700)">配置清单</b><p style="font-size:11.5px;color:var(--ink-2);line-height:1.7;margin-top:6px">${c.list}</p></div>
+    <div class="cquote" style="margin:14px 0 0"><div class="qm">“</div><p>${c.quote}</p><div class="by">— ${c.by}</div></div>
+    <button class="btn block" style="margin-top:18px" onclick="closeSheet();go('contact')">${icon('i-chat','ic sm')} 获取同款搭配方案</button>`);
+}
+function openCart(){
+  const items=Object.entries(cart).filter(([,n])=>n>0);
+  if(!items.length){openSheet('购物车',`<div class="empty" style="padding:60px 0">购物车还是空的 🌱<br><br><button class="btn sm" onclick="closeSheet();go('shop')">去挑一盆</button></div>`);return}
+  openSheet(`购物车 · ${cartCount()} 件`,items.map(([id,n])=>{
+    const p=PRODUCTS.find(x=>x.id===id);
+    return `<div class="cart-item"><div style="width:58px;height:58px;border-radius:11px;overflow:hidden;flex:none;background:#EEF1E9">${artHTML(p)}</div>
+      <div class="ci"><b>${esc(p.name)}</b><span>${esc(p.spec)}</span><div class="qty"><button onclick="chg('${id}',-1)">−</button>${n}<button onclick="chg('${id}',1)">+</button></div></div>
+      <div class="cp">¥${p.price*n}</div></div>`}).join('')+
+    `<div class="cart-foot"><div class="tot"><small>合计（不含配送费）</small><b>¥${cartTotal()}</b></div><button class="btn" onclick="checkout()">去结算 ${icon('i-chev','ic sm')}</button></div>
+     <p style="font-size:10.5px;color:var(--ink-3);text-align:center;margin-top:12px">上海市外环内免费专车配送</p>`);
+}
+function chg(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];updateBadges();openCart()}
+function checkout(){
+  if(!cartCount())return;
+  $('#toast').classList.remove('on');
+  const no='ZJ'+String(Date.now()).slice(-8);
+  cart={};updateBadges();
+  $('#sheetTitle').textContent='下单成功';
+  $('#sheetBody').innerHTML=`<div class="success"><div class="ok">${icon('i-check','ic lg')}</div><b class="serif">谢谢你把绿意带回家</b><p>订单已提交，客服会在 24 小时内联系你确认<br>配送时间与摆放位置。</p><div class="no">订单号 ${no}</div><div style="margin-top:22px;display:flex;gap:10px;justify-content:center"><button class="btn ghost sm" onclick="closeSheet()">继续逛逛</button><button class="btn sm" onclick="closeSheet();go('contact')">联系客服</button></div></div>`;
+}
+function callUs(){toast('正在呼叫 400-820-6688');setTimeout(()=>{window.location.href='tel:4008206688'},400)}
+function copyWechat(){
+  const t='zhijian_green';
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('微信号已复制：'+t)).catch(()=>toast('微信号：'+t))}
+  else{const i=document.createElement('textarea');i.value=t;document.body.appendChild(i);i.select();try{document.execCommand('copy');toast('微信号已复制：'+t)}catch(e){toast('微信号：'+t)}i.remove()}
+}
+function submitForm(){
+  const name=$('#fName').value.trim(),phone=$('#fPhone').value.trim(),msg=$('#fMsg').value.trim();
+  if(!name){toast('请填写称呼');$('#fName').focus();return}
+  if(!/^1[3-9]\d{9}$/.test(phone)){toast('请填写正确的 11 位手机号');$('#fPhone').focus();return}
+  const no='ZX'+String(Date.now()).slice(-8);
+  openSheet('提交成功',`<div class="success"><div class="ok">${icon('i-check','ic lg')}</div><b class="serif">收到啦，${esc(name)}</b><p>你的「${esc(need)}」需求已记录${msg?'<br>留言：'+esc(msg):''}<br>顾问会在 24 小时内通过 ${phone.slice(0,3)}****${phone.slice(-4)} 与你联系。</p><div class="no">咨询单号 ${no}</div><div style="margin-top:22px"><button class="btn sm" onclick="closeSheet()">好的</button></div></div>`);
+  $('#fName').value='';$('#fPhone').value='';$('#fMsg').value='';
+}
+function tick(){const d=new Date();$('#clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+
+renderTabs();renderHome();renderCare();renderShop();renderCases();renderContact();updateBadges();tick();setInterval(tick,30000);
+const initTab=(location.hash||'').slice(1);
+if(TABS.some(t=>t.k===initTab))go(initTab);
+window.addEventListener('hashchange',()=>{
+  const k=(location.hash||'').slice(1);
+  if(TABS.some(t=>t.k===k)&&k!==tab)go(k);
+});
+</script>
+</body>
+</html>

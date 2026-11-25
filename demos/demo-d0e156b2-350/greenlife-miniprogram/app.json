@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/care/care",
+    "pages/shop/shop",
+    "pages/cases/cases",
+    "pages/contact/contact"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F7F5EE",
+    "navigationBarTitleText": "植间",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F7F5EE"
+  },
+  "tabBar": {
+    "color": "#94A094",
+    "selectedColor": "#2A4A34",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "images/tab/home.png", "selectedIconPath": "images/tab/home-on.png" },
+      { "pagePath": "pages/care/care", "text": "养护", "iconPath": "images/tab/book.png", "selectedIconPath": "images/tab/book-on.png" },
+      { "pagePath": "pages/shop/shop", "text": "商城", "iconPath": "images/tab/bag.png", "selectedIconPath": "images/tab/bag-on.png" },
+      { "pagePath": "pages/cases/cases", "text": "案例", "iconPath": "images/tab/grid.png", "selectedIconPath": "images/tab/grid-on.png" },
+      { "pagePath": "pages/contact/contact", "text": "咨询", "iconPath": "images/tab/chat.png", "selectedIconPath": "images/tab/chat-on.png" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
