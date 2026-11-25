@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>萌宠农场 · 小程序Demo</title>
+<style>
+/* ===== Reset & Base ===== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;font-size:14px;color:#333;background:#000}
+:root{
+  --primary:#ff7a45;
+  --primary-light:#fff7e6;
+  --primary-dark:#d4380d;
+  --secondary:#52c41a;
+  --blue:#1890ff;
+  --purple:#722ed1;
+  --bg:#f5f5f5;
+  --card:#fff;
+  --border:#f0f0f0;
+  --text-secondary:#8c8c8c;
+  --text-third:#bfbfbf;
+  --radius:12px;
+  --shadow:0 2px 8px rgba(0,0,0,.06);
+  --tab-h:56px;
+}
+
+/* ===== Phone Frame ===== */
+#app{
+  width:100%;max-width:390px;height:100vh;max-height:844px;margin:0 auto;
+  background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column;
+}
+@media(min-width:500px){
+  body{display:flex;align-items:center;justify-content:center;background:#1a1a1a}
+  #app{border-radius:40px;box-shadow:0 0 0 12px #2a2a2a,0 0 0 14px #3a3a3a,0 20px 60px rgba(0,0,0,.5);height:844px}
+}
+
+/* ===== Status Bar ===== */
+.status-bar{
+  height:44px;background:var(--primary);color:#fff;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;font-size:12px;font-weight:600;
+  flex-shrink:0;position:relative;z-index:100;
+}
+.status-bar .time{font-size:14px}
+.status-bar .icons{display:flex;gap:5px;align-items:center}
+.status-bar .icons svg{width:16px;height:16px;fill:#fff}
+
+/* ===== Page Container ===== */
+.page-container{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;-webkit-overflow-scrolling:touch}
+.page-container::-webkit-scrollbar{width:0}
+.page{display:none;min-height:100%;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== Sub Page (overlay) ===== */
+.sub-page{
+  position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);
+  z-index:200;display:none;flex-direction:column;
+  animation:slideIn .3s ease;
+}
+.sub-page.active{display:flex}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.sub-header{
+  height:44px;background:#fff;display:flex;align-items:center;padding:0 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0;position:relative;
+}
+.sub-header .back-btn{font-size:24px;color:#333;cursor:pointer;line-height:1;padding:4px}
+.sub-header .title{flex:1;text-align:center;font-size:17px;font-weight:600;margin-right:32px}
+.sub-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sub-body::-webkit-scrollbar{width:0}
+
+/* ===== Bottom Tab Bar ===== */
+.tab-bar{
+  height:var(--tab-h);background:#fff;display:flex;border-top:1px solid var(--border);
+  flex-shrink:0;position:relative;z-index:100;
+}
+.tab-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;cursor:pointer;color:var(--text-third);transition:color .2s;
+}
+.tab-item.active{color:var(--primary)}
+.tab-item .tab-icon{font-size:22px;line-height:1}
+.tab-item .tab-label{font-size:10px;font-weight:500}
+
+/* ===== Common Components ===== */
+.section{padding:12px 16px}
+.card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px}
+
+/* Search bar */
+.search-bar{
+  display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--primary);
+}
+.search-input{
+  flex:1;background:rgba(255,255,255,.9);border-radius:20px;padding:7px 14px;
+  display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);
+}
+.search-input svg{width:14px;height:14px;fill:var(--text-secondary)}
+
+/* Banner */
+.banner{padding:0 16px 12px;background:var(--primary)}
+.banner-slider{
+  border-radius:var(--radius);overflow:hidden;height:150px;position:relative;background:linear-gradient(135deg,#ff7a45,#ffa940);
+}
+.banner-slide{
+  position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;
+  opacity:0;transition:opacity .5s;
+}
+.banner-slide.active{opacity:1}
+.banner-slide h2{font-size:20px;margin-bottom:6px;text-shadow:0 2px 4px rgba(0,0,0,.2)}
+.banner-slide p{font-size:13px;opacity:.9}
+.banner-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px}
+.banner-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)}
+.banner-dots .dot.active{background:#fff;width:16px;border-radius:3px}
+
+/* Grid nav */
+.grid-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:12px 0;padding:12px 16px;background:#fff;margin:0 16px 12px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.grid-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.grid-item .grid-icon{
+  width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.grid-item .grid-label{font-size:11px;color:#595959}
+
+/* Section title */
+.section-title{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:10px}
+.section-title h3{font-size:16px;font-weight:700}
+.section-title .more{font-size:12px;color:var(--text-secondary);cursor:pointer}
+
+/* Horizontal scroll cards */
+.h-scroll{display:flex;gap:12px;overflow-x:auto;padding:0 16px 12px;scroll-behavior:smooth}
+.h-scroll::-webkit-scrollbar{height:0}
+.h-card{flex-shrink:0;width:140px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+.h-card .h-img{width:100%;height:100px;background:linear-gradient(135deg,#f0f0f0,#e8e8e8);display:flex;align-items:center;justify-content:center;font-size:40px}
+.h-card .h-info{padding:8px 10px}
+.h-card .h-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-card .h-price{font-size:13px;color:var(--primary);font-weight:700;margin-top:4px}
+.h-card .h-price small{font-size:10px;font-weight:400}
+.h-card .h-tag{display:inline-block;font-size:9px;background:var(--primary-light);color:var(--primary);padding:1px 6px;border-radius:4px;margin-top:4px}
+
+/* Product grid */
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 12px}
+.product-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+.product-card .p-img{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#fafafa,#f0f0f0);display:flex;align-items:center;justify-content:center;font-size:48px}
+.product-card .p-info{padding:8px}
+.product-card .p-name{font-size:12px;font-weight:600;line-height:1.3;height:32px;overflow:hidden}
+.product-card .p-price{font-size:15px;color:var(--primary);font-weight:700;margin-top:4px}
+.product-card .p-price small{font-size:10px;font-weight:400}
+.product-card .p-sales{font-size:10px;color:var(--text-third);margin-top:2px}
+
+/* Knowledge list */
+.knowledge-item{display:flex;gap:12px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);cursor:pointer}
+.knowledge-item .k-img{width:80px;height:60px;border-radius:8px;background:linear-gradient(135deg,#e6f7ff,#bae7ff);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.knowledge-item .k-info{flex:1;min-width:0}
+.knowledge-item .k-title{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.knowledge-item .k-meta{font-size:11px;color:var(--text-third);margin-top:6px;display:flex;gap:8px}
+
+/* Community post */
+.post-item{background:#fff;padding:14px 16px;border-bottom:6px solid var(--bg);cursor:pointer}
+.post-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.post-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.post-user-info{flex:1}
+.post-username{font-size:13px;font-weight:600}
+.post-meta{font-size:11px;color:var(--text-third)}
+.post-content{font-size:14px;line-height:1.6;margin-bottom:10px}
+.post-images{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px}
+.post-images .post-img{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.post-actions{display:flex;gap:20px}
+.post-action{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);cursor:pointer}
+.post-action svg{width:16px;height:16px;fill:var(--text-secondary)}
+.post-action.liked svg{fill:var(--primary)}
+.post-action.liked{color:var(--primary)}
+
+/* Activity card */
+.activity-card{background:#fff;border-radius:var(--radius);overflow:hidden;margin:0 16px 12px;box-shadow:var(--shadow);cursor:pointer}
+.activity-card .a-banner{height:120px;display:flex;align-items:center;justify-content:center;font-size:50px;position:relative}
+.activity-card .a-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px}
+.activity-card .a-info{padding:12px}
+.activity-card .a-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.activity-card .a-desc{font-size:12px;color:var(--text-secondary);margin-bottom:8px}
+.activity-card .a-meta{display:flex;gap:12px;font-size:11px;color:var(--text-third);margin-bottom:8px}
+.activity-card .a-bottom{display:flex;align-items:center;justify-content:space-between}
+.activity-card .a-price{font-size:18px;color:var(--primary);font-weight:700}
+.activity-card .a-price small{font-size:11px;font-weight:400}
+.activity-card .a-btn{background:var(--primary);color:#fff;border:none;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer}
+
+/* Member card */
+.member-header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px 16px;color:#fff}
+.member-card-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.member-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#ff7a45,#ffa940);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:2px solid rgba(255,255,255,.2)}
+.member-info{flex:1}
+.member-name{font-size:17px;font-weight:700;display:flex;align-items:center;gap:6px}
+.member-level-tag{font-size:10px;background:linear-gradient(90deg,#ffd700,#ffaa00);color:#333;padding:1px 8px;border-radius:8px;font-weight:600}
+.member-growth{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px}
+.growth-bar{height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin-top:6px;overflow:hidden}
+.growth-fill{height:100%;background:linear-gradient(90deg,#ffd700,#ffaa00);border-radius:2px}
+.member-stats{display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:12px}
+.member-stat{flex:1;text-align:center}
+.member-stat .stat-num{font-size:18px;font-weight:700}
+.member-stat .stat-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+
+/* Menu list */
+.menu-list{background:#fff;border-radius:var(--radius);margin:0 16px 12px;overflow:hidden;box-shadow:var(--shadow)}
+.menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.menu-item:last-child{border-bottom:none}
+.menu-item .m-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.menu-item .m-label{flex:1;font-size:14px;font-weight:500}
+.menu-item .m-value{font-size:12px;color:var(--text-third)}
+.menu-item .m-arrow{color:var(--text-third);font-size:12px}
+
+/* Pet card */
+.pet-card{background:#fff;border-radius:var(--radius);margin:0 16px 12px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;display:flex;padding:12px;gap:12px;align-items:center}
+.pet-avatar{width:60px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.pet-info{flex:1}
+.pet-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px}
+.pet-detail{font-size:12px;color:var(--text-secondary);margin-top:4px}
+.pet-tags{display:flex;gap:4px;margin-top:6px}
+.pet-tag{font-size:10px;padding:1px 6px;border-radius:4px}
+
+/* Buttons */
+.btn-primary{
+  background:var(--primary);color:#fff;border:none;padding:12px;border-radius:24px;
+  font-size:15px;font-weight:600;cursor:pointer;width:100%;display:block;text-align:center;
+}
+.btn-primary:active{background:var(--primary-dark)}
+.btn-outline{
+  background:transparent;color:var(--primary);border:1px solid var(--primary);padding:8px 20px;
+  border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
+}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--text-third)}
+.empty .empty-icon{font-size:48px;margin-bottom:12px}
+.empty .empty-text{font-size:14px}
+
+/* Tab switcher */
+.tab-switcher{display:flex;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.tab-switcher .ts-item{flex:1;text-align:center;padding:12px 0;font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer;position:relative}
+.tab-switcher .ts-item.active{color:var(--primary);font-weight:700}
+.tab-switcher .ts-item.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--primary);border-radius:2px}
+
+/* Category sidebar */
+.cat-layout{display:flex;height:100%}
+.cat-sidebar{width:90px;background:#f5f5f5;overflow-y:auto;flex-shrink:0}
+.cat-sidebar::-webkit-scrollbar{width:0}
+.cat-side-item{padding:14px 8px;text-align:center;font-size:12px;cursor:pointer;border-left:3px solid transparent;color:#595959}
+.cat-side-item.active{background:#fff;color:var(--primary);font-weight:600;border-left-color:var(--primary)}
+.cat-content{flex:1;overflow-y:auto;padding:12px;background:#fff}
+.cat-content::-webkit-scrollbar{width:0}
+.cat-banner{height:80px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.cat-group-title{font-size:13px;font-weight:700;margin-bottom:8px;color:#595959}
+
+/* Cart */
+.cart-item{display:flex;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)}
+.cart-item .ci-check{width:20px;height:20px;border:2px solid #d9d9d9;border-radius:50%;flex-shrink:0;margin-top:30px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cart-item .ci-check.checked{background:var(--primary);border-color:var(--primary)}
+.cart-item .ci-check.checked::after{content:'✓';color:#fff;font-size:12px}
+.cart-item .ci-img{width:80px;height:80px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;background:#fafafa}
+.cart-item .ci-info{flex:1;min-width:0}
+.cart-item .ci-name{font-size:13px;font-weight:600;line-height:1.3}
+.cart-item .ci-spec{font-size:11px;color:var(--text-secondary);margin-top:4px}
+.cart-item .ci-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cart-item .ci-price{font-size:16px;color:var(--primary);font-weight:700}
+.cart-qty{display:flex;align-items:center;gap:8px}
+.cart-qty .qty-btn{width:24px;height:24px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border:none}
+.cart-qty .qty-num{font-size:14px;min-width:20px;text-align:center}
+
+/* Order item */
+.order-card{background:#fff;margin:0 16px 12px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.order-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.order-no{font-size:12px;color:var(--text-secondary)}
+.order-status{font-size:13px;font-weight:600}
+.order-status.pending{color:#faad14}
+.order-status.paid{color:var(--blue)}
+.order-status.done{color:var(--secondary)}
+.order-product{display:flex;gap:10px;padding:12px 16px}
+.order-product .op-img{width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;background:#fafafa}
+.order-product .op-info{flex:1}
+.order-product .op-name{font-size:13px;font-weight:600}
+.order-product .op-spec{font-size:11px;color:var(--text-secondary);margin-top:4px}
+.order-product .op-qty{font-size:12px;color:var(--text-third);margin-top:4px}
+.order-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border)}
+.order-total{font-size:13px}
+.order-total span{color:var(--primary);font-weight:700;font-size:15px}
+.order-actions{display:flex;gap:8px}
+.order-btn{padding:5px 14px;border-radius:16px;font-size:12px;cursor:pointer;border:1px solid #d9d9d9;background:#fff;color:#595959}
+.order-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Coupon */
+.coupon-card{display:flex;margin:0 16px 12px;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.coupon-left{width:100px;background:linear-gradient(135deg,#ff7a45,#ffa940);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.coupon-left .cl-amount{font-size:28px;font-weight:700}
+.coupon-left .cl-amount small{font-size:14px}
+.coupon-left .cl-desc{font-size:11px;opacity:.9}
+.coupon-right{flex:1;background:#fff;padding:12px;display:flex;flex-direction:column;justify-content:space-between}
+.coupon-right .cr-name{font-size:14px;font-weight:600}
+.coupon-right .cr-scope{font-size:11px;color:var(--text-secondary);margin-top:4px}
+.coupon-right .cr-valid{font-size:10px;color:var(--text-third)}
+.coupon-right .cr-btn{align-self:flex-end;background:var(--primary);color:#fff;border:none;padding:4px 14px;border-radius:14px;font-size:12px;cursor:pointer}
+
+/* QR code */
+.qr-container{background:#fff;margin:16px;border-radius:var(--radius);padding:30px;text-align:center;box-shadow:var(--shadow)}
+.qr-box{width:200px;height:200px;margin:16px auto;background:#f5f5f5;border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative}
+.qr-pattern{width:180px;height:180px;background:
+  linear-gradient(45deg,#000 25%,transparent 25%),
+  linear-gradient(-45deg,#000 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#000 75%),
+  linear-gradient(-45deg,transparent 75%,#000 75%);
+  background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0;
+  border-radius:8px}
+
+/* Forms */
+.form-group{padding:14px 16px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.form-label{width:80px;font-size:14px;color:#595959;flex-shrink:0}
+.form-input{flex:1;border:none;font-size:14px;outline:none;background:transparent;text-align:right}
+.form-value{flex:1;font-size:14px;text-align:right;color:var(--text-secondary)}
+
+/* Toast */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;display:none;pointer-events:none;max-width:260px;text-align:center}
+.toast.show{display:block;animation:toastShow .3s}
+@keyframes toastShow{from{opacity:0}to{opacity:1}}
+
+/* Bottom action bar */
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);
+  padding:8px 16px;display:flex;align-items:center;gap:12px;z-index:50;max-width:390px;margin:0 auto;
+}
+.bottom-bar .bb-total{flex:1;font-size:13px}
+.bottom-bar .bb-total span{color:var(--primary);font-size:20px;font-weight:700}
+.bottom-bar .bb-btn{background:var(--primary);color:#fff;border:none;padding:10px 24px;border-radius:22px;font-size:15px;font-weight:600;cursor:pointer}
+
+/* Vaccine timeline */
+.timeline{padding:16px}
+.timeline-item{display:flex;gap:12px;padding-bottom:20px;position:relative}
+.timeline-item::before{content:'';position:absolute;left:15px;top:28px;bottom:0;width:2px;background:var(--border)}
+.timeline-item:last-child::before{display:none}
+.timeline-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;z-index:1}
+.timeline-content{flex:1}
+.timeline-title{font-size:14px;font-weight:600}
+.timeline-date{font-size:12px;color:var(--text-secondary);margin:2px 0 4px}
+.timeline-desc{font-size:12px;color:#595959;line-height:1.5;background:#f9f9f9;padding:8px;border-radius:6px}
+
+/* Weight chart */
+.weight-chart{background:#fff;margin:0 16px 12px;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.chart-svg{width:100%;height:120px}
+
+/* FAB button */
+.fab{
+  position:fixed;bottom:72px;right:16px;width:48px;height:48px;border-radius:50%;
+  background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:24px;box-shadow:0 4px 12px rgba(255,122,69,.4);cursor:pointer;z-index:50;border:none;
+}
+
+/* Tag pills */
+.tag-pills{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px}
+.tag-pill{font-size:11px;padding:3px 10px;border-radius:12px;background:#f0f0f0;color:#595959;cursor:pointer}
+.tag-pill.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+
+/* Time slot */
+.time-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px}
+.time-slot{border:1px solid var(--border);border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;background:#fff}
+.time-slot .ts-time{font-size:12px;font-weight:600}
+.time-slot .ts-cap{font-size:10px;color:var(--text-third);margin-top:2px}
+.time-slot.active{border-color:var(--primary);background:var(--primary-light)}
+.time-slot.disabled{opacity:.4;cursor:not-allowed;background:#f5f5f5}
+
+/* Date picker */
+.date-row{display:flex;gap:8px;overflow-x:auto;padding:12px 16px}
+.date-row::-webkit-scrollbar{height:0}
+.date-item{flex-shrink:0;width:52px;text-align:center;padding:8px 0;border-radius:8px;cursor:pointer;background:#fff;border:1px solid var(--border)}
+.date-item .di-week{font-size:11px;color:var(--text-secondary)}
+.date-item .di-day{font-size:16px;font-weight:700;margin-top:2px}
+.date-item.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.date-item.active .di-week{color:rgba(255,255,255,.8)}
+
+/* Counter */
+.counter{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--border)}
+.counter .c-label{flex:1;font-size:14px}
+.counter .c-ctrl{display:flex;align-items:center;gap:10px}
+.counter .c-btn{width:28px;height:28px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:none}
+.counter .c-num{font-size:16px;font-weight:600;min-width:24px;text-align:center}
+
+/* Mask */
+.mask{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:300;display:none}
+.mask.active{display:block}
+
+/* Extension placeholder */
+.ext-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+.ext-placeholder .ext-icon{font-size:60px;margin-bottom:16px}
+.ext-placeholder .ext-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.ext-placeholder .ext-desc{font-size:13px;color:var(--text-secondary);line-height:1.6}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg viewBox="0 0 24 24"><path d="M12 3C7.95 3 5.21 4.41 3.56 6.29c-.36.41-.34 1.03.05 1.39.38.35.98.33 1.35-.05C6.29 6.16 8.5 5 12 5s5.71 1.16 7.04 2.63c.37.38.97.4 1.35.05.39-.36.41-.98.05-1.39C18.79 4.41 16.05 3 12 3zm0 4c-2.63 0-4.42.93-5.55 2.05-.4.39-.4 1.02-.01 1.41.37.37.97.37 1.35.01C8.64 9.66 9.93 9 12 9s3.36.66 4.21 1.47c.38.36.98.36 1.35-.01.39-.39.39-1.02-.01-1.41C16.42 7.93 14.63 7 12 7zm0 4c-1.2 0-2.05.46-2.64 1.05-.4.39-.4 1.02-.01 1.41.37.37.97.37 1.35.01.29-.28.67-.47 1.3-.47s1.01.19 1.3.47c.38.36.98.36 1.35-.01.39-.39.39-1.02-.01-1.41C14.05 11.46 13.2 11 12 11zm0 3a1 1 0 100 2 1 1 0 000-2z"/></svg>
+      <span style="font-size:11px">5G</span>
+      <svg viewBox="0 0 24 24"><path d="M2 22h20V2L2 22z" opacity=".3"/><path d="M2 22h20V2L2 22z"/></svg>
+    </div>
+  </div>
+
+  <!-- Page Container -->
+  <div class="page-container" id="pageContainer">
+    
+    <!-- ============ HOME PAGE ============ -->
+    <div class="page active" id="page-home">
+      <!-- Search -->
+      <div class="search-bar">
+        <div class="search-input" onclick="showToast('搜索功能开发中')">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <span>搜索活动、商品、知识...</span>
+        </div>
+        <span style="font-size:22px;cursor:pointer" onclick="openSubPage('sub-message')">✉️</span>
+      </div>
+
+      <!-- Banner -->
+      <div class="banner">
+        <div class="banner-slider" id="bannerSlider">
+          <div class="banner-slide active" style="background:linear-gradient(135deg,#ff7a45,#ffa940)">
+            <h2>🐾 农场撸宠体验</h2>
+            <p>周末亲子好去处 · 在线预约享9折</p>
+          </div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#52c41a,#389e0d)">
+            <h2>🐶 新品上架</h2>
+            <p>天然有机宠粮 · 首单立减20元</p>
+          </div>
+          <div class="banner-slide" style="background:linear-gradient(135deg,#722ed1,#9254de)">
+            <h2>🏆 会员日特惠</h2>
+            <p>每周三会员专享 · 积分翻倍</p>
+          </div>
+          <div class="banner-dots" id="bannerDots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member card entry -->
+      <div style="margin:0 16px 12px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:14px 16px;color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="switchTab(3);openSubPage('sub-member')">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#ffaa00);display:flex;align-items:center;justify-content:center;font-size:20px">⭐</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">开通会员享专属权益</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">活动8折 · 积分翻倍 · 免费体检</div>
+        </div>
+        <div style="font-size:12px;background:linear-gradient(90deg,#ffd700,#ffaa00);color:#333;padding:4px 12px;border-radius:12px;font-weight:600">立即查看</div>
+      </div>
+
+      <!-- Grid Nav -->
+      <div class="grid-nav">
+        <div class="grid-item" onclick="switchTab(1)">
+          <div class="grid-icon" style="background:#e6f7ff">📝</div>
+          <span class="grid-label">知识专栏</span>
+        </div>
+        <div class="grid-item" onclick="switchTab(0);scrollToActivities()">
+          <div class="grid-icon" style="background:#fff0e6">🎪</div>
+          <span class="grid-label">预约撸宠</span>
+        </div>
+        <div class="grid-item" onclick="switchTab(2)">
+          <div class="grid-icon" style="background:#f6ffed">🛒</div>
+          <span class="grid-label">用品商城</span>
+        </div>
+        <div class="grid-item" onclick="switchTab(0);openSubPage('sub-post')">
+          <div class="grid-icon" style="background:#fff1f0">📷</div>
+          <span class="grid-label">发帖分享</span>
+        </div>
+        <div class="grid-item" onclick="openSubPage('sub-pets')">
+          <div class="grid-icon" style="background:#f9f0ff">💉</div>
+          <span class="grid-label">疫苗提醒</span>
+        </div>
+        <div class="grid-item" onclick="openSubPage('sub-extension-boarding')">
+          <div class="grid-icon" style="background:#e6fffb">🏠</div>
+          <span class="grid-label">寄养预约</span>
+        </div>
+        <div class="grid-item" onclick="openSubPage('sub-extension-grooming')">
+          <div class="grid-icon" style="background:#fff0f6">✂️</div>
+          <span class="grid-label">洗护美容</span>
+        </div>
+        <div class="grid-item" onclick="openSubPage('sub-extension-adoption')">
+          <div class="grid-icon" style="background:#f0f5ff">🐱</div>
+          <span class="grid-label">宠物领养</span>
+        </div>
+        <div class="grid-item" onclick="openSubPage('sub-extension-promo')">
+          <div class="grid-icon" style="background:#fff7e6">🚀</div>
+          <span class="grid-label">营销裂变</span>
+        </div>
+        <div class="grid-item" onclick="switchTab(3)">
+          <div class="grid-icon" style="background:#fffbe6">🎁</div>
+          <span class="grid-label">积分商城</span>
+        </div>
+      </div>
+
+      <!-- Hot Activities -->
+      <div class="section-title">
+        <h3>🔥 热门活动</h3>
+        <span class="more" onclick="switchTab(0);scrollToActivities()">查看更多 ›</span>
+      </div>
+      <div class="h-scroll" id="hotActivities">
+        <div class="h-card" onclick="openActivityDetail(0)">
+          <div class="h-img" style="background:linear-gradient(135deg,#fff0e6,#ffd9bf)">🐰</div>
+          <div class="h-info">
+            <div class="h-title">萌兔撸宠体验</div>
+            <div class="h-price">¥<span style="font-size:16px">39</span><small>/次</small></div>
+            <div class="h-tag">周末特惠</div>
+          </div>
+        </div>
+        <div class="h-card" onclick="openActivityDetail(1)">
+          <div class="h-img" style="background:linear-gradient(135deg,#e6f7ff,#bae7ff)">🐕</div>
+          <div class="h-info">
+            <div class="h-title">狗狗互动派对</div>
+            <div class="h-price">¥<span style="font-size:16px">59</span><small>/次</small></div>
+            <div class="h-tag">名额紧张</div>
+          </div>
+        </div>
+        <div class="h-card" onclick="openActivityDetail(2)">
+          <div class="h-img" style="background:linear-gradient(135deg,#f6ffed,#d9f7be)">🐱</div>
+          <div class="h-info">
+            <div class="h-title">猫咪主题下午茶</div>
+            <div class="h-price">¥<span style="font-size:16px">88</span><small>/次</small></div>
+            <div class="h-tag">含下午茶</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommend Products -->
+      <div class="section-title">
+        <h3>🛍️ 为你推荐</h3>
+        <span class="more" onclick="switchTab(2)">查看更多 ›</span>
+      </div>
+      <div class="product-grid" id="homeProducts"></div>
+
+      <!-- Knowledge -->
+      <div class="section-title">
+        <h3>📖 喂养知识精选</h3>
+        <span class="more" onclick="switchTab(1)">查看更多 ›</span>
+      </div>
+      <div id="homeKnowledge">
+        <div class="knowledge-item" onclick="openSubPage('sub-knowledge-detail')">
+          <div class="k-img" style="background:linear-gradient(135deg,#fff0e6,#ffccc7)">🍖</div>
+          <div class="k-info">
+            <div class="k-title">幼犬喂养指南：0-12个月每月该吃什么？</div>
+            <div class="k-meta"><span>👁 2.3万</span><span>👍 856</span><span>3天前</span></div>
+          </div>
+        </div>
+        <div class="knowledge-item" onclick="openSubPage('sub-knowledge-detail')">
+          <div class="k-img" style="background:linear-gradient(135deg,#e6f7ff,#91d5ff)">💉</div>
+          <div class="k-info">
+            <div class="k-title">猫咪疫苗接种全攻略：时间表与注意事项</div>
+            <div class="k-meta"><span>👁 1.8万</span><span>👍 642</span><span>1周前</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- ============ COMMUNITY PAGE ============ -->
+    <div class="page" id="page-community">
+      <div class="tab-switcher" id="communityTabs">
+        <div class="ts-item active" onclick="switchCommunityTab(this,0)">推荐</div>
+        <div class="ts-item" onclick="switchCommunityTab(this,1)">关注</div>
+        <div class="ts-item" onclick="switchCommunityTab(this,2)">最新</div>
+      </div>
+      <div id="communityFeed"></div>
+      <div style="height:20px"></div>
+      <button class="fab" onclick="openSubPage('sub-post')">✏️</button>
+    </div>
+
+    <!-- ============ SHOP PAGE ============ -->
+    <div class="page" id="page-shop">
+      <div class="search-bar" style="background:#fff">
+        <div class="search-input" style="background:#f5f5f5" onclick="showToast('搜索功能开发中')">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <span>搜索宠物用品...</span>
+        </div>
+        <span style="font-size:22px;cursor:pointer" onclick="openSubPage('sub-cart')">🛒</span>
+      </div>
+
+      <!-- Banner -->
+      <div class="banner" style="background:#fff">
+        <div class="banner-slider" style="height:120px;background:linear-gradient(135deg,#ff7a45,#ffa940);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;flex-direction:column;gap:4px">
+          <h2 style="font-size:18px">🎉 商城新品上架</h2>
+          <p style="font-size:12px">全场满99减20 · 会员再享折上折</p>
+        </div>
+      </div>
+
+      <!-- Category Layout -->
+      <div class="cat-layout" style="height:auto">
+        <div class="cat-sidebar" id="shopSidebar">
+          <div class="cat-side-item active" onclick="switchCat(this,0)">🍖 主粮</div>
+          <div class="cat-side-item" onclick="switchCat(this,1)">🦴 零食</div>
+          <div class="cat-side-item" onclick="switchCat(this,2)">🧴 洗护</div>
+          <div class="cat-side-item" onclick="switchCat(this,3)">🎾 玩具</div>
+          <div class="cat-side-item" onclick="switchCat(this,4)">📦 用品</div>
+        </div>
+        <div class="cat-content" id="shopContent" style="min-height:400px">
+          <div class="cat-banner" style="background:linear-gradient(135deg,#fff0e6,#ffd9bf)">🍖 主粮专区 · 健康成长</div>
+          <div class="product-grid" style="padding:0" id="shopProducts"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PROFILE PAGE ============ -->
+    <div class="page" id="page-profile">
+      <!-- Member Header -->
+      <div class="member-header">
+        <div class="member-card-top">
+          <div class="member-avatar">🐶</div>
+          <div class="member-info">
+            <div class="member-name">宠物爱好者 <span class="member-level-tag">L2 活跃宠友</span></div>
+            <div class="member-growth">成长值 1280 / 2000</div>
+            <div class="growth-bar"><div class="growth-fill" style="width:64%"></div></div>
+          </div>
+        </div>
+        <div class="member-stats">
+          <div class="member-stat" onclick="openSubPage('sub-points')">
+            <div class="stat-num">1,256</div>
+            <div class="stat-label">积分</div>
+          </div>
+          <div class="member-stat" onclick="openSubPage('sub-coupons')">
+            <div class="stat-num">5</div>
+            <div class="stat-label">优惠券</div>
+          </div>
+          <div class="member-stat" onclick="openSubPage('sub-orders')">
+            <div class="stat-num">12</div>
+            <div class="stat-label">订单</div>
+          </div>
+          <div class="member-stat" onclick="openSubPage('sub-favorites')">
+            <div class="stat-num">8</div>
+            <div class="stat-label">收藏</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Menu -->
+      <div style="padding:12px 16px 0">
+        <div class="menu-list">
+          <div class="menu-item" onclick="openSubPage('sub-pets')">
+            <div class="m-icon" style="background:#fff0e6">🐾</div>
+            <div class="m-label">我的宠物</div>
+            <div class="m-value">2只</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-member')">
+            <div class="m-icon" style="background:#fff7e6">⭐</div>
+            <div class="m-label">会员中心</div>
+            <div class="m-value">L2</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-points')">
+            <div class="m-icon" style="background:#f6ffed">🎁</div>
+            <div class="m-label">积分商城</div>
+            <div class="m-value">1256分</div>
+            <div class="m-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="menu-list">
+          <div class="menu-item" onclick="openSubPage('sub-orders')">
+            <div class="m-icon" style="background:#e6f7ff">📋</div>
+            <div class="m-label">我的订单</div>
+            <div class="m-value">全部</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-coupons')">
+            <div class="m-icon" style="background:#fff0f6">🎫</div>
+            <div class="m-label">优惠券</div>
+            <div class="m-value">5张</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-address')">
+            <div class="m-icon" style="background:#f0f5ff">📍</div>
+            <div class="m-label">收货地址</div>
+            <div class="m-value">3个</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-favorites')">
+            <div class="m-icon" style="background:#fffbe6">⭐</div>
+            <div class="m-label">我的收藏</div>
+            <div class="m-value">8个</div>
+            <div class="m-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="menu-list">
+          <div class="menu-item" onclick="openSubPage('sub-extension-boarding')">
+            <div class="m-icon" style="background:#e6fffb">🏠</div>
+            <div class="m-label">寄养预约</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-extension-grooming')">
+            <div class="m-icon" style="background:#fff0f6">✂️</div>
+            <div class="m-label">洗护美容</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-extension-adoption')">
+            <div class="m-icon" style="background:#f0f5ff">🐱</div>
+            <div class="m-label">宠物领养</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="openSubPage('sub-extension-promo')">
+            <div class="m-icon" style="background:#fff7e6">🚀</div>
+            <div class="m-label">邀请有礼</div>
+            <div class="m-arrow">›</div>
+          </div>
+        </div>
+
+        <div class="menu-list">
+          <div class="menu-item" onclick="openSubPage('sub-message')">
+            <div class="m-icon" style="background:#e6f7ff">✉️</div>
+            <div class="m-label">消息中心</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="showToast('客服在线，请拨打400-xxx-xxxx')">
+            <div class="m-icon" style="background:#f6ffed">🎧</div>
+            <div class="m-label">联系客服</div>
+            <div class="m-arrow">›</div>
+          </div>
+          <div class="menu-item" onclick="showToast('设置功能开发中')">
+            <div class="m-icon" style="background:#f5f5f5">⚙️</div>
+            <div class="m-label">设置</div>
+            <div class="m-arrow">›</div>
+          </div>
+        </div>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+  </div><!-- /page-container -->
+
+  <!-- Bottom Tab Bar -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-item active" onclick="switchTab(0)">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">首页</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(1)">
+      <span class="tab-icon">💬</span>
+      <span class="tab-label">社区</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(2)">
+      <span class="tab-icon">🛒</span>
+      <span class="tab-label">商城</span>
+    </div>
+    <div class="tab-item" onclick="switchTab(3)">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">我的</span>
+    </div>
+  </div>
+</div><!-- /app -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ Sub Pages ============ -->
+
+<!-- Message -->
+<div class="sub-page" id="sub-message">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-message')">‹</span><span class="title">消息中心</span></div>
+  <div class="sub-body">
+    <div class="menu-list" style="margin-top:12px">
+      <div class="menu-item" onclick="showToast('暂无新消息')">
+        <div class="m-icon" style="background:#e6f7ff">🔔</div>
+        <div class="m-label">系统通知</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('您预约的「萌兔撸宠体验」后天开始')">
+        <div class="m-icon" style="background:#fff0e6">🎪</div>
+        <div class="m-label">活动提醒</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('豆豆的狂犬疫苗将于7天后到期')">
+        <div class="m-icon" style="background:#fff0f6">💉</div>
+        <div class="m-label">疫苗提醒</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('暂无订单消息')">
+        <div class="m-icon" style="background:#f6ffed">📦</div>
+        <div class="m-label">订单通知</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Detail -->
+<div class="sub-page" id="sub-activity">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-activity')">‹</span><span class="title">活动详情</span></div>
+  <div class="sub-body" id="activityDetailBody"></div>
+  <div class="bottom-bar">
+    <div class="bb-total"><span>¥39</span><small style="font-size:11px;color:#8c8c8c">/次</small></div>
+    <button class="bb-btn" onclick="openSubPage('sub-booking')">立即预约</button>
+  </div>
+</div>
+
+<!-- Booking -->
+<div class="sub-page" id="sub-booking">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-booking')">‹</span><span class="title">预约下单</span></div>
+  <div class="sub-body">
+    <div style="padding:16px 16px 8px;font-size:14px;font-weight:700">选择日期</div>
+    <div class="date-row" id="dateRow"></div>
+    <div style="padding:0 16px 8px;font-size:14px;font-weight:700">选择时段</div>
+    <div class="time-slots" id="timeSlots"></div>
+    
+    <div style="padding:16px 16px 8px;font-size:14px;font-weight:700">选择人数</div>
+    <div class="counter">
+      <div class="c-label">大人</div>
+      <div class="c-ctrl">
+        <button class="c-btn" onclick="adjustQty('adults',-1)">−</button>
+        <span class="c-num" id="qtyAdults">1</span>
+        <button class="c-btn" onclick="adjustQty('adults',1)">+</button>
+      </div>
+      <div style="font-size:12px;color:#8c8c8c;margin-left:8px">¥39/人</div>
+    </div>
+    <div class="counter">
+      <div class="c-label">儿童（3-12岁）</div>
+      <div class="c-ctrl">
+        <button class="c-btn" onclick="adjustQty('kids',-1)">−</button>
+        <span class="c-num" id="qtyKids">0</span>
+        <button class="c-btn" onclick="adjustQty('kids',1)">+</button>
+      </div>
+      <div style="font-size:12px;color:#8c8c8c;margin-left:8px">¥19/人</div>
+    </div>
+
+    <div style="padding:16px 16px 8px;font-size:14px;font-weight:700">关联宠物</div>
+    <div class="menu-list" style="margin:0 16px">
+      <div class="menu-item" onclick="showToast('已选择：豆豆（金毛）')">
+        <div class="m-icon" style="background:#fff0e6">🐕</div>
+        <div class="m-label">豆豆 · 金毛 · 3岁</div>
+        <div class="m-arrow" style="color:#52c41a">已选 ✓</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 16px 8px;font-size:14px;font-weight:700">联系人信息</div>
+    <div class="form-group"><span class="form-label">姓名</span><input class="form-input" value="宠物爱好者" placeholder="请输入姓名"></div>
+    <div class="form-group"><span class="form-label">手机号</span><input class="form-input" value="138****8888" placeholder="请输入手机号"></div>
+
+    <div style="padding:16px 16px 8px;font-size:14px;font-weight:700">优惠券</div>
+    <div class="menu-list" style="margin:0 16px">
+      <div class="menu-item" onclick="showToast('暂无可用优惠券')">
+        <div class="m-icon" style="background:#fff0f6">🎫</div>
+        <div class="m-label">可用优惠券</div>
+        <div class="m-value">无可用</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+    <div style="height:80px"></div>
+  </div>
+  <div class="bottom-bar">
+    <div class="bb-total">合计 <span>¥<span id="bookingTotal">39</span></span></div>
+    <button class="bb-btn" onclick="submitBooking()">提交订单</button>
+  </div>
+</div>
+
+<!-- Product Detail -->
+<div class="sub-page" id="sub-product">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-product')">‹</span><span class="title">商品详情</span></div>
+  <div class="sub-body" id="productDetailBody"></div>
+  <div class="bottom-bar">
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="text-align:center;cursor:pointer" onclick="openSubPage('sub-cart');closeSubPage('sub-product')"><div style="font-size:20px">🛒</div><div style="font-size:10px">购物车</div></div>
+      <div style="text-align:center;cursor:pointer" onclick="showToast('已收藏')"><div style="font-size:20px">⭐</div><div style="font-size:10px">收藏</div></div>
+    </div>
+    <button class="bb-btn" style="background:#ff9c6e" onclick="addToCart()">加入购物车</button>
+    <button class="bb-btn" onclick="buyNow()">立即购买</button>
+  </div>
+</div>
+
+<!-- Cart -->
+<div class="sub-page" id="sub-cart">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-cart')">‹</span><span class="title">购物车</span><span style="position:absolute;right:16px;font-size:13px;color:#8c8c8c;cursor:pointer" onclick="showToast('编辑功能开发中')">编辑</span></div>
+  <div class="sub-body" id="cartBody"></div>
+  <div class="bottom-bar" id="cartBar">
+    <div class="ci-check" id="cartAllCheck" onclick="toggleCartAll()" style="cursor:pointer"></div>
+    <span style="font-size:13px">全选</span>
+    <div class="bb-total">合计 <span>¥<span id="cartTotal">0</span></span></div>
+    <button class="bb-btn" onclick="checkout()">结算</button>
+  </div>
+</div>
+
+<!-- Checkout -->
+<div class="sub-page" id="sub-checkout">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-checkout')">‹</span><span class="title">确认订单</span></div>
+  <div class="sub-body" id="checkoutBody"></div>
+  <div class="bottom-bar">
+    <div class="bb-total">应付 <span>¥<span id="checkoutTotal">0</span></span></div>
+    <button class="bb-btn" onclick="payOrder()">提交支付</button>
+  </div>
+</div>
+
+<!-- Pay Result -->
+<div class="sub-page" id="sub-pay-result">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-pay-result')">‹</span><span class="title">支付结果</span></div>
+  <div class="sub-body">
+    <div class="empty">
+      <div class="empty-icon" style="font-size:60px">✅</div>
+      <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px">支付成功</div>
+      <div style="font-size:13px;color:#8c8c8c;margin-bottom:20px">订单已提交，请留意消息通知</div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn-outline" onclick="closeSubPage('sub-pay-result');switchTab(3);openSubPage('sub-orders')">查看订单</button>
+        <button class="btn-outline" onclick="closeSubPage('sub-pay-result');switchTab(2)">继续购物</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Orders -->
+<div class="sub-page" id="sub-orders">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-orders')">‹</span><span class="title">我的订单</span></div>
+  <div class="tab-switcher">
+    <div class="ts-item active" onclick="switchOrderTab(this,0)">全部</div>
+    <div class="ts-item" onclick="switchOrderTab(this,1)">待支付</div>
+    <div class="ts-item" onclick="switchOrderTab(this,2)">待使用</div>
+    <div class="ts-item" onclick="switchOrderTab(this,3)">已完成</div>
+  </div>
+  <div class="sub-body" id="ordersBody"></div>
+</div>
+
+<!-- Order Detail -->
+<div class="sub-page" id="sub-order-detail">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-order-detail')">‹</span><span class="title">订单详情</span></div>
+  <div class="sub-body" id="orderDetailBody"></div>
+</div>
+
+<!-- Verify / QR -->
+<div class="sub-page" id="sub-verify">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-verify')">‹</span><span class="title">核销券码</span></div>
+  <div class="sub-body">
+    <div class="qr-container">
+      <div style="font-size:14px;color:#8c8c8c;margin-bottom:4px">到店出示此二维码核销</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px" id="verifyTitle">萌兔撸宠体验</div>
+      <div class="qr-box"><div class="qr-pattern"></div></div>
+      <div style="font-size:13px;color:#8c8c8c;margin-top:8px">核销码</div>
+      <div style="font-size:20px;font-weight:700;letter-spacing:2px;color:var(--primary)" id="verifyCode">MC20260825A01</div>
+      <div style="margin-top:16px;padding:12px;background:#fff7e6;border-radius:8px;font-size:12px;color:#595959;line-height:1.6">
+        <b>📌 使用须知：</b><br>
+        1. 请在预约时段内到店出示二维码<br>
+        2. 店员扫码核销后订单自动完成<br>
+        3. 如需取消请在活动开始前24小时操作
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Knowledge Detail -->
+<div class="sub-page" id="sub-knowledge-detail">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-knowledge-detail')">‹</span><span class="title">知识详情</span></div>
+  <div class="sub-body">
+    <div style="padding:20px 16px;background:#fff">
+      <h1 style="font-size:20px;font-weight:700;line-height:1.4;margin-bottom:12px">幼犬喂养指南：0-12个月每月该吃什么？</h1>
+      <div style="display:flex;gap:12px;font-size:12px;color:#8c8c8c;margin-bottom:16px">
+        <span>👁 2.3万阅读</span><span>📅 2026-08-22</span><span>👍 856赞</span>
+      </div>
+      <div style="width:100%;height:160px;border-radius:12px;background:linear-gradient(135deg,#fff0e6,#ffd9bf);display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:16px">🍖</div>
+      <div style="font-size:15px;line-height:2;color:#333">
+        <p style="font-weight:700;margin-bottom:8px">一、0-2个月：母乳/羊奶粉阶段</p>
+        <p style="margin-bottom:16px">幼犬出生后前2个月以母乳为主，若母乳不足可选择宠物专用羊奶粉替代。切忌喂食牛奶，乳糖不耐受会导致腹泻。</p>
+        <p style="font-weight:700;margin-bottom:8px">二、2-4个月：离乳期过渡</p>
+        <p style="margin-bottom:16px">2个月起开始逐渐引入离乳食品，可用温水泡软幼犬粮，从每天4餐逐步过渡到3餐。</p>
+        <p style="font-weight:700;margin-bottom:8px">三、4-12个月：幼犬粮为主</p>
+        <p style="margin-bottom:16px">4个月后可完全喂食幼犬粮，选择蛋白质含量26%以上的优质粮。6个月后可适当增加零食作为训练奖励。</p>
+        <p style="font-weight:700;margin-bottom:8px">四、疫苗接种与饮食关系</p>
+        <p>疫苗接种前后一周避免更换食物，保持饮食稳定。接种后可能出现食欲下降，属正常反应。</p>
+      </div>
+    </div>
+    <div style="padding:16px;background:#fff;margin-top:8px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">相关推荐</div>
+      <div class="knowledge-item" style="border:none;padding:8px 0" onclick="showToast('加载中...')">
+        <div class="k-img" style="background:linear-gradient(135deg,#e6f7ff,#91d5ff)">💉</div>
+        <div class="k-info"><div class="k-title">猫咪疫苗接种全攻略</div><div class="k-meta"><span>👁 1.8万</span></div></div>
+      </div>
+      <div class="knowledge-item" style="border:none;padding:8px 0" onclick="showToast('加载中...')">
+        <div class="k-img" style="background:linear-gradient(135deg,#f6ffed,#d9f7be)">🦴</div>
+        <div class="k-info"><div class="k-title">如何选择适合的狗粮？看这篇就够了</div><div class="k-meta"><span>👁 3.1万</span></div></div>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Post Detail -->
+<div class="sub-page" id="sub-post-detail">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-post-detail')">‹</span><span class="title">帖子详情</span></div>
+  <div class="sub-body" id="postDetailBody"></div>
+</div>
+
+<!-- Publish Post -->
+<div class="sub-page" id="sub-post">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-post')">‹</span><span class="title">发布帖子</span><span style="position:absolute;right:16px;color:var(--primary);font-weight:600;cursor:pointer" onclick="submitPost()">发布</span></div>
+  <div class="sub-body">
+    <div style="padding:16px;background:#fff">
+      <textarea placeholder="分享你和宠物的故事..." style="width:100%;min-height:120px;border:none;outline:none;font-size:14px;resize:none;line-height:1.6;font-family:inherit"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+        <div style="aspect-ratio:1;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">📷</div>
+        <div style="aspect-ratio:1;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">📷</div>
+        <div style="aspect-ratio:1;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">＋</div>
+      </div>
+    </div>
+    <div class="menu-list" style="margin-top:8px">
+      <div class="menu-item" onclick="showToast('选择话题')">
+        <div class="m-icon" style="background:#e6f7ff">#</div>
+        <div class="m-label">添加话题</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('选择分类')">
+        <div class="m-icon" style="background:#fff0e6">🏷</div>
+        <div class="m-label">帖子分类</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- My Pets -->
+<div class="sub-page" id="sub-pets">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-pets')">‹</span><span class="title">我的宠物</span><span style="position:absolute;right:16px;color:var(--primary);font-weight:600;cursor:pointer" onclick="openSubPage('sub-pet-edit')">+ 添加</span></div>
+  <div class="sub-body">
+    <div style="padding:12px 0">
+      <div class="pet-card" onclick="openSubPage('sub-pet-health')">
+        <div class="pet-avatar" style="background:linear-gradient(135deg,#fff0e6,#ffd9bf)">🐕</div>
+        <div class="pet-info">
+          <div class="pet-name">豆豆 <span class="pet-tag" style="background:#f6ffed;color:#52c41a">健康</span></div>
+          <div class="pet-detail">金毛寻回犬 · 公 · 3岁2个月 · 28.5kg</div>
+          <div class="pet-tags">
+            <span class="pet-tag" style="background:#fff7e6;color:#d48806">已绝育</span>
+            <span class="pet-tag" style="background:#e6f7ff;color:#1890ff">已 chip</span>
+          </div>
+        </div>
+        <div style="color:#bfbfbf">›</div>
+      </div>
+      <div class="pet-card" onclick="openSubPage('sub-pet-health')">
+        <div class="pet-avatar" style="background:linear-gradient(135deg,#f0f5ff,#d6e4ff)">🐱</div>
+        <div class="pet-info">
+          <div class="pet-name">毛毛 <span class="pet-tag" style="background:#f6ffed;color:#52c41a">健康</span></div>
+          <div class="pet-detail">英国短毛猫 · 母 · 2岁 · 4.2kg</div>
+          <div class="pet-tags">
+            <span class="pet-tag" style="background:#fff7e6;color:#d48806">已绝育</span>
+            <span class="pet-tag" style="background:#fff1f0;color:#ff4d4f">疫苗即将到期</span>
+          </div>
+        </div>
+        <div style="color:#bfbfbf">›</div>
+      </div>
+    </div>
+    <div class="empty" style="padding:20px">
+      <div style="font-size:13px;margin-bottom:12px">添加宠物档案，获得20积分奖励</div>
+      <button class="btn-outline" onclick="openSubPage('sub-pet-edit')">+ 添加宠物</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pet Edit -->
+<div class="sub-page" id="sub-pet-edit">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-pet-edit')">‹</span><span class="title">添加宠物</span></div>
+  <div class="sub-body">
+    <div style="padding:20px;text-align:center;background:#fff">
+      <div style="width:80px;height:80px;border-radius:50%;background:#f5f5f5;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer" onclick="showToast('选择头像')">📷</div>
+      <div style="font-size:12px;color:#8c8c8c;margin-top:8px">点击上传宠物头像</div>
+    </div>
+    <div class="form-group"><span class="form-label">宠物名</span><input class="form-input" placeholder="请输入宠物名"></div>
+    <div class="form-group" onclick="showToast('选择品种')"><span class="form-label">品种</span><span class="form-value">请选择 ›</span></div>
+    <div class="form-group"><span class="form-label">性别</span><span class="form-value">公 / 母</span></div>
+    <div class="form-group" onclick="showToast('选择日期')"><span class="form-label">出生日期</span><span class="form-value">请选择 ›</span></div>
+    <div class="form-group"><span class="form-label">体重(kg)</span><input class="form-input" type="number" placeholder="请输入"></div>
+    <div class="form-group"><span class="form-label">是否绝育</span><span class="form-value">是 / 否</span></div>
+    <div class="form-group"><span class="form-label">芯片号</span><input class="form-input" placeholder="选填"></div>
+    <div style="padding:16px;margin-top:12px">
+      <button class="btn-primary" onclick="closeSubPage('sub-pet-edit');showToast('保存成功，获得20积分！')">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pet Health -->
+<div class="sub-page" id="sub-pet-health">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-pet-health')">‹</span><span class="title">豆豆的健康档案</span></div>
+  <div class="sub-body">
+    <!-- Pet summary -->
+    <div style="background:linear-gradient(135deg,#ff7a45,#ffa940);padding:20px 16px;color:#fff;display:flex;gap:12px;align-items:center">
+      <div style="width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px">🐕</div>
+      <div>
+        <div style="font-size:18px;font-weight:700">豆豆</div>
+        <div style="font-size:12px;opacity:.9">金毛寻回犬 · 公 · 3岁2个月 · 28.5kg</div>
+      </div>
+    </div>
+
+    <!-- Weight chart -->
+    <div class="weight-chart">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;font-weight:700">体重变化趋势</span>
+        <span style="font-size:12px;color:#52c41a">↑ 健康增长</span>
+      </div>
+      <svg class="chart-svg" viewBox="0 0 300 120">
+        <polyline points="20,90 80,75 140,60 200,50 260,42" fill="none" stroke="#ff7a45" stroke-width="2"/>
+        <polyline points="20,90 80,75 140,60 200,50 260,42 260,120 20,120" fill="rgba(255,122,69,.1)" stroke="none"/>
+        <circle cx="20" cy="90" r="3" fill="#ff7a45"/>
+        <circle cx="80" cy="75" r="3" fill="#ff7a45"/>
+        <circle cx="140" cy="60" r="3" fill="#ff7a45"/>
+        <circle cx="200" cy="50" r="3" fill="#ff7a45"/>
+        <circle cx="260" cy="42" r="3" fill="#ff7a45"/>
+        <text x="20" y="108" font-size="10" fill="#bfbfbf" text-anchor="middle">1月</text>
+        <text x="80" y="108" font-size="10" fill="#bfbfbf" text-anchor="middle">3月</text>
+        <text x="140" y="108" font-size="10" fill="#bfbfbf" text-anchor="middle">5月</text>
+        <text x="200" y="108" font-size="10" fill="#bfbfbf" text-anchor="middle">7月</text>
+        <text x="260" y="108" font-size="10" fill="#bfbfbf" text-anchor="middle">8月</text>
+        <text x="20" y="85" font-size="9" fill="#8c8c8c">27kg</text>
+        <text x="260" y="37" font-size="9" fill="#ff7a45">28.5kg</text>
+      </svg>
+    </div>
+
+    <!-- Vaccine reminder -->
+    <div style="margin:0 16px 12px;background:linear-gradient(135deg,#fff7e6,#ffe7ba);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:28px">⏰</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#d48806">狂犬疫苗即将到期</div>
+        <div style="font-size:11px;color:#8c8c8c;margin-top:2px">下次接种日期：2026-09-01 · 还有7天</div>
+      </div>
+      <button style="background:#ff7a45;color:#fff;border:none;padding:6px 14px;border-radius:16px;font-size:12px;cursor:pointer" onclick="showToast('跳转预约接种')">去预约</button>
+    </div>
+
+    <!-- Menu -->
+    <div class="menu-list" style="margin-top:0">
+      <div class="menu-item" onclick="openSubPage('sub-vaccine')">
+        <div class="m-icon" style="background:#e6f7ff">💉</div>
+        <div class="m-label">疫苗记录</div>
+        <div class="m-value">3条记录</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('驱虫记录开发中')">
+        <div class="m-icon" style="background:#f6ffed">🐛</div>
+        <div class="m-label">驱虫记录</div>
+        <div class="m-value">2条记录</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="showToast('体检记录开发中')">
+        <div class="m-icon" style="background:#fff0e6">🏥</div>
+        <div class="m-label">体检记录</div>
+        <div class="m-value">1条记录</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Vaccine Records -->
+<div class="sub-page" id="sub-vaccine">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-vaccine')">‹</span><span class="title">疫苗记录</span><span style="position:absolute;right:16px;color:var(--primary);font-weight:600;cursor:pointer" onclick="openSubPage('sub-vaccine-add')">+ 登记</span></div>
+  <div class="sub-body">
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#fff1f0">⏰</div>
+        <div class="timeline-content">
+          <div class="timeline-title" style="color:#ff4d4f">狂犬疫苗 · 即将到期</div>
+          <div class="timeline-date">上次接种：2026-03-20 · 下次接种：2026-09-01</div>
+          <div class="timeline-desc">疫苗类型：狂犬疫苗<br>接种机构：XX宠物医院<br>疫苗批次：BN20260320<br>状态：7天后到期，请尽快接种</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#f6ffed">✓</div>
+        <div class="timeline-content">
+          <div class="timeline-title">犬瘟热疫苗 · 已完成</div>
+          <div class="timeline-date">接种日期：2026-02-15 · 下次：2027-02-15</div>
+          <div class="timeline-desc">疫苗类型：四联疫苗<br>接种机构：XX宠物医院<br>状态：已完成接种</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#f6ffed">✓</div>
+        <div class="timeline-content">
+          <div class="timeline-title">犬副流感疫苗 · 已完成</div>
+          <div class="timeline-date">接种日期：2026-01-10 · 下次：2027-01-10</div>
+          <div class="timeline-desc">疫苗类型：副流感疫苗<br>接种机构：XX宠物医院<br>状态：已完成接种</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Vaccine Add -->
+<div class="sub-page" id="sub-vaccine-add">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-vaccine-add')">‹</span><span class="title">登记疫苗</span></div>
+  <div class="sub-body">
+    <div class="form-group" onclick="showToast('选择疫苗类型')"><span class="form-label">疫苗类型</span><span class="form-value">请选择 ›</span></div>
+    <div class="form-group"><span class="form-label">疫苗名称</span><input class="form-input" placeholder="如：英特威狂犬"></div>
+    <div class="form-group" onclick="showToast('选择日期')"><span class="form-label">接种日期</span><span class="form-value">请选择 ›</span></div>
+    <div class="form-group" onclick="showToast('选择日期')"><span class="form-label">下次接种</span><span class="form-value">请选择 ›</span></div>
+    <div class="form-group"><span class="form-label">接种机构</span><input class="form-input" placeholder="请输入"></div>
+    <div class="form-group"><span class="form-label">疫苗批次</span><input class="form-input" placeholder="选填"></div>
+    <div class="form-group" onclick="showToast('上传凭证')"><span class="form-label">凭证照片</span><span class="form-value">点击上传 ›</span></div>
+    <div style="padding:16px;margin-top:12px">
+      <button class="btn-primary" onclick="closeSubPage('sub-vaccine-add');showToast('登记成功，获得10积分！')">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Center -->
+<div class="sub-page" id="sub-member">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-member')">‹</span><span class="title">会员中心</span></div>
+  <div class="sub-body">
+    <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:24px 16px;color:#fff;text-align:center">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#ffd700,#ffaa00);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:32px">⭐</div>
+      <div style="font-size:18px;font-weight:700">宠物爱好者</div>
+      <div style="display:inline-block;margin-top:8px;background:linear-gradient(90deg,#ffd700,#ffaa00);color:#333;padding:2px 12px;border-radius:12px;font-size:12px;font-weight:600">L2 活跃宠友</div>
+      <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,.6)">成长值 1280 / 2000 · 距L3还差720</div>
+      <div class="growth-bar" style="margin-top:6px"><div class="growth-fill" style="width:64%"></div></div>
+    </div>
+
+    <!-- Level cards -->
+    <div style="padding:12px 16px;font-size:14px;font-weight:700">会员等级体系</div>
+    <div style="padding:0 16px;display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:2px solid #f0f0f0">
+        <div style="font-size:24px">🌱</div><div style="font-size:12px;font-weight:700;margin-top:4px">L1 萌新</div><div style="font-size:10px;color:#8c8c8c">0-499</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:2px solid #3498db;position:relative">
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#3498db;color:#fff;font-size:9px;padding:1px 6px;border-radius:8px">当前</div>
+        <div style="font-size:24px">🌿</div><div style="font-size:12px;font-weight:700;margin-top:4px">L2 活跃</div><div style="font-size:10px;color:#8c8c8c">500-1999</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:2px solid #f0f0f0">
+        <div style="font-size:24px">🌟</div><div style="font-size:12px;font-weight:700;margin-top:4px">L3 资深</div><div style="font-size:10px;color:#8c8c8c">2000-4999</div>
+      </div>
+      <div style="flex:1;background:#fff;border-radius:10px;padding:12px;text-align:center;border:2px solid #f0f0f0">
+        <div style="font-size:24px">👑</div><div style="font-size:12px;font-weight:700;margin-top:4px">L4 VIP</div><div style="font-size:10px;color:#8c8c8c">5000+</div>
+      </div>
+    </div>
+
+    <!-- Benefits table -->
+    <div style="padding:0 16px 12px">
+      <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)">
+        <div style="display:flex;background:#f5f5f5;padding:10px;font-size:12px;font-weight:600">
+          <div style="flex:1">权益项</div>
+          <div style="width:50px;text-align:center">L1</div>
+          <div style="width:50px;text-align:center;color:#3498db">L2</div>
+          <div style="width:50px;text-align:center">L3</div>
+          <div style="width:50px;text-align:center">L4</div>
+        </div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">积分倍数</div><div style="width:50px;text-align:center">1.0x</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">1.2x</div><div style="width:50px;text-align:center">1.5x</div><div style="width:50px;text-align:center">2.0x</div></div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">活动折扣</div><div style="width:50px;text-align:center">9.5折</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">9折</div><div style="width:50px;text-align:center">8.5折</div><div style="width:50px;text-align:center">8折</div></div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">月度满减券</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">1张</div><div style="width:50px;text-align:center">2张</div><div style="width:50px;text-align:center">3张</div></div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">生日礼包</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">✓</div><div style="width:50px;text-align:center">✓</div><div style="width:50px;text-align:center">双倍</div></div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">免费体检</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">—</div><div style="width:50px;text-align:center">1次/季</div><div style="width:50px;text-align:center">2次/季</div></div>
+        <div style="display:flex;padding:10px;font-size:12px;border-bottom:1px solid #f0f0f0"><div style="flex:1">专属客服</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">—</div><div style="width:50px;text-align:center">✓</div><div style="width:50px;text-align:center">✓</div></div>
+        <div style="display:flex;padding:10px;font-size:12px"><div style="flex:1">优先预约</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center;color:#3498db;font-weight:700">—</div><div style="width:50px;text-align:center">—</div><div style="width:50px;text-align:center">✓</div></div>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Points -->
+<div class="sub-page" id="sub-points">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-points')">‹</span><span class="title">积分中心</span></div>
+  <div class="sub-body">
+    <div style="background:linear-gradient(135deg,#52c41a,#389e0d);padding:30px 16px;color:#fff;text-align:center">
+      <div style="font-size:12px;opacity:.9">我的积分</div>
+      <div style="font-size:36px;font-weight:700;margin:4px 0">1,256</div>
+      <div style="font-size:12px;opacity:.8">≈ 12.56元</div>
+    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700">积分明细</div>
+    <div class="menu-list" style="margin:0 16px">
+      <div class="menu-item"><div class="m-icon" style="background:#f6ffed">🛒</div><div class="m-label">商城消费积分</div><div class="m-value" style="color:#52c41a">+120</div><div class="m-arrow" style="font-size:11px">08-25</div></div>
+      <div class="menu-item"><div class="m-icon" style="background:#e6f7ff">✅</div><div class="m-label">每日签到</div><div class="m-value" style="color:#52c41a">+5</div><div class="m-arrow" style="font-size:11px">08-25</div></div>
+      <div class="menu-item"><div class="m-icon" style="background:#fff0e6">📝</div><div class="m-label">发布帖子</div><div class="m-value" style="color:#52c41a">+10</div><div class="m-arrow" style="font-size:11px">08-24</div></div>
+      <div class="menu-item"><div class="m-icon" style="background:#fff7e6">🎫</div><div class="m-label">兑换优惠券</div><div class="m-value" style="color:#ff4d4f">-500</div><div class="m-arrow" style="font-size:11px">08-23</div></div>
+      <div class="menu-item"><div class="m-icon" style="background:#f6ffed">🛒</div><div class="m-label">活动消费积分</div><div class="m-value" style="color:#52c41a">+39</div><div class="m-arrow" style="font-size:11px">08-22</div></div>
+    </div>
+    <div style="padding:12px 16px;font-size:14px;font-weight:700;margin-top:12px">积分规则</div>
+    <div class="menu-list" style="margin:0 16px">
+      <div class="menu-item"><div class="m-label">每日签到</div><div class="m-value">+5分/天</div></div>
+      <div class="menu-item"><div class="m-label">发布帖子</div><div class="m-value">+10分/帖</div></div>
+      <div class="menu-item"><div class="m-label">帖子被点赞</div><div class="m-value">+1分/赞</div></div>
+      <div class="menu-item"><div class="m-label">完善宠物档案</div><div class="m-value">+20分/只</div></div>
+      <div class="menu-item"><div class="m-label">消费</div><div class="m-value">1元=1分</div></div>
+      <div class="menu-item"><div class="m-label">邀请好友注册</div><div class="m-value">+50分</div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Coupons -->
+<div class="sub-page" id="sub-coupons">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-coupons')">‹</span><span class="title">优惠券</span></div>
+  <div class="tab-switcher">
+    <div class="ts-item active">未使用(5)</div>
+    <div class="ts-item">已使用</div>
+    <div class="ts-item">已过期</div>
+  </div>
+  <div class="sub-body" style="padding-top:12px">
+    <div class="coupon-card">
+      <div class="coupon-left"><div class="cl-amount"><small>¥</small>20</div><div class="cl-desc">满99可用</div></div>
+      <div class="coupon-right"><div class="cr-name">新人专享券</div><div class="cr-scope">全场通用</div><div class="cr-valid">有效期：2026-09-30前</div><button class="cr-btn" onclick="showToast('去使用')">去使用</button></div>
+    </div>
+    <div class="coupon-card">
+      <div class="coupon-left" style="background:linear-gradient(135deg,#722ed1,#9254de)"><div class="cl-amount"><small>¥</small>10</div><div class="cl-desc">满49可用</div></div>
+      <div class="coupon-right"><div class="cr-name">活动专享券</div><div class="cr-scope">仅限活动预约</div><div class="cr-valid">有效期：2026-09-15前</div><button class="cr-btn" onclick="showToast('去使用')">去使用</button></div>
+    </div>
+    <div class="coupon-card">
+      <div class="coupon-left" style="background:linear-gradient(135deg,#52c41a,#389e0d)"><div class="cl-amount"><small>¥</small>15</div><div class="cl-desc">满79可用</div></div>
+      <div class="coupon-right"><div class="cr-name">商城满减券</div><div class="cr-scope">仅限宠物用品商城</div><div class="cr-valid">有效期：2026-09-30前</div><button class="cr-btn" onclick="showToast('去使用')">去使用</button></div>
+    </div>
+    <div class="coupon-card">
+      <div class="coupon-left" style="background:linear-gradient(135deg,#faad14,#ffc53d)"><div class="cl-amount"><small>¥</small>5</div><div class="cl-desc">无门槛</div></div>
+      <div class="coupon-right"><div class="cr-name">会员日专享</div><div class="cr-scope">每周三可用</div><div class="cr-valid">有效期：2026-12-31前</div><button class="cr-btn" onclick="showToast('去使用')">去使用</button></div>
+    </div>
+    <div class="coupon-card">
+      <div class="coupon-left" style="background:linear-gradient(135deg,#1890ff,#096dd9)"><div class="cl-amount"><small>¥</small>30</div><div class="cl-desc">满199可用</div></div>
+      <div class="coupon-right"><div class="cr-name">大额满减券</div><div class="cr-scope">全场通用</div><div class="cr-valid">有效期：2026-10-31前</div><button class="cr-btn" onclick="showToast('去使用')">去使用</button></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Address -->
+<div class="sub-page" id="sub-address">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-address')">‹</span><span class="title">收货地址</span><span style="position:absolute;right:16px;color:var(--primary);font-weight:600;cursor:pointer" onclick="showToast('新增地址')">+ 新增</span></div>
+  <div class="sub-body" style="padding-top:12px">
+    <div class="card" style="margin:0 16px 12px;padding:14px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">张三</span><span style="font-size:13px;color:#8c8c8c">138****8888</span><span style="font-size:10px;background:#ff7a45;color:#fff;padding:1px 6px;border-radius:4px">默认</span></div>
+      <div style="font-size:13px;color:#595959;line-height:1.5">广东省深圳市南山区科技园路XX号宠物农场101室</div>
+      <div style="display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0;font-size:12px;color:#8c8c8c">
+        <span onclick="showToast('设为默认')">设为默认</span>
+        <span onclick="showToast('编辑地址')">编辑</span>
+        <span onclick="showToast('删除地址')">删除</span>
+      </div>
+    </div>
+    <div class="card" style="margin:0 16px 12px;padding:14px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:15px;font-weight:700">张三</span><span style="font-size:13px;color:#8c8c8c">138****8888</span></div>
+      <div style="font-size:13px;color:#595959;line-height:1.5">广东省深圳市福田区XX街道XX花园5栋302</div>
+      <div style="display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0;font-size:12px;color:#8c8c8c">
+        <span onclick="showToast('设为默认')">设为默认</span>
+        <span onclick="showToast('编辑地址')">编辑</span>
+        <span onclick="showToast('删除地址')">删除</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Favorites -->
+<div class="sub-page" id="sub-favorites">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-favorites')">‹</span><span class="title">我的收藏</span></div>
+  <div class="tab-switcher">
+    <div class="ts-item active">商品</div>
+    <div class="ts-item">活动</div>
+    <div class="ts-item">文章</div>
+  </div>
+  <div class="sub-body">
+    <div class="product-grid" style="padding-top:12px" id="favProducts"></div>
+  </div>
+</div>
+
+<!-- Extension Placeholders -->
+<div class="sub-page" id="sub-extension-boarding">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-extension-boarding')">‹</span><span class="title">寄养预约</span></div>
+  <div class="sub-body">
+    <div class="ext-placeholder">
+      <div class="ext-icon">🏠</div>
+      <div class="ext-title">寄养预约 · 敬请期待</div>
+      <div class="ext-desc">专业寄养服务即将上线<br>标准间 / 豪华间 / VIP套间<br>24小时视频监控 · 每日遛弯</div>
+    </div>
+  </div>
+</div>
+<div class="sub-page" id="sub-extension-grooming">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-extension-grooming')">‹</span><span class="title">洗护美容</span></div>
+  <div class="sub-body">
+    <div class="ext-placeholder">
+      <div class="ext-icon">✂️</div>
+      <div class="ext-title">洗护美容 · 敬请期待</div>
+      <div class="ext-desc">专业宠物洗护美容服务<br>洗护 / 美容 / SPA / 药浴<br>预约时段 · 技师选择</div>
+    </div>
+  </div>
+</div>
+<div class="sub-page" id="sub-extension-adoption">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-extension-adoption')">‹</span><span class="title">宠物领养</span></div>
+  <div class="sub-body">
+    <div class="ext-placeholder">
+      <div class="ext-icon">🐱</div>
+      <div class="ext-title">宠物领养 · 敬请期待</div>
+      <div class="ext-desc">给流浪动物一个温暖的家<br>可领养宠物列表 · 领养申请<br>领养后续跟踪</div>
+    </div>
+  </div>
+</div>
+<div class="sub-page" id="sub-extension-promo">
+  <div class="sub-header"><span class="back-btn" onclick="closeSubPage('sub-extension-promo')">‹</span><span class="title">邀请有礼</span></div>
+  <div class="sub-body">
+    <div class="ext-placeholder">
+      <div class="ext-icon">🚀</div>
+      <div class="ext-title">营销裂变 · 敬请期待</div>
+      <div class="ext-desc">邀请好友注册得50积分<br>好友首单再得100积分<br>拼团 / 砍价 / 分销即将上线</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#app outer -->
+
+<script>
+// ===== Data =====
+var products = [
+  {id:1,name:'皇家金毛幼犬粮 15kg',price:299,oldPrice:359,sales:'2.3万',icon:'🍖',bg:'linear-gradient(135deg,#fff0e6,#ffd9bf)',cat:0},
+  {id:2,name:'渴望无谷六种鱼成犬粮 11.4kg',price:568,oldPrice:628,sales:'1.8万',icon:'🐟',bg:'linear-gradient(135deg,#e6f7ff,#bae7ff)',cat:0},
+  {id:3,name:'GO! 九种肉无谷猫粮 16lb',price:388,oldPrice:448,sales:'3.1万',icon:'🐱',bg:'linear-gradient(135deg,#f6ffed,#d9f7be)',cat:0},
+  {id:4,name:'巅峰风干牛肉粒训练零食 200g',price:89,oldPrice:109,sales:'5600',icon:'🦴',bg:'linear-gradient(135deg,#fff7e6,#ffe7ba)',cat:1},
+  {id:5,name:'冻干鹌鹑蛋黄零食 50g',price:39,oldPrice:59,sales:'8900',icon:'🥚',bg:'linear-gradient(135deg,#fff1f0,#ffa39e)',cat:1},
+  {id:6,name:'SmartBones磨牙棒洁齿骨 大号',price:69,oldPrice:89,sales:'1.2万',icon:'🦴',bg:'linear-gradient(135deg,#fff0f6,#ffadd2)',cat:1},
+  {id:7,name:'雪貂洗毛液深层洁净 500ml',price:128,oldPrice:168,sales:'4300',icon:'🧴',bg:'linear-gradient(135deg,#e6fffb,#87e8de)',cat:2},
+  {id:8,name:'伊珊娜宠物护毛素 300ml',price:79,oldPrice:99,sales:'6700',icon:'🧴',bg:'linear-gradient(135deg,#f9f0ff,#d3adf7)',cat:2},
+  {id:9,name:'8in1专业耳道清洁液 118ml',price:49,oldPrice:69,sales:'7800',icon:'💧',bg:'linear-gradient(135deg,#e6f7ff,#91d5ff)',cat:2},
+  {id:10,name:'Kong经典飞盘狗狗玩具',price:59,oldPrice:79,sales:'1.5万',icon:'🥏',bg:'linear-gradient(135deg,#fff0e6,#ffbb96)',cat:3},
+  {id:11,name:'逗猫棒羽毛互动玩具套装',price:25,oldPrice:39,sales:'2.4万',icon:'🪶',bg:'linear-gradient(135deg,#f6ffed,#b7eb8f)',cat:3},
+  {id:12,name:'益智漏食球耐咬犬用',price:35,oldPrice:49,sales:'9800',icon:'🎾',bg:'linear-gradient(135deg,#fffbe6,#ffe58f)',cat:3},
+];
+
+var activities = [
+  {id:0,name:'萌兔撸宠体验',icon:'🐰',bg:'linear-gradient(135deg,#fff0e6,#ffd9bf)',price:39,desc:'与荷兰兔/垂耳兔亲密互动',duration:'2小时',tags:['亲子','周末特惠'],location:'A区萌宠馆',capacity:'15人/时段'},
+  {id:1,name:'狗狗互动派对',icon:'🐕',bg:'linear-gradient(135deg,#e6f7ff,#bae7ff)',price:59,desc:'多犬种社交互动+训练表演',duration:'2.5小时',tags:['社交','名额紧张'],location:'B区运动场',capacity:'8人/时段'},
+  {id:2,name:'猫咪主题下午茶',icon:'🐱',bg:'linear-gradient(135deg,#f6ffed,#d9f7be)',price:88,desc:'布偶/英短互动+精致下午茶',duration:'2小时',tags:['下午茶','含餐'],location:'C区猫咖馆',capacity:'10人/时段'},
+];
+
+var communityPosts = [
+  {id:1,user:'豆豆麻麻',avatar:'👩',avatarBg:'#fff0e6',time:'3小时前',content:'今天带豆豆去农场撸宠了，小兔子太可爱了！豆豆一直舍不得走，下次还要来～',images:['🐰','🥕','🐕'],'likes':56,comments:12,liked:false,tag:'晒宠'},
+  {id:2,user:'猫咪爸爸',avatar:'👨',avatarBg:'#e6f7ff',time:'5小时前',content:'分享一下毛毛的疫苗接种时间表，新手铲屎官建议收藏！疫苗一定要按时打，不要拖延。',images:['💉','🐱'],'likes':89,comments:23,liked:true,tag:'经验分享'},
+  {id:3,user:'训犬师小王',avatar:'🧑',avatarBg:'#f6ffed',time:'昨天',content:'【训犬小技巧】狗狗乱咬东西怎么办？三步教你纠正：1.提供磨牙玩具 2.及时制止 3.正向激励。坚持两周就能看到效果！',images:[],'likes':134,comments:45,liked:false,tag:'知识'},
+  {id:4,user:'金毛控',avatar:'👧',avatarBg:'#fff0f6',time:'2天前',content:'我家大金毛今天终于学会握手了！太激动了，感谢农场训犬师小王的指导，分享给大家训练过程视频。',images:['🐕','🦴','⭐'],'likes':67,comments:18,liked:false,tag:'晒宠'},
+];
+
+var cart = [];
+var selectedDate = 0;
+var selectedTime = 0;
+var qty = {adults:1,kids:0};
+
+// ===== Init =====
+function init(){
+  renderHomeProducts();
+  renderShopProducts(0);
+  renderCommunity();
+  renderCart();
+  startBanner();
+  renderDateRow();
+  renderTimeSlots();
+}
+
+// ===== Tab Switching =====
+function switchTab(idx){
+  document.querySelectorAll('.tab-item').forEach(function(el,i){
+    el.classList.toggle('active',i===idx);
+  });
+  document.querySelectorAll('.page').forEach(function(el,i){
+    el.classList.toggle('active',i===idx);
+  });
+  document.getElementById('pageContainer').scrollTop=0;
+}
+
+function scrollToActivities(){
+  document.getElementById('pageContainer').scrollTo({top:300,behavior:'smooth'});
+}
+
+// ===== Banner =====
+var bannerIdx=0;
+function startBanner(){
+  setInterval(function(){
+    bannerIdx=(bannerIdx+1)%3;
+    document.querySelectorAll('.banner-slide').forEach(function(el,i){
+      el.classList.toggle('active',i===bannerIdx);
+    });
+    document.querySelectorAll('#bannerDots .dot').forEach(function(el,i){
+      el.classList.toggle('active',i===bannerIdx);
+    });
+  },3500);
+}
+
+// ===== Home Products =====
+function renderHomeProducts(){
+  var html='';
+  products.slice(0,4).forEach(function(p){
+    html+=productCardHTML(p);
+  });
+  document.getElementById('homeProducts').innerHTML=html;
+}
+
+function productCardHTML(p){
+  return '<div class="product-card" onclick="openProduct('+p.id+')">'+
+    '<div class="p-img" style="background:'+p.bg+'">'+p.icon+'</div>'+
+    '<div class="p-info">'+
+      '<div class="p-name">'+p.name+'</div>'+
+      '<div class="p-price">¥'+p.price+'<small> ¥'+p.oldPrice+'</small></div>'+
+      '<div class="p-sales">已售'+p.sales+'</div>'+
+    '</div>'+
+  '</div>';
+}
+
+// ===== Shop =====
+function switchCat(el,idx){
+  el.parentNode.querySelectorAll('.cat-side-item').forEach(function(e){e.classList.remove('active')});
+  el.classList.add('active');
+  renderShopProducts(idx);
+}
+
+function renderShopProducts(cat){
+  var banners=['🍖 主粮专区 · 健康成长','🦴 零食专区 · 美味奖励','🧴 洗护专区 · 清洁护理','🎾 玩具专区 · 快乐互动','📦 用品专区 · 日常必备'];
+  var bgs=['linear-gradient(135deg,#fff0e6,#ffd9bf)','linear-gradient(135deg,#fff7e6,#ffe7ba)','linear-gradient(135deg,#e6fffb,#b5f5ec)','linear-gradient(135deg,#f6ffed,#d9f7be)','linear-gradient(135deg,#f9f0ff,#efdbff)'];
+  var filtered=cat===undefined?products:products.filter(function(p){return p.cat===cat});
+  if(filtered.length===0) filtered=products;
+  var html='<div class="cat-banner" style="background:'+bgs[cat||0]+'">'+banners[cat||0]+'</div>';
+  html+='<div class="product-grid" style="padding:0">';
+  filtered.forEach(function(p){html+=productCardHTML(p)});
+  html+='</div>';
+  document.getElementById('shopContent').innerHTML=html;
+}
+
+// ===== Product Detail =====
+function openProduct(id){
+  var p=products.find(function(x){return x.id===id});
+  if(!p) return;
+  var html='<div style="width:100%;aspect-ratio:1;background:'+p.bg+';display:flex;align-items:center;justify-content:center;font-size:80px">'+p.icon+'</div>'+
+    '<div style="padding:16px;background:#fff">'+
+      '<div style="font-size:24px;font-weight:700;color:var(--primary)">¥'+p.price+' <small style="font-size:13px;color:#8c8c8c;text-decoration:line-through;font-weight:400">¥'+p.oldPrice+'</small></div>'+
+      '<div style="font-size:16px;font-weight:600;margin-top:8px;line-height:1.4">'+p.name+'</div>'+
+      '<div style="font-size:12px;color:#8c8c8c;margin-top:6px">已售'+p.sales+' · 好评率98.5%</div>'+
+    '</div>'+
+    '<div style="padding:16px;background:#fff;margin-top:8px">'+
+      '<div style="font-size:14px;font-weight:700;margin-bottom:10px">商品详情</div>'+
+      '<div style="font-size:13px;color:#595959;line-height:1.8">'+
+        '<p style="margin-bottom:8px">✅ 天然原料，无添加防腐剂</p>'+
+        '<p style="margin-bottom:8px">✅ 营养均衡配方，满足日常需求</p>'+
+        '<p style="margin-bottom:8px">✅ 农场实地采购，品质保证</p>'+
+        '<p style="margin-bottom:8px">✅ 支持快递发货 / 到店自提</p>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:16px;background:#fff;margin-top:8px">'+
+      '<div style="font-size:14px;font-weight:700;margin-bottom:10px">用户评价(238条)</div>'+
+      '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0">'+
+        '<div style="font-size:13px;font-weight:600">爱宠达人 ⭐⭐⭐⭐⭐</div>'+
+        '<div style="font-size:12px;color:#595959;margin-top:4px;line-height:1.5">品质很好，我家狗狗很爱吃，会回购！</div>'+
+        '<div style="font-size:11px;color:#bfbfbf;margin-top:4px">2天前</div>'+
+      '</div>'+
+      '<div style="padding:10px 0">'+
+        '<div style="font-size:13px;font-weight:600">猫咪爱好者 ⭐⭐⭐⭐⭐</div>'+
+        '<div style="font-size:12px;color:#595959;margin-top:4px;line-height:1.5">农场出品值得信赖，包装精美，物流也快。</div>'+
+        '<div style="font-size:11px;color:#bfbfbf;margin-top:4px">1周前</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="height:60px"></div>';
+  document.getElementById('productDetailBody').innerHTML=html;
+  document.getElementById('productDetailBody').dataset.productId=id;
+  openSubPage('sub-product');
+}
+
+function addToCart(){
+  var body=document.getElementById('productDetailBody');
+  var id=parseInt(body.dataset.productId);
+  var p=products.find(function(x){return x.id===id});
+  if(!p) return;
+  var existing=cart.find(function(x){return x.id===id});
+  if(existing){existing.qty++}
+  else{cart.push({id:p.id,name:p.name,price:p.price,icon:p.icon,bg:p.bg,qty:1,checked:true})}
+  renderCart();
+  showToast('已加入购物车');
+}
+
+function buyNow(){
+  var body=document.getElementById('productDetailBody');
+  var id=parseInt(body.dataset.productId);
+  var p=products.find(function(x){return x.id===id});
+  if(!p) return;
+  cart=[{id:p.id,name:p.name,price:p.price,icon:p.icon,bg:p.bg,qty:1,checked:true}];
+  closeSubPage('sub-product');
+  openCheckout();
+}
+
+// ===== Cart =====
+function renderCart(){
+  var body=document.getElementById('cartBody');
+  if(cart.length===0){
+    body.innerHTML='<div class="empty"><div class="empty-icon">🛒</div><div class="empty-text">购物车空空如也<br>去逛逛吧！</div></div>';
+    document.getElementById('cartTotal').textContent='0';
+    return;
+  }
+  var html='';
+  cart.forEach(function(item,idx){
+    html+='<div class="cart-item">'+
+      '<div class="ci-check '+(item.checked?'checked':'')+'" onclick="toggleCartItem('+idx+')"></div>'+
+      '<div class="ci-img" style="background:'+item.bg+'">'+item.icon+'</div>'+
+      '<div class="ci-info">'+
+        '<div class="ci-name">'+item.name+'</div>'+
+        '<div class="ci-spec">默认规格</div>'+
+        '<div class="ci-bottom">'+
+          '<div class="ci-price">¥'+item.price+'</div>'+
+          '<div class="cart-qty">'+
+            '<button class="qty-btn" onclick="changeQty('+idx+',-1)">−</button>'+
+            '<span class="qty-num">'+item.qty+'</span>'+
+            '<button class="qty-btn" onclick="changeQty('+idx+',1)">+</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  });
+  html+='<div style="height:60px"></div>';
+  body.innerHTML=html;
+  updateCartTotal();
+}
+
+function toggleCartItem(idx){
+  cart[idx].checked=!cart[idx].checked;
+  renderCart();
+}
+
+function changeQty(idx,delta){
+  cart[idx].qty+=delta;
+  if(cart[idx].qty<=0){
+    cart.splice(idx,1);
+  }
+  renderCart();
+}
+
+function toggleCartAll(){
+  var allChecked=cart.every(function(x){return x.checked});
+  cart.forEach(function(x){x.checked=!allChecked});
+  renderCart();
+}
+
+function updateCartTotal(){
+  var total=0;
+  cart.forEach(function(x){if(x.checked)total+=x.price*x.qty});
+  document.getElementById('cartTotal').textContent=total;
+  var allChecked=cart.length>0&&cart.every(function(x){return x.checked});
+  var cb=document.getElementById('cartAllCheck');
+  if(allChecked) cb.classList.add('checked'); else cb.classList.remove('checked');
+}
+
+function checkout(){
+  var checked=cart.filter(function(x){return x.checked});
+  if(checked.length===0){showToast('请选择要结算的商品');return}
+  openCheckout();
+}
+
+function openCheckout(){
+  var checked=cart.filter(function(x){return x.checked});
+  var total=0;
+  checked.forEach(function(x){total+=x.price*x.qty});
+  var html='';
+  // Delivery method
+  html+='<div style="padding:12px 16px;font-size:14px;font-weight:700;background:#fff;border-bottom:1px solid #f0f0f0">配送方式</div>';
+  html+='<div class="menu-list" style="margin:0;border-radius:0">'+
+    '<div class="menu-item" onclick="showToast(\'选择地址\')">'+
+      '<div class="m-icon" style="background:#e6f7ff">🚚</div>'+
+      '<div class="m-label">快递发货</div>'+
+      '<div class="m-value">2-3天送达</div>'+
+      '<div class="m-arrow" style="color:var(--primary)">选择 ›</div>'+
+    '</div>'+
+    '<div class="menu-item" onclick="showToast(\'选择门店\')">'+
+      '<div class="m-icon" style="background:#f6ffed">🏠</div>'+
+      '<div class="m-label">到店自提</div>'+
+      '<div class="m-value">免运费</div>'+
+      '<div class="m-arrow">›</div>'+
+    '</div>'+
+  '</div>';
+  // Address
+  html+='<div style="padding:12px 16px;background:#fff;margin-top:8px" onclick="showToast(\'选择地址\')">'+
+    '<div style="display:flex;align-items:center;gap:8px">'+
+      '<span style="font-size:16px">📍</span>'+
+      '<div style="flex:1">'+
+        '<div style="font-size:13px;font-weight:600">张三 138****8888</div>'+
+        '<div style="font-size:12px;color:#8c8c8c;margin-top:2px">广东省深圳市南山区科技园路XX号</div>'+
+      '</div>'+
+      '<span style="color:#bfbfbf">›</span>'+
+    '</div>'+
+  '</div>';
+  // Products
+  html+='<div style="padding:8px 16px;font-size:14px;font-weight:700;background:#fff;margin-top:8px">商品清单</div>';
+  html+='<div style="background:#fff;padding:0 16px">';
+  checked.forEach(function(x){
+    html+='<div class="order-product" style="padding:10px 0;border-bottom:1px solid #f0f0f0">'+
+      '<div class="op-img" style="background:'+x.bg+'">'+x.icon+'</div>'+
+      '<div class="op-info">'+
+        '<div class="op-name">'+x.name+'</div>'+
+        '<div class="op-spec">默认规格</div>'+
+        '<div class="op-qty">x'+x.qty+'</div>'+
+      '</div>'+
+      '<div style="font-size:14px;color:var(--primary);font-weight:700">¥'+(x.price*x.qty)+'</div>'+
+    '</div>';
+  });
+  html+='</div>';
+  // Coupon & points
+  html+='<div class="menu-list" style="margin:8px 16px">'+
+    '<div class="menu-item" onclick="showToast(\'选择优惠券\')">'+
+      '<div class="m-icon" style="background:#fff0f6">🎫</div>'+
+      '<div class="m-label">优惠券</div>'+
+      '<div class="m-value" style="color:var(--primary)">-¥10</div>'+
+      '<div class="m-arrow">›</div>'+
+    '</div>'+
+    '<div class="menu-item" onclick="showToast(\'积分抵扣\')">'+
+      '<div class="m-icon" style="background:#f6ffed">🎁</div>'+
+      '<div class="m-label">积分抵扣</div>'+
+      '<div class="m-value" style="color:var(--primary)">-¥5</div>'+
+      '<div class="m-arrow">›</div>'+
+    '</div>'+
+  '</div>';
+  // Remark
+  html+='<div class="form-group"><span class="form-label">备注</span><input class="form-input" placeholder="选填"></div>';
+  html+='<div style="height:60px"></div>';
+  document.getElementById('checkoutBody').innerHTML=html;
+  document.getElementById('checkoutTotal').textContent=Math.max(0,total-15);
+  openSubPage('sub-checkout');
+}
+
+function payOrder(){
+  closeSubPage('sub-checkout');
+  closeSubPage('sub-cart');
+  openSubPage('sub-pay-result');
+}
+
+// ===== Activity Detail =====
+function openActivityDetail(id){
+  var a=activities[id];
+  var html='<div style="height:200px;background:'+a.bg+';display:flex;align-items:center;justify-content:center;font-size:80px;position:relative">'+
+    '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.4);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px">'+a.tags.join(' · ')+'</div>'+
+    a.icon+
+  '</div>'+
+  '<div style="padding:16px;background:#fff">'+
+    '<div style="font-size:20px;font-weight:700;margin-bottom:6px">'+a.name+'</div>'+
+    '<div style="font-size:14px;color:var(--primary);font-weight:700;margin-bottom:12px">¥'+a.price+'<small style="font-size:12px;color:#8c8c8c;font-weight:400">/次</small></div>'+
+    '<div style="display:flex;gap:16px;font-size:12px;color:#8c8c8c;margin-bottom:16px">'+
+      '<span>⏱ '+a.duration+'</span>'+
+      '<span>📍 '+a.location+'</span>'+
+      '<span>👥 '+a.capacity+'</span>'+
+    '</div>'+
+  '</div>'+
+  '<div style="padding:16px;background:#fff;margin-top:8px">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px">活动详情</div>'+
+    '<div style="font-size:13px;color:#595959;line-height:1.8">'+
+      '<p style="margin-bottom:8px">🐾 '+a.desc+'</p>'+
+      '<p style="margin-bottom:8px">✅ 专业饲养员全程陪同指导</p>'+
+      '<p style="margin-bottom:8px">✅ 提供互动道具和防护用品</p>'+
+      '<p style="margin-bottom:8px">✅ 活动后可领取纪念照片</p>'+
+      '<p style="margin-bottom:8px">✅ 适合3岁以上儿童及成人参与</p>'+
+    '</div>'+
+  '</div>'+
+  '<div style="padding:16px;background:#fff;margin-top:8px">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px">预约须知</div>'+
+    '<div style="font-size:12px;color:#8c8c8c;line-height:1.8">'+
+      '<p>1. 请在预约时段提前10分钟到场</p>'+
+      '<p>2. 活动开始前24小时可免费取消</p>'+
+      '<p>3. 每时段容量有限，约满即止</p>'+
+      '<p>4. 到店出示核销码进行核销</p>'+
+    '</div>'+
+  '</div>'+
+  '<div style="padding:16px;background:#fff;margin-top:8px">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px">用户评价(86条)</div>'+
+    '<div style="padding:10px 0;border-bottom:1px solid #f0f0f0">'+
+      '<div style="font-size:13px;font-weight:600">亲子家庭 ⭐⭐⭐⭐⭐</div>'+
+      '<div style="font-size:12px;color:#595959;margin-top:4px">孩子非常喜欢，兔子很温顺，工作人员也很专业！</div>'+
+    '</div>'+
+    '<div style="padding:10px 0">'+
+      '<div style="font-size:13px;font-weight:600">爱宠人士 ⭐⭐⭐⭐⭐</div>'+
+      '<div style="font-size:12px;color:#595959;margin-top:4px">环境很好，动物都很干净健康，值得推荐！</div>'+
+    '</div>'+
+  '</div>'+
+  '<div style="height:60px"></div>';
+  document.getElementById('activityDetailBody').innerHTML=html;
+  openSubPage('sub-activity');
+}
+
+// ===== Booking =====
+function renderDateRow(){
+  var html='';
+  var now=new Date();
+  var weekdays=['日','一','二','三','四','五','六'];
+  for(var i=0;i<7;i++){
+    var d=new Date(now.getTime()+i*24*60*60*1000);
+    var isToday=i===0;
+    html+='<div class="date-item '+(i===selectedDate?'active':'')+'" onclick="selectDate('+i+')">'+
+      '<div class="di-week">'+(isToday?'今天':'周'+weekdays[d.getDay()])+'</div>'+
+      '<div class="di-day">'+(d.getMonth()+1)+'/'+d.getDate()+'</div>'+
+    '</div>';
+  }
+  document.getElementById('dateRow').innerHTML=html;
+}
+
+function selectDate(idx){
+  selectedDate=idx;
+  renderDateRow();
+}
+
+function renderTimeSlots(){
+  var slots=[
+    {time:'09:00-11:00',cap:'余8/15'},
+    {time:'10:00-12:00',cap:'余3/15'},
+    {time:'13:00-15:00',cap:'余12/15'},
+    {time:'14:00-16:00',cap:'余6/15'},
+    {time:'15:00-17:00',cap:'余0/15',disabled:true},
+    {time:'16:00-18:00',cap:'余10/15'},
+  ];
+  var html='';
+  slots.forEach(function(s,i){
+    html+='<div class="time-slot '+(i===selectedTime?'active':'')+' '+(s.disabled?'disabled':'')+'" '+(s.disabled?'':'onclick="selectTime('+i+')"')+'>'+
+      '<div class="ts-time">'+s.time+'</div>'+
+      '<div class="ts-cap">'+(s.disabled?'已约满':s.cap)+'</div>'+
+    '</div>';
+  });
+  document.getElementById('timeSlots').innerHTML=html;
+}
+
+function selectTime(idx){
+  selectedTime=idx;
+  renderTimeSlots();
+}
+
+function adjustQty(key,delta){
+  if(key==='adults'){
+    qty.adults=Math.max(1,qty.adults+delta);
+    document.getElementById('qtyAdults').textContent=qty.adults;
+  }else{
+    qty.kids=Math.max(0,qty.kids+delta);
+    document.getElementById('qtyKids').textContent=qty.kids;
+  }
+  updateBookingTotal();
+}
+
+function updateBookingTotal(){
+  var total=qty.adults*39+qty.kids*19;
+  document.getElementById('bookingTotal').textContent=total;
+}
+
+function submitBooking(){
+  closeSubPage('sub-booking');
+  closeSubPage('sub-activity');
+  // Create order
+  showToast('预约成功！核销码已生成');
+  setTimeout(function(){
+    openSubPage('sub-verify');
+    document.getElementById('verifyTitle').textContent='萌兔撸宠体验';
+    document.getElementById('verifyCode').textContent='MC'+new Date().getTime().toString().slice(-8);
+  },500);
+}
+
+// ===== Community =====
+function renderCommunity(){
+  var html='';
+  communityPosts.forEach(function(p){
+    html+=postCardHTML(p);
+  });
+  document.getElementById('communityFeed').innerHTML=html;
+}
+
+function postCardHTML(p){
+  var imagesHTML='';
+  if(p.images.length>0){
+    imagesHTML='<div class="post-images">';
+    p.images.forEach(function(img){
+      var bgs=['linear-gradient(135deg,#fff0e6,#ffd9bf)','linear-gradient(135deg,#e6f7ff,#bae7ff)','linear-gradient(135deg,#f6ffed,#d9f7be)'];
+      imagesHTML+='<div class="post-img" style="background:'+bgs[Math.floor(Math.random()*3)]+'">'+img+'</div>';
+    });
+    imagesHTML+='</div>';
+  }
+  return '<div class="post-item" onclick="openPostDetail('+p.id+')">'+
+    '<div class="post-header">'+
+      '<div class="post-avatar" style="background:'+p.avatarBg+'">'+p.avatar+'</div>'+
+      '<div class="post-user-info">'+
+        '<div class="post-username">'+p.user+' <span style="font-size:10px;background:#fff7e6;color:#d48806;padding:1px 6px;border-radius:4px;margin-left:4px">'+p.tag+'</span></div>'+
+        '<div class="post-meta">'+p.time+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="post-content">'+p.content+'</div>'+
+    imagesHTML+
+    '<div class="post-actions">'+
+      '<div class="post-action '+(p.liked?'liked':'')+'" onclick="event.stopPropagation();toggleLike('+p.id+',this)">'+
+        '<svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>'+
+        '<span>'+(p.liked?'已赞':'赞')+' '+p.likes+'</span>'+
+      '</div>'+
+      '<div class="post-action" onclick="event.stopPropagation();showToast(\'评论功能开发中\')">'+
+        '<svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>'+
+        '<span>评论 '+p.comments+'</span>'+
+      '</div>'+
+      '<div class="post-action" onclick="event.stopPropagation();showToast(\'已分享\')">'+
+        '<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>'+
+        '<span>分享</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function toggleLike(id,el){
+  var post=communityPosts.find(function(x){return x.id===id});
+  if(!post) return;
+  post.liked=!post.liked;
+  post.likes+=post.liked?1:-1;
+  el.classList.toggle('liked');
+  el.querySelector('span').textContent=(post.liked?'已赞':'赞')+' '+post.likes;
+}
+
+function openPostDetail(id){
+  var p=communityPosts.find(function(x){return x.id===id});
+  if(!p) return;
+  var imagesHTML='';
+  if(p.images.length>0){
+    imagesHTML='<div class="post-images" style="grid-template-columns:1fr 1fr;gap:6px;margin:12px 0">';
+    p.images.forEach(function(img){
+      imagesHTML+='<div class="post-img" style="aspect-ratio:4/3;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#fff0e6,#ffd9bf)">'+img+'</div>';
+    });
+    imagesHTML+='</div>';
+  }
+  var html='<div class="post-item" style="border-bottom:none">'+
+    '<div class="post-header">'+
+      '<div class="post-avatar" style="background:'+p.avatarBg+'">'+p.avatar+'</div>'+
+      '<div class="post-user-info">'+
+        '<div class="post-username">'+p.user+'</div>'+
+        '<div class="post-meta">'+p.time+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="post-content" style="font-size:15px">'+p.content+'</div>'+
+    imagesHTML+
+    '<div class="post-actions">'+
+      '<div class="post-action '+(p.liked?'liked':'')+'" onclick="toggleLike('+p.id+',this)">'+
+        '<svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>'+
+        '<span>'+(p.liked?'已赞':'赞')+' '+p.likes+'</span>'+
+      '</div>'+
+      '<div class="post-action" onclick="showToast(\'评论功能开发中\')">'+
+        '<svg viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>'+
+        '<span>评论 '+p.comments+'</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div style="padding:12px 16px;background:#fff;margin-top:6px">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px">评论('+p.comments+')</div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<div style="width:32px;height:32px;border-radius:50%;background:#f0f5ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">👻</div>'+
+      '<div style="flex:1;background:#f5f5f5;border-radius:16px;padding:8px 12px">'+
+        '<div style="font-size:12px;font-weight:600;color:#595959">匿名用户</div>'+
+        '<div style="font-size:13px;margin-top:2px">好可爱啊！我也想去！</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>'+
+  '<div style="position:fixed;bottom:0;left:0;right:0;max-width:390px;margin:0 auto;background:#fff;border-top:1px solid #f0f0f0;padding:10px 16px;display:flex;gap:8px;z-index:50">'+
+    '<input style="flex:1;background:#f5f5f5;border:none;border-radius:20px;padding:8px 14px;font-size:13px;outline:none" placeholder="写评论...">'+
+    '<button style="background:var(--primary);color:#fff;border:none;padding:0 16px;border-radius:20px;font-size:13px;cursor:pointer" onclick="showToast(\'评论成功\')">发送</button>'+
+  '</div>';
+  document.getElementById('postDetailBody').innerHTML=html;
+  openSubPage('sub-post-detail');
+}
+
+function switchCommunityTab(el,idx){
+  el.parentNode.querySelectorAll('.ts-item').forEach(function(e){e.classList.remove('active')});
+  el.classList.add('active');
+  if(idx===0) showToast('推荐');
+  else if(idx===1) showToast('关注');
+  else showToast('最新');
+}
+
+function submitPost(){
+  closeSubPage('sub-post');
+  showToast('发布成功，获得10积分！');
+}
+
+// ===== Orders =====
+var orders=[
+  {id:'MC20260825001',type:'activity',name:'萌兔撸宠体验',icon:'🐰',bg:'linear-gradient(135deg,#fff0e6,#ffd9bf)',price:39,qty:1,status:'pending',statusText:'待支付',date:'2026-08-25',time:'09:00-11:00'},
+  {id:'MC20260824002',type:'activity',name:'狗狗互动派对',icon:'🐕',bg:'linear-gradient(135deg,#e6f7ff,#bae7ff)',price:59,qty:2,status:'paid',statusText:'待使用',date:'2026-08-27',time:'14:00-16:00'},
+  {id:'MC20260820003',type:'shop',name:'皇家金毛幼犬粮 15kg',icon:'🍖',bg:'linear-gradient(135deg,#fff0e6,#ffd9bf)',price:299,qty:1,status:'done',statusText:'已完成',date:'2026-08-20'},
+  {id:'MC20260818004',type:'shop',name:'冻干鹌鹑蛋黄零食 50g',icon:'🥚',bg:'linear-gradient(135deg,#fff1f0,#ffa39e)',price:39,qty:2,status:'done',statusText:'已完成',date:'2026-08-18'},
+  {id:'MC20260815005',type:'activity',name:'猫咪主题下午茶',icon:'🐱',bg:'linear-gradient(135deg,#f6ffed,#d9f7be)',price:88,qty:1,status:'done',statusText:'已完成',date:'2026-08-15'},
+];
+
+function renderOrders(filter){
+  var filtered=filter===0?orders:orders.filter(function(o){
+    var map={1:'pending',2:'paid',3:'done'};
+    return o.status===map[filter];
+  });
+  var html='';
+  if(filtered.length===0){
+    html='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">暂无订单</div></div>';
+  }else{
+    filtered.forEach(function(o){
+      var actions='';
+      if(o.status==='pending'){
+        actions='<button class="order-btn" onclick="showToast(\'已取消\')">取消</button><button class="order-btn primary" onclick="showToast(\'支付成功\')">去支付</button>';
+      }else if(o.status==='paid'){
+        if(o.type==='activity'){
+          actions='<button class="order-btn" onclick="showToast(\'退款申请已提交\')">申请退款</button><button class="order-btn primary" onclick="openSubPage(\'sub-verify\');document.getElementById(\'verifyTitle\').textContent=\''+o.name+'\';document.getElementById(\'verifyCode\').textContent=\''+o.id+'\'">核销码</button>';
+        }else{
+          actions='<button class="order-btn" onclick="showToast(\'物流跟踪\')">查物流</button><button class="order-btn primary" onclick="showToast(\'已确认收货\')">确认收货</button>';
+        }
+      }else{
+        actions='<button class="order-btn" onclick="showToast(\'评价\')">去评价</button><button class="order-btn" onclick="showToast(\'再次购买\')">再次购买</button>';
+      }
+      html+='<div class="order-card">'+
+        '<div class="order-header">'+
+          '<span class="order-no">订单号：'+o.id+'</span>'+
+          '<span class="order-status '+o.status+'">'+o.statusText+'</span>'+
+        '</div>'+
+        '<div class="order-product" onclick="openOrderDetail(\''+o.id+'\')">'+
+          '<div class="op-img" style="background:'+o.bg+'">'+o.icon+'</div>'+
+          '<div class="op-info">'+
+            '<div class="op-name">'+o.name+'</div>'+
+            (o.time?'<div class="op-spec">预约时间：'+o.date+' '+o.time+'</div>':'<div class="op-spec">下单时间：'+o.date+'</div>')+
+            '<div class="op-qty">x'+o.qty+'</div>'+
+          '</div>'+
+          '<div style="font-size:14px;color:var(--primary);font-weight:700">¥'+(o.price*o.qty)+'</div>'+
+        '</div>'+
+        '<div class="order-footer">'+
+          '<div class="order-total">共'+o.qty+'件 合计 <span>¥'+(o.price*o.qty)+'</span></div>'+
+          '<div class="order-actions">'+actions+'</div>'+
+        '</div>'+
+      '</div>';
+    });
+  }
+  document.getElementById('ordersBody').innerHTML=html+'<div style="height:20px"></div>';
+}
+
+function switchOrderTab(el,idx){
+  el.parentNode.querySelectorAll('.ts-item').forEach(function(e){e.classList.remove('active')});
+  el.classList.add('active');
+  renderOrders(idx);
+}
+
+function openOrderDetail(id){
+  var o=orders.find(function(x){return x.id===id});
+  if(!o) return;
+  var html='<div style="background:#fff;padding:16px;text-align:center;margin-bottom:8px">'+
+    '<div style="font-size:16px;font-weight:700;color:var(--primary)">'+o.statusText+'</div>'+
+  '</div>'+
+  '<div class="order-card" style="margin:0 16px 8px">'+
+    '<div class="order-product" style="padding:12px 0">'+
+      '<div class="op-img" style="background:'+o.bg+'">'+o.icon+'</div>'+
+      '<div class="op-info">'+
+        '<div class="op-name">'+o.name+'</div>'+
+        '<div class="op-spec">x'+o.qty+'</div>'+
+      '</div>'+
+      '<div style="font-size:14px;font-weight:700;color:var(--primary)">¥'+(o.price*o.qty)+'</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="menu-list" style="margin:0 16px 8px">'+
+    '<div class="menu-item"><div class="m-label">订单编号</div><div class="m-value">'+o.id+'</div></div>'+
+    '<div class="menu-item"><div class="m-label">下单时间</div><div class="m-value">'+o.date+'</div></div>'+
+    (o.time?'<div class="menu-item"><div class="m-label">预约时段</div><div class="m-value">'+o.time+'</div></div>':'')+
+    '<div class="menu-item"><div class="m-label">支付方式</div><div class="m-value">微信支付</div></div>'+
+  '</div>'+
+  '<div class="menu-list" style="margin:0 16px">'+
+    '<div class="menu-item"><div class="m-label">商品金额</div><div class="m-value">¥'+(o.price*o.qty)+'</div></div>'+
+    '<div class="menu-item"><div class="m-label">实付金额</div><div class="m-value" style="color:var(--primary);font-weight:700">¥'+(o.price*o.qty)+'</div></div>'+
+  '</div>'+
+  '<div style="height:20px"></div>';
+  document.getElementById('orderDetailBody').innerHTML=html;
+  openSubPage('sub-order-detail');
+}
+
+// ===== Favorites =====
+function renderFavorites(){
+  var html='';
+  products.slice(0,4).forEach(function(p){
+    html+=productCardHTML(p);
+  });
+  document.getElementById('favProducts').innerHTML=html;
+}
+
+// ===== Sub Page Management =====
+var subPageStack=[];
+function openSubPage(id){
+  document.getElementById(id).classList.add('active');
+  subPageStack.push(id);
+}
+function closeSubPage(id){
+  document.getElementById(id).classList.remove('active');
+  subPageStack=subPageStack.filter(function(x){return x!==id});
+}
+
+// ===== Toast =====
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show')},2000);
+}
+
+// ===== Init =====
+init();
+renderFavorites();
+renderOrders(0);
+</script>
+</body>
+</html>
