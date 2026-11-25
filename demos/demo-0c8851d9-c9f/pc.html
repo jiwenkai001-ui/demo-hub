@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>装修公司管理系统 · PC 管理端</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<link rel="stylesheet" href="assets/css/pc.css">
+</head>
+<body class="pc-body">
+
+<div id="loginPage" class="login-page">
+  <div class="deco d1"></div><div class="deco d2"></div>
+  <div class="login-card">
+    <div class="logo" id="loginLogo"></div>
+    <h1>装修公司管理系统</h1>
+    <p class="sub">臻品装饰 · 项目运营管理平台</p>
+    <div class="field" style="margin-bottom:14px"><label>账号</label><input class="input" id="loginUser" value="admin" placeholder="请输入账号"></div>
+    <div class="field"><label>密码</label><input class="input" id="loginPwd" type="password" value="123456" placeholder="请输入密码"></div>
+    <button class="btn btn-primary btn-lg btn-block" id="loginBtn" style="margin-top:22px">登 录</button>
+    <div class="login-tip">演示环境：任意账号密码均可登录，数据保存在本机浏览器中。</div>
+  </div>
+</div>
+
+<div id="app" class="pc-app hide">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark"></div>
+      <div><div class="brand-name">臻品装饰管理</div><div class="brand-sub">DECORATION SMS</div></div>
+    </div>
+    <nav class="side-nav" id="sideNav"></nav>
+    <div class="side-foot"><div class="mini-card">
+      <div style="display:flex;align-items:center;gap:6px"><span class="dot" style="background:#34d399"></span><b>系统运行正常</b></div>
+      <div style="margin-top:6px;opacity:.8">数据本地存储 · v1.0.0</div>
+    </div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="crumb"><b id="crumbTitle">工作台</b><span id="crumbSub">经营概览</span></div>
+      <div class="top-actions">
+        <div class="top-search"><span id="topSearchIcon"></span><input id="globalSearch" placeholder="搜索客户 / 项目"></div>
+        <button class="icon-btn" id="bellBtn" title="消息通知"><span id="bellIcon"></span><i class="red-dot"></i></button>
+        <button class="icon-btn" id="resetBtn" title="重置演示数据"><span id="resetIcon"></span></button>
+        <div class="user-chip"><div class="avatar" style="background:#ea580c;width:34px;height:34px">管</div><div><div class="name">管理员</div><div class="role">运营主管</div></div></div>
+      </div>
+    </header>
+    <section class="page-area" id="pageArea"></section>
+  </main>
+</div>
+<div class="toast-box" id="toastBox"></div>
+<div id="modalRoot"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/pc.js"></script>
+</body>
+</html>

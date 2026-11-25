@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>装修公司管理系统 · 入口</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+  body { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fafaf9 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .wrap { width:100%; max-width:900px; text-align:center; }
+  .logo { width:74px; height:74px; border-radius:22px; background:linear-gradient(135deg,#ea580c,#c2410c); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; box-shadow:0 12px 30px rgba(234,88,12,.28); }
+  .logo svg { width:42px; height:42px; }
+  h1 { font-size:34px; font-weight:800; letter-spacing:-.6px; }
+  .subtitle { color:var(--text-2); margin:10px 0 36px; font-size:15px; }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .entry { background:#fff; border:1px solid var(--border); border-radius:18px; padding:30px 26px; box-shadow:var(--shadow-md); transition:.2s; display:block; text-align:left; }
+  .entry:hover { transform:translateY(-4px); box-shadow:0 20px 45px rgba(41,37,36,.14); border-color:#fdba74; }
+  .entry .ic { width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin-bottom:18px; }
+  .entry .ic svg { width:28px; height:28px; }
+  .entry h2 { font-size:21px; font-weight:800; }
+  .entry p { color:var(--text-2); font-size:13px; margin:8px 0 18px; line-height:1.8; }
+  .entry .tag { display:inline-block; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:700; background:#ffedd5; color:#9a3412; margin-right:6px; }
+  .entry .go { color:var(--primary); font-weight:700; font-size:13px; margin-top:14px; display:block; }
+  .foot { margin-top:30px; color:var(--text-3); font-size:12px; line-height:2; }
+  @media(max-width:640px){ .cards{grid-template-columns:1fr} h1{font-size:26px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo" id="logo"></div>
+  <h1>装修公司管理系统</h1>
+  <p class="subtitle">纯前端演示版 · 无需安装后端 · 数据保存在本机浏览器</p>
+  <div class="cards">
+    <a class="entry" href="pc.html">
+      <div class="ic" style="background:#ffedd5;color:#c2410c" id="pcIcon"></div>
+      <h2>PC 管理端</h2>
+      <p>工作台、客户管理、项目管理、施工进度、方案管理、沟通消息、报价款项、材料管理、团队管理、报表统计与系统设置。</p>
+      <span class="tag" style="background:#fef3c7;color:#b45309">公司运营</span><span class="tag">11 个功能模块</span>
+      <span class="go">进入管理后台 →</span>
+    </a>
+    <a class="entry" href="mini.html">
+      <div class="ic" style="background:#dbeafe;color:#1d4ed8" id="miniIcon"></div>
+      <h2>业主小程序</h2>
+      <p>手机端交互界面，支持查看装修进度时间轴与现场记录、设计方案确认与反馈、与装修团队在线沟通。</p>
+      <span class="tag" style="background:#ede9fe;color:#6d28d9">业主端</span><span class="tag">5 个底部导航</span>
+      <span class="go">打开小程序 →</span>
+    </a>
+  </div>
+  <div class="foot">建议使用 Chrome / Edge 浏览器打开<br>退出时请勿清除浏览器站点数据，否则演示数据会丢失</div>
+</div>
+<script src="assets/js/icons.js"></script>
+<script>document.getElementById('logo').innerHTML=Icon.home;document.getElementById('pcIcon').innerHTML=Icon.grid;document.getElementById('miniIcon').innerHTML=Icon.hammer;</script>
+</body>
+</html>
