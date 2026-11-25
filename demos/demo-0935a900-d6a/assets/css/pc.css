@@ -1,0 +1,125 @@
+/* ============================================================
+ * PC 管理端样式
+ * ============================================================ */
+body.pc-body { background: #f1f5f9; overflow: hidden; }
+
+.pc-app { display: flex; height: 100vh; width: 100%; }
+
+/* 侧边栏 */
+.sidebar {
+  width: 230px; flex: none; height: 100vh; display: flex; flex-direction: column;
+  background: linear-gradient(165deg, #0f766e 0%, #115e59 55%, #134e4a 100%);
+  color: #d5f5f0; position: relative; z-index: 10;
+}
+.brand { height: 72px; display: flex; align-items: center; gap: 11px; padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,.1); flex: none; }
+.brand-mark { width: 38px; height: 38px; border-radius: 11px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; flex: none; }
+.brand-mark svg { width: 24px; height: 24px; }
+.brand-name { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: .5px; line-height: 1.25; }
+.brand-sub { font-size: 10px; color: #99f6e4; letter-spacing: 1.2px; }
+.side-nav { flex: 1; overflow-y: auto; padding: 14px 10px; }
+.side-group-title { font-size: 11px; color: rgba(204,251,241,.55); padding: 8px 12px 6px; font-weight: 700; letter-spacing: 1px; }
+.side-item {
+  display: flex; align-items: center; gap: 11px; height: 42px; padding: 0 12px; margin-bottom: 3px;
+  border-radius: 9px; color: #b8e6df; font-weight: 600; font-size: 13.5px; cursor: pointer; transition: .16s;
+  border: 0; background: transparent; width: 100%; text-align: left;
+}
+.side-item svg { width: 18px; height: 18px; flex: none; opacity: .9; }
+.side-item:hover { background: rgba(255,255,255,.09); color: #fff; }
+.side-item.active { background: rgba(255,255,255,.17); color: #fff; box-shadow: inset 3px 0 0 #5eead4; }
+.side-foot { padding: 12px 16px 18px; border-top: 1px solid rgba(255,255,255,.1); flex: none; }
+.side-foot .mini-card { background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 11px 12px; font-size: 12px; color: #ccfbf1; }
+.side-foot .mini-card b { color: #fff; }
+
+/* 主区域 */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; }
+.topbar {
+  height: 72px; flex: none; background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 28px; gap: 20px;
+}
+.crumb { font-size: 13px; color: var(--text-3); }
+.crumb b { color: var(--text); font-size: 18px; font-weight: 800; display: block; line-height: 1.3; }
+.top-actions { display: flex; align-items: center; gap: 14px; }
+.top-search { position: relative; }
+.top-search input { width: 220px; height: 36px; border: 1px solid var(--border); background: #f8fafc; border-radius: 20px; padding: 0 14px 0 36px; outline: none; font-size: 13px; }
+.top-search input:focus { border-color: var(--primary); background: #fff; }
+.top-search svg { position: absolute; left: 12px; top: 10px; width: 16px; height: 16px; color: var(--text-3); }
+.icon-btn { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; color: var(--text-2); position: relative; }
+.icon-btn:hover { color: var(--primary); border-color: var(--primary); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn .red-dot { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); border: 1.5px solid #fff; }
+.user-chip { display: flex; align-items: center; gap: 9px; padding-left: 14px; border-left: 1px solid var(--border); }
+.user-chip .name { font-size: 13px; font-weight: 700; line-height: 1.2; }
+.user-chip .role { font-size: 11px; color: var(--text-3); }
+
+.page-area { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.page-head h2 { font-size: 21px; font-weight: 800; letter-spacing: -.3px; }
+.page-head p { color: var(--text-2); font-size: 13px; margin-top: 3px; }
+
+/* 数据卡片 */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 18px; }
+.stat-card {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.stat-card .label { font-size: 13px; color: var(--text-2); font-weight: 600; }
+.stat-card .value { font-size: 28px; font-weight: 800; letter-spacing: -.5px; line-height: 1.35; margin-top: 4px; }
+.stat-card .trend { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+.stat-card .trend.up { color: var(--success); }
+.stat-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex: none; }
+.stat-icon svg { width: 22px; height: 22px; }
+
+.dash-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; margin-bottom: 18px; }
+.dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+/* 筛选栏 */
+.filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.filter-bar .input, .filter-bar .select { width: auto; min-width: 140px; }
+.filter-bar .grow { flex: 1; }
+.search-box { position: relative; }
+.search-box .input { padding-left: 34px; width: 220px; }
+.search-box svg { position: absolute; left: 11px; top: 10px; width: 15px; height: 15px; color: var(--text-3); }
+
+/* 详情 */
+.detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; }
+.detail-item { display: flex; gap: 8px; font-size: 13px; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+.detail-item .k { color: var(--text-2); min-width: 74px; flex: none; }
+.detail-item .v { font-weight: 600; word-break: break-all; }
+.section-title { font-size: 14px; font-weight: 800; margin: 20px 0 10px; padding-left: 10px; border-left: 3px solid var(--primary); }
+
+.vision-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.vision-cell { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+.vision-cell .k { font-size: 12px; color: var(--text-2); }
+.vision-cell .v { font-size: 19px; font-weight: 800; color: var(--primary); margin-top: 2px; }
+
+/* 登录页 */
+.login-page {
+  height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 50%, #f1f5f9 100%);
+  position: relative; overflow: hidden;
+}
+.login-page .deco { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .5; }
+.login-page .d1 { width: 420px; height: 420px; background: #99f6e4; top: -120px; left: -100px; }
+.login-page .d2 { width: 520px; height: 520px; background: #bae6fd; bottom: -200px; right: -120px; }
+.login-card { width: 400px; background: #fff; border-radius: 18px; box-shadow: 0 24px 60px rgba(15,23,42,.12); padding: 36px; position: relative; z-index: 1; }
+.login-card .logo { width: 56px; height: 56px; border-radius: 15px; background: linear-gradient(135deg, #0d9488, #0891b2); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+.login-card .logo svg { width: 32px; height: 32px; }
+.login-card h1 { font-size: 23px; font-weight: 800; }
+.login-card .sub { color: var(--text-2); font-size: 13px; margin: 5px 0 26px; }
+.login-card .btn { height: 42px; margin-top: 8px; }
+.login-tip { margin-top: 20px; padding: 12px; background: #f0fdfa; border-radius: 8px; font-size: 12px; color: #0f766e; }
+
+/* 响应式 */
+@media (max-width: 1100px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 200px; }
+}
+@media (max-width: 760px) {
+  .sidebar { width: 62px; }
+  .brand-name, .brand-sub, .side-group-title, .side-item span, .side-foot { display: none; }
+  .brand { justify-content: center; padding: 0; }
+  .side-item { justify-content: center; padding: 0; }
+  .top-search { display: none; }
+  .page-area { padding: 16px; }
+}
