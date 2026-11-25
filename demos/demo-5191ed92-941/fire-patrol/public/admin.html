@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>防火巡更管理后台 · 地铁商业物业</title>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+<style>
+:root{
+  --primary:#E0402B; --primary-light:#FDECEA; --green:#10B981; --orange:#F59E0B;
+  --blue:#3B82F6; --ink:#1F2937; --ink2:#6B7280; --ink3:#9CA3AF;
+  --bg:#F4F5F7; --card:#fff; --line:#EEF0F3;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+/* 顶栏 */
+.topbar{background:linear-gradient(135deg,#E0402B,#C33523);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:17px;font-weight:800;letter-spacing:.5px}
+.topbar .sub{font-size:12px;opacity:.85}
+.topbar .right{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:12px}
+.netdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fbbf24;margin-right:4px}
+.netdot.on{background:#34D399;box-shadow:0 0 6px #34D399}
+.link{color:#fff;opacity:.85;text-decoration:none;cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.5)}
+/* 布局 */
+.wrap{max-width:1180px;margin:0 auto;padding:20px 20px 60px}
+.nav{display:flex;gap:6px;margin-bottom:16px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 2px 10px rgba(31,41,55,.06);width:fit-content}
+.nav a{padding:8px 20px;border-radius:10px;font-size:14px;color:var(--ink2);cursor:pointer;font-weight:600;text-decoration:none}
+.nav a.on{background:var(--primary);color:#fff}
+.view{display:none;animation:fadeUp .25s}
+.view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(31,41,55,.06);margin-bottom:16px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.card h3 .muted{font-size:12px;color:var(--ink3);font-weight:400}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+/* 统计卡 */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:860px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(31,41,55,.06);border-left:4px solid var(--blue)}
+.stat .num{font-size:26px;font-weight:800;line-height:1.2}
+.stat .lbl{font-size:12px;color:var(--ink2);margin-top:4px}
+.stat.b-red{border-color:var(--primary)} .stat.b-red .num{color:var(--primary)}
+.stat.b-green{border-color:var(--green)} .stat.b-green .num{color:var(--green)}
+.stat.b-orange{border-color:var(--orange)} .stat.b-orange .num{color:var(--orange)}
+.stat.b-blue{border-color:var(--blue)} .stat.b-blue .num{color:var(--blue)}
+.stat.b-gray{border-color:#9CA3AF}
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#F8F9FB;color:var(--ink2);font-size:12px;font-weight:600;text-align:left;padding:10px 12px;white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:#FAFBFC}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.bg-green{background:#E7F8F0;color:#0B9E6E} .bg-red{background:var(--primary-light);color:var(--primary)}
+.bg-orange{background:#FEF3E2;color:#C77F06} .bg-gray{background:#F1F2F4;color:#6B7280}
+/* 筛选 */
+.filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;outline:none;background:#fff;font-family:inherit}
+.btn{border:none;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--primary);color:#fff}
+.btn.ghost{background:#fff;color:var(--ink2);border:1px solid var(--line)}
+.btn.sm{padding:5px 12px;font-size:12px;border-radius:8px}
+.btn.green{background:var(--green)} .btn.orange{background:var(--orange)} .btn.gray{background:#6B7280}
+/* 照片 */
+.ph-row{display:flex;gap:6px;flex-wrap:wrap}
+.ph{width:44px;height:44px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid var(--line)}
+.ph:hover{transform:scale(1.08);transition:.15s}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;display:none;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.show{display:flex}
+#lightbox img{max-width:92vw;max-height:92vh;border-radius:8px}
+/* 二维码 */
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.qr-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+.qr-card .qrbox{display:inline-block;padding:8px;background:#fff}
+.qr-card .code{font-size:13px;font-weight:800;margin-top:8px;letter-spacing:1px}
+.qr-card .name{font-size:12px;color:var(--ink2);margin-top:2px}
+.qr-card .line{font-size:11px;color:var(--ink3);margin-bottom:8px}
+@media print{
+  .topbar,.nav,.no-print{display:none!important}
+  body{background:#fff}
+  .qr-grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .qr-card{box-shadow:none;break-inside:avoid}
+  .view{display:block!important}
+}
+.empty{padding:40px;text-align:center;color:var(--ink3);font-size:13px}
+.muted{color:var(--ink3);font-size:12px}
+.chart-svg{width:100%;max-width:520px;display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🚒 防火巡更管理后台</h1>
+  <div class="sub">地铁商业多站点 · 物业安保监管</div>
+  <div class="right">
+    <span><span class="netdot" id="netDot"></span><span id="netText">连接中…</span></span>
+    <a class="link" onclick="refreshAll()">↻ 刷新</a>
+    <a class="link" href="/">📱 打开巡更端</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="nav" id="nav">
+    <a class="on" data-v="dash">📊 仪表盘</a>
+    <a data-v="records">📝 打卡记录</a>
+    <a data-v="hazards">⚠️ 隐患管理</a>
+    <a data-v="qr">🔲 巡更点二维码</a>
+  </div>
+
+  <!-- 仪表盘 -->
+  <div class="view active" id="v-dash">
+    <div class="stats">
+      <div class="stat b-blue"><div class="num" id="d-today">-</div><div class="lbl">今日打卡次数</div></div>
+      <div class="stat b-green"><div class="num" id="d-rate">-</div><div class="lbl">今日正常率</div></div>
+      <div class="stat b-red"><div class="num" id="d-abn">-</div><div class="lbl">今日异常打卡</div></div>
+      <div class="stat b-orange"><div class="num" id="d-hz">-</div><div class="lbl">未闭环隐患</div></div>
+      <div class="stat b-gray"><div class="num" id="d-total">-</div><div class="lbl">累计打卡记录</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>📈 近7日打卡趋势 <span class="muted">次/日</span></h3><div id="d-trend"></div></div>
+      <div class="card"><h3>🏢 站点打卡分布 <span class="muted">累计</span></h3><div id="d-station"></div></div>
+    </div>
+    <div class="card">
+      <h3>🆕 最新打卡 <span class="muted">自动刷新</span></h3>
+      <div id="d-recent"></div>
+    </div>
+  </div>
+
+  <!-- 打卡记录 -->
+  <div class="view" id="v-records">
+    <div class="card">
+      <div class="filters no-print">
+        <select id="fStation"><option value="ALL">全部站点</option></select>
+        <input type="date" id="fDate">
+        <select id="fResult"><option value="ALL">全部结果</option><option value="ok">正常</option><option value="bad">异常</option></select>
+        <button class="btn" onclick="loadRecords()">查询</button>
+        <button class="btn ghost" onclick="document.getElementById('fDate').value='';document.getElementById('fStation').value='ALL';document.getElementById('fResult').value='ALL';loadRecords()">重置</button>
+        <span class="muted" style="margin-left:auto" id="recCount"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>时间</th><th>站点</th><th>点位编号</th><th>巡更点</th><th>打卡人</th><th>结果</th><th>照片</th><th>备注</th></tr></thead>
+          <tbody id="recBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐患管理 -->
+  <div class="view" id="v-hazards">
+    <div class="card">
+      <div class="filters no-print">
+        <select id="hzStatus"><option value="ALL">全部状态</option><option value="open">待处理</option><option value="processing">处理中</option><option value="closed">已闭环</option></select>
+        <button class="btn" onclick="loadHazards()">查询</button>
+      </div>
+      <div id="hzList"></div>
+    </div>
+  </div>
+
+  <!-- 二维码 -->
+  <div class="view" id="v-qr">
+    <div class="card no-print">
+      <h3>🔲 巡更点二维码生成
+        <span class="muted">打印后张贴到现场点位，保安用手机扫码 → 自动打开巡更端打卡页并带出点位信息</span></h3>
+      <div class="filters">
+        <span class="muted">共 <b id="qrCount">0</b> 个点位（3站点 × 6点位）</span>
+        <button class="btn" onclick="window.print()">🖨️ 打印全部二维码</button>
+        <button class="btn ghost" onclick="renderQR()">↻ 重新生成</button>
+      </div>
+      <p class="muted" style="margin-bottom:14px;line-height:1.8">
+        使用方法：① 打印二维码并张贴到对应巡更点位 → ② 保安用手机相机扫码 → ③ 自动跳转巡更端并预填点位 → ④ 选择结果、拍现场照片、提交打卡 → ⑤ 后台实时收到记录，异常打卡自动生成隐患。
+      </p>
+      <div class="qr-grid" id="qrGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" onclick="this.classList.remove('show')"><img id="lightboxImg"></div>
+
+<script>
+/* ============ 状态 ============ */
+let STATIONS=[],POINTS=[];
+const API=async(p,o)=>{
+  const r=await fetch(p,Object.assign({headers:{'Content-Type':'application/json'}},o||{}));
+  const d=await r.json();if(!r.ok)throw new Error(d.error||('HTTP '+r.status));return d;
+};
+function fmtTs(ts){const d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+
+/* ============ 视图切换 ============ */
+document.getElementById('nav').addEventListener('click',e=>{
+  const a=e.target.closest('a');if(!a)return;
+  document.querySelectorAll('#nav a').forEach(x=>x.classList.remove('on'));
+  a.classList.add('on');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-'+a.dataset.v).classList.add('active');
+  if(a.dataset.v==='dash')loadStats();
+  if(a.dataset.v==='records')loadRecords();
+  if(a.dataset.v==='hazards')loadHazards();
+  if(a.dataset.v==='qr')renderQR();
+});
+
+/* ============ 图表（SVG） ============ */
+function barV(items,max){
+  const W=460,H=210,L=10,B=32,T=24,iw=W-L*2,m=max||Math.max(...items.map(i=>i.value),1);
+  const bw=Math.min(46,iw/items.length*.5);
+  let bars='';
+  items.forEach((it,i)=>{
+    const cx=L+iw*(i+.5)/items.length,bh=(H-T-B)*it.value/m;
+    bars+=`<rect x="${cx-bw/2}" y="${H-B-bh}" width="${bw}" height="${bh}" rx="6" fill="${it.color||'#E0402B'}"/>
+    <text x="${cx}" y="${H-B-bh-6}" font-size="12" font-weight="700" fill="#1F2937" text-anchor="middle">${it.value}</text>
+    <text x="${cx}" y="${H-10}" font-size="11" fill="#6B7280" text-anchor="middle">${it.label}</text>`});
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}"><line x1="${L}" y1="${H-B}" x2="${W-L}" y2="${H-B}" stroke="#EEF0F3"/>${bars}</svg>`;
+}
+function lineV(labels,values){
+  const W=460,H=210,L=40,R=12,T=18,B=30,iw=W-L-R,ih=H-T-B;
+  const max=Math.max(...values,1)*1.2;
+  const x=i=>L+iw*i/(values.length-1),y=v=>T+ih*(1-v/max);
+  const pts=values.map((v,i)=>x(i)+','+y(v)).join(' ');
+  let grid='';for(let g=1;g<=4;g++){const gv=max*g/4;grid+=`<line x1="${L}" y1="${y(gv)}" x2="${W-R}" y2="${y(gv)}" stroke="#EEF0F3"/><text x="${L-6}" y="${y(gv)+3}" font-size="10" fill="#9CA3AF" text-anchor="end">${Math.round(gv)}</text>`}
+  const dots=values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="#fff" stroke="#E0402B" stroke-width="2"/><text x="${x(i)}" y="${y(v)-8}" font-size="10" font-weight="700" fill="#E0402B" text-anchor="middle">${v}</text>`).join('');
+  const labs=labels.map((l,i)=>`<text x="${x(i)}" y="${H-10}" font-size="10" fill="#9CA3AF" text-anchor="middle">${l}</text>`).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}">${grid}<polygon points="${L},${T+ih} ${pts} ${L+iw},${T+ih}" fill="#FDECEA"/><polyline points="${pts}" fill="none" stroke="#E0402B" stroke-width="2.6" stroke-linejoin="round"/>${dots}${labs}</svg>`;
+}
+
+/* ============ 数据加载 ============ */
+async function boot(){
+  try{
+    const d=await API('/api/points');
+    STATIONS=d.stations;POINTS=d.points;
+    document.getElementById('netDot').classList.add('on');
+    document.getElementById('netText').textContent='后台运行中';
+    document.getElementById('fStation').innerHTML='<option value="ALL">全部站点</option>'+
+      STATIONS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    await loadStats();
+  }catch(e){
+    document.getElementById('netText').textContent='连接失败';
+    alert('后台连接失败：'+e.message+'\n\n请先在 fire-patrol 目录运行：node server.js');
+  }
+}
+async function loadStats(){
+  const d=await API('/api/stats');
+  document.getElementById('d-today').textContent=d.today;
+  document.getElementById('d-rate').textContent=d.today?d.normalRate+'%':'—';
+  document.getElementById('d-abn').textContent=d.todayAbnormal;
+  document.getElementById('d-hz').textContent=d.hazardsOpen;
+  document.getElementById('d-total').textContent=d.total;
+  document.getElementById('d-trend').innerHTML=lineV(d.trend7.map(t=>t.date),d.trend7.map(t=>t.count));
+  document.getElementById('d-station').innerHTML=barV(d.byStation.map((s,i)=>({label:s.name,value:s.count,
+    color:['#E0402B','#F59E0B','#3B82F6','#8B5CF6','#10B981'][i%5]})));
+  document.getElementById('d-recent').innerHTML=d.recent.length?`<table><thead><tr><th>时间</th><th>站点</th><th>巡更点</th><th>打卡人</th><th>结果</th><th>照片</th></tr></thead><tbody>`+
+    d.recent.map(r=>rowHTML(r)).join('')+'</tbody></table>'
+    :'<div class="empty">暂无打卡数据 —— 打开巡更端扫码打卡后这里会实时更新</div>';
+}
+function rowHTML(r){
+  return `<tr><td class="muted">${fmtTs(r.ts)}</td><td>${r.stationName}</td><td><b>${r.code}</b></td><td>${r.pointName}</td>
+  <td>${r.staff}</td><td><span class="badge ${r.result==='ok'?'bg-green':'bg-red'}">${r.result==='ok'?'正常':'异常'}</span></td>
+  <td><div class="ph-row">${r.photos.map(p=>`<img class="ph" src="${p}" onclick="showImg('${p}')">`).join('')||'<span class="muted">无</span>'}</div></td>
+  <td class="muted" style="max-width:200px">${r.note||'—'}</td></tr>`;
+}
+function showImg(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show')}
+
+async function loadRecords(){
+  const st=document.getElementById('fStation').value;
+  const dt=document.getElementById('fDate').value;
+  const rs=document.getElementById('fResult').value;
+  const q=new URLSearchParams({station:st,limit:300});
+  if(dt)q.set('date',dt);
+  let recs=(await API('/api/records?'+q)).records;
+  if(rs!=='ALL')recs=recs.filter(r=>r.result===rs);
+  document.getElementById('recCount').textContent='共 '+recs.length+' 条';
+  document.getElementById('recBody').innerHTML=recs.length?recs.map(rowHTML).join(''):'<tr><td colspan="8" class="empty">没有符合条件的记录</td></tr>';
+}
+
+async function loadHazards(){
+  const st=document.getElementById('hzStatus').value;
+  const q=st==='ALL'?'':'?status='+st;
+  const list=(await API('/api/hazards'+q)).hazards;
+  const SMAP={open:['待处理','bg-red'],processing:['处理中','bg-orange'],closed:['已闭环','bg-green']};
+  const LVC={'一般':'#F59E0B','较大':'#E0402B','重大':'#7F1D1D'};
+  document.getElementById('hzList').innerHTML=list.length?list.map(h=>`
+    <div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;border-left:4px solid ${LVC[h.level]||'#ccc'}">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <b style="font-size:14px">${h.type}</b>
+        <span class="badge" style="background:${LVC[h.level]}1A;color:${LVC[h.level]}">${h.level}</span>
+        <span class="badge ${SMAP[h.status][1]}">${SMAP[h.status][0]}</span>
+        <span class="muted">📍 ${h.stationName} · ${h.source} · 上报人 ${h.reporter} · ${fmtTs(h.ts)}</span>
+        <span style="margin-left:auto;display:flex;gap:6px" class="no-print">
+          <button class="btn sm orange" onclick="setHz('${h.id}','processing')">转处理中</button>
+          <button class="btn sm green" onclick="setHz('${h.id}','closed')">确认闭环</button>
+        </span>
+      </div>
+      <div style="font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.6">${h.desc}</div>
+      <div class="ph-row" style="margin-top:8px">${h.photos.map(p=>`<img class="ph" src="${p}" onclick="showImg('${p}')">`).join('')}</div>
+    </div>`).join(''):'<div class="empty">没有隐患记录 🎉</div>';
+}
+async function setHz(id,status){
+  try{await API('/api/hazards/status',{method:'POST',body:JSON.stringify({id,status})});loadHazards()}
+  catch(e){alert('操作失败：'+e.message)}
+}
+
+/* ============ 二维码 ============ */
+function renderQR(){
+  if(typeof QRCode==='undefined'){document.getElementById('qrGrid').innerHTML='<div class="empty">二维码组件未加载（需联网加载 CDN）</div>';return}
+  document.getElementById('qrCount').textContent=POINTS.length;
+  const grid=document.getElementById('qrGrid');
+  grid.innerHTML='';
+  POINTS.forEach(p=>{
+    const st=STATIONS.find(s=>s.id===p.stationId)||{};
+    const card=document.createElement('div');
+    card.className='qr-card';
+    card.innerHTML=`<div class="line">${st.line||''} · ${st.name||''}</div><div class="qrbox" id="qr-${p.code}"></div>
+      <div class="code">${p.code}</div><div class="name">${p.name}</div>`;
+    grid.appendChild(card);
+    new QRCode(document.getElementById('qr-'+p.code),{
+      text:location.origin+'/?scan='+p.code,width:120,height:120,colorDark:'#1F2937',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  });
+}
+
+function refreshAll(){boot().then(()=>{
+  const cur=document.querySelector('#nav a.on').dataset.v;
+  if(cur==='records')loadRecords();if(cur==='hazards')loadHazards();if(cur==='qr')renderQR();
+})}
+
+boot();
+setInterval(()=>{ if(document.querySelector('#v-dash').classList.contains('active')) loadStats().catch(()=>{}) }, 20000);
+</script>
+</body>
+</html>

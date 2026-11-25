@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地铁商业防火巡更管理系统</title>
+<style>
+:root{
+  --primary:#E0402B; --primary-dark:#C33523; --primary-light:#FDECEA;
+  --orange:#F59E0B; --green:#10B981; --blue:#3B82F6; --purple:#8B5CF6;
+  --ink:#1F2937; --ink2:#6B7280; --ink3:#9CA3AF;
+  --bg:#F4F5F7; --card:#FFFFFF; --line:#EEF0F3;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:linear-gradient(135deg,#2b3444 0%,#1f2733 55%,#3a2b28 100%);
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px 0;
+}
+/* ===== 手机容器 ===== */
+.phone{
+  width:414px;max-width:100%;height:min(880px,calc(100vh - 24px));
+  background:var(--bg);border-radius:34px;overflow:hidden;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 10px #12161d;display:flex;flex-direction:column;
+}
+@media (max-width:480px){body{padding:0}.phone{border-radius:0;height:100vh;box-shadow:none}}
+/* ===== 顶栏 ===== */
+.appheader{
+  background:linear-gradient(150deg,#E0402B 0%,#C33523 70%,#A72B1C 100%);
+  color:#fff;padding:14px 18px 58px;position:relative;flex-shrink:0;
+}
+.appheader .row1{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.92}
+.appheader .row1 .r{display:flex;gap:10px;align-items:center}
+.appheader h1{font-size:19px;font-weight:700;margin-top:10px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.stationSel{
+  margin-top:10px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+  border-radius:22px;padding:7px 12px;font-size:13px;color:#fff;width:100%;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='white' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;
+}
+.stationSel option{color:#1F2937}
+/* ===== 主区域 ===== */
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 14px 84px;margin-top:-46px;scroll-behavior:smooth}
+main::-webkit-scrollbar{width:0}
+.page{display:none;animation:fadeUp .28s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* ===== 通用卡片 ===== */
+.card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.card h3{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card h3 .more{font-size:12px;color:var(--ink3);font-weight:400}
+.sec-title{font-size:13px;color:var(--ink2);font-weight:600;margin:16px 4px 8px;display:flex;align-items:center;gap:6px}
+.sec-title::before{content:"";width:3px;height:13px;background:var(--primary);border-radius:2px}
+/* ===== 统计卡 ===== */
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:#fff;border-radius:12px;padding:12px 4px;text-align:center;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.stat .num{font-size:20px;font-weight:800;line-height:1.1}
+.stat .lbl{font-size:10.5px;color:var(--ink2);margin-top:4px}
+.stat.c-red .num{color:var(--primary)} .stat.c-green .num{color:var(--green)}
+.stat.c-blue .num{color:var(--blue)} .stat.c-orange .num{color:var(--orange)}
+/* ===== 快捷入口 ===== */
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#fff;border-radius:var(--radius);padding:14px 8px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.quick .q{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--ink)}
+.quick .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px}
+/* ===== 列表项 ===== */
+.list-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.list-item:last-child{border-bottom:none;padding-bottom:2px}
+.li-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.li-main{flex:1;min-width:0}
+.li-main .t{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-main .s{font-size:11.5px;color:var(--ink2);margin-top:3px}
+.li-right{text-align:right;flex-shrink:0}
+.li-right .v{font-size:12.5px;font-weight:700}
+.li-right .d{font-size:10.5px;color:var(--ink3);margin-top:3px}
+/* ===== 徽章 ===== */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600}
+.bg-green{background:#E7F8F0;color:#0B9E6E} .bg-red{background:var(--primary-light);color:var(--primary)}
+.bg-orange{background:#FEF3E2;color:#C77F06} .bg-blue{background:#EAF2FE;color:#2D6FDB}
+.bg-gray{background:#F1F2F4;color:#6B7280} .bg-purple{background:#F3EEFE;color:#7C3AED}
+/* ===== 任务卡 ===== */
+.task-card{background:#fff;border-radius:var(--radius);padding:13px 14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(31,41,55,.05);cursor:pointer;transition:transform .15s}
+.task-card:active{transform:scale(.985)}
+.task-top{display:flex;justify-content:space-between;align-items:flex-start}
+.task-top .t{font-size:14.5px;font-weight:700;color:var(--ink)}
+.task-meta{display:flex;gap:12px;margin-top:7px;font-size:11.5px;color:var(--ink2);flex-wrap:wrap}
+.task-meta span{display:flex;align-items:center;gap:3px}
+.task-foot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink2)}
+.progress{height:6px;background:#F1F2F4;border-radius:4px;overflow:hidden;flex:1;margin-right:10px}
+.progress i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#F26B4F)}
+.progress.g i{background:linear-gradient(90deg,#0B9E6E,#34D399)}
+/* ===== 筛选 chips ===== */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:20px;background:#fff;font-size:12px;color:var(--ink2);border:1px solid var(--line);white-space:nowrap;cursor:pointer;font-weight:500}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+/* ===== 隐患卡 ===== */
+.hz-card{background:#fff;border-radius:var(--radius);margin-bottom:10px;box-shadow:0 2px 10px rgba(31,41,55,.05);overflow:hidden}
+.hz-strip{height:4px}
+.hz-body{padding:12px 14px;cursor:pointer}
+.hz-top{display:flex;justify-content:space-between;align-items:center}
+.hz-top .t{font-size:14px;font-weight:700;color:var(--ink)}
+.hz-desc{font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hz-meta{display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--ink3);align-items:center}
+.hz-detail{display:none;padding:0 14px 13px;border-top:1px solid var(--line)}
+.hz-card.open .hz-detail{display:block}
+.timeline{margin-top:12px}
+.tl-item{display:flex;gap:10px;position:relative;padding-bottom:14px}
+.tl-item:last-child{padding-bottom:2px}
+.tl-item::before{content:"";position:absolute;left:5px;top:16px;bottom:0;width:1.5px;background:var(--line)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--ink3);flex-shrink:0;margin-top:3px;z-index:1}
+.tl-item.done .tl-dot{background:var(--green);border-color:var(--green)}
+.tl-item.cur .tl-dot{border-color:var(--primary);background:var(--primary-light)}
+.tl-item .tt{font-size:12.5px;font-weight:600;color:var(--ink)}
+.tl-item .td{font-size:11px;color:var(--ink3);margin-top:2px}
+/* ===== 图表 ===== */
+.chart-svg{width:100%;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px}
+.legend li{list-style:none;font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut-wrap svg{width:118px;flex-shrink:0}
+.rank-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.rank-no{width:20px;height:20px;border-radius:6px;background:#F1F2F4;font-size:11px;font-weight:700;color:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-row:nth-child(1) .rank-no{background:#FDECEA;color:var(--primary)}
+.rank-row:nth-child(2) .rank-no{background:#FEF3E2;color:var(--orange)}
+.rank-row:nth-child(3) .rank-no{background:#EAF2FE;color:var(--blue)}
+.rank-name{width:56px;font-size:12.5px;font-weight:600;color:var(--ink);flex-shrink:0}
+.rank-bar{flex:1;height:8px;background:#F1F2F4;border-radius:5px;overflow:hidden}
+.rank-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--primary),#F26B4F)}
+.rank-val{width:44px;text-align:right;font-size:12px;font-weight:700;color:var(--ink);flex-shrink:0}
+.summary li{list-style:none;font-size:12.5px;color:var(--ink);line-height:1.7;padding-left:16px;position:relative}
+.summary li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.summary li b{color:var(--primary)}
+/* ===== 我的 ===== */
+.me-top{display:flex;align-items:center;gap:14px;background:#fff;border-radius:var(--radius);padding:18px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#F26B4F);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.me-name{font-size:17px;font-weight:800;color:var(--ink)}
+.me-role{font-size:12px;color:var(--ink2);margin-top:4px}
+.menu-item{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fff;border-radius:12px;margin-bottom:8px;font-size:13.5px;color:var(--ink);font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.menu-item .mi{font-size:17px}
+.menu-item .arr{margin-left:auto;color:var(--ink3);font-size:12px}
+/* ===== 底部导航 ===== */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--ink3);cursor:pointer;position:relative}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--primary);font-weight:700}
+.tab .tabdot{position:absolute;top:8px;right:calc(50% - 16px);width:15px;height:15px;background:var(--primary);color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+/* ===== 弹层 ===== */
+.mask{position:absolute;inset:0;background:rgba(17,24,39,.45);z-index:30;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.mask.show{display:flex}
+.sheet{background:#fff;width:100%;border-radius:22px 22px 0 0;max-height:86%;display:flex;flex-direction:column;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.sheet-head{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);flex-shrink:0}
+.sheet-head .t{font-size:15.5px;font-weight:800;color:var(--ink)}
+.sheet-close{width:28px;height:28px;border-radius:50%;background:#F1F2F4;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink2);cursor:pointer}
+.sheet-body{overflow-y:auto;padding:14px 18px 18px;flex:1}
+.sheet-body::-webkit-scrollbar{width:0}
+.ck-item{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:9px}
+.ck-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ck-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.45}
+.ck-cat{font-size:10px;color:var(--ink3);background:#F4F5F7;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.ck-btns{display:flex;gap:8px;margin-top:9px}
+.ck-btn{flex:1;padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;text-align:center;border:1.5px solid var(--line);color:var(--ink2);cursor:pointer;transition:.15s}
+.ck-btn.ok.sel{background:#E7F8F0;border-color:var(--green);color:#0B9E6E}
+.ck-btn.bad.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.ck-note{display:none;margin-top:8px}
+.ck-note.show{display:block}
+.ck-note input{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px;outline:none}
+.ck-note input:focus{border-color:var(--primary)}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:600}
+.form-row select,.form-row textarea,.form-row input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff}
+.form-row textarea{height:72px;resize:none}
+.btn-primary{width:100%;padding:13px 0;border:none;border-radius:13px;background:linear-gradient(135deg,var(--primary),#F26B4F);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px}
+.btn-primary:active{opacity:.85}
+.btn-ghost{width:100%;padding:12px 0;border-radius:13px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:9px}
+/* toast */
+.toast{position:absolute;left:50%;top:42%;transform:translateX(-50%);background:rgba(17,24,39,.88);color:#fff;padding:11px 20px;border-radius:12px;font-size:13px;z-index:60;display:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.show{display:block;animation:fadeUp .25s}
+.empty{text-align:center;padding:34px 0;color:var(--ink3);font-size:13px}
+.empty .e{font-size:34px;margin-bottom:8px}
+.tag-pts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag-pts span{font-size:10.5px;background:#F4F5F7;color:var(--ink2);padding:3px 9px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="phone" id="app">
+
+  <!-- 顶部 -->
+  <div class="appheader">
+    <div class="row1">
+      <span id="todayStr">2026年11月25日 周三</span>
+      <div class="r"><span>☁️ 16°C</span><span>🔔</span></div>
+    </div>
+    <h1>🚇 地铁商业防火巡更</h1>
+    <select class="stationSel" id="stationSel">
+      <option value="ALL">🏢 全部站点（3个）</option>
+    </select>
+  </div>
+
+  <main id="main">
+    <!-- ============ 概览 ============ -->
+    <div class="page active" id="page-0">
+      <div class="statgrid">
+        <div class="stat c-blue"><div class="num" id="st-today">0</div><div class="lbl">今日任务</div></div>
+        <div class="stat c-green"><div class="num" id="st-done">0</div><div class="lbl">已完成</div></div>
+        <div class="stat c-orange"><div class="num" id="st-rate">0%</div><div class="lbl">完成率</div></div>
+        <div class="stat c-red"><div class="num" id="st-hz">0</div><div class="lbl">今日隐患</div></div>
+      </div>
+
+      <div class="card">
+        <h3>📋 今日待办任务 <span class="more" id="todoMore"></span></h3>
+        <div id="todoList"></div>
+      </div>
+
+      <div class="quick">
+        <div class="q" onclick="openScan()"><div class="ic" style="background:var(--primary-light)">📷</div>扫码巡更</div>
+        <div class="q" onclick="openReport()"><div class="ic" style="background:#FEF3E2">⚠️</div>隐患上报</div>
+        <div class="q" onclick="toast('巡更点位平面图开发中')"><div class="ic" style="background:#EAF2FE">🗺️</div>点位图</div>
+        <div class="q" onclick="go(3)"><div class="ic" style="background:#F3EEFE">📊</div>数据分析</div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 消防安全提示</h3>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.8">
+          冬季火灾高发期，请重点巡查<b style="color:var(--primary)">餐饮区燃气用具、商铺取暖设备、配电间</b>；
+          常闭式防火门务必保持关闭，消防通道严禁占用，发现隐患立即上报并拍照留证。
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🕐 最近巡查动态 <span class="more">查看全部</span></h3>
+        <div id="recentList"></div>
+      </div>
+    </div>
+
+    <!-- ============ 巡查 ============ -->
+    <div class="page" id="page-1">
+      <div class="chips" id="taskChips">
+        <div class="chip on" data-f="ALL">全部</div>
+        <div class="chip" data-f="pending">待执行</div>
+        <div class="chip" data-f="done">已完成</div>
+        <div class="chip" data-f="late">已逾期</div>
+      </div>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- ============ 隐患 ============ -->
+    <div class="page" id="page-2">
+      <div class="chips" id="hzChips">
+        <div class="chip on" data-f="ALL">全部</div>
+        <div class="chip" data-f="open">待处理</div>
+        <div class="chip" data-f="processing">处理中</div>
+        <div class="chip" data-f="closed">已闭环</div>
+      </div>
+      <div id="hzList"></div>
+    </div>
+
+    <!-- ============ 分析 ============ -->
+    <div class="page" id="page-3">
+      <div class="card">
+        <h3>📈 近7日巡查完成率趋势 <span class="more" id="monthRate"></span></h3>
+        <div id="chartTrend"></div>
+      </div>
+      <div class="card">
+        <h3>🏢 各站点完成率对比（近30天）</h3>
+        <div id="chartStation"></div>
+      </div>
+      <div class="card">
+        <h3>🧯 隐患类型分布</h3>
+        <div class="donut-wrap">
+          <div id="chartDonut"></div>
+          <ul class="legend" id="donutLegend" style="flex:1;margin-top:0"></ul>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🎖️ 保安巡查绩效排行（近30天）</h3>
+        <div id="rankList"></div>
+      </div>
+      <div class="card">
+        <h3>⚖️ 隐患等级分布</h3>
+        <div id="levelDist"></div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,#FFF7F5,#fff)">
+        <h3>🤖 智能分析摘要</h3>
+        <ul class="summary" id="aiSummary"></ul>
+      </div>
+    </div>
+
+    <!-- ============ 我的 ============ -->
+    <div class="page" id="page-4">
+      <div class="me-top">
+        <div class="avatar">王</div>
+        <div>
+          <div class="me-name">王建国 <span class="badge bg-blue">消控主管</span></div>
+          <div class="me-role">鱼化寨地铁站 · 物业安保部 · 工号 A1001</div>
+        </div>
+      </div>
+      <div class="statgrid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat c-green"><div class="num" id="me-done">0</div><div class="lbl">本月巡查</div></div>
+        <div class="stat c-red"><div class="num" id="me-hz">0</div><div class="lbl">上报隐患</div></div>
+        <div class="stat c-blue"><div class="num" id="me-score">0</div><div class="lbl">绩效分</div></div>
+      </div>
+      <div class="sec-title" style="margin-top:6px">常用功能</div>
+      <div class="menu-item" onclick="toast('消防预案查阅开发中')"><span class="mi">📖</span>消防应急预案库<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('培训课程开发中')"><span class="mi">🎓</span>消防安全培训<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('设备绑定开发中')"><span class="mi">📡</span>NFC 巡更点绑定<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('已复制值班电话 021-96119 转 8')"><span class="mi">☎️</span>应急值班电话<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('当前已是最新版本 v1.2.0')"><span class="mi">⚙️</span>设置与关于<span class="arr">›</span></div>
+    </div>
+  </main>
+
+  <!-- 底部导航 -->
+  <nav class="tabbar" id="tabbar">
+    <div class="tab on" data-t="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+      概览
+    </div>
+    <div class="tab" data-t="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/><path d="M9.5 8h5M9.5 11.5h5"/></svg>
+      巡查<span class="tabdot" id="badgeTask">0</span>
+    </div>
+    <div class="tab" data-t="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.5 3-1.5 4.5-3 6-1.8 1.8-2.5 3.6-2.5 5.5A5.5 5.5 0 0 0 12 20a5.5 5.5 0 0 0 5.5-5.5c0-1.9-.7-3.7-2.5-5.5-1.5-1.5-3.5-3-3-6z"/></svg>
+      隐患<span class="tabdot" id="badgeHz">0</span>
+    </div>
+    <div class="tab" data-t="3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>
+      分析
+    </div>
+    <div class="tab" data-t="4">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>
+      我的
+    </div>
+  </nav>
+
+  <!-- 巡查执行弹层 -->
+  <div class="mask" id="maskPatrol">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="t" id="patrolTitle">巡查执行</div>
+        <div class="sheet-close" onclick="closeSheet('maskPatrol')">✕</div>
+      </div>
+      <div class="sheet-body">
+        <div id="patrolMeta" style="font-size:12px;color:var(--ink2);margin-bottom:12px;line-height:1.7"></div>
+        <div id="ckList"></div>
+        <div style="height:4px"></div>
+        <button class="btn-primary" id="btnSubmitPatrol" onclick="submitPatrol()">提交巡查结果</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐患上报弹层 -->
+  <div class="mask" id="maskReport">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="t">⚠️ 隐患上报</div>
+        <div class="sheet-close" onclick="closeSheet('maskReport')">✕</div>
+      </div>
+      <div class="sheet-body">
+        <div class="form-row"><label>所属站点</label><select id="rpStation"></select></div>
+        <div class="form-row"><label>隐患类型</label><select id="rpType"></select></div>
+        <div class="form-row"><label>隐患等级</label><select id="rpLevel"><option>一般</option><option>较大</option><option>重大</option></select></div>
+        <div class="form-row"><label>具体描述</label><textarea id="rpDesc" placeholder="请描述隐患位置、情况，并现场拍照留证…"></textarea></div>
+        <button class="btn-primary" onclick="submitReport()">提交上报</button>
+        <button class="btn-ghost" onclick="closeSheet('maskReport')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ================= 基础数据 ================= */
+const STATIONS=[
+  {id:'S1',name:'鱼化寨地铁站',short:'鱼化寨',line:'3号线',shops:64},
+  {id:'S2',name:'余家寨地铁站',short:'余家寨',line:'2号线',shops:52},
+  {id:'S3',name:'行政中心地铁站',short:'行政中心',line:'2号线',shops:71},
+];
+const STAFF=[
+  {id:'P1',name:'王建国',sid:'S1'},{id:'P2',name:'李晓峰',sid:'S1'},
+  {id:'P3',name:'张伟民',sid:'S2'},{id:'P4',name:'刘 洋',sid:'S2'},
+  {id:'P5',name:'陈 志',sid:'S3'},{id:'P6',name:'赵 磊',sid:'S3'},
+];
+const CHECK_ITEMS=[
+  {id:1,name:'消防通道、安全出口畅通无堵塞',cat:'疏散设施'},
+  {id:2,name:'疏散指示标志、应急照明完好有效',cat:'疏散设施'},
+  {id:3,name:'常闭式防火门处于关闭状态',cat:'防火分隔'},
+  {id:4,name:'灭火器压力正常、在有效期内',cat:'消防器材'},
+  {id:5,name:'室内消火栓完好、无遮挡',cat:'消防器材'},
+  {id:6,name:'喷淋头、烟感探测器无遮挡损坏',cat:'自动设施'},
+  {id:7,name:'电气线路无私拉乱接、无裸露老化',cat:'用电安全'},
+  {id:8,name:'商铺无违规用火、吸烟现象',cat:'用火管理'},
+  {id:9,name:'易燃可燃物品未违规堆放',cat:'物品管理'},
+  {id:10,name:'消防控制室值班人员在岗在位',cat:'值班管理'},
+];
+const POINTS=['A区商业街','B区餐饮区','中庭扶梯区','设备夹层','出入口连通道','停车场接驳区'];
+const SHIFTS=['早班 08:00','中班 14:00','晚班 20:00'];
+const HZ_TYPES=['消防通道堵塞','灭火器过期','疏散指示损坏','防火门故障','电气隐患','违规用火用电','易燃物堆放','消火栓缺陷'];
+const TYPE_COLORS=['#E0402B','#F59E0B','#3B82F6','#8B5CF6','#10B981','#EC4899','#6366F1','#14B8A6'];
+const LEVEL_COLORS={'一般':'#F59E0B','较大':'#E0402B','重大':'#7F1D1D'};
+const HZ_STATUS={open:['待处理','bg-red'],processing:['处理中','bg-orange'],closed:['已闭环','bg-green']};
+
+/* ================= 随机数据（固定种子，保证刷新稳定） ================= */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=mulberry32(20261125);
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+function dstr(d){return d.toISOString().slice(0,10)}
+function fmtD(d){return (d.getMonth()+1)+'月'+d.getDate()+'日'}
+let TID=0,HID=0;
+let TASKS=[],HAZARDS=[];
+const stationStaff=sid=>STAFF.filter(s=>s.sid===sid);
+
+// 生成近30天任务
+for(let dayAgo=29;dayAgo>=0;dayAgo--){
+  const date=new Date(TODAY);date.setDate(date.getDate()-dayAgo);
+  STATIONS.forEach(st=>{
+    SHIFTS.forEach((shift,si)=>{
+      const staff=pick(stationStaff(st.id));
+      const pts=[...POINTS].sort(()=>rnd()-.5).slice(0,3+Math.floor(rnd()*2));
+      const isToday=dayAgo===0;
+      let status;
+      if(isToday){ status = si<1?'done' : (si===1?'pending':'pending'); if(si===1&&rnd()<.3)status='done'; }
+      else{
+        const r=rnd();
+        const base = st.id==='S3'?.86 : .93;
+        status = r<base?'done':(r<base+.06?'late':'done');
+      }
+      const items=CHECK_ITEMS.map(it=>({itemId:it.id,ok:rnd()<.94,note:''}));
+      const abnormal=items.filter(i=>!i.ok);
+      const task={id:++TID,date:dstr(date),dayAgo,stationId:st.id,shift,staffId:staff.id,points:pts,
+        status:status==='done'?'done':status,items,abnormalCount:status==='done'?abnormal.length:0};
+      TASKS.push(task);
+      if(status==='done'){
+        abnormal.forEach(ab=>{
+          const it=CHECK_ITEMS.find(c=>c.id===ab.itemId);
+          const htype=({'疏散设施':'疏散指示损坏','防火分隔':'防火门故障','消防器材':pick(['灭火器过期','消火栓缺陷']),
+            '自动设施':'灭火器过期','用电安全':'电气隐患','用火管理':'违规用火用电','物品管理':'易燃物堆放','值班管理':'消防通道堵塞'})[it.cat];
+          const lv=rnd()<.7?'一般':(rnd()<.85?'较大':'重大');
+          let hst=rnd()<.78?'closed':(rnd()<.7?'processing':'open');
+          if(dayAgo<=1&&hst==='closed')hst='processing';
+          HAZARDS.push({id:++HID,taskId:task.id,date:dstr(date),dayAgo,stationId:st.id,type:htype,level:lv,
+            desc:st.name+pick(pts)+'：'+it.name+' 存在异常，巡查中发现，已现场记录。',
+            status:hst,reporter:staff.name});
+        });
+      }
+    });
+  });
+}
+// 补充少量独立上报隐患
+for(let i=0;i<6;i++){
+  const st=pick(STATIONS);
+  HAZARDS.push({id:++HID,taskId:null,date:dstr(new Date(TODAY.getTime()-Math.floor(rnd()*20)*864e5)),dayAgo:Math.floor(rnd()*20),
+    stationId:st.id,type:pick(HZ_TYPES),level:pick(['一般','较大']),desc:st.name+'商铺顾客/商户人工上报线索，经安保现场核实确认。',
+    status:pick(['open','processing','closed']),reporter:pick(STAFF).name});
+}
+HAZARDS.sort((a,b)=>b.dayAgo-a.dayAgo);
+
+/* ================= 状态 ================= */
+let curTab=0,curStation='ALL',taskFilter='ALL',hzFilter='ALL';
+const stationName=id=>STATIONS.find(s=>s.id===id).name;
+const staffName=id=>STAFF.find(s=>s.id===id).name;
+const fTasks=()=>TASKS.filter(t=>curStation==='ALL'||t.stationId===curStation);
+const fHz=()=>HAZARDS.filter(h=>curStation==='ALL'||h.stationId===curStation);
+
+/* ================= 渲染：概览 ================= */
+function renderHome(){
+  const ts=fTasks().filter(t=>t.dayAgo===0);
+  const done=ts.filter(t=>t.status==='done').length;
+  const rate=ts.length?Math.round(done/ts.length*100):0;
+  const hzToday=fHz().filter(h=>h.dayAgo===0).length;
+  document.getElementById('st-today').textContent=ts.length;
+  document.getElementById('st-done').textContent=done;
+  document.getElementById('st-rate').textContent=rate+'%';
+  document.getElementById('st-hz').textContent=hzToday;
+  const pend=ts.filter(t=>t.status!=='done');
+  document.getElementById('todoMore').textContent=pend.length?('待执行 '+pend.length+' 项'):'全部完成 🎉';
+  document.getElementById('todoList').innerHTML=pend.length?pend.slice(0,4).map(t=>`
+    <div class="list-item" onclick="openPatrol(${t.id})">
+      <div class="li-dot" style="background:var(--primary-light)">🕐</div>
+      <div class="li-main"><div class="t">${t.shift}防火巡查 · ${stationName(t.stationId)}</div>
+      <div class="s">巡更点 ${t.points.length} 个 · ${staffName(t.staffId)}</div></div>
+      <div class="li-right"><span class="badge bg-red">待执行</span></div>
+    </div>`).join('')
+    :'<div class="empty"><div class="e">✅</div>今日巡查任务已全部完成</div>';
+
+  const recent=fTasks().filter(t=>t.status==='done').sort((a,b)=>a.dayAgo-b.dayAgo||b.id-a.id).slice(0,5);
+  document.getElementById('recentList').innerHTML=recent.map(t=>`
+    <div class="list-item" onclick="openPatrol(${t.id})">
+      <div class="li-dot" style="background:#E7F8F0">✓</div>
+      <div class="li-main"><div class="t">${t.shift}防火巡查 · ${stationName(t.stationId)}</div>
+      <div class="s">${staffName(t.staffId)}${t.abnormalCount?' · 发现 '+t.abnormalCount+' 项异常':''}</div></div>
+      <div class="li-right"><div class="v" style="color:${t.abnormalCount?'var(--primary)':'var(--green)'}">${t.abnormalCount?'异常 '+t.abnormalCount:'正常'}</div>
+      <div class="d">${t.dayAgo===0?'今天':fmtD(new Date(t.date))}</div></div>
+    </div>`).join('');
+  document.getElementById('badgeTask').textContent=pend.length;
+  document.getElementById('badgeTask').style.display=pend.length?'flex':'none';
+  const openHz=fHz().filter(h=>h.status!=='closed').length;
+  document.getElementById('badgeHz').textContent=openHz;
+  document.getElementById('badgeHz').style.display=openHz?'flex':'none';
+}
+
+/* ================= 渲染：巡查 ================= */
+function renderTasks(){
+  let list=fTasks().filter(t=>taskFilter==='ALL'||t.status===taskFilter);
+  list=list.sort((a,b)=>a.dayAgo-b.dayAgo||b.id-a.id).slice(0,40);
+  document.getElementById('taskList').innerHTML=list.length?list.map(t=>{
+    const checked=t.status==='done'?CHECK_ITEMS.length:0;
+    const pct=t.status==='done'?100:t.status==='late'?0:0;
+    const bmap={done:['已完成','bg-green'],pending:['待执行','bg-red'],late:['已逾期','bg-orange']};
+    return `<div class="task-card" onclick="openPatrol(${t.id})">
+      <div class="task-top"><div class="t">${t.shift} · 防火巡查</div><span class="badge ${bmap[t.status][1]}">${bmap[t.status][0]}</span></div>
+      <div class="task-meta"><span>📍 ${stationName(t.stationId)}</span><span>👤 ${staffName(t.staffId)}</span>
+      <span>🕐 ${t.dayAgo===0?'今天':fmtD(new Date(t.date))}</span></div>
+      <div class="tag-pts">${t.points.map(p=>'<span>#'+p+'</span>').join('')}</div>
+      <div class="task-foot">
+        <div style="display:flex;align-items:center;flex:1">
+          <div class="progress ${t.status==='done'?'g':''}"><i style="width:${pct}%"></i></div>
+          <span>${t.status==='done'?'检查 '+CHECK_ITEMS.length+' 项 · 异常 '+t.abnormalCount:'检查项 '+CHECK_ITEMS.length+' 项'}</span>
+        </div>
+        <span style="color:${t.status==='done'?'var(--green)':'var(--primary)'};font-weight:600">${t.status==='done'?'查看详情':'去执行 ›'}</span>
+      </div>
+    </div>`}).join('')
+    :'<div class="empty"><div class="e">📭</div>暂无相关任务</div>';
+}
+
+/* ================= 渲染：隐患 ================= */
+function renderHz(){
+  let list=fHz().filter(h=>hzFilter==='ALL'||h.status===hzFilter);
+  document.getElementById('hzList').innerHTML=list.length?list.map(h=>{
+    const st=HZ_STATUS[h.status];
+    const steps=[['隐患上报',h.date+' '+h.reporter],['派单整改',h.status!=='open'?'已派单至物业工程部':'待派单'],
+      ['整改完成',h.status==='closed'?'整改完毕并复核':'待整改'],['复核闭环',h.status==='closed'?'安保部复核通过':'未闭环']];
+    return `<div class="hz-card" onclick="this.classList.toggle('open')">
+      <div class="hz-strip" style="background:${LEVEL_COLORS[h.level]}"></div>
+      <div class="hz-body">
+        <div class="hz-top"><div class="t">${h.type}</div><span class="badge ${st[1]}">${st[0]}</span></div>
+        <div class="hz-desc">${h.desc}</div>
+        <div class="hz-meta"><span class="badge" style="background:${LEVEL_COLORS[h.level]}1A;color:${LEVEL_COLORS[h.level]}">${h.level}风险</span>
+        <span>📍 ${stationName(h.stationId)}</span><span>📅 ${fmtD(new Date(h.date))}</span>
+        <span style="margin-left:auto;color:var(--blue)">详情 ▾</span></div>
+      </div>
+      <div class="hz-detail"><div class="timeline">
+        ${steps.map((s,i)=>`<div class="tl-item ${h.status==='closed'||(h.status==='processing'&&i<2)?'done':(h.status==='open'&&i===1?'cur':(i===0?'done':''))}">
+        <div class="tl-dot"></div><div><div class="tt">${s[0]}</div><div class="td">${s[1]}</div></div></div>`).join('')}
+      </div></div>
+    </div>`}).join('')
+    :'<div class="empty"><div class="e">🎉</div>该分类下暂无隐患</div>';
+}
+
+/* ================= 图表工具 ================= */
+function lineChart(labels,values,color){
+  const W=360,H=170,L=34,R=10,T=16,B=26,iw=W-L-R,ih=H-T-B;
+  const max=100,x=i=>L+iw*i/(values.length-1),y=v=>T+ih*(1-v/max);
+  const pts=values.map((v,i)=>x(i)+','+y(v)).join(' ');
+  const area=`${L},${T+ih} ${pts} ${L+iw},${T+ih}`;
+  let grid='';[0,25,50,75,100].forEach(g=>{grid+=`<line x1="${L}" y1="${y(g)}" x2="${W-R}" y2="${y(g)}" stroke="#EEF0F3" stroke-width="1"/><text x="${L-5}" y="${y(g)+3}" font-size="9" fill="#9CA3AF" text-anchor="end">${g}</text>`});
+  const dots=values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.2" fill="#fff" stroke="${color}" stroke-width="2"/>`).join('');
+  const labs=labels.map((l,i)=>`<text x="${x(i)}" y="${H-8}" font-size="9" fill="#9CA3AF" text-anchor="middle">${l}</text>`).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}">
+    <defs><linearGradient id="lg${color.slice(1)}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${color}" stop-opacity=".25"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}<polygon points="${area}" fill="url(#lg${color.slice(1)})"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${labs}</svg>`;
+}
+function barChart(items){
+  const W=360,H=190,L=8,B=30,T=20,max=100,iw=W-L*2;
+  const bw=Math.min(36,iw/items.length*0.55);
+  let bars='';
+  items.forEach((it,i)=>{
+    const cx=L+iw*(i+.5)/items.length,bh=(H-T-B)*it.value/max;
+    bars+=`<rect x="${cx-bw/2}" y="${H-B-bh}" width="${bw}" height="${bh}" rx="5" fill="${it.color||'url(#barg)'}"/>
+      <text x="${cx}" y="${H-B-bh-5}" font-size="10.5" font-weight="700" fill="#1F2937" text-anchor="middle">${it.value}%</text>
+      <text x="${cx}" y="${H-10}" font-size="9.5" fill="#6B7280" text-anchor="middle">${it.label}</text>`});
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="barg" x1="0" y1="1" x2="0" y2="0">
+    <stop offset="0" stop-color="#F26B4F"/><stop offset="1" stop-color="#E0402B"/></linearGradient></defs>
+    <line x1="${L}" y1="${H-B}" x2="${W-L}" y2="${H-B}" stroke="#EEF0F3"/>${bars}</svg>`;
+}
+function donut(segs){
+  const r=48,c=2*Math.PI*r,total=segs.reduce((s,x)=>s+x.v,0)||1;let off=0,paths='';
+  segs.forEach(s=>{
+    const len=c*s.v/total;
+    paths+=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${s.c}" stroke-width="20"
+      stroke-dasharray="${len-1.5} ${c-len+1.5}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;
+    off+=len;});
+  return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#F1F2F4" stroke-width="20"/>${paths}
+    <text x="60" y="56" font-size="15" font-weight="800" fill="#1F2937" text-anchor="middle">${total}</text>
+    <text x="60" y="72" font-size="9" fill="#9CA3AF" text-anchor="middle">累计隐患</text></svg>`;
+}
+
+/* ================= 渲染：分析 ================= */
+function renderAnalysis(){
+  const T=fTasks(),H=fHz();
+  // 近7日趋势
+  const labels=[],vals=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(TODAY);d.setDate(d.getDate()-i);
+    labels.push(i===0?'今天':(d.getMonth()+1)+'/'+d.getDate());
+    const day=T.filter(t=>t.date===dstr(d));
+    vals.push(day.length?Math.round(day.filter(t=>t.status==='done').length/day.length*100):0);
+  }
+  document.getElementById('chartTrend').innerHTML=lineChart(labels,vals,'#E0402B');
+  const last30=T.filter(t=>t.dayAgo<30);
+  document.getElementById('monthRate').textContent='近30天均值 '+Math.round(last30.filter(t=>t.status==='done').length/last30.length*100)+'%';
+  // 站点对比
+  const stBars=STATIONS.filter(s=>curStation==='ALL'||s.id===curStation).map(s=>{
+    const ts=T.filter(t=>t.stationId===s.id&&t.dayAgo<30);
+    return {label:s.short,value:ts.length?Math.round(ts.filter(t=>t.status==='done').length/ts.length*100):0,
+      color:curStation==='ALL'?'url(#barg)':null}});
+  document.getElementById('chartStation').innerHTML=barChart(stBars);
+  // 隐患类型
+  const typeCount={};H.forEach(h=>typeCount[h.type]=(typeCount[h.type]||0)+1);
+  const segs=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).map((e,i)=>({n:e[0],v:e[1],c:TYPE_COLORS[i%TYPE_COLORS.length]}));
+  document.getElementById('chartDonut').innerHTML=donut(segs);
+  document.getElementById('donutLegend').innerHTML=segs.map(s=>`<li><i style="background:${s.c}"></i>${s.n}（${s.v}）</li>`).join('');
+  // 绩效排行
+  const perf={};
+  T.filter(t=>t.dayAgo<30&&t.status==='done').forEach(t=>{
+    perf[t.staffId]=perf[t.staffId]||{done:0,abn:0};perf[t.staffId].done++;perf[t.staffId].abn+=t.abnormalCount;});
+  const rank=Object.entries(perf).map(([id,v])=>({name:staffName(id).replace(/\s/g,''),v:v.done,abn:v.abn}))
+    .sort((a,b)=>b.v-a.v).slice(0,6);
+  const maxV=rank[0]?rank[0].v:1;
+  document.getElementById('rankList').innerHTML=rank.map((r,i)=>`
+    <div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${r.name}</div>
+    <div class="rank-bar"><i style="width:${r.v/maxV*100}%"></i></div>
+    <div class="rank-val">${r.v}次</div></div>`).join('');
+  // 等级分布
+  const lv={'一般':0,'较大':0,'重大':0};H.forEach(h=>lv[h.level]=(lv[h.level]||0)+1);
+  const tot=H.length||1;
+  document.getElementById('levelDist').innerHTML=Object.entries(lv).map(([k,v])=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <span style="width:40px;font-size:12px;font-weight:700;color:${LEVEL_COLORS[k]}">${k}</span>
+      <div class="rank-bar" style="height:10px"><i style="width:${v/tot*100}%;background:${LEVEL_COLORS[k]}"></i></div>
+      <span style="width:56px;text-align:right;font-size:12px;color:var(--ink2)">${v}起 · ${Math.round(v/tot*100)}%</span>
+    </div>`).join('');
+  // AI 摘要
+  const worst=[...STATIONS].map(s=>{
+    const ts=T.filter(t=>t.stationId===s.id&&t.dayAgo<30);
+    return {n:s.short,r:ts.length?ts.filter(t=>t.status==='done').length/ts.length*100:0}})
+    .sort((a,b)=>a.r-b.r)[0];
+  const topType=segs[0],openH=H.filter(h=>h.status!=='closed').length;
+  const wk=thisWeek=T.filter(t=>t.dayAgo<7),wkPrev=T.filter(t=>t.dayAgo>=7&&t.dayAgo<14);
+  const r1=wk.length?wk.filter(t=>t.status==='done').length/wk.length*100:0;
+  const r0=wkPrev.length?wkPrev.filter(t=>t.status==='done').length/wkPrev.length*100:0;
+  const diff=Math.round(r1-r0);
+  const late=T.filter(t=>t.status==='late'&&t.dayAgo<30).length;
+  document.getElementById('aiSummary').innerHTML=[
+    `<b>${worst.n}</b>近30天巡查完成率最低（${Math.round(worst.r)}%），建议站长级督办并核查排班。`,
+    `隐患最集中于「<b>${topType.n}</b>」共 ${topType.v} 起，占 ${Math.round(topType.v/tot*100)}%，建议开展专项排查整治。`,
+    `本周完成率较上周${diff>=0?'提升':'下降'} <b>${Math.abs(diff)}个百分点</b>（${Math.round(r1)}% vs ${Math.round(r0)}%）。`,
+    `当前未闭环隐患 <b>${openH} 起</b>，其中重大风险须24小时内处置并复核。`,
+    `近30天逾期任务 ${late} 次，建议对相关班组进行巡更纪律考核。`
+  ].map(s=>'<li>'+s+'</li>').join('');
+}
+
+/* ================= 巡查执行 ================= */
+let curTaskId=null,ckState={};
+function openPatrol(id){
+  const t=TASKS.find(x=>x.id===id);
+  curTaskId=id;ckState={};
+  const readonly=t.status==='done';
+  document.getElementById('patrolTitle').textContent=readonly?'巡查详情':'防火巡查执行';
+  document.getElementById('patrolMeta').innerHTML=
+    `<b style="color:var(--ink)">${stationName(t.stationId)}（${STATIONS.find(s=>s.id===t.stationId).line}）</b><br>
+     ${t.shift} · 巡查人：${staffName(t.staffId)} · ${t.dayAgo===0?'今天':fmtD(new Date(t.date))}<br>
+     巡更点位：${t.points.join('、')} ${readonly?`<br>结果：<span style="color:${t.abnormalCount?'var(--primary)':'var(--green)'};font-weight:700">${t.abnormalCount?'发现异常 '+t.abnormalCount+' 项':'全部正常'}</span>`:''}`;
+  document.getElementById('ckList').innerHTML=CHECK_ITEMS.map((it,i)=>{
+    const pre=readonly?(t.items[i].ok?'ok':'bad'):null;
+    if(readonly)ckState[it.id]=pre;
+    return `<div class="ck-item">
+      <div class="ck-top"><div class="ck-name">${i+1}. ${it.name}</div><span class="ck-cat">${it.cat}</span></div>
+      <div class="ck-btns">
+        <div class="ck-btn ok ${pre==='ok'?'sel':''}" onclick="setCk(${it.id},'ok',${readonly})">✓ 正常</div>
+        <div class="ck-btn bad ${pre==='bad'?'sel':''}" onclick="setCk(${it.id},'bad',${readonly})">✗ 异常</div>
+      </div>
+      <div class="ck-note ${pre==='bad'?'show':''}" id="note-${it.id}"><input placeholder="请描述异常情况（必填）" value="${t.items[i].note||''}"></div>
+    </div>`}).join('');
+  document.getElementById('btnSubmitPatrol').style.display=readonly?'none':'block';
+  openSheet('maskPatrol');
+}
+function setCk(id,val,ro){
+  if(ro)return;ckState[id]=val;
+  const item=event.target.closest('.ck-item');
+  item.querySelectorAll('.ck-btn').forEach(b=>b.classList.remove('sel'));
+  event.target.classList.add('sel');
+  item.querySelector('.ck-note').classList.toggle('show',val==='bad');
+}
+function submitPatrol(){
+  const t=TASKS.find(x=>x.id===curTaskId);
+  const unmarked=CHECK_ITEMS.filter(it=>!ckState[it.id]).length;
+  if(unmarked){toast('还有 '+unmarked+' 项未判定，请逐项检查');return}
+  const badNotes=CHECK_ITEMS.filter(it=>ckState[it.id]==='bad'&&!document.getElementById('note-'+it.id).querySelector('input').value.trim());
+  if(badNotes.length){toast('异常项请填写情况说明');return}
+  let abn=0;
+  CHECK_ITEMS.forEach((it,i)=>{
+    const ok=ckState[it.id]==='ok';
+    t.items[i].ok=ok;
+    t.items[i].note=ok?'':document.getElementById('note-'+it.id).querySelector('input').value.trim();
+    if(!ok)abn++;
+  });
+  t.status='done';t.abnormalCount=abn;
+  CHECK_ITEMS.filter(it=>ckState[it.id]==='bad').forEach(it=>{
+    HAZARDS.unshift({id:++HID,taskId:t.id,date:dstr(TODAY),dayAgo:0,stationId:t.stationId,
+      type:({'疏散设施':'疏散指示损坏','防火分隔':'防火门故障','消防器材':'灭火器过期','自动设施':'消火栓缺陷',
+        '用电安全':'电气隐患','用火管理':'违规用火用电','物品管理':'易燃物堆放','值班管理':'消防通道堵塞'})[it.cat],
+      level:pick(['一般','较大']),desc:stationName(t.stationId)+t.points[0]+'：'+it.name+' 异常 —— '+t.items[it.id-1].note,
+      status:'open',reporter:staffName(t.staffId)});
+  });
+  closeSheet('maskPatrol');
+  toast(abn?('已提交，发现异常 '+abn+' 项并自动生成隐患'):'已提交，全部正常 ✔');
+  renderAll();
+}
+/* ================= 隐患上报 ================= */
+function openReport(){
+  document.getElementById('rpStation').innerHTML=STATIONS.map(s=>`<option value="${s.id}">${s.name}（${s.line}）</option>`).join('');
+  document.getElementById('rpType').innerHTML=HZ_TYPES.map(t=>`<option>${t}</option>`).join('');
+  document.getElementById('rpDesc').value='';
+  openSheet('maskReport');
+}
+function submitReport(){
+  const desc=document.getElementById('rpDesc').value.trim();
+  if(!desc){toast('请填写具体描述');return}
+  HAZARDS.unshift({id:++HID,taskId:null,date:dstr(TODAY),dayAgo:0,stationId:document.getElementById('rpStation').value,
+    type:document.getElementById('rpType').value,level:document.getElementById('rpLevel').value,
+    desc:stationName(document.getElementById('rpStation').value)+'人工上报：'+desc,status:'open',reporter:'王建国'});
+  closeSheet('maskReport');toast('上报成功，已同步至物业工程部');
+  renderAll();go(2);
+}
+/* ================= 通用交互 ================= */
+function go(i){
+  curTab=i;
+  document.querySelectorAll('.page').forEach((p,idx)=>p.classList.toggle('active',idx===i));
+  document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('on',idx===i));
+  document.getElementById('main').scrollTop=0;
+  if(i===3)renderAnalysis();
+}
+document.getElementById('tabbar').addEventListener('click',e=>{
+  const tab=e.target.closest('.tab');if(tab)go(+tab.dataset.t);
+});
+document.getElementById('taskChips').addEventListener('click',e=>{
+  if(!e.target.classList.contains('chip'))return;
+  document.querySelectorAll('#taskChips .chip').forEach(c=>c.classList.remove('on'));
+  e.target.classList.add('on');taskFilter=e.target.dataset.f;renderTasks();
+});
+document.getElementById('hzChips').addEventListener('click',e=>{
+  if(!e.target.classList.contains('chip'))return;
+  document.querySelectorAll('#hzChips .chip').forEach(c=>c.classList.remove('on'));
+  e.target.classList.add('on');hzFilter=e.target.dataset.f;renderHz();
+});
+document.getElementById('stationSel').addEventListener('change',e=>{curStation=e.target.value;renderAll();if(curTab===3)renderAnalysis()});
+function openSheet(id){document.getElementById(id).classList.add('show')}
+function closeSheet(id){document.getElementById(id).classList.remove('show')}
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function openScan(){
+  toast('对准巡更点二维码即可打卡（演示）');
+  setTimeout(()=>toast('✔ 打卡成功：中庭扶梯区巡更点'),1400);
+}
+function renderAll(){
+  renderHome();
+  if(curTab===1)renderTasks();
+  if(curTab===2)renderHz();
+}
+/* ================= 初始化 ================= */
+const wk=['日','一','二','三','四','五','六'];
+document.getElementById('todayStr').textContent=TODAY.getFullYear()+'年'+(TODAY.getMonth()+1)+'月'+TODAY.getDate()+'日 周'+wk[TODAY.getDay()];
+document.getElementById('stationSel').innerHTML='<option value="ALL">🏢 全部站点（'+STATIONS.length+'个）</option>'+
+  STATIONS.map(s=>`<option value="${s.id}">${s.line} · ${s.name}商业区</option>`).join('');
+renderHome();renderTasks();renderHz();
+</script>
+</body>
+</html>

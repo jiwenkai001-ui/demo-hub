@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地铁商业防火巡更管理系统</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<style>
+:root{
+  --primary:#E0402B; --primary-dark:#C33523; --primary-light:#FDECEA;
+  --orange:#F59E0B; --green:#10B981; --blue:#3B82F6; --purple:#8B5CF6;
+  --ink:#1F2937; --ink2:#6B7280; --ink3:#9CA3AF;
+  --bg:#F4F5F7; --card:#FFFFFF; --line:#EEF0F3;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background:linear-gradient(135deg,#2b3444 0%,#1f2733 55%,#3a2b28 100%);
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px 0;
+}
+.phone{width:414px;max-width:100%;height:min(880px,calc(100vh - 24px));background:var(--bg);border-radius:34px;overflow:hidden;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 10px #12161d;display:flex;flex-direction:column}
+@media (max-width:480px){body{padding:0}.phone{border-radius:0;height:100vh;box-shadow:none}}
+.appheader{background:linear-gradient(150deg,#E0402B 0%,#C33523 70%,#A72B1C 100%);color:#fff;padding:14px 18px 58px;position:relative;flex-shrink:0}
+.appheader .row1{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.92}
+.appheader .row1 .r{display:flex;gap:10px;align-items:center}
+.netdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9CA3AF;margin-right:4px}
+.netdot.on{background:#34D399;box-shadow:0 0 6px #34D399}
+.appheader h1{font-size:19px;font-weight:700;margin-top:10px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.stationSel{margin-top:10px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:22px;padding:7px 12px;font-size:13px;color:#fff;width:100%;appearance:none;-webkit-appearance:none;
+background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='white' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+.stationSel option{color:#1F2937}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 14px 84px;margin-top:-46px;scroll-behavior:smooth}
+main::-webkit-scrollbar{width:0}
+.page{display:none;animation:fadeUp .28s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.card h3{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card h3 .more{font-size:12px;color:var(--ink3);font-weight:400}
+.sec-title{font-size:13px;color:var(--ink2);font-weight:600;margin:16px 4px 8px;display:flex;align-items:center;gap:6px}
+.sec-title::before{content:"";width:3px;height:13px;background:var(--primary);border-radius:2px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stat{background:#fff;border-radius:12px;padding:12px 4px;text-align:center;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.stat .num{font-size:20px;font-weight:800;line-height:1.1}
+.stat .lbl{font-size:10.5px;color:var(--ink2);margin-top:4px}
+.stat.c-red .num{color:var(--primary)} .stat.c-green .num{color:var(--green)}
+.stat.c-blue .num{color:var(--blue)} .stat.c-orange .num{color:var(--orange)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#fff;border-radius:var(--radius);padding:14px 8px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.quick .q{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--ink)}
+.quick .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.list-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.list-item:last-child{border-bottom:none;padding-bottom:2px}
+.li-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.li-main{flex:1;min-width:0}
+.li-main .t{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-main .s{font-size:11.5px;color:var(--ink2);margin-top:3px}
+.li-right{text-align:right;flex-shrink:0}
+.li-right .v{font-size:12.5px;font-weight:700}
+.li-right .d{font-size:10.5px;color:var(--ink3);margin-top:3px}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600}
+.bg-green{background:#E7F8F0;color:#0B9E6E} .bg-red{background:var(--primary-light);color:var(--primary)}
+.bg-orange{background:#FEF3E2;color:#C77F06} .bg-blue{background:#EAF2FE;color:#2D6FDB}
+.bg-gray{background:#F1F2F4;color:#6B7280}
+.task-card{background:#fff;border-radius:var(--radius);padding:13px 14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(31,41,55,.05);cursor:pointer;transition:transform .15s}
+.task-card:active{transform:scale(.985)}
+.task-top{display:flex;justify-content:space-between;align-items:flex-start}
+.task-top .t{font-size:14.5px;font-weight:700;color:var(--ink)}
+.task-meta{display:flex;gap:12px;margin-top:7px;font-size:11.5px;color:var(--ink2);flex-wrap:wrap}
+.task-meta span{display:flex;align-items:center;gap:3px}
+.task-foot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink2)}
+.progress{height:6px;background:#F1F2F4;border-radius:4px;overflow:hidden;flex:1;margin-right:10px}
+.progress i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),#F26B4F)}
+.progress.g i{background:linear-gradient(90deg,#0B9E6E,#34D399)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;border-radius:20px;background:#fff;font-size:12px;color:var(--ink2);border:1px solid var(--line);white-space:nowrap;cursor:pointer;font-weight:500}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.hz-card{background:#fff;border-radius:var(--radius);margin-bottom:10px;box-shadow:0 2px 10px rgba(31,41,55,.05);overflow:hidden}
+.hz-strip{height:4px}
+.hz-body{padding:12px 14px;cursor:pointer}
+.hz-top{display:flex;justify-content:space-between;align-items:center}
+.hz-top .t{font-size:14px;font-weight:700;color:var(--ink)}
+.hz-desc{font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hz-meta{display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--ink3);align-items:center}
+.hz-detail{display:none;padding:0 14px 13px;border-top:1px solid var(--line)}
+.hz-card.open .hz-detail{display:block}
+.timeline{margin-top:12px}
+.tl-item{display:flex;gap:10px;position:relative;padding-bottom:14px}
+.tl-item:last-child{padding-bottom:2px}
+.tl-item::before{content:"";position:absolute;left:5px;top:16px;bottom:0;width:1.5px;background:var(--line)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--ink3);flex-shrink:0;margin-top:3px;z-index:1}
+.tl-item.done .tl-dot{background:var(--green);border-color:var(--green)}
+.tl-item.cur .tl-dot{border-color:var(--primary);background:var(--primary-light)}
+.tl-item .tt{font-size:12.5px;font-weight:600;color:var(--ink)}
+.tl-item .td{font-size:11px;color:var(--ink3);margin-top:2px}
+.chart-svg{width:100%;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px}
+.legend li{list-style:none;font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.donut-wrap{display:flex;align-items:center;gap:14px}
+.donut-wrap svg{width:118px;flex-shrink:0}
+.rank-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.rank-no{width:20px;height:20px;border-radius:6px;background:#F1F2F4;font-size:11px;font-weight:700;color:var(--ink2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-row:nth-child(1) .rank-no{background:#FDECEA;color:var(--primary)}
+.rank-row:nth-child(2) .rank-no{background:#FEF3E2;color:var(--orange)}
+.rank-row:nth-child(3) .rank-no{background:#EAF2FE;color:var(--blue)}
+.rank-name{width:56px;font-size:12.5px;font-weight:600;color:var(--ink);flex-shrink:0}
+.rank-bar{flex:1;height:8px;background:#F1F2F4;border-radius:5px;overflow:hidden}
+.rank-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--primary),#F26B4F)}
+.rank-val{width:44px;text-align:right;font-size:12px;font-weight:700;color:var(--ink);flex-shrink:0}
+.summary li{list-style:none;font-size:12.5px;color:var(--ink);line-height:1.7;padding-left:16px;position:relative}
+.summary li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.summary li b{color:var(--primary)}
+.me-top{display:flex;align-items:center;gap:14px;background:#fff;border-radius:var(--radius);padding:18px 16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#F26B4F);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.me-name{font-size:17px;font-weight:800;color:var(--ink)}
+.me-role{font-size:12px;color:var(--ink2);margin-top:4px}
+.menu-item{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fff;border-radius:12px;margin-bottom:8px;font-size:13.5px;color:var(--ink);font-weight:500;cursor:pointer;box-shadow:0 2px 10px rgba(31,41,55,.05)}
+.menu-item .mi{font-size:17px}
+.menu-item .arr{margin-left:auto;color:var(--ink3);font-size:12px}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:20}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--ink3);cursor:pointer;position:relative}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--primary);font-weight:700}
+.tab .tabdot{position:absolute;top:8px;right:calc(50% - 16px);width:15px;height:15px;background:var(--primary);color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.mask{position:absolute;inset:0;background:rgba(17,24,39,.45);z-index:30;display:none;align-items:flex-end;backdrop-filter:blur(2px)}
+.mask.show{display:flex}
+.sheet{background:#fff;width:100%;border-radius:22px 22px 0 0;max-height:90%;display:flex;flex-direction:column;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.sheet-head{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);flex-shrink:0}
+.sheet-head .t{font-size:15.5px;font-weight:800;color:var(--ink)}
+.sheet-close{width:28px;height:28px;border-radius:50%;background:#F1F2F4;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink2);cursor:pointer}
+.sheet-body{overflow-y:auto;padding:14px 18px 18px;flex:1}
+.sheet-body::-webkit-scrollbar{width:0}
+.ck-item{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:9px}
+.ck-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ck-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.45}
+.ck-cat{font-size:10px;color:var(--ink3);background:#F4F5F7;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.ck-btns{display:flex;gap:8px;margin-top:9px}
+.ck-btn{flex:1;padding:7px 0;border-radius:9px;font-size:12px;font-weight:600;text-align:center;border:1.5px solid var(--line);color:var(--ink2);cursor:pointer;transition:.15s}
+.ck-btn.ok.sel{background:#E7F8F0;border-color:var(--green);color:#0B9E6E}
+.ck-btn.bad.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.ck-note{display:none;margin-top:8px}
+.ck-note.show{display:block}
+.ck-note input{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:12px;outline:none}
+.ck-note input:focus{border-color:var(--primary)}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:600}
+.form-row select,.form-row textarea,.form-row input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;outline:none;font-family:inherit;background:#fff}
+.form-row textarea{height:72px;resize:none}
+.form-row select:focus,.form-row textarea:focus,.form-row input:focus{border-color:var(--primary)}
+.btn-primary{width:100%;padding:13px 0;border:none;border-radius:13px;background:linear-gradient(135deg,var(--primary),#F26B4F);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:2px}
+.btn-primary:active{opacity:.85}
+.btn-primary:disabled{opacity:.5}
+.btn-ghost{width:100%;padding:12px 0;border-radius:13px;border:1.5px solid var(--line);background:#fff;color:var(--ink2);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:9px}
+.toast{position:absolute;left:50%;top:42%;transform:translateX(-50%);background:rgba(17,24,39,.88);color:#fff;padding:11px 20px;border-radius:12px;font-size:13px;z-index:60;display:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:90%;text-align:center}
+.toast.show{display:block;animation:fadeUp .25s}
+.empty{text-align:center;padding:34px 0;color:var(--ink3);font-size:13px}
+.empty .e{font-size:34px;margin-bottom:8px}
+.tag-pts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag-pts span{font-size:10.5px;background:#F4F5F7;color:var(--ink2);padding:3px 9px;border-radius:8px}
+/* 打卡相关 */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.photo-grid .ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F1F2F4}
+.photo-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-grid .del{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(17,24,39,.7);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.scanbox{display:none;margin-bottom:12px}
+.scanbox.show{display:block}
+.scanbox video{width:100%;border-radius:12px;background:#11161d;aspect-ratio:4/3;object-fit:cover}
+.scanbox .hint{font-size:11px;color:var(--ink3);text-align:center;margin-top:6px}
+.row2{display:flex;gap:8px}
+.row2>*{flex:1;min-width:0}
+</style>
+</head>
+<body>
+<div class="phone" id="app">
+
+  <div class="appheader">
+    <div class="row1">
+      <span id="todayStr">—</span>
+      <div class="r"><span><span class="netdot" id="netDot"></span><span id="netText">连接后台中…</span></span><span>🔔</span></div>
+    </div>
+    <h1>🚇 地铁商业防火巡更</h1>
+    <select class="stationSel" id="stationSel">
+      <option value="ALL">🏢 全部站点（3个）</option>
+    </select>
+  </div>
+
+  <main id="main">
+    <!-- 概览 -->
+    <div class="page active" id="page-0">
+      <div class="statgrid">
+        <div class="stat c-blue"><div class="num" id="st-today">0</div><div class="lbl">今日任务</div></div>
+        <div class="stat c-green"><div class="num" id="st-done">0</div><div class="lbl">已完成</div></div>
+        <div class="stat c-orange"><div class="num" id="st-rate">0%</div><div class="lbl">完成率</div></div>
+        <div class="stat c-red"><div class="num" id="st-hz">0</div><div class="lbl">今日隐患</div></div>
+      </div>
+
+      <div class="card">
+        <h3>📋 今日待办任务 <span class="more" id="todoMore"></span></h3>
+        <div id="todoList"></div>
+      </div>
+
+      <div class="quick">
+        <div class="q" onclick="openCheckin()"><div class="ic" style="background:var(--primary-light)">📷</div>扫码打卡</div>
+        <div class="q" onclick="openReport()"><div class="ic" style="background:#FEF3E2">⚠️</div>隐患上报</div>
+        <div class="q" onclick="go(3)"><div class="ic" style="background:#EAF2FE">🗺️</div>点位任务</div>
+        <div class="q" onclick="go(3)"><div class="ic" style="background:#F3EEFE">📊</div>数据分析</div>
+      </div>
+
+      <div class="card">
+        <h3>🔴 实时打卡动态 <span class="more"><span onclick="loadFeed()" style="cursor:pointer">刷新</span> · <span onclick="location='/admin.html'" style="cursor:pointer">管理后台</span></span></h3>
+        <div id="feedList"><div class="empty"><div class="e">📡</div>正在连接后台…</div></div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 消防安全提示</h3>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.8">
+          冬季火灾高发期，请重点巡查<b style="color:var(--primary)">餐饮区燃气用具、商铺取暖设备、配电间</b>；
+          常闭式防火门务必保持关闭，消防通道严禁占用，发现隐患立即上报并拍照留证。
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🕐 最近巡查动态</h3>
+        <div id="recentList"></div>
+      </div>
+    </div>
+
+    <!-- 巡查 -->
+    <div class="page" id="page-1">
+      <div class="chips" id="taskChips">
+        <div class="chip on" data-f="ALL">全部</div>
+        <div class="chip" data-f="pending">待执行</div>
+        <div class="chip" data-f="done">已完成</div>
+        <div class="chip" data-f="late">已逾期</div>
+      </div>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- 隐患 -->
+    <div class="page" id="page-2">
+      <div class="chips" id="hzChips">
+        <div class="chip on" data-f="ALL">全部</div>
+        <div class="chip" data-f="open">待处理</div>
+        <div class="chip" data-f="processing">处理中</div>
+        <div class="chip" data-f="closed">已闭环</div>
+      </div>
+      <div id="hzList"></div>
+    </div>
+
+    <!-- 分析 -->
+    <div class="page" id="page-3">
+      <div class="card">
+        <h3>📈 近7日巡查完成率趋势 <span class="more" id="monthRate"></span></h3>
+        <div id="chartTrend"></div>
+      </div>
+      <div class="card">
+        <h3>🏢 各站点完成率对比（近30天）</h3>
+        <div id="chartStation"></div>
+      </div>
+      <div class="card">
+        <h3>🧯 隐患类型分布</h3>
+        <div class="donut-wrap">
+          <div id="chartDonut"></div>
+          <ul class="legend" id="donutLegend" style="flex:1;margin-top:0"></ul>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🎖️ 保安巡查绩效排行（近30天）</h3>
+        <div id="rankList"></div>
+      </div>
+      <div class="card">
+        <h3>⚖️ 隐患等级分布</h3>
+        <div id="levelDist"></div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,#FFF7F5,#fff)">
+        <h3>🤖 智能分析摘要</h3>
+        <ul class="summary" id="aiSummary"></ul>
+      </div>
+    </div>
+
+    <!-- 我的 -->
+    <div class="page" id="page-4">
+      <div class="me-top">
+        <div class="avatar">王</div>
+        <div>
+          <div class="me-name">王建国 <span class="badge bg-blue">消控主管</span></div>
+          <div class="me-role">鱼化寨地铁站 · 物业安保部 · 工号 A1001</div>
+        </div>
+      </div>
+      <div class="statgrid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat c-green"><div class="num" id="me-done">0</div><div class="lbl">本月巡查</div></div>
+        <div class="stat c-red"><div class="num" id="me-hz">0</div><div class="lbl">上报隐患</div></div>
+        <div class="stat c-blue"><div class="num" id="me-score">0</div><div class="lbl">绩效分</div></div>
+      </div>
+      <div class="sec-title" style="margin-top:6px">常用功能</div>
+      <div class="menu-item" onclick="openCheckin()"><span class="mi">📷</span>扫码巡更打卡<span class="arr">›</span></div>
+      <div class="menu-item" onclick="location='/admin.html'"><span class="mi">🖥️</span>打开管理后台<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('消防预案查阅开发中')"><span class="mi">📖</span>消防应急预案库<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('培训课程开发中')"><span class="mi">🎓</span>消防安全培训<span class="arr">›</span></div>
+      <div class="menu-item" onclick="toast('应急值班电话 021-96119 转 8')"><span class="mi">☎️</span>应急值班电话<span class="arr">›</span></div>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <div class="tab on" data-t="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+      概览
+    </div>
+    <div class="tab" data-t="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/><path d="M9.5 8h5M9.5 11.5h5"/></svg>
+      巡查<span class="tabdot" id="badgeTask">0</span>
+    </div>
+    <div class="tab" data-t="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c.5 3-1.5 4.5-3 6-1.8 1.8-2.5 3.6-2.5 5.5A5.5 5.5 0 0 0 12 20a5.5 5.5 0 0 0 5.5-5.5c0-1.9-.7-3.7-2.5-5.5-1.5-1.5-3.5-3-3-6z"/></svg>
+      隐患<span class="tabdot" id="badgeHz">0</span>
+    </div>
+    <div class="tab" data-t="3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>
+      分析
+    </div>
+    <div class="tab" data-t="4">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/></svg>
+      我的
+    </div>
+  </nav>
+
+  <!-- 打卡弹层 -->
+  <div class="mask" id="maskCheckin">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="t">📷 扫码巡更打卡</div>
+        <div class="sheet-close" onclick="closeSheet('maskCheckin');stopScan()">✕</div>
+      </div>
+      <div class="sheet-body">
+        <div class="scanbox" id="scanBox">
+          <video id="scanVideo" playsinline muted></video>
+          <div class="hint">对准巡更点二维码即可自动识别 · <span style="cursor:pointer;color:var(--primary)" onclick="stopScan()">关闭相机，手动输入</span></div>
+        </div>
+        <div class="form-row"><label>巡更点位</label>
+          <div class="row2">
+            <select id="ckStation"></select>
+            <select id="ckPoint" style="flex:1.3"></select>
+          </div>
+        </div>
+        <div class="form-row"><label>打卡人</label><select id="ckStaff"></select></div>
+        <div class="form-row"><label>检查结果</label>
+          <div class="row2">
+            <div class="ck-btn ok sel" id="ckResOk" onclick="setCkRes('ok')">✓ 正常</div>
+            <div class="ck-btn bad" id="ckResBad" onclick="setCkRes('bad')">✗ 异常</div>
+          </div>
+        </div>
+        <div class="form-row" id="ckNoteRow" style="display:none"><label>异常说明</label><input id="ckNote" placeholder="请描述异常情况（提交后自动生成隐患）"></div>
+        <div class="form-row"><label>现场照片（最多6张，自动压缩上传）</label>
+          <div class="photo-grid" id="photoGrid"></div>
+          <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="addPhotos(this)">
+          <button class="btn-ghost" style="margin-top:0" onclick="document.getElementById('photoInput').click()">📸 拍照 / 从相册选择</button>
+        </div>
+        <button class="btn-primary" id="btnCheckin" onclick="submitCheckin()">提交打卡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐患上报弹层 -->
+  <div class="mask" id="maskReport">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="t">⚠️ 隐患上报</div>
+        <div class="sheet-close" onclick="closeSheet('maskReport')">✕</div>
+      </div>
+      <div class="sheet-body">
+        <div class="form-row"><label>所属站点</label><select id="rpStation"></select></div>
+        <div class="form-row"><label>隐患类型</label><select id="rpType"></select></div>
+        <div class="form-row"><label>隐患等级</label><select id="rpLevel"><option>一般</option><option>较大</option><option>重大</option></select></div>
+        <div class="form-row"><label>具体描述</label><textarea id="rpDesc" placeholder="请描述隐患位置、情况，并现场拍照留证…"></textarea></div>
+        <div class="form-row"><label>现场照片</label>
+          <div class="photo-grid" id="rpPhotoGrid"></div>
+          <input type="file" id="rpPhotoInput" accept="image/*" multiple style="display:none" onchange="addPhotos(this,'rp')">
+          <button class="btn-ghost" style="margin-top:0" onclick="document.getElementById('rpPhotoInput').click()">📸 拍照 / 从相册选择</button>
+        </div>
+        <button class="btn-primary" onclick="submitReport()">提交上报</button>
+        <button class="btn-ghost" onclick="closeSheet('maskReport')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ================= 演示任务数据（固定种子） ================= */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=mulberry32(20261125);
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+function dstr(d){return d.toISOString().slice(0,10)}
+function fmtD(d){return (d.getMonth()+1)+'月'+d.getDate()+'日'}
+let TID=0,HID=0;
+let TASKS=[];
+const CHECK_ITEMS=['消防通道、安全出口畅通无堵塞','疏散指示标志、应急照明完好有效','常闭式防火门处于关闭状态','灭火器压力正常、在有效期内','室内消火栓完好、无遮挡','喷淋头、烟感探测器无遮挡损坏','电气线路无私拉乱接、无裸露老化','商铺无违规用火、吸烟现象','易燃可燃物品未违规堆放','消防控制室值班人员在岗在位'];
+const POINTS=['A区商业街','B区餐饮区','中庭扶梯区','设备夹层','出入口连通道','停车场接驳区'];
+const SHIFTS=['早班 08:00','中班 14:00','晚班 20:00'];
+const HZ_TYPES=['消防通道堵塞','灭火器过期','疏散指示损坏','防火门故障','电气隐患','违规用火用电','易燃物堆放','消火栓缺陷'];
+const TYPE_COLORS=['#E0402B','#F59E0B','#3B82F6','#8B5CF6','#10B981','#EC4899','#6366F1','#14B8A6'];
+const LEVEL_COLORS={'一般':'#F59E0B','较大':'#E0402B','重大':'#7F1D1D'};
+const HZ_STATUS={open:['待处理','bg-red'],processing:['处理中','bg-orange'],closed:['已闭环','bg-green']};
+
+// 演示：站点/人员/任务（云端任务管理与本地演示并存）
+const DEMO_STATIONS=[
+  {id:'S1',name:'鱼化寨地铁站',short:'鱼化寨',line:'3号线'},
+  {id:'S2',name:'余家寨地铁站',short:'余家寨',line:'2号线'},
+  {id:'S3',name:'行政中心地铁站',short:'行政中心',line:'2号线'},
+];
+const DEMO_STAFF={S1:['王建国','李晓峰'],S2:['张伟民','刘 洋'],S3:['陈 志','赵 磊']};
+for(let dayAgo=29;dayAgo>=0;dayAgo--){
+  const date=new Date(TODAY);date.setDate(date.getDate()-dayAgo);
+  DEMO_STATIONS.forEach(st=>{
+    SHIFTS.forEach((shift,si)=>{
+      const staff=pick(DEMO_STAFF[st.id]);
+      const pts=[...POINTS].sort(()=>rnd()-.5).slice(0,3+Math.floor(rnd()*2));
+      let status;
+      if(dayAgo===0){status=si<1?'done':'pending';if(si===1&&rnd()<.3)status='done'}
+      else{const r=rnd();const base=st.id==='S3'?.86:.93;status=r<base?'done':(r<base+.06?'late':'done')}
+      const items=CHECK_ITEMS.map(n=>({name:n,ok:rnd()<.94,note:''}));
+      const abnormal=items.filter(i=>!i.ok);
+      TASKS.push({id:++TID,date:dstr(date),dayAgo,stationId:st.id,shift,staff,points:pts,status:status==='late'?'late':'done'|status==='pending'?'pending':'done',items,abnormalCount:status==='done'?abnormal.length:0});
+      TASKS[TASKS.length-1].status=status;
+    });
+  });
+}
+
+/* ================= 全局状态 ================= */
+let curTab=0,curStation='ALL',taskFilter='ALL',hzFilter='ALL';
+let serverOnline=false;
+let POINTS_DB=[];   // 后台巡更点
+let STATIONS_DB=DEMO_STATIONS.slice();
+let STAFF_DB=[];
+let ckPhotos=[],rpPhotos=[];
+let ckResult='ok';
+const stationName=id=>(STATIONS_DB.find(s=>s.id===id)||{}).name||id;
+const fTasks=()=>TASKS.filter(t=>curStation==='ALL'||t.stationId===curStation);
+
+/* ================= API ================= */
+async function api(path,opts){
+  const r=await fetch(path,Object.assign({headers:{'Content-Type':'application/json'}},opts||{}));
+  const d=await r.json();
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+async function probe(){
+  try{
+    const d=await api('/api/points');
+    POINTS_DB=d.points;STATIONS_DB=d.stations;STAFF_DB=d.staff;
+    serverOnline=true;
+    document.getElementById('netDot').classList.add('on');
+    document.getElementById('netText').textContent='已连接后台';
+  }catch(e){
+    serverOnline=false;
+    document.getElementById('netText').textContent='演示模式';
+  }
+}
+
+/* ================= 打卡 ================= */
+function openCheckin(prefillCode){
+  if(!serverOnline){toast('后台未连接，请先启动：node server.js');return}
+  // 站点下拉
+  const stSel=document.getElementById('ckStation');
+  stSel.innerHTML=STATIONS_DB.map(s=>`<option value="${s.id}">${s.line} · ${s.name}</option>`).join('');
+  // 打卡人
+  document.getElementById('ckStaff').innerHTML=STAFF_DB.map(n=>`<option ${n==='王建国'?'selected':''}>${n}</option>`).join('');
+  fillPointSel(stSel.value,prefillCode);
+  setCkRes('ok');
+  document.getElementById('ckNote').value='';
+  ckPhotos=[];renderPhotos();
+  openSheet('maskCheckin');
+  if(prefillCode)toast('已识别二维码：'+prefillCode);
+  stSel.onchange=()=>fillPointSel(stSel.value);
+}
+function fillPointSel(sid,preCode){
+  const pts=POINTS_DB.filter(p=>p.stationId===sid);
+  const sel=document.getElementById('ckPoint');
+  sel.innerHTML=pts.map(p=>`<option value="${p.code}">${p.code} · ${p.name}</option>`).join('');
+  if(preCode&&pts.some(p=>p.code===preCode))sel.value=preCode;
+}
+function setCkRes(v){
+  ckResult=v;
+  document.getElementById('ckResOk').classList.toggle('sel',v==='ok');
+  document.getElementById('ckResBad').classList.toggle('sel',v==='bad');
+  document.getElementById('ckNoteRow').style.display=v==='bad'?'block':'none';
+}
+/* 照片：压缩 → base64 */
+function compressFile(file,maxW=1280,q=.82){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxW/img.naturalWidth);
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.naturalWidth*scale);c.height=Math.round(img.naturalHeight*scale);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',q));
+    };
+    img.onerror=reject;
+    img.src=URL.createObjectURL(file);
+  });
+}
+async function addPhotos(input,target){
+  const list=target==='rp'?rpPhotos:ckPhotos;
+  const grid=target==='rp'?'rpPhotoGrid':'photoGrid';
+  for(const f of input.files){
+    if(list.length>=6){toast('最多6张照片');break}
+    try{list.push(await compressFile(f))}catch(e){toast('照片读取失败')}
+  }
+  input.value='';
+  renderPhotos(grid,list);
+}
+function renderPhotos(grid,list){
+  grid=grid||'photoGrid';list=list||ckPhotos;
+  const el=document.getElementById(grid);
+  el.innerHTML=list.map((src,i)=>`<div class="ph"><img src="${src}" onclick="viewPhoto('${grid}',${i})"><div class="del" onclick="delPhoto('${grid}',${i})">✕</div></div>`).join('');
+}
+function delPhoto(grid,i){
+  if(grid==='rp'){rpPhotos.splice(i,1);renderPhotos('rpPhotoGrid',rpPhotos)}
+  else{ckPhotos.splice(i,1);renderPhotos('photoGrid',ckPhotos)}
+}
+function viewPhoto(grid,i){
+  const list=grid==='rp'?rpPhotos:ckPhotos;
+  const w=window.open('');if(w){w.document.write('<img src="'+list[i]+'" style="max-width:100%">')}
+}
+async function submitCheckin(){
+  const btn=document.getElementById('btnCheckin');
+  const code=document.getElementById('ckPoint').value;
+  const note=document.getElementById('ckNote').value.trim();
+  if(!code){toast('请选择巡更点位');return}
+  if(ckResult==='bad'&&!note){toast('异常打卡请填写说明');return}
+  btn.disabled=true;btn.textContent='上传中…';
+  try{
+    const d=await api('/api/checkin',{method:'POST',body:JSON.stringify({
+      code,staff:document.getElementById('ckStaff').value,result:ckResult,note,photos:ckPhotos})});
+    closeSheet('maskCheckin');stopScan();
+    toast(d.record.result==='ok'?'✔ 打卡成功，记录已保存':'已打卡（异常），自动生成隐患 '+d.hazardId.slice(0,8));
+    loadFeed();
+  }catch(e){toast('打卡失败：'+e.message)}
+  btn.disabled=false;btn.textContent='提交打卡';
+}
+/* 实时打卡动态 */
+async function loadFeed(){
+  const el=document.getElementById('feedList');
+  if(!serverOnline){el.innerHTML='<div class="empty"><div class="e">📡</div>后台未连接<br><span style="font-size:11px">在本目录运行 node server.js 后刷新</span></div>';return}
+  try{
+    const d=await api('/api/records?limit=6');
+    el.innerHTML=d.records.length?d.records.map(r=>{
+      const dt=new Date(r.ts);
+      const t=dt.getMonth()+1+'月'+dt.getDate()+'日 '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+      return `<div class="list-item" onclick="viewRecord('${r.id}')">
+        <div class="li-dot" style="background:${r.result==='ok'?'#E7F8F0':'var(--primary-light)'}">${r.result==='ok'?'✓':'⚠'}</div>
+        <div class="li-main"><div class="t">${r.pointName} · ${r.stationName}</div>
+        <div class="s">${r.staff}${r.photos.length?' · 📷'+r.photos.length:''}${r.note?' · '+r.note.slice(0,14):''}</div></div>
+        <div class="li-right"><div class="v" style="color:${r.result==='ok'?'var(--green)':'var(--primary)'}">${r.result==='ok'?'正常':'异常'}</div>
+        <div class="d">${t}</div></div></div>`;
+    }).join(''):'<div class="empty"><div class="e">📭</div>暂无打卡记录，去扫码打卡吧</div>';
+  }catch(e){el.innerHTML='<div class="empty"><div class="e">📡</div>后台连接失败</div>'}
+}
+async function viewRecord(id){
+  try{
+    const d=await api('/api/records?limit=500');
+    const r=d.records.find(x=>x.id===id);if(!r)return;
+    const dt=new Date(r.ts);
+    alert(`巡更打卡记录\n\n点位：${r.code} · ${r.pointName}（${r.stationName}）\n打卡人：${r.staff}\n时间：${dt.toLocaleString('zh-CN')}\n结果：${r.result==='ok'?'正常':'异常'}\n说明：${r.note||'无'}\n照片：${r.photos.length}张\n\n照片链接（控制台可复制）：\n${r.photos.join('\n')||'无'}`);
+    console.log('照片URL:',r.photos);
+  }catch(e){toast('读取失败')}
+}
+
+/* ================= 相机扫码（jsQR） ================= */
+let scanStream=null,scanRAF=null;
+async function startScan(){
+  const box=document.getElementById('scanBox');
+  if(typeof jsQR==='undefined'){toast('扫码组件未加载（需联网），请手动选择点位');return}
+  try{
+    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=document.getElementById('scanVideo');
+    v.srcObject=scanStream;await v.play();
+    box.classList.add('show');
+    const c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});
+    const tick=()=>{
+      if(!scanStream)return;
+      if(v.readyState===v.HAVE_ENOUGH_DATA){
+        c.width=v.videoWidth;c.height=v.videoHeight;
+        ctx.drawImage(v,0,0);
+        const code=jsQR(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height,{inversionAttempts:'dontInvert'});
+        if(code&&code.data){
+          const m=code.data.match(/scan=([A-Za-z0-9-]+)/);
+          const codeVal=m?m[1]:code.data;
+          if(POINTS_DB.some(p=>p.code===codeVal)){
+            document.getElementById('ckPoint').value=codeVal;
+            // 站点联动
+            const pt=POINTS_DB.find(p=>p.code===codeVal);
+            document.getElementById('ckStation').value=pt.stationId;fillPointSel(pt.stationId,codeVal);
+            stopScan();toast('✔ 识别成功：'+codeVal+' · '+pt.name);return;
+          }
+        }
+      }
+      scanRAF=requestAnimationFrame(tick);
+    };
+    tick();
+  }catch(e){toast('相机不可用：'+(e.message||e.name)+'，请手动选择点位或用系统相机扫码')}
+}
+function stopScan(){
+  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null}
+  if(scanRAF)cancelAnimationFrame(scanRAF);
+  document.getElementById('scanBox').classList.remove('show');
+}
+
+/* ================= 渲染：概览/巡查/隐患/分析（演示数据） ================= */
+function renderHome(){
+  const ts=fTasks().filter(t=>t.dayAgo===0);
+  const done=ts.filter(t=>t.status==='done').length;
+  const rate=ts.length?Math.round(done/ts.length*100):0;
+  document.getElementById('st-today').textContent=ts.length;
+  document.getElementById('st-done').textContent=done;
+  document.getElementById('st-rate').textContent=rate+'%';
+  const pend=ts.filter(t=>t.status!=='done');
+  document.getElementById('todoMore').textContent=pend.length?('待执行 '+pend.length+' 项'):'全部完成 🎉';
+  document.getElementById('todoList').innerHTML=pend.length?pend.slice(0,4).map(t=>`
+    <div class="list-item" onclick="openPatrol(${t.id})">
+      <div class="li-dot" style="background:var(--primary-light)">🕐</div>
+      <div class="li-main"><div class="t">${t.shift}防火巡查 · ${stationName(t.stationId)}</div>
+      <div class="s">巡更点 ${t.points.length} 个 · ${t.staff}</div></div>
+      <div class="li-right"><span class="badge bg-red">待执行</span></div>
+    </div>`).join('')
+    :'<div class="empty"><div class="e">✅</div>今日巡查任务已全部完成</div>';
+  const recent=TASKS.filter(t=>t.status==='done'&&t.stationId===curStation).sort((a,b)=>a.dayAgo-b.dayAgo||b.id-a.id).slice(0,5);
+  document.getElementById('recentList').innerHTML=recent.map(t=>`
+    <div class="list-item" onclick="openPatrol(${t.id})">
+      <div class="li-dot" style="background:#E7F8F0">✓</div>
+      <div class="li-main"><div class="t">${t.shift}防火巡查 · ${stationName(t.stationId)}</div>
+      <div class="s">${t.staff}${t.abnormalCount?' · 发现 '+t.abnormalCount+' 项异常':''}</div></div>
+      <div class="li-right"><div class="v" style="color:${t.abnormalCount?'var(--primary)':'var(--green)'}">${t.abnormalCount?'异常 '+t.abnormalCount:'正常'}</div>
+      <div class="d">${t.dayAgo===0?'今天':fmtD(new Date(t.date))}</div></div>
+    </div>`).join('');
+}
+function renderTasks(){
+  let list=fTasks().filter(t=>taskFilter==='ALL'||t.status===taskFilter);
+  list=list.sort((a,b)=>a.dayAgo-b.dayAgo||b.id-a.id).slice(0,40);
+  document.getElementById('taskList').innerHTML=list.length?list.map(t=>{
+    const bmap={done:['已完成','bg-green'],pending:['待执行','bg-red'],late:['已逾期','bg-orange']};
+    return `<div class="task-card" onclick="openPatrol(${t.id})">
+      <div class="task-top"><div class="t">${t.shift} · 防火巡查</div><span class="badge ${bmap[t.status][1]}">${bmap[t.status][0]}</span></div>
+      <div class="task-meta"><span>📍 ${stationName(t.stationId)}</span><span>👤 ${t.staff}</span>
+      <span>🕐 ${t.dayAgo===0?'今天':fmtD(new Date(t.date))}</span></div>
+      <div class="tag-pts">${t.points.map(p=>'<span>#'+p+'</span>').join('')}</div>
+      <div class="task-foot">
+        <div style="display:flex;align-items:center;flex:1">
+          <div class="progress ${t.status==='done'?'g':''}"><i style="width:${t.status==='done'?100:0}%"></i></div>
+          <span>${t.status==='done'?'检查 10 项 · 异常 '+t.abnormalCount:'检查项 10 项'}</span>
+        </div>
+        <span style="color:${t.status==='done'?'var(--green)':'var(--primary)'};font-weight:600">${t.status==='done'?'查看详情':'去执行 ›'}</span>
+      </div>
+    </div>`}).join('')
+    :'<div class="empty"><div class="e">📭</div>暂无相关任务</div>';
+}
+function renderHz(){
+  const list=fHzDemo().filter(h=>hzFilter==='ALL'||h.status===hzFilter);
+  document.getElementById('hzList').innerHTML=list.length?list.map(h=>{
+    const st=HZ_STATUS[h.status];
+    const steps=[['隐患上报',fmtD(new Date(h.date))+' '+h.reporter],['派单整改',h.status!=='open'?'已派单至物业工程部':'待派单'],
+      ['整改完成',h.status==='closed'?'整改完毕并复核':'待整改'],['复核闭环',h.status==='closed'?'安保部复核通过':'未闭环']];
+    return `<div class="hz-card" onclick="this.classList.toggle('open')">
+      <div class="hz-strip" style="background:${LEVEL_COLORS[h.level]}"></div>
+      <div class="hz-body">
+        <div class="hz-top"><div class="t">${h.type}</div><span class="badge ${st[1]}">${st[0]}</span></div>
+        <div class="hz-desc">${h.desc}</div>
+        <div class="hz-meta"><span class="badge" style="background:${LEVEL_COLORS[h.level]}1A;color:${LEVEL_COLORS[h.level]}">${h.level}风险</span>
+        <span>📍 ${stationName(h.stationId)}</span><span>📅 ${fmtD(new Date(h.date))}</span>
+        <span style="margin-left:auto;color:var(--blue)">详情 ▾</span></div>
+      </div>
+      <div class="hz-detail"><div class="timeline">
+        ${steps.map((s,i)=>`<div class="tl-item ${h.status==='closed'||(h.status==='processing'&&i<2)?'done':(h.status==='open'&&i===1?'cur':(i===0?'done':''))}">
+        <div class="tl-dot"></div><div><div class="tt">${s[0]}</div><div class="td">${s[1]}</div></div></div>`).join('')}
+      </div></div>
+    </div>`}).join('')
+    :'<div class="empty"><div class="e">🎉</div>该分类下暂无隐患</div>';
+}
+let HZ_DEMO=[];
+function fHzDemo(){return HZ_DEMO.filter(h=>curStation==='ALL'||h.stationId===curStation)}
+/* 分析图表 */
+function lineChart(labels,values,color){
+  const W=360,H=170,L=34,R=10,T=16,B=26,iw=W-L-R,ih=H-T-B;
+  const max=100,x=i=>L+iw*i/(values.length-1),y=v=>T+ih*(1-v/max);
+  const pts=values.map((v,i)=>x(i)+','+y(v)).join(' ');
+  const area=`${L},${T+ih} ${pts} ${L+iw},${T+ih}`;
+  let grid='';[0,25,50,75,100].forEach(g=>{grid+=`<line x1="${L}" y1="${y(g)}" x2="${W-R}" y2="${y(g)}" stroke="#EEF0F3"/><text x="${L-5}" y="${y(g)+3}" font-size="9" fill="#9CA3AF" text-anchor="end">${g}</text>`});
+  const dots=values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.2" fill="#fff" stroke="${color}" stroke-width="2"/>`).join('');
+  const labs=labels.map((l,i)=>`<text x="${x(i)}" y="${H-8}" font-size="9" fill="#9CA3AF" text-anchor="middle">${l}</text>`).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="lg${color.slice(1)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".25"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>${grid}<polygon points="${area}" fill="url(#lg${color.slice(1)})"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labs}</svg>`;
+}
+function barChart(items){
+  const W=360,H=190,L=8,B=30,T=20,iw=W-L*2;
+  const bw=Math.min(36,iw/items.length*.55);
+  let bars='';
+  items.forEach((it,i)=>{
+    const cx=L+iw*(i+.5)/items.length,bh=(H-T-B)*it.value/100;
+    bars+=`<rect x="${cx-bw/2}" y="${H-B-bh}" width="${bw}" height="${bh}" rx="5" fill="${it.color||'url(#barg)'}"/>
+    <text x="${cx}" y="${H-B-bh-5}" font-size="10.5" font-weight="700" fill="#1F2937" text-anchor="middle">${it.value}%</text>
+    <text x="${cx}" y="${H-10}" font-size="9.5" fill="#6B7280" text-anchor="middle">${it.label}</text>`});
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="barg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#F26B4F"/><stop offset="1" stop-color="#E0402B"/></linearGradient></defs><line x1="${L}" y1="${H-B}" x2="${W-L}" y2="${H-B}" stroke="#EEF0F3"/>${bars}</svg>`;
+}
+function donut(segs){
+  const r=48,c=2*Math.PI*r,total=segs.reduce((s,x)=>s+x.v,0)||1;let off=0,paths='';
+  segs.forEach(s=>{const len=c*s.v/total;
+    paths+=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${s.c}" stroke-width="20" stroke-dasharray="${len-1.5} ${c-len+1.5}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;off+=len});
+  return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#F1F2F4" stroke-width="20"/>${paths}<text x="60" y="56" font-size="15" font-weight="800" fill="#1F2937" text-anchor="middle">${total}</text><text x="60" y="72" font-size="9" fill="#9CA3AF" text-anchor="middle">累计隐患</text></svg>`;
+}
+function renderAnalysis(){
+  const T=fTasks(),H=fHzDemo();
+  const labels=[],vals=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(TODAY);d.setDate(d.getDate()-i);
+    labels.push(i===0?'今天':(d.getMonth()+1)+'/'+d.getDate());
+    const day=T.filter(t=>t.date===dstr(d));
+    vals.push(day.length?Math.round(day.filter(t=>t.status==='done').length/day.length*100):0);
+  }
+  document.getElementById('chartTrend').innerHTML=lineChart(labels,vals,'#E0402B');
+  const last30=T.filter(t=>t.dayAgo<30);
+  document.getElementById('monthRate').textContent='近30天均值 '+Math.round(last30.filter(t=>t.status==='done').length/last30.length*100)+'%';
+  const stBars=STATIONS_DB.filter(s=>curStation==='ALL'||s.id===curStation).map(s=>{
+    const ts=T.filter(t=>t.stationId===s.id&&t.dayAgo<30);
+    return{label:s.short,value:ts.length?Math.round(ts.filter(t=>t.status==='done').length/ts.length*100):0}});
+  document.getElementById('chartStation').innerHTML=barChart(stBars);
+  const typeCount={};H.forEach(h=>typeCount[h.type]=(typeCount[h.type]||0)+1);
+  const segs=Object.entries(typeCount).sort((a,b)=>b[1]-a[1]).map((e,i)=>({n:e[0],v:e[1],c:TYPE_COLORS[i%TYPE_COLORS.length]}));
+  document.getElementById('chartDonut').innerHTML=donut(segs);
+  document.getElementById('donutLegend').innerHTML=segs.map(s=>`<li><i style="background:${s.c}"></i>${s.n}（${s.v}）</li>`).join('');
+  const perf={};
+  T.filter(t=>t.dayAgo<30&&t.status==='done').forEach(t=>{perf[t.staff]=perf[t.staff]||{done:0,abn:0};perf[t.staff].done++;perf[t.staff].abn+=t.abnormalCount});
+  const rank=Object.entries(perf).map(([n,v])=>({name:n.replace(/\s/g,''),v:v.done})).sort((a,b)=>b.v-a.v).slice(0,6);
+  const maxV=rank[0]?rank[0].v:1;
+  document.getElementById('rankList').innerHTML=rank.map((r,i)=>`
+    <div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${r.name}</div>
+    <div class="rank-bar"><i style="width:${r.v/maxV*100}%"></i></div><div class="rank-val">${r.v}次</div></div>`).join('');
+  const lv={'一般':0,'较大':0,'重大':0};H.forEach(h=>lv[h.level]=(lv[h.level]||0)+1);
+  const tot=H.length||1;
+  document.getElementById('levelDist').innerHTML=Object.entries(lv).map(([k,v])=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+    <span style="width:40px;font-size:12px;font-weight:700;color:${LEVEL_COLORS[k]}">${k}</span>
+    <div class="rank-bar" style="height:10px"><i style="width:${v/tot*100}%;background:${LEVEL_COLORS[k]}"></i></div>
+    <span style="width:56px;text-align:right;font-size:12px;color:var(--ink2)">${v}起 · ${Math.round(v/tot*100)}%</span></div>`).join('');
+  const worst=[...STATIONS_DB].map(s=>{const ts=T.filter(t=>t.stationId===s.id&&t.dayAgo<30);
+    return{n:s.short,r:ts.length?ts.filter(t=>t.status==='done').length/ts.length*100:0}}).sort((a,b)=>a.r-b.r)[0];
+  const topType=segs[0]||{n:'—',v:0};
+  const wk=T.filter(t=>t.dayAgo<7),wp=T.filter(t=>t.dayAgo>=7&&t.dayAgo<14);
+  const r1=wk.length?wk.filter(t=>t.status==='done').length/wk.length*100:0;
+  const r0=wp.length?wp.filter(t=>t.status==='done').length/wp.length*100:0;
+  const diff=Math.round(r1-r0);
+  document.getElementById('aiSummary').innerHTML=[
+    `<b>${worst.n}</b>近30天巡查完成率最低（${Math.round(worst.r)}%），建议督办并核查排班。`,
+    `隐患最集中于「<b>${topType.n}</b>」共 ${topType.v} 起，建议开展专项排查整治。`,
+    `本周完成率较上周${diff>=0?'提升':'下降'} <b>${Math.abs(diff)}个百分点</b>。`,
+    `真实扫码打卡数据可在管理后台（/admin.html）查看与导出管理。`
+  ].map(s=>'<li>'+s+'</li>').join('');
+}
+
+/* ================= 巡查执行（演示任务） ================= */
+let curTaskId=null,ckState={};
+function openPatrol(id){
+  const t=TASKS.find(x=>x.id===id);
+  curTaskId=id;ckState={};
+  const readonly=t.status==='done';
+  document.getElementById('patrolTitle').textContent=readonly?'巡查详情':'防火巡查执行';
+  document.getElementById('patrolMeta').innerHTML=`<b style="color:var(--ink)">${stationName(t.stationId)}</b><br>${t.shift} · 巡查人：${t.staff} · ${t.dayAgo===0?'今天':fmtD(new Date(t.date))}<br>巡更点位：${t.points.join('、')}`;
+  document.getElementById('ckList').innerHTML=CHECK_ITEMS.map((n,i)=>{
+    const pre=readonly?(t.items[i].ok?'ok':'bad'):null;
+    if(readonly)ckState[i]=pre;
+    return `<div class="ck-item"><div class="ck-top"><div class="ck-name">${i+1}. ${n}</div></div>
+    <div class="ck-btns"><div class="ck-btn ok ${pre==='ok'?'sel':''}" onclick="setTCk(${i},'ok',${readonly})">✓ 正常</div>
+    <div class="ck-btn bad ${pre==='bad'?'sel':''}" onclick="setTCk(${i},'bad',${readonly})">✗ 异常</div></div>
+    <div class="ck-note ${pre==='bad'?'show':''}" id="tnote-${i}"><input placeholder="请描述异常情况（必填）"></div></div>`}).join('');
+  document.getElementById('btnSubmitPatrol').style.display=readonly?'none':'block';
+  openSheet('maskPatrol');
+}
+function setTCk(i,val,ro){
+  if(ro)return;ckState[i]=val;
+  const item=event.target.closest('.ck-item');
+  item.querySelectorAll('.ck-btn').forEach(b=>b.classList.remove('sel'));
+  event.target.classList.add('sel');
+  item.querySelector('.ck-note').classList.toggle('show',val==='bad');
+}
+function submitPatrol(){
+  const t=TASKS.find(x=>x.id===curTaskId);
+  let abn=0,unmarked=0;
+  CHECK_ITEMS.forEach((n,i)=>{
+    if(!ckState[i]){unmarked++;return}
+    const ok=ckState[i]==='ok';
+    t.items[i].ok=ok;t.items[i].note=ok?'':document.getElementById('tnote-'+i).querySelector('input').value.trim();
+    if(!ok)abn++;
+  });
+  if(unmarked){toast('还有 '+unmarked+' 项未判定');return}
+  t.status='done';t.abnormalCount=abn;
+  closeSheet('maskPatrol');
+  toast(abn?('已提交，发现异常 '+abn+' 项'):'已提交，全部正常 ✔');
+  renderHome();renderTasks();
+}
+
+/* ================= 隐患上报（真实写入后台） ================= */
+function openReport(){
+  if(!serverOnline){toast('后台未连接，请先启动 node server.js');return}
+  document.getElementById('rpStation').innerHTML=STATIONS_DB.map(s=>`<option value="${s.id}">${s.name}（${s.line}）</option>`).join('');
+  document.getElementById('rpType').innerHTML=HZ_TYPES.map(t=>`<option>${t}</option>`).join('');
+  document.getElementById('rpDesc').value='';
+  rpPhotos=[];renderPhotos('rpPhotoGrid',rpPhotos);
+  openSheet('maskReport');
+}
+async function submitReport(){
+  const desc=document.getElementById('rpDesc').value.trim();
+  if(!desc){toast('请填写具体描述');return}
+  try{
+    await api('/api/hazards',{method:'POST',body:JSON.stringify({
+      stationId:document.getElementById('rpStation').value,type:document.getElementById('rpType').value,
+      level:document.getElementById('rpLevel').value,desc,photos:rpPhotos,reporter:'王建国'})});
+    closeSheet('maskReport');toast('上报成功，已同步至物业工程部');
+  }catch(e){toast('上报失败：'+e.message)}
+}
+
+/* ================= 演示隐患数据生成 ================= */
+(function(){
+  for(let i=0;i<14;i++){
+    const st=pick(DEMO_STATIONS);
+    const dayAgo=Math.floor(rnd()*20);
+    const date=new Date(TODAY);date.setDate(date.getDate()-dayAgo);
+    HZ_DEMO.push({id:++HID,stationId:st.id,type:pick(HZ_TYPES),level:pick(['一般','一般','较大','重大']),
+      desc:st.name+pick(POINTS)+'：巡查发现异常，已现场记录。',
+      date:dstr(date),dayAgo,status:pick(['closed','closed','processing','open']),reporter:pick(DEMO_STAFF[st.id])});
+  }
+  HZ_DEMO.sort((a,b)=>b.dayAgo-a.dayAgo);
+})();
+
+/* ================= 通用交互 ================= */
+function go(i){
+  curTab=i;
+  document.querySelectorAll('.page').forEach((p,idx)=>p.classList.toggle('active',idx===i));
+  document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('on',idx===i));
+  document.getElementById('main').scrollTop=0;
+  if(i===3)renderAnalysis();
+}
+document.getElementById('tabbar').addEventListener('click',e=>{const tab=e.target.closest('.tab');if(tab)go(+tab.dataset.t)});
+document.getElementById('taskChips').addEventListener('click',e=>{
+  if(!e.target.classList.contains('chip'))return;
+  document.querySelectorAll('#taskChips .chip').forEach(c=>c.classList.remove('on'));
+  e.target.classList.add('on');taskFilter=e.target.dataset.f;renderTasks();
+});
+document.getElementById('hzChips').addEventListener('click',e=>{
+  if(!e.target.classList.contains('chip'))return;
+  document.querySelectorAll('#hzChips .chip').forEach(c=>c.classList.remove('on'));
+  e.target.classList.add('on');hzFilter=e.target.dataset.f;renderHz();
+});
+document.getElementById('stationSel').addEventListener('change',e=>{curStation=e.target.value;renderHome();if(curTab===1)renderTasks();if(curTab===2)renderHz();if(curTab===3)renderAnalysis()});
+function openSheet(id){document.getElementById(id).classList.add('show')}
+function closeSheet(id){document.getElementById(id).classList.remove('show')}
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ================= 初始化 ================= */
+const wk=['日','一','二','三','四','五','六'];
+document.getElementById('todayStr').textContent=TODAY.getFullYear()+'年'+(TODAY.getMonth()+1)+'月'+TODAY.getDate()+'日 周'+wk[TODAY.getDay()];
+document.getElementById('stationSel').innerHTML='<option value="ALL">🏢 全部站点（'+DEMO_STATIONS.length+'个）</option>'+
+  DEMO_STATIONS.map(s=>`<option value="${s.id}">${s.line} · ${s.name}商业区</option>`).join('');
+probe().then(()=>{
+  renderHome();renderTasks();renderHz();loadFeed();
+  // 扫码直达：URL 带 ?scan=S1-P03 时自动打开打卡
+  const sp=new URLSearchParams(location.search).get('scan');
+  if(sp){
+    if(serverOnline&&POINTS_DB.some(p=>p.code===sp)){
+      const pt=POINTS_DB.find(p=>p.code===sp);
+      openCheckin(sp);
+      setTimeout(()=>{document.getElementById('ckStation').value=pt.stationId;fillPointSel(pt.stationId,sp)},50);
+    }else if(!serverOnline){toast('后台未连接，无法打卡：'+sp)}
+  }
+});
+</script>
+
+<!-- 演示任务巡查执行弹层 -->
+<div class="mask" id="maskPatrol">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="t" id="patrolTitle">巡查执行</div>
+      <div class="sheet-close" onclick="closeSheet('maskPatrol')">✕</div>
+    </div>
+    <div class="sheet-body">
+      <div id="patrolMeta" style="font-size:12px;color:var(--ink2);margin-bottom:12px;line-height:1.7"></div>
+      <div id="ckList"></div>
+      <div style="height:4px"></div>
+      <button class="btn-primary" id="btnSubmitPatrol" onclick="submitPatrol()">提交巡查结果</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
