@@ -1,0 +1,413 @@
+{
+  "pages": [
+    {
+      "width": 1440,
+      "route": "home",
+      "title": "你好，今天也要开心呀。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "activities",
+      "title": "把快乐，预约好。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "activity/dog",
+      "title": "狗狗互动派对",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "booking/dog",
+      "title": "预约一段可爱时光",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "shop",
+      "title": "好好吃饭，好好陪伴。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "product/1",
+      "title": "给它的心意，刚刚好。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "cart",
+      "title": "装满喜欢，也装满爱。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "orders",
+      "title": "每一份快乐，都有记录。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "order/MC20260824002",
+      "title": "订单详情",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "voucher/MC20260824002",
+      "title": "带上这份快乐，出发吧。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "community",
+      "title": "可爱的日常，值得分享。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "post/post1",
+      "title": "一份可爱的日常",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "publish",
+      "title": "记录今天的小确幸。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "knowledge",
+      "title": "更懂它，才能更爱它。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "article/vaccine",
+      "title": "养宠知识库",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "profile",
+      "title": "我的陪伴日记。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "pets",
+      "title": "我家的毛孩子。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "pet-edit/new",
+      "title": "认识一位新朋友。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "health/pet-maomao",
+      "title": "毛毛的健康手册。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "health-edit/pet-doudou/new",
+      "title": "新增豆豆的健康记录",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "member",
+      "title": "让陪伴，成为一种身份。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "points",
+      "title": "小小积分，大大心意。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "coupons",
+      "title": "留一点小惊喜，给下一次。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "addresses",
+      "title": "把心意，送到对的地方。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "favorites",
+      "title": "喜欢的，都留在这里。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "messages",
+      "title": "每一件在意的事，都提醒你。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "service/boarding",
+      "title": "你暂时离开，它被好好照顾。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "service/grooming",
+      "title": "洗去尘土，留下可爱。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "service/checkup",
+      "title": "多一份了解，多一份安心。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "adoption",
+      "title": "以领养，遇见另一种家人。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "promo",
+      "title": "快乐分享，陪伴加倍。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "support",
+      "title": "有什么想问的？",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "settings",
+      "title": "属于你的农场设置。",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "route": "search",
+      "title": "发现一份喜欢。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "home",
+      "title": "你好，今天也要开心呀。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "activities",
+      "title": "把快乐，预约好。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "activity/dog",
+      "title": "狗狗互动派对",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "booking/dog",
+      "title": "预约一段可爱时光",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "shop",
+      "title": "好好吃饭，好好陪伴。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "product/1",
+      "title": "给它的心意，刚刚好。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "cart",
+      "title": "装满喜欢，也装满爱。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "orders",
+      "title": "每一份快乐，都有记录。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "order/MC20260824002",
+      "title": "订单详情",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "voucher/MC20260824002",
+      "title": "带上这份快乐，出发吧。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "community",
+      "title": "可爱的日常，值得分享。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "post/post1",
+      "title": "一份可爱的日常",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "publish",
+      "title": "记录今天的小确幸。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "knowledge",
+      "title": "更懂它，才能更爱它。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "article/vaccine",
+      "title": "养宠知识库",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "profile",
+      "title": "我的陪伴日记。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "pets",
+      "title": "我家的毛孩子。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "pet-edit/new",
+      "title": "认识一位新朋友。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "health/pet-maomao",
+      "title": "毛毛的健康手册。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "health-edit/pet-doudou/new",
+      "title": "新增豆豆的健康记录",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "member",
+      "title": "让陪伴，成为一种身份。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "points",
+      "title": "小小积分，大大心意。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "coupons",
+      "title": "留一点小惊喜，给下一次。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "addresses",
+      "title": "把心意，送到对的地方。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "favorites",
+      "title": "喜欢的，都留在这里。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "messages",
+      "title": "每一件在意的事，都提醒你。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "service/boarding",
+      "title": "你暂时离开，它被好好照顾。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "service/grooming",
+      "title": "洗去尘土，留下可爱。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "service/checkup",
+      "title": "多一份了解，多一份安心。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "adoption",
+      "title": "以领养，遇见另一种家人。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "promo",
+      "title": "快乐分享，陪伴加倍。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "support",
+      "title": "有什么想问的？",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "settings",
+      "title": "属于你的农场设置。",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "route": "search",
+      "title": "发现一份喜欢。",
+      "overflow": false
+    }
+  ],
+  "errors": []
+}
