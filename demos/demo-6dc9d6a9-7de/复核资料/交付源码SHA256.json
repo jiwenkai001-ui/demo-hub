@@ -1,0 +1,17 @@
+{
+  "collectedAt": "2026-10-22T15:05:51.520849+08:00",
+  "files": {
+    "serve_demo.py": "f588ad53265cf613468f449203aeaf5675b7d26f9c95db420730350ac8db1d35",
+    "start-demo.ps1": "14edd37726d3bf88655f2a0661d1be3caafe8a19d06957a120bc157fa5ecda84",
+    "assets/app.js": "518746680e5efde8685cd841208a9ebc2becbb5748cd80a54a1003a3a5ba94cc",
+    "assets/i18n.js": "b2998e1e3c4566861d085c2919cbfbfb7c4576f152c03204c0df7c3c2996f4e7",
+    "assets/icons.js": "d8929e01377e05f1aca482d3169f2b84ab8f05b3359ff1fca47907561916fdaa",
+    "assets/vendor/qrcode.js": "18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780",
+    "assets/style.css": "3e48a52c044180e14e5e5b2ff95271a8ec72318575317efe3c723d503c603464",
+    "tests/test_audit_browser.py": "f8b323b1d35eb68a3d6f8e866a1222a324f1993a2159efc20731e18f0693839e",
+    "tests/test_audit_http.py": "98eaf7fdbe99e3915a4f852ac7f8eaafe61ce8b5ede75a82c315be9af6541c3c",
+    "tests/test_audit_queue.py": "79fe0bcfeb25aa32319868062b67027488b8af377457f411c50df254b005325a",
+    "tests/test_browser.py": "dd4c0811aa765ac5ce4d765825eff4a6f5c56572b76ecdc712c36fcdfc8a45b0",
+    "tests/test_queue.py": "7af7897f0a616b60979a2393638d5f3a996d548e0b301c2f73bc7ccf5383b3c8"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-10-22T18:15:11.983062+08:00",
+  "success": true,
+  "checks": [
+    {
+      "name": "验收与交付源码一致",
+      "passed": true,
+      "detail": {
+        "total": 79,
+        "byModule": {
+          "test_audit_browser": 12,
+          "test_audit_http": 2,
+          "test_audit_queue": 11,
+          "test_browser": 10,
+          "test_queue": 18,
+          "test_v22_browser": 8,
+          "test_v22_http": 2,
+          "test_v22_queue": 16
+        }
+      }
+    },
+    {
+      "name": "报告本地链接与截图",
+      "passed": true,
+      "detail": 25
+    },
+    {
+      "name": "线上原版核对",
+      "passed": true,
+      "detail": "11/11 SHA256一致"
+    },
+    {
+      "name": "Windows启动脚本复用服务",
+      "passed": true,
+      "detail": "V2.2已运行服务正确复用"
+    },
+    {
+      "name": "Windows端口冲突",
+      "passed": true,
+      "detail": "端口被其他程序占用时拒绝启动，不覆盖原服务"
+    }
+  ]
+}

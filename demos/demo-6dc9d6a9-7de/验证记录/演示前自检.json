@@ -1,0 +1,72 @@
+{
+  "checkedAt": "2026-10-22T18:12:40.774407+08:00",
+  "url": "http://127.0.0.1:8800/",
+  "success": true,
+  "checks": [
+    {
+      "name": "服务与版本",
+      "passed": true,
+      "detail": "2.2"
+    },
+    {
+      "name": "入口与部署目录",
+      "passed": true,
+      "detail": "2 家门店；局域网候选地址：['192.168.3.37']"
+    },
+    {
+      "name": "队列状态 yunshang",
+      "passed": true,
+      "detail": "2026-10-22；等待1，过号0，完成0"
+    },
+    {
+      "name": "队列状态 qinghe",
+      "passed": true,
+      "detail": "2026-10-22；等待0，过号0，完成0"
+    },
+    {
+      "name": "页面与本地资源 index.html",
+      "passed": true,
+      "detail": "716 bytes"
+    },
+    {
+      "name": "页面与本地资源 customer.html",
+      "passed": true,
+      "detail": "621 bytes"
+    },
+    {
+      "name": "页面与本地资源 merchant.html",
+      "passed": true,
+      "detail": "674 bytes"
+    },
+    {
+      "name": "页面与本地资源 display.html",
+      "passed": true,
+      "detail": "620 bytes"
+    },
+    {
+      "name": "页面与本地资源 assets/app.js",
+      "passed": true,
+      "detail": "56366 bytes"
+    },
+    {
+      "name": "页面与本地资源 assets/i18n.js",
+      "passed": true,
+      "detail": "18202 bytes"
+    },
+    {
+      "name": "页面与本地资源 assets/style.css",
+      "passed": true,
+      "detail": "42809 bytes"
+    },
+    {
+      "name": "页面与本地资源 assets/vendor/qrcode.js",
+      "passed": true,
+      "detail": "56694 bytes"
+    }
+  ],
+  "onsite": [
+    "电脑与手机使用同一可互通网络，并实际扫码取号一次",
+    "点击开启语音，实际试听扬声器；需要全屏时手动点击全屏",
+    "保留服务启动窗口；演示时关闭电脑休眠"
+  ]
+}
