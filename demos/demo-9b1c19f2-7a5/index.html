@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>花名册洞察官 · 智能统计分析</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">📊</div>
+      <div>
+        <div class="brand-name">花名册洞察官</div>
+        <div class="brand-sub">HR Roster Analytics · 智能统计分析</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="btnSample" class="btn btn-ghost">载入示例</button>
+      <button id="btnExport" class="btn btn-ghost" disabled>导出看板</button>
+      <button id="btnUploadTop" class="btn btn-primary">＋ 上传花名册</button>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+  </header>
+
+  <!-- Hero / upload -->
+  <section class="hero" id="hero">
+    <div class="hero-badge">✨ 纯本地 · 数据不上传 · 秒出看板</div>
+    <h1>上传花名册，<span>一眼看懂人员结构</span></h1>
+    <p class="hero-desc">支持 Excel（.xlsx / .xls）与 CSV，自动识别字段、统计多维指标，生成专业可视化看板。所有处理都在你的浏览器内完成，隐私安全。</p>
+    <div class="dropzone" id="dropzone">
+      <div class="dz-icon">📁</div>
+      <div class="dz-title">拖拽文件到这里，或 <span>点击选择</span></div>
+      <div class="dz-hint">支持 .xlsx / .xls / .csv · 单个文件 · 数据仅在本地处理</div>
+      <input type="file" id="fileInputDrop" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+    <div class="hero-features">
+      <div class="feat"><span class="feat-ico">⚡</span><div><b>秒级统计</b><small>多维指标自动算</small></div></div>
+      <div class="feat"><span class="feat-ico">🔒</span><div><b>本地处理</b><small>数据不离开浏览器</small></div></div>
+      <div class="feat"><span class="feat-ico">📤</span><div><b>一键导出</b><small>看板存为 HTML</small></div></div>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <section class="loading" id="loading" hidden>
+    <div class="spinner"></div>
+    <div>正在解析花名册并生成看板…</div>
+  </section>
+
+  <!-- Error -->
+  <section class="error-box" id="errorBox" hidden>
+    <div class="err-icon">⚠️</div>
+    <div><b id="errTitle">处理失败</b><p id="errMsg"></p></div>
+    <button class="btn btn-primary" onclick="resetApp()">重新上传</button>
+  </section>
+
+  <!-- Dashboard -->
+  <main class="dashboard" id="dashboard" hidden>
+    <div class="dash-head">
+      <div>
+        <h2>📈 数据概览</h2>
+        <p class="dash-meta" id="dashMeta"></p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-ghost" id="btnReload">重新上传</button>
+        <button class="btn btn-primary" id="btnExport2">导出看板</button>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <section class="kpi-grid" id="kpiGrid"></section>
+
+    <!-- Charts row 1 -->
+    <section class="grid">
+      <div class="card span4" id="cardGender"></div>
+      <div class="card span4" id="cardStatus"></div>
+      <div class="card span4" id="cardEdu"></div>
+
+      <div class="card span7" id="cardDept"></div>
+      <div class="card span5" id="cardAge"></div>
+
+      <div class="card span6" id="cardLevel"></div>
+      <div class="card span6" id="cardYear"></div>
+
+      <div class="card span4" id="cardSeq"></div>
+      <div class="card span4" id="cardMarry"></div>
+      <div class="card span4" id="cardProv"></div>
+
+      <div class="card span6" id="cardManager"></div>
+      <div class="card span6" id="cardInsight"></div>
+
+      <div class="card span12" id="cardTable">
+        <div class="card-head"><h3>员工明细</h3><input type="text" id="tableSearch" class="search" placeholder="🔍 搜索姓名 / 部门 / 岗位"></div>
+        <div class="table-wrap" id="tableWrap"></div>
+      </div>
+    </section>
+    <footer class="foot">花名册洞察官 · 所有统计均在本地浏览器完成 · 数据不上传</footer>
+  </main>
+</div>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="sample-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
