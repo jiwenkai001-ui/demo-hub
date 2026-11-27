@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>装修公司管理系统 · 入口</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+  body {
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; color:var(--text);
+    background-color:#f2faf8;
+    background-image:
+      linear-gradient(rgba(14,159,142,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,159,142,.07) 1px, transparent 1px),
+      radial-gradient(circle at 10% 8%, #d8f5ee 0%, transparent 32%),
+      radial-gradient(circle at 90% 92%, #ffe6dc 0%, transparent 34%),
+      linear-gradient(135deg, #f7fcfa 0%, #eaf7f2 100%);
+    background-size:30px 30px, 30px 30px, auto, auto, auto;
+  }
+  .wrap { width:100%; max-width:900px; text-align:center; position:relative; }
+  .wrap::before { content:''; position:absolute; width:180px; height:130px; left:-70px; top:-40px; border:2px dashed rgba(14,159,142,.18); border-radius:18px; transform:rotate(-8deg); }
+  .wrap::after { content:''; position:absolute; width:150px; height:110px; right:-60px; bottom:-30px; border:2px dashed rgba(255,138,101,.2); border-radius:18px; transform:rotate(10deg); }
+  .logo { width:74px; height:74px; border-radius:22px; background:linear-gradient(135deg,#5eead4,#0e9f8e 55%,#ff8a65); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; box-shadow:0 12px 30px rgba(14,159,142,.28); }
+  .logo svg { width:42px; height:42px; }
+  h1 { font-size:34px; font-weight:800; letter-spacing:-.6px; }
+  .subtitle { color:var(--text-2); margin:10px 0 16px; font-size:15px; }
+  .palette { width:180px; height:5px; border-radius:99px; margin:0 auto 28px; background:var(--swatch); box-shadow:0 2px 8px rgba(13,81,75,.12); }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .entry { background:#fff; border:1px solid var(--border); border-radius:18px; padding:30px 26px; box-shadow:var(--shadow-md); transition:.2s; display:block; text-align:left; position:relative; overflow:hidden; }
+  .entry::before { content:''; position:absolute; left:0; right:0; top:0; height:5px; background:var(--swatch); }
+  .entry:hover { transform:translateY(-4px); box-shadow:0 20px 45px rgba(13,81,75,.16); border-color:#a9ded2; }
+  .entry .ic { width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin:6px 0 18px; }
+  .entry .ic svg { width:28px; height:28px; }
+  .entry h2 { font-size:21px; font-weight:800; }
+  .entry p { color:var(--text-2); font-size:13px; margin:8px 0 18px; line-height:1.8; }
+  .entry .tag { display:inline-block; padding:4px 10px; border-radius:99px; font-size:11px; font-weight:700; background:var(--primary-light); color:#0b7c71; margin-right:6px; }
+  .entry .go { color:var(--primary-dark); font-weight:700; font-size:13px; margin-top:14px; display:block; }
+  .foot { margin-top:30px; color:var(--text-3); font-size:12px; line-height:2; }
+  @media(max-width:640px){ .cards{grid-template-columns:1fr} h1{font-size:26px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo" id="logo"></div>
+  <h1>装修公司管理系统</h1>
+  <p class="subtitle">纯前端演示版 · 清新家装工作台 · 数据保存在本机浏览器</p>
+  <div class="palette"></div>
+  <div class="cards">
+    <a class="entry" href="pc.html">
+      <div class="ic" style="background:#d8f5ee;color:#0b7c71" id="pcIcon"></div>
+      <h2>PC 管理端</h2>
+      <p>工作台、客户管理、项目管理、施工进度、方案管理、沟通消息、报价款项、材料管理、团队管理、报表统计与系统设置。</p>
+      <span class="tag" style="background:#fff2d6;color:#a56a1d">公司运营</span><span class="tag">11 个功能模块</span>
+      <span class="go">进入管理后台 →</span>
+    </a>
+    <a class="entry" href="mini.html">
+      <div class="ic" style="background:#ffe6dc;color:#d46243" id="miniIcon"></div>
+      <h2>业主小程序</h2>
+      <p>手机端交互界面，支持查看装修进度时间轴与现场记录、设计方案确认与反馈、与装修团队在线沟通。</p>
+      <span class="tag" style="background:#efe9fb;color:#7451bd">业主端</span><span class="tag">5 个底部导航</span>
+      <span class="go">打开小程序 →</span>
+    </a>
+  </div>
+  <div class="foot">建议使用 Chrome / Edge 浏览器打开<br>退出时请勿清除浏览器站点数据，否则演示数据会丢失</div>
+</div>
+<script src="assets/js/icons.js"></script>
+<script>document.getElementById('logo').innerHTML=Icon.home;document.getElementById('pcIcon').innerHTML=Icon.blueprint;document.getElementById('miniIcon').innerHTML=Icon.hammer;</script>
+</body>
+</html>
