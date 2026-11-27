@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车鉴云 · 机动车鉴定评估管理系统</title>
+<style>
+:root{
+  --bg:#f3f5f9; --panel:#ffffff; --line:#e6e9f0; --text:#1f2937; --muted:#7b8494;
+  --primary:#2563eb; --primary-dark:#1d4ed8; --primary-soft:#eaf1ff;
+  --green:#16a34a; --green-soft:#e8f7ee; --amber:#d97706; --amber-soft:#fff5e6;
+  --red:#dc2626; --red-soft:#fdecec; --purple:#7c3aed; --purple-soft:#f2edff;
+  --sidebar:#0f1729; --shadow:0 1px 3px rgba(16,24,40,.06),0 6px 20px rgba(16,24,40,.04);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;outline:none}
+button{cursor:pointer}
+a{color:var(--primary);text-decoration:none}
+.app{display:flex;min-height:100vh}
+
+/* ---------- 侧边栏 ---------- */
+.sidebar{width:238px;background:var(--sidebar);color:#c5cede;position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:30}
+.brand{height:70px;display:flex;align-items:center;gap:11px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.brand-mark svg{width:22px;height:22px}
+.brand-name{font-size:17px;font-weight:700;color:#fff;letter-spacing:.5px;white-space:nowrap}
+.brand-sub{font-size:10px;color:#7e8ca6;letter-spacing:1.4px;white-space:nowrap}
+.nav{flex:1;overflow-y:auto;padding:14px 12px 24px}
+.nav::-webkit-scrollbar{width:0}
+.nav-group{font-size:11px;color:#63718b;letter-spacing:1.2px;padding:16px 10px 7px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;height:42px;padding:0 12px;border-radius:9px;color:#b7c2d6;cursor:pointer;margin-bottom:2px;transition:.15s;white-space:nowrap}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:linear-gradient(90deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.35)}
+.nav-item svg{width:18px;height:18px;flex:0 0 auto;opacity:.9}
+.nav-item span{font-size:13.5px}
+.side-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#6d7b93;line-height:1.7}
+
+/* ---------- 主区域 ---------- */
+.main{margin-left:238px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20}
+.crumb{color:var(--muted);font-size:13px}
+.crumb b{color:var(--text);font-weight:600}
+.top-right{display:flex;align-items:center;gap:14px}
+.top-search{display:flex;align-items:center;gap:8px;background:#f5f7fb;border:1px solid transparent;border-radius:9px;padding:0 12px;height:36px;width:230px;transition:.2s}
+.top-search:focus-within{border-color:#bfd3ff;background:#fff}
+.top-search svg{width:16px;height:16px;color:#9aa5b6;flex:0 0 auto}
+.top-search input{border:0;background:transparent;width:100%;font-size:13px}
+.icon-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:#64748b;position:relative}
+.icon-btn:hover{background:#f8fafc;color:var(--primary)}
+.icon-btn svg{width:18px;height:18px}
+.dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff}
+.user-chip{display:flex;align-items:center;gap:9px;padding-left:6px;border-left:1px solid var(--line)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:0 0 auto}
+.user-name{font-size:13px;font-weight:600;line-height:1.2}
+.user-role{font-size:11px;color:var(--muted)}
+.content{padding:26px 28px 50px;max-width:1600px;width:100%;margin:0 auto}
+
+/* ---------- 通用组件 ---------- */
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.page-head h1{font-size:22px;margin:0 0 4px;font-weight:700;letter-spacing:.3px}
+.page-head p{margin:0;color:var(--muted);font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 15px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#374151;font-size:13px;font-weight:500;white-space:nowrap;transition:.15s}
+.btn:hover{border-color:#c7d3e8;background:#f9fbff}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 3px 8px rgba(37,99,235,.2)}
+.btn.primary:hover{background:var(--primary-dark)}
+.btn.danger{color:var(--red);border-color:#f3c9c9}
+.btn.danger:hover{background:var(--red-soft)}
+.btn.sm{height:30px;padding:0 11px;font-size:12px;border-radius:7px}
+.btn svg{width:15px;height:15px}
+.link{border:0;background:transparent;color:var(--primary);font-size:12.5px;padding:2px 5px}
+.link:hover{text-decoration:underline}
+.link.red{color:var(--red)}
+.link.gray{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+.pad{padding:20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.card-head h3,.card h3{margin:0;font-size:15px;font-weight:650}
+.card-body{padding:18px 20px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px}
+.nowrap{white-space:nowrap}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.badge::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.b-blue{background:var(--primary-soft);color:var(--primary)}
+.b-green{background:var(--green-soft);color:var(--green)}
+.b-amber{background:var(--amber-soft);color:var(--amber)}
+.b-red{background:var(--red-soft);color:var(--red)}
+.b-purple{background:var(--purple-soft);color:var(--purple)}
+.b-gray{background:#eef1f5;color:#64748b}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 19px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-18px;top:-18px;width:86px;height:86px;border-radius:50%;background:var(--kbg);opacity:.55}
+.kpi-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+.kpi-label{font-size:12.5px;color:var(--muted);font-weight:500}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--kc);background:var(--kbg)}
+.kpi-icon svg{width:18px;height:18px}
+.kpi-value{font-size:29px;font-weight:750;line-height:1.2;margin:10px 0 4px;position:relative;z-index:1;letter-spacing:-.5px}
+.kpi-sub{font-size:11.5px;color:var(--muted);position:relative;z-index:1}
+.kpi-sub em{font-style:normal;color:var(--green);font-weight:600}
+.kpi-sub em.down{color:var(--red)}
+
+/* 图表 */
+.chart-wrap{display:flex;align-items:center;gap:22px;min-height:195px}
+.chart-wrap svg{width:100%;height:auto;max-height:195px}
+.donut{width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;position:relative}
+.donut::after{content:"";position:absolute;width:98px;height:98px;border-radius:50%;background:#fff}
+.donut-inner{position:relative;z-index:1;text-align:center}
+.donut-inner b{display:block;font-size:25px;line-height:1.1}
+.donut-inner span{font-size:11px;color:var(--muted)}
+.legend{flex:1;display:flex;flex-direction:column;gap:10px}
+.legend-row{display:flex;align-items:center;gap:9px;font-size:12.5px}
+.legend-dot{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.legend-row .n{margin-left:auto;font-weight:650}
+
+/* 表格 */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:12px 14px;background:#fafbfd;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 14px;border-bottom:1px solid #f0f2f6;font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fbfcff}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.field{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 11px;background:#fff;font-size:13px;color:var(--text);min-width:0}
+.field:focus{border-color:#9dbdff;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.search-field{position:relative}
+.search-field input{padding-left:32px;width:220px}
+.search-field svg{position:absolute;left:10px;top:10px;width:15px;height:15px;color:#9aa5b6}
+select.field{cursor:pointer;padding-right:26px}
+.toolbar .spacer{flex:1}
+.pager{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.pager-btns{display:flex;gap:6px}
+.pg{width:29px;height:29px;border:1px solid var(--line);border-radius:7px;background:#fff;color:#475569;font-size:12px}
+.pg.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.empty{padding:54px 20px;text-align:center;color:var(--muted)}
+.empty svg{width:42px;height:42px;color:#cbd5e1;margin-bottom:10px}
+
+/* 时间线 / 待办 */
+.todo{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #f0f2f6}
+.todo:last-child{border-bottom:0}
+.todo-bar{width:3px;height:34px;border-radius:3px;background:var(--amber);flex:0 0 auto}
+.todo-main{flex:1;min-width:0}
+.todo-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.timeline{padding:8px 20px 14px}
+.tl{display:flex;gap:12px;position:relative;padding:10px 0}
+.tl:not(:last-child)::before{content:"";position:absolute;left:5px;top:24px;bottom:-6px;width:1px;background:#e6e9f0}
+.tl-dot{width:11px;height:11px;border-radius:50%;background:var(--primary);border:2px solid #dbeafe;flex:0 0 auto;margin-top:5px;z-index:1}
+.tl-dot.green{background:var(--green);border-color:#dcfce7}
+.tl-dot.amber{background:var(--amber);border-color:#fef3c7}
+.tl-text{font-size:12.5px;line-height:1.5}
+.tl-text b{font-weight:600}
+.tl-time{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* 车辆卡片 */
+.vehicle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.vehicle-card{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:18px;transition:.18s}
+.vehicle-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,24,40,.09);border-color:#c9d8f5}
+.veh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.veh-icon{width:44px;height:44px;border-radius:11px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center}
+.veh-icon svg{width:25px;height:25px}
+.veh-plate{font-size:15px;font-weight:700;letter-spacing:.5px}
+.veh-model{font-size:12.5px;color:var(--muted);margin-top:2px}
+.veh-info{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;padding:13px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.veh-info div span{display:block;font-size:11px;color:var(--muted)}
+.veh-info div b{font-size:12.5px;font-weight:600;word-break:break-all}
+.veh-foot{display:flex;align-items:center;justify-content:space-between;padding-top:13px}
+
+/* 检测清单 */
+.check-block{border:1px solid var(--line);border-radius:11px;margin-bottom:14px;overflow:hidden}
+.check-title{background:#f8fafc;padding:11px 15px;font-size:13px;font-weight:650;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.check-title::before{content:"";width:3px;height:14px;background:var(--primary);border-radius:2px}
+.check-grid{padding:6px 15px 12px}
+.check-row{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #f4f6f9}
+.check-row:last-child{border-bottom:0}
+.check-label{font-size:12.5px;color:#475569}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:inline-block;padding:5px 11px;border-radius:7px;border:1px solid var(--line);background:#fff;font-size:12px;color:#64748b;transition:.15s}
+.seg input:checked+span{background:var(--primary-soft);border-color:#93b8ff;color:var(--primary);font-weight:600}
+.seg input:focus-visible+span{box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.level-box{border-radius:11px;padding:15px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.level-box.info{background:var(--primary-soft);border:1px solid #cfe0ff}
+.level-box.warn{background:var(--amber-soft);border:1px solid #f6ddb0}
+.level-box b{font-size:17px}
+
+/* 弹窗 */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:100;padding:22px}
+.modal{background:#fff;border-radius:14px;width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.24);animation:pop .18s ease-out}
+.modal.wide{width:min(980px,100%)}
+.modal.narrow{width:min(520px,100%)}
+@keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid var(--line)}
+.modal-head h2{font-size:16px;margin:0;font-weight:650}
+.modal-body{padding:22px;overflow-y:auto;flex:1}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px;background:#fbfcfe;border-radius:0 0 14px 14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.form-item{display:flex;flex-direction:column;gap:6px}
+.form-item.full{grid-column:1/-1}
+.form-item label{font-size:12.5px;color:#4b5563;font-weight:600}
+.form-item .field,.form-item textarea{width:100%;height:38px}
+.form-item textarea{height:88px;padding:10px 11px;border:1px solid var(--line);border-radius:8px;resize:vertical;font-size:13px}
+.form-item textarea:focus{border-color:#9dbdff}
+.req::after{content:" *";color:var(--red)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{padding:9px 15px;border:0;background:transparent;color:var(--muted);font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:650}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px}
+.info-grid div span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.info-grid div b{font-size:13px;font-weight:600;word-break:break-all}
+.sec-title{font-size:13px;font-weight:650;margin:20px 0 10px;padding-left:9px;border-left:3px solid var(--primary)}
+
+/* VIN 工具 */
+.vin-result{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:18px;min-height:180px}
+.vin-big{font-family:ui-monospace,Consolas,monospace;font-size:24px;letter-spacing:4px;font-weight:700;color:#1e293b;margin-bottom:6px;word-break:break-all}
+.vin-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed #e2e8f0;font-size:13px}
+.vin-row:last-child{border-bottom:0}
+.vin-row span{color:var(--muted)}
+.vin-row b{font-weight:600}
+.mock-row{padding:12px 0;border-bottom:1px solid #f0f2f6}
+.mock-row:last-child{border-bottom:0}
+.mock-row .t{font-size:13px;font-weight:600;display:flex;justify-content:space-between;gap:10px}
+.mock-row .d{font-size:12px;color:var(--muted);margin-top:3px}
+.notice{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:9px;padding:10px 13px;font-size:12px;margin-top:14px}
+
+/* 报告纸张 */
+.paper{background:#fff;border:1px solid #dfe3ea;box-shadow:0 6px 26px rgba(16,24,40,.08);padding:42px 48px;color:#1f2937;font-size:13px;line-height:1.8}
+.paper-head{display:flex;align-items:center;gap:16px;border-bottom:3px double #1e3a8a;padding-bottom:16px;margin-bottom:22px}
+.paper-logo{width:56px;height:56px;border:2px solid #1e3a8a;border-radius:50%;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;line-height:1.1;text-align:center;flex:0 0 auto}
+.paper-head h2{font-size:22px;margin:0;letter-spacing:3px;color:#1e3a8a}
+.paper-head p{margin:2px 0 0;font-size:12px;color:#64748b}
+.paper h3{font-size:14px;margin:22px 0 8px;color:#1e3a8a}
+.paper-table{width:100%;border-collapse:collapse;margin:10px 0}
+.paper-table td{border:1px solid #d7dde6;padding:8px 11px;font-size:12.5px}
+.paper-table td.lb{background:#f5f7fb;width:110px;color:#64748b;font-weight:600}
+.paper p{margin:7px 0}
+.conclusion{background:#f5f8ff;border-left:4px solid #2563eb;padding:14px 16px;font-size:14px;font-weight:600;margin:10px 0 18px}
+.sign-row{display:flex;justify-content:space-between;margin-top:46px;gap:30px}
+.sign-box{flex:1;font-size:12.5px;color:#475569}
+.sign-box .line{border-top:1px solid #94a3b8;margin-top:38px;padding-top:6px;text-align:center}
+.stamp{width:98px;height:98px;border:3px solid rgba(220,38,38,.55);border-radius:50%;color:rgba(220,38,38,.65);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:700;line-height:1.4;transform:rotate(-14deg);margin:16px 0 0 auto}
+.paper-foot{border-top:1px solid #e2e8f0;margin-top:30px;padding-top:10px;font-size:11px;color:#94a3b8}
+
+/* Toast */
+#toastRoot{position:fixed;top:18px;right:20px;z-index:300;display:flex;flex-direction:column;gap:9px}
+.toast{background:#111827;color:#fff;padding:11px 16px;border-radius:9px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.22);animation:slide .25s ease-out;max-width:340px}
+.toast.ok{background:#15803d}
+.toast.err{background:#b91c1c}
+@keyframes slide{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+#printArea{display:none}
+
+/* ---------- 多级导航（一级分组 / 二级模块 / 三级页面） ---------- */
+.nav-item.level1{font-weight:600;color:#dbe4f2}
+.nav-item.level2{padding-left:24px;font-size:13px}
+.nav-item.level3{padding-left:39px;font-size:12.5px;height:35px;color:#95a3b9}
+.nav-item.level3 span{font-size:12.5px}
+.nav-item.level3::before{content:"";position:absolute;left:27px;top:16px;width:5px;height:5px;border-radius:50%;background:#4d5d77}
+.nav-item.level3.active::before{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.nav-caret{width:13px;height:13px;margin-left:auto;transition:transform .18s;opacity:.65;flex:0 0 auto}
+.nav-item.open .nav-caret{transform:rotate(90deg)}
+.nav-children{display:none}
+.nav-children.show{display:block}
+.nav-count{margin-left:auto;font-size:10.5px;background:rgba(255,255,255,.1);padding:1px 6px;border-radius:9px}
+.nav-item.active .nav-count{background:rgba(255,255,255,.22)}
+.nav-level-tag{font-size:10px;color:#64748b;background:#eef1f6;border-radius:5px;padding:1px 6px;margin-left:7px;font-weight:500}
+
+/* ---------- 车型库 / 系统信息 ---------- */
+.catalog-tree{display:flex;flex-direction:column;gap:14px}
+.catalog-brand{border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.catalog-brand-head{background:#f8fafc;padding:11px 15px;font-weight:650;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line)}
+.catalog-brand-head .lv{font-size:10px;color:#fff;background:var(--primary);border-radius:4px;padding:1px 6px}
+.catalog-series{padding:12px 15px;border-bottom:1px dashed var(--line)}
+.catalog-series:last-child{border-bottom:0}
+.catalog-series-name{font-weight:600;font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.catalog-series-name .lv{font-size:10px;color:var(--primary);background:var(--primary-soft);border-radius:4px;padding:1px 6px}
+.model-line{display:flex;gap:10px;align-items:flex-start;padding:5px 0 5px 18px;font-size:12.5px;flex-wrap:wrap}
+.model-line .mname{font-weight:600;min-width:150px}
+.year-chip{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:11px;color:#64748b;margin:0 4px 4px 0;background:#fff}
+.info-banner{background:linear-gradient(120deg,#eef4ff,#f7f3ff);border:1px solid #dfe8ff;border-radius:12px;padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.info-banner h3{margin:0 0 5px;font-size:16px}
+.info-banner p{margin:0;color:#64748b;font-size:12.5px}
+.info-stats{display:flex;gap:24px}
+.info-stats div{text-align:center}
+.info-stats b{display:block;font-size:19px;color:var(--primary)}
+.info-stats span{font-size:11px;color:#64748b}
+.rule-box{border-left:3px solid var(--primary);background:#f8fafc;padding:10px 13px;font-size:12.5px;margin:9px 0}
+.rule-box b{color:var(--primary)}
+
+@media (max-width:1150px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.vehicle-grid,.grid-3{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
+@media (max-width:820px){.sidebar{width:64px}.brand{padding:0 14px}.brand-name,.brand-sub,.nav-item span,.nav-group,.side-foot{display:none}.nav-item{justify-content:center;padding:0}.main{margin-left:64px}.content{padding:20px 16px 40px}.top-search{display:none}.grid-2,.grid-3,.vehicle-grid,.kpi-grid{grid-template-columns:1fr}.form-grid,.info-grid{grid-template-columns:1fr}.check-row{grid-template-columns:1fr}.paper{padding:22px}}
+@media print{
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important}
+  #printArea .paper{border:0;box-shadow:none;padding:0}
+  @page{margin:16mm}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M6.5 17v2M17.5 17v2M3 13l2-5.2A2 2 0 0 1 6.9 6.5h10.2a2 2 0 0 1 1.9 1.3L21 13v4H3v-4Z"/><path d="M3 13h18M7 16h1M16 16h1"/></svg></div>
+      <div><div class="brand-name">车鉴云</div><div class="brand-sub">APPRAISAL SYSTEM</div></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">专业机动车鉴定评估管理平台<br>三级导航结构 · 演示版本 v1.1</div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb" id="crumb">工作台</div>
+      <div class="top-right">
+        <div class="top-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="globalSearch" placeholder="搜索案件编号 / 车牌 / VIN"></div>
+        <button class="icon-btn" data-act="notify" title="待办提醒"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8M10 20a2 2 0 0 0 4 0"/></svg><i class="dot"></i></button>
+        <div class="user-chip"><div class="avatar" id="avatar">陈</div><div><div class="user-name" id="userName">陈建国</div><div class="user-role">高级鉴定评估师</div></div></div>
+      </div>
+    </header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+<div id="printArea"></div>
+
+<script>
+/* ==================== 基础工具 ==================== */
+const KEY = 'chejianyun_appraisal_system_v1';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const today = () => new Date().toISOString().slice(0,10);
+const uid = p => p + Date.now().toString(36).slice(-6).toUpperCase();
+const ico = {
+  home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z"/>',
+  case:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  car:'<path d="M5 16h14M6.5 16v2M17.5 16v2M3 12l2-5.2A2 2 0 0 1 6.9 5.5h10.2a2 2 0 0 1 1.9 1.3L21 12v4H3v-4Z"/><path d="M3 12h18M7 15h1M16 15h1"/>',
+  check:'<path d="M9 11l2 2 4-4"/><rect x="4" y="3" width="16" height="18" rx="2"/>',
+  doc:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  vin:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M17 5a3.5 3.5 0 0 1 0 7M18 14c2.3.7 4 2.7 4 5"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  checkCircle:'<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',
+  money:'<circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.6-1-1.7-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.8 3 2 3 .8 3 2-1.3 2-3 2c-1.3 0-2.4-.5-3-1.5M12 6v12"/>',
+  box:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 8v8l9 5 9-5V8M12 13v8"/>',
+  print:'<path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
+  download:'<path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/>'
+};
+const svg = (d,cls='') => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="'+cls+'">'+d+'</svg>';
+
+/* ==================== 演示数据 ==================== */
+const DEFAULT_SETTINGS_EXTRA={creditCode:'91310114MA1GXXXX8K',qualification:'二手车鉴定评估机构 A 级',licenseNo:'沪鉴评估许可 2026-0088',licenseUntil:'2028-12-31',legalPerson:'陈建国',founded:'2015-06-18',capital:'500',email:'service@huajian-appraisal.cn',website:'www.huajian-appraisal.cn',fax:'021-6688 9667',zip:'201800'};
+const DEFAULT_CATALOG=[
+  {brand:'大众',series:[{name:'帕萨特',models:[{name:'330TSI 尊贵版',years:['2016','2017','2018','2019','2020']},{name:'380TSI 旗舰版',years:['2017','2018','2019','2021']}]},{name:'途观L',models:[{name:'380TSI 四驱',years:['2016','2017','2018','2020']}]},{name:'奥迪 A6L',models:[{name:'45TFSI 臻选',years:['2019','2020','2021','2022']}]}]},
+  {brand:'丰田',series:[{name:'凯美瑞',models:[{name:'2.0G 豪华版',years:['2018','2019','2020','2021']}]},{name:'卡罗拉',models:[{name:'1.2T 精英版',years:['2017','2019','2021']}]}]},
+  {brand:'本田',series:[{name:'雅阁',models:[{name:'2.4L 智睿版',years:['2016','2017','2018']}]},{name:'飞度',models:[{name:'1.5L CVT',years:['2018','2020','2022']}]}]},
+  {brand:'宝马',series:[{name:'5系',models:[{name:'530Li 领先版',years:['2017','2018','2020','2021']}]},{name:'3系',models:[{name:'325Li M运动',years:['2019','2020','2022']}]}]},
+  {brand:'自主品牌',series:[{name:'长安 CS75',models:[{name:'1.5T 自动',years:['2017','2018','2020']}]},{name:'荣威 i6',models:[{name:'20T 互联网版',years:['2017','2018','2019']}]}]}
+];
+const DEFAULT_CHECK_ITEMS=[
+  ['structure','车身结构件','frontRail','左/右前纵梁','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','rearRail','后纵梁','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','aPillar','A 柱','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','bPillar','B 柱','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','cPillar','C 柱','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','waterTank','水箱框架','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','firewall','防火墙','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','shockTower','前减震器座','正常,钣金修复,切割更换,无法确认'],
+  ['structure','车身结构件','trunkFloor','后备箱底板','正常,钣金修复,切割更换,无法确认'],
+  ['power','动力与底盘','engine','发动机','正常,更换,异常,无法确认'],
+  ['power','动力与底盘','gearbox','变速箱','正常,更换,异常,无法确认'],
+  ['power','动力与底盘','chassis','底盘大梁','正常,钣金修复,切割更换,无法确认'],
+  ['special','特殊车况','water','是否水泡','否,是'],
+  ['special','特殊车况','fire','是否火烧','否,是'],
+  ['special','特殊车况','odometer','里程表状态','正常,异常,无法确认']
+].map(x=>({group:x[0],groupName:x[1],key:x[2],label:x[3],options:x[4],enabled:true}));
+const DEFAULT_ROLES=[
+  {id:'R1',name:'机构管理员',desc:'系统全局配置、账号与权限管理',members:1,perms:['全部功能']},
+  {id:'R2',name:'鉴定评估师',desc:'案件受理、现场查勘、检测结论录入',members:3,perms:['案件管理','检测评估','VIN 工具']},
+  {id:'R3',name:'报告审核员',desc:'报告复核、签发与归档',members:2,perms:['报告管理','车辆档案']},
+  {id:'R4',name:'业务受理员',desc:'客户登记、案件受理与进度跟踪',members:2,perms:['案件管理','客户管理']}
+];
+const DEFAULT_USERS=[
+  {id:'U01',name:'陈建国',role:'鉴定评估师',dept:'鉴定一部',status:'启用',lastLogin:'2026-11-27 09:18'},
+  {id:'U02',name:'周敏',role:'鉴定评估师',dept:'鉴定二部',status:'启用',lastLogin:'2026-11-26 16:42'},
+  {id:'U03',name:'刘志远',role:'报告审核员',dept:'技术审核部',status:'启用',lastLogin:'2026-11-27 08:05'},
+  {id:'U04',name:'徐雅琴',role:'业务受理员',dept:'业务受理部',status:'启用',lastLogin:'2026-11-25 14:30'},
+  {id:'U05',name:'系统管理员',role:'机构管理员',dept:'综合管理部',status:'启用',lastLogin:'2026-11-27 10:02'}
+];
+function seedDB(){
+  const cases = [
+    {id:'JD-2026-0108',plate:'沪A·8F521',vin:'LSVAA4180J2000158',model:'大众 帕萨特 2018款 330TSI',year:'2018',mileage:'8.6万公里',owner:'张伟',client:'上海恒信二手车行',type:'事故车鉴定',appraiser:'陈建国',accept:'2026-11-03',due:'2026-11-08',status:'检测中',value:128000,note:'客户怀疑左侧纵梁存在切割修复，需重点核查。'},
+    {id:'JD-2026-0107',plate:'苏E·3K990',vin:'LFV3A23C1L3034567',model:'奥迪 A6L 2020款 45TFSI',year:'2020',mileage:'5.2万公里',owner:'李静',client:'个人委托',type:'价值评估',appraiser:'周敏',accept:'2026-11-05',due:'2026-11-10',status:'报告编制',value:285000,note:'二手车交易前价值评估。'},
+    {id:'JD-2026-0106',plate:'浙B·7D218',vin:'LHGCR1643G8027391',model:'本田 雅阁 2016款 2.4L',year:'2016',mileage:'12.4万公里',owner:'王磊',client:'宁波通顺汽贸',type:'水泡车鉴定',appraiser:'陈建国',accept:'2026-11-06',due:'2026-11-09',status:'待受理',value:68000,note:'客户反映雨季车内进水，疑似水泡车。'},
+    {id:'JD-2026-0105',plate:'沪B·2M775',vin:'WBA8E9G5XGNU49321',model:'宝马 5系 2017款 530Li',year:'2017',mileage:'9.8万公里',owner:'赵强',client:'上海恒信二手车行',type:'事故车鉴定',appraiser:'刘志远',accept:'2026-11-01',due:'2026-11-05',status:'已完成',value:176000,note:'已完成底盘与结构件检测。'},
+    {id:'JD-2026-0104',plate:'粤A·6T308',vin:'LGXC34C42H0128846',model:'丰田 凯美瑞 2019款 2.0G',year:'2019',mileage:'6.7万公里',owner:'黄珊',client:'个人委托',type:'价值评估',appraiser:'周敏',accept:'2026-10-28',due:'2026-11-02',status:'已归档',value:152000,note:'已完成归档。'},
+    {id:'JD-2026-0103',plate:'京N·9P167',vin:'LS5A2ABE1JA123456',model:'长安 CS75 2018款 1.5T',year:'2018',mileage:'7.9万公里',owner:'孙浩',client:'北京中联汽车',type:'火烧车鉴定',appraiser:'刘志远',accept:'2026-10-25',due:'2026-10-30',status:'已完成',value:54000,note:'机舱线束有改装痕迹，需核查火烧可能。'},
+    {id:'JD-2026-0102',plate:'鲁B·1C886',vin:'LFV3B28R7G3021984',model:'大众 途观L 2016款 380TSI',year:'2016',mileage:'11.2万公里',owner:'郑毅',client:'青岛德众二手车',type:'事故车鉴定',appraiser:'陈建国',accept:'2026-10-22',due:'2026-10-27',status:'已归档',value:92000,note:'已归档。'},
+    {id:'JD-2026-0101',plate:'沪C·5X246',vin:'LSJA24U6XHS123789',model:'荣威 i6 2017款 20T',year:'2017',mileage:'10.3万公里',owner:'吴芳',client:'个人委托',type:'里程真实性鉴定',appraiser:'周敏',accept:'2026-10-20',due:'2026-10-24',status:'已归档',value:46000,note:'仪表里程与维保记录存在差异。'}
+  ];
+  const insp = {
+    'JD-2026-0105':{frontRail:'切割更换',rearRail:'正常',aPillar:'正常',bPillar:'钣金修复',cPillar:'正常',waterTank:'更换',firewall:'正常',shockTower:'钣金修复',trunkFloor:'正常',engine:'正常',gearbox:'正常',chassis:'正常',water:'否',fire:'否',odometer:'正常',updated:'2026-11-04',remark:'左前纵梁切割拼接，左A柱钣金修复，判定为重大事故车。'},
+    'JD-2026-0103':{frontRail:'正常',rearRail:'正常',aPillar:'正常',bPillar:'正常',cPillar:'正常',waterTank:'正常',firewall:'正常',shockTower:'正常',trunkFloor:'正常',engine:'更换',gearbox:'正常',chassis:'正常',water:'否',fire:'是',odometer:'正常',updated:'2026-10-28',remark:'机舱存在火烧熏黑痕迹，线束更换。'}
+  };
+  return {
+    settings:{company:'华鉴机动车鉴定评估有限公司',prefix:'HJ',appraiser:'陈建国',phone:'021-6688 9666',address:'上海市嘉定区汽车科技园区 8 号楼',autoNumber:true,emailNotify:true,...DEFAULT_SETTINGS_EXTRA},
+    cases,
+    inspections:insp,
+    catalog:JSON.parse(JSON.stringify(DEFAULT_CATALOG)),
+    checkItems:JSON.parse(JSON.stringify(DEFAULT_CHECK_ITEMS)),
+    roles:JSON.parse(JSON.stringify(DEFAULT_ROLES)),
+    users:JSON.parse(JSON.stringify(DEFAULT_USERS)),
+    reports:[
+      {id:'HJ-2026-0087',caseId:'JD-2026-0108',date:'2026-11-27',status:'待签发',conclusion:'待检测',value:128000,appraiser:'陈建国'},
+      {id:'HJ-2026-0086',caseId:'JD-2026-0105',date:'2026-11-04',status:'已签发',conclusion:'重大事故车',value:176000,appraiser:'刘志远'},
+      {id:'HJ-2026-0085',caseId:'JD-2026-0103',date:'2026-10-28',status:'已签发',conclusion:'火烧车',value:54000,appraiser:'刘志远'},
+      {id:'HJ-2026-0084',caseId:'JD-2026-0104',date:'2026-10-31',status:'已签发',conclusion:'非事故车',value:152000,appraiser:'周敏'}
+    ],
+    experts:[
+      {id:'E01',name:'陈建国',title:'高级鉴定评估师',cert:'A-沪-2018-0321',years:14,specialty:'事故车结构鉴定、痕迹分析',phone:'138****5621',status:'在岗'},
+      {id:'E02',name:'周敏',title:'注册评估师',cert:'B-沪-2020-1187',years:9,specialty:'车辆价值评估、二手车定价',phone:'139****7788',status:'在岗'},
+      {id:'E03',name:'刘志远',title:'高级鉴定评估师',cert:'A-沪-2019-0654',years:12,specialty:'水泡火烧鉴定、电子系统检测',phone:'136****3092',status:'外勤'},
+      {id:'E04',name:'徐雅琴',title:'鉴定助理',cert:'C-沪-2023-0442',years:4,specialty:'VIN 解析、档案核查',phone:'187****2145',status:'在岗'}
+    ],
+    clients:[
+      {id:'K01',name:'上海恒信二手车行',type:'企业',contact:'张经理',phone:'021-5566 8899',city:'上海'},
+      {id:'K02',name:'宁波通顺汽贸',type:'企业',contact:'王经理',phone:'0574-8812 3300',city:'宁波'},
+      {id:'K03',name:'个人委托（李静）',type:'个人',contact:'李静',phone:'138****1120',city:'苏州'},
+      {id:'K04',name:'北京中联汽车',type:'企业',contact:'刘经理',phone:'010-8899 2210',city:'北京'},
+      {id:'K05',name:'青岛德众二手车',type:'企业',contact:'孙经理',phone:'0532-6677 1200',city:'青岛'}
+    ],
+    activities:[
+      {text:'刘志远 签发了报告 <b>HJ-2026-0086</b>',time:'今天 09:42',color:'green'},
+      {text:'案件 <b>JD-2026-0106</b> 已完成受理登记',time:'今天 08:55',color:'blue'},
+      {text:'陈建国 上传了 <b>帕萨特</b> 的底盘检测照片',time:'昨天 16:20',color:'amber'},
+      {text:'周敏 更新了 <b>奥迪 A6L</b> 的价值评估',time:'昨天 14:07',color:'blue'}
+    ]
+  };
+}
+function loadDB(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){
+      const d=JSON.parse(raw);
+      d.settings={...DEFAULT_SETTINGS_EXTRA,...(d.settings||{})};
+      if(!Array.isArray(d.catalog)||!d.catalog.length)d.catalog=JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+      if(!Array.isArray(d.checkItems)||!d.checkItems.length)d.checkItems=JSON.parse(JSON.stringify(DEFAULT_CHECK_ITEMS));
+      if(!Array.isArray(d.roles)||!d.roles.length)d.roles=JSON.parse(JSON.stringify(DEFAULT_ROLES));
+      if(!Array.isArray(d.users)||!d.users.length)d.users=JSON.parse(JSON.stringify(DEFAULT_USERS));
+      if(!Array.isArray(d.reports))d.reports=[];
+      if(!d.reports.some(r=>r.status==='待签发'))d.reports.unshift({id:'HJ-2026-0087',caseId:'JD-2026-0108',date:'2026-11-27',status:'待签发',conclusion:'待检测',value:128000,appraiser:'陈建国'});
+      return d;
+    }
+  }catch(e){}
+  return seedDB();
+}
+let DB = loadDB();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){toast('本地存储不可用，数据仅本次有效','err')}}
+
+const state = {page:'dashboard', navOpen:['g-business','m-cases','g-data','m-vehicles','m-vin','m-catalog','g-resource','m-staff','m-client','g-config','m-config','m-system'], status:'全部', type:'全部', q:'', detailTab:'basic', currentCase:null, currentReport:null, vinText:''};
+
+function toast(msg,type='ok'){const r=document.getElementById('toastRoot');const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;r.appendChild(d);setTimeout(()=>d.remove(),2700)}
+function showModal(title,body,footer='',size=''){
+  document.getElementById('modalRoot').innerHTML='<div class="overlay" data-act="overlay"><div class="modal '+size+'"><div class="modal-head"><h2>'+title+'</h2><button class="icon-btn" data-act="close-modal" title="关闭">✕</button></div><div class="modal-body">'+body+'</div>'+(footer?'<div class="modal-foot">'+footer+'</div>':'')+'</div></div>';
+}
+function updateModal(body,footer){const b=document.querySelector('.modal-body');if(b)b.innerHTML=body;const f=document.querySelector('.modal-foot');if(f&&footer!==undefined)f.innerHTML=footer}
+function closeModal(){document.getElementById('modalRoot').innerHTML=''}
+function statusBadge(s){const m={'待受理':'b-gray','检测中':'b-blue','报告编制':'b-purple','已完成':'b-green','已归档':'b-gray'};return '<span class="badge '+(m[s]||'b-gray')+'">'+esc(s)+'</span>'}
+function typeBadge(t){const m={'事故车鉴定':'b-red','价值评估':'b-blue','水泡车鉴定':'b-purple','火烧车鉴定':'b-amber','里程真实性鉴定':'b-green'};return '<span class="badge '+(m[t]||'b-gray')+'">'+esc(t)+'</span>'}
+function levelBadge(l){const m={'重大事故车':'b-red','事故车（轻微）':'b-amber','水泡车':'b-purple','火烧车':'b-amber','里程异常':'b-red','非事故车':'b-green'};return '<span class="badge '+(m[l]||'b-gray')+'">'+esc(l)+'</span>'}
+
+/* ==================== 导航 ==================== */
+/* 三级导航：一级分组 → 二级模块 → 三级页面 */
+const NAV = [
+  {id:'dashboard',name:'工作台',icon:'home'},
+  {id:'g-business',name:'鉴定业务',icon:'case',children:[
+    {id:'m-cases',name:'案件管理',icon:'case',children:[
+      {id:'case-all',name:'全部案件'},{id:'case-pending',name:'待受理案件'},{id:'case-doing',name:'在办案件'},{id:'case-done',name:'已归档案件'}]},
+    {id:'m-inspect',name:'检测评估',icon:'check',children:[
+      {id:'inspect-task',name:'检测任务'},{id:'inspect-standard',name:'检测判定标准'}]},
+    {id:'m-report',name:'报告管理',icon:'doc',children:[
+      {id:'report-all',name:'全部报告'},{id:'report-draft',name:'待签发报告'},{id:'report-signed',name:'已签发报告'}]}
+  ]},
+  {id:'g-data',name:'车辆与数据',icon:'car',children:[
+    {id:'m-vehicles',name:'车辆档案',icon:'car',children:[
+      {id:'vehicle-all',name:'全部车辆'},{id:'vehicle-accident',name:'事故车辆'},{id:'vehicle-clean',name:'非事故车辆'}]},
+    {id:'m-vin',name:'VIN 工具',icon:'vin',children:[
+      {id:'vin-parse',name:'VIN 解析'},{id:'vin-history',name:'维保出险查询'}]},
+    {id:'m-catalog',name:'车型库',icon:'box',children:[
+      {id:'catalog-brand',name:'品牌管理'},{id:'catalog-series',name:'车系管理'},{id:'catalog-model',name:'车型年款'}]}
+  ]},
+  {id:'g-resource',name:'资源管理',icon:'users',children:[
+    {id:'m-staff',name:'人员管理',icon:'user',children:[
+      {id:'staff-expert',name:'鉴定师'},{id:'staff-auditor',name:'审核人员'}]},
+    {id:'m-client',name:'客户管理',icon:'users',children:[
+      {id:'client-company',name:'企业客户'},{id:'client-person',name:'个人客户'}]}
+  ]},
+  {id:'g-config',name:'基础配置',icon:'gear',children:[
+    {id:'m-config',name:'检测项配置',icon:'check',children:[
+      {id:'config-structure',name:'车身结构件'},{id:'config-power',name:'动力底盘'},{id:'config-special',name:'特殊车况'}]},
+    {id:'m-system',name:'系统管理',icon:'gear',children:[
+      {id:'setting-company',name:'机构信息'},{id:'setting-role',name:'用户与角色'},{id:'setting-about',name:'关于系统'}]}
+  ]}
+];
+const PAGE_NAME={},PAGE_PATH={},PAGE_ANCESTORS={};
+(function walk(nodes,ids,names){
+  nodes.forEach(n=>{
+    const ni=ids.concat(n.id),nn=names.concat(n.name);
+    PAGE_ANCESTORS[n.id]=ids;PAGE_PATH[n.id]=nn;
+    if(n.children)walk(n.children,ni,nn);else PAGE_NAME[n.id]=n.name;
+  });
+})(NAV,[],[]);
+function findNav(id){
+  let found=null;
+  (function walk(nodes){nodes.forEach(n=>{if(n.id===id)found=n;if(n.children)walk(n.children)})})(NAV);
+  return found;
+}
+function firstLeaf(n){while(n&&n.children)n=n.children[0];return n?n.id:'dashboard'}
+function navNode(n,level){
+  const has=!!n.children,open=state.navOpen.includes(n.id),active=state.page===n.id;
+  const cls='nav-item level'+level+(active?' active':'')+(open?' open':'');
+  const caret=has?'<svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>':'';
+  const icon=n.icon?svg(ico[n.icon]):'';
+  const count=has?'<span class="nav-count">'+n.children.length+'</span>':'';
+  let html='<div class="'+cls+'" data-nav="'+n.id+'" title="'+n.name+'">'+icon+'<span>'+n.name+'</span>'+count+caret+'</div>';
+  if(has)html+='<div class="nav-children'+(open?' show':'')+'">'+n.children.map(c=>navNode(c,level+1)).join('')+'</div>';
+  return html;
+}
+function renderNav(){document.getElementById('nav').innerHTML=NAV.map(n=>navNode(n,1)).join('')}
+function navigate(p){
+  state.page=p;
+  (PAGE_ANCESTORS[p]||[]).forEach(id=>{if(!state.navOpen.includes(id))state.navOpen.push(id)});
+  renderNav();render();
+  const path=PAGE_PATH[p]||['工作台'];
+  document.getElementById('crumb').innerHTML=path.map((x,i)=>i===path.length-1?'<b>'+x+'</b>':x).join(' / ');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ==================== 工作台 ==================== */
+function barChart(){
+  const data=[{m:'6月',v:12},{m:'7月',v:18},{m:'8月',v:15},{m:'9月',v:22},{m:'10月',v:19},{m:'11月',v:DB.cases.length}];
+  const max=Math.max(...data.map(d=>d.v),24), W=520,H=180,left=26,bottom=28,tw=W-left-8,th=H-bottom-8;
+  let grid='';for(let i=0;i<=4;i++){const y=8+th*i/4;grid+='<line x1="'+left+'" y1="'+y+'" x2="'+(W-8)+'" y2="'+y+'" stroke="#eef1f6" stroke-width="1"/><text x="'+(left-7)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#9aa5b6">'+Math.round(max-max*i/4)+'</text>'}
+  const bw=tw/data.length;
+  const bars=data.map((d,i)=>{const h=th*d.v/max,x=left+bw*i+bw*.28,y=8+th-h;return '<rect x="'+x+'" y="'+y+'" width="'+(bw*.44)+'" height="'+h+'" rx="4" fill="url(#g1)"/><text x="'+(x+bw*.22)+'" y="'+(y-6)+'" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">'+d.v+'</text><text x="'+(left+bw*i+bw*.5)+'" y="'+(H-7)+'" text-anchor="middle" font-size="11" fill="#94a3b8">'+d.m+'</text>'}).join('');
+  return '<svg viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#93c5fd"/></linearGradient></defs>'+grid+bars+'</svg>';
+}
+function donutBlock(){
+  const counts={};DB.cases.forEach(c=>counts[c.status]=(counts[c.status]||0)+1);
+  const arr=[['待受理',counts['待受理']||0,'#cbd5e1'],['检测中',counts['检测中']||0,'#3b82f6'],['报告编制',counts['报告编制']||0,'#8b5cf6'],['已完成',counts['已完成']||0,'#22c55e'],['已归档',counts['已归档']||0,'#94a3b8']];
+  const total=arr.reduce((s,a)=>s+a[1],0)||1;let acc=0;const parts=arr.map(a=>{const from=acc/total*100;acc+=a[1];return a[2]+' '+(acc/total*100)+'%'});
+  // 修正起点为顶部
+  const stops=[];let p=0;arr.forEach(a=>{const end=p+a[1]/total*100;stops.push(a[2]+' '+p.toFixed(2)+'% '+end.toFixed(2)+'%');p=end});
+  return '<div class="chart-wrap"><div class="donut" style="background:conic-gradient('+stops.join(',')+')"><div class="donut-inner"><b>'+DB.cases.length+'</b><span>案件总数</span></div></div><div class="legend">'+arr.map(a=>'<div class="legend-row"><i class="legend-dot" style="background:'+a[2]+'"></i><span>'+a[0]+'</span><span class="n">'+a[1]+' 件</span></div>').join('')+'</div></div>';
+}
+function renderDashboard(){
+  const cs=DB.cases, doing=cs.filter(c=>['检测中','报告编制','待受理'].includes(c.status)).length, done=cs.filter(c=>c.status==='已完成'||c.status==='已归档').length;
+  const totalVal=cs.reduce((s,c)=>s+(Number(c.value)||0),0);
+  const kpis=[
+    {label:'累计鉴定案件',v:cs.length,sub:'本月新增 <em>+3</em>',icon:'case',c:'#2563eb',bg:'#e8f0ff'},
+    {label:'进行中案件',v:doing,sub:'待处理任务 <em>'+doing+'</em>',icon:'clock',c:'#d97706',bg:'#fff2dd'},
+    {label:'已完成鉴定',v:done,sub:'按期完成率 <em>96.5%</em>',icon:'checkCircle',c:'#16a34a',bg:'#e5f8ed'},
+    {label:'累计评估价值',v:'¥'+(totalVal/10000).toFixed(1)+'万',sub:'较上月 <em>+12.4%</em>',icon:'money',c:'#7c3aed',bg:'#f0eaff'}
+  ];
+  const todos=cs.filter(c=>['待受理','检测中','报告编制'].includes(c.status)).slice(0,4);
+  return '<div class="page-head"><div><h1>工作台</h1><p>欢迎回来，'+esc(DB.settings.appraiser)+' · 今天是 '+today()+'，有 '+doing+' 项案件需要跟进</p></div><button class="btn primary" data-act="new-case">'+svg(ico.plus)+' 新建鉴定案件</button></div>'+
+  '<div class="kpi-grid">'+kpis.map(k=>'<div class="kpi" style="--kc:'+k.c+';--kbg:'+k.bg+'"><div class="kpi-top"><span class="kpi-label">'+k.label+'</span><span class="kpi-icon">'+svg(ico[k.icon])+'</span></div><div class="kpi-value">'+k.v+'</div><div class="kpi-sub">'+k.sub+'</div></div>').join('')+'</div>'+
+  '<div class="grid-2"><div class="card pad"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3>案件受理趋势</h3><span class="muted small">近 6 个月</span></div>'+barChart()+'</div><div class="card pad"><h3 style="margin-bottom:12px">案件状态分布</h3>'+donutBlock()+'</div></div>'+
+  '<div class="grid-2"><div class="card"><div class="card-head"><h3>待办案件</h3><button class="link" data-page="case-all">查看全部 →</button></div>'+todos.map(c=>'<div class="todo"><div class="todo-bar" style="background:'+(c.status==='待受理'?'#cbd5e1':c.status==='检测中'?'#3b82f6':'#8b5cf6')+'"></div><div class="todo-main"><div class="todo-title">'+esc(c.plate)+' · '+esc(c.model)+'</div><div class="todo-meta">'+esc(c.id)+' · '+esc(c.type)+' · 截止 '+esc(c.due)+'</div></div>'+statusBadge(c.status)+'<button class="link" data-act="case-detail" data-id="'+c.id+'">处理</button></div>').join('')+'</div>'+
+  '<div class="card"><div class="card-head"><h3>最近动态</h3><span class="muted small">实时更新</span></div><div class="timeline">'+DB.activities.map(a=>'<div class="tl"><i class="tl-dot '+a.color+'"></i><div><div class="tl-text">'+a.text+'</div><div class="tl-time">'+esc(a.time)+'</div></div></div>').join('')+'</div></div></div>';
+}
+
+/* ==================== 鉴定案件 ==================== */
+function caseScope(){
+  if(state.page==='case-pending')return '待受理';
+  if(state.page==='case-doing')return '在办';
+  if(state.page==='case-done')return '已归档';
+  return '全部';
+}
+function filteredCases(){
+  const scope=caseScope();
+  return DB.cases.filter(c=>{
+    if(scope==='待受理'&&c.status!=='待受理')return false;
+    if(scope==='在办'&&!['检测中','报告编制'].includes(c.status))return false;
+    if(scope==='已归档'&&!['已完成','已归档'].includes(c.status))return false;
+    if(scope==='全部'&&state.status!=='全部'&&c.status!==state.status)return false;
+    if(state.type!=='全部'&&c.type!==state.type)return false;
+    if(state.q){const q=state.q.toLowerCase();if(![c.id,c.plate,c.vin,c.model,c.client,c.owner].some(v=>String(v).toLowerCase().includes(q)))return false}
+    return true;
+  });
+}
+function renderCases(){
+  const list=filteredCases(),scope=caseScope();
+  return '<div class="page-head"><div><h1>'+(scope==='全部'?'鉴定案件':scope+'案件')+'</h1><p>'+(scope==='全部'?'共 '+DB.cases.length+' 件案件，当前筛选 '+list.length+' 件':'当前分类「'+scope+'」，共 '+list.length+' 件')+'</p></div><button class="btn primary" data-act="new-case">'+svg(ico.plus)+' 新建鉴定案件</button></div>'+
+  '<div class="card"><div style="padding:16px 18px"><div class="toolbar"><div class="search-field">'+svg(ico.search)+'<input class="field" id="caseQ" placeholder="案件编号 / 车牌 / VIN / 客户" value="'+esc(state.q)+'"></div>'+
+  '<select class="field" id="caseStatus" data-filter="status"><option>全部</option>'+['待受理','检测中','报告编制','已完成','已归档'].map(s=>'<option'+(state.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+  '<select class="field" id="caseType" data-filter="type"><option>全部</option>'+['事故车鉴定','价值评估','水泡车鉴定','火烧车鉴定','里程真实性鉴定'].map(s=>'<option'+(state.type===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+  '<div class="spacer"></div><span class="muted small">共 '+list.length+' 条记录</span></div></div>'+
+  '<div class="table-wrap"><table><thead><tr><th>案件编号</th><th>车牌 / VIN</th><th>车型</th><th>委托方</th><th>鉴定类型</th><th>鉴定师</th><th>受理日期</th><th>状态</th><th>操作</th></tr></thead><tbody>'+
+  (list.length?list.map(c=>'<tr><td><span class="mono">'+esc(c.id)+'</span></td><td><strong>'+esc(c.plate)+'</strong><div class="muted small mono">'+esc(c.vin)+'</div></td><td>'+esc(c.model)+'</td><td>'+esc(c.client)+'</td><td>'+typeBadge(c.type)+'</td><td>'+esc(c.appraiser)+'</td><td class="nowrap">'+esc(c.accept)+'</td><td>'+statusBadge(c.status)+'</td><td class="nowrap"><button class="link" data-act="case-detail" data-id="'+c.id+'">查看</button><button class="link" data-act="case-edit" data-id="'+c.id+'">编辑</button><button class="link red" data-act="case-del" data-id="'+c.id+'">删除</button></td></tr>').join(''):'<tr><td colspan="9"><div class="empty">'+svg(ico.search)+'<div>没有符合条件的案件</div></div></td></tr>')+
+  '</tbody></table></div><div class="pager"><span>显示 1 - '+list.length+' 条，共 '+list.length+' 条</span><div class="pager-btns"><button class="pg active">1</button></div></div></div>';
+}
+
+/* ==================== 案件详情 ==================== */
+function openCase(id){state.currentCase=id;state.detailTab='basic';renderCaseModal()}
+function renderCaseModal(){
+  const c=DB.cases.find(x=>x.id===state.currentCase);if(!c)return;
+  const insp=DB.inspections[c.id];const level=insp?computeLevel(insp):null;
+  const rep=DB.reports.find(r=>r.caseId===c.id);
+  let body='<div class="tabs">'+
+    [['basic','基本信息'],['inspect','检测结论'],['report','报告信息'],['note','委托备注']].map(t=>'<button class="tab'+(state.detailTab===t[0]?' active':'')+'" data-act="case-tab" data-tab="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>';
+  if(state.detailTab==='basic'){
+    body+='<div class="info-grid">'+[['案件编号',c.id],['案件状态',c.status],['鉴定类型',c.type],['车牌号码',c.plate],['车架号 VIN',c.vin],['车辆车型',c.model],['出厂年份',c.year],['表显里程',c.mileage],['车辆所有人',c.owner],['委托方',c.client],['鉴定评估师',c.appraiser],['受理 / 截止',c.accept+' ~ '+c.due],['预估价值','¥ '+Number(c.value).toLocaleString()],['登记日期',c.accept]].map(x=>'<div><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>').join('')+'</div>';
+  }else if(state.detailTab==='inspect'){
+    body+= insp ? '<div class="level-box '+(level==='非事故车'?'info':'warn')+'">'+svg(ico.checkCircle)+'<div><div class="muted small">综合判定结论</div><b>'+level+'</b><div class="small muted">最近更新：'+esc(insp.updated)+'</div></div></div>'+
+      '<div class="info-grid">'+Object.keys(insp).filter(k=>!['updated','remark'].includes(k)).map(k=>'<div><span>'+FIELD_LABEL[k]+'</span><b>'+esc(insp[k])+'</b></div>').join('')+'</div>'+(insp.remark?'<div class="sec-title">检测备注</div><p>'+esc(insp.remark)+'</p>':'')
+      : '<div class="empty" style="padding:40px 0">'+svg(ico.check)+'<div>尚未录入该案件的结构检测数据</div><button class="btn primary sm" style="margin-top:12px" data-act="open-inspect" data-id="'+c.id+'">前往录入检测</button></div>';
+  }else if(state.detailTab==='report'){
+    body+= rep ? '<div class="info-grid"><div><span>报告编号</span><b>'+rep.id+'</b></div><div><span>出具日期</span><b>'+rep.date+'</b></div><div><span>报告状态</span><b>'+rep.status+'</b></div><div><span>鉴定结论</span><b>'+rep.conclusion+'</b></div><div><span>评估价值</span><b>¥ '+rep.value.toLocaleString()+'</b></div><div><span>签发人</span><b>'+rep.appraiser+'</b></div></div><button class="btn primary sm" style="margin-top:16px" data-act="view-report" data-id="'+rep.id+'">预览报告</button>'
+      : '<div class="empty" style="padding:40px 0">'+svg(ico.doc)+'<div>尚未生成鉴定报告</div><button class="btn primary sm" style="margin-top:12px" data-act="gen-report" data-id="'+c.id+'">生成鉴定报告</button></div>';
+  }else{
+    body+='<div class="sec-title">委托事项与备注</div><p>'+esc(c.note||'暂无备注')+'</p><div class="sec-title">委托声明</div><p class="muted">本机构依据委托人提供资料及现场查勘结果出具鉴定意见，仅对鉴定时点标的现状负责。委托人应对车辆来源及提供材料的真实性承担法律责任。</p>';
+  }
+  const foot='<button class="btn" data-act="close-modal">关闭</button><button class="btn" data-act="open-inspect" data-id="'+c.id+'">录入检测</button><button class="btn primary" data-act="case-edit" data-id="'+c.id+'">编辑案件</button>';
+  showModal('案件详情 · '+c.id,body,foot,'wide');
+}
+
+/* ==================== 案件表单 ==================== */
+function caseForm(c){
+  c=c||{};
+  const f=(label,name,val,cls='')=>'<div class="form-item '+cls+'"><label>'+label+'</label><input class="field" name="'+name+'" value="'+esc(val||'')+'"></div>';
+  const sel=(label,name,val,opts)=>'<div class="form-item"><label>'+label+'</label><select class="field" name="'+name+'">'+opts.map(o=>'<option'+(o===val?' selected':'')+'>'+o+'</option>').join('')+'</select></div>';
+  return '<div class="form-grid">'+f('车牌号码','plate',c.plate)+f('车辆识别代号 VIN','vin',c.vin)+f('车辆车型','model',c.model)+f('出厂年份','year',c.year)+f('表显里程','mileage',c.mileage)+f('车辆所有人','owner',c.owner)+
+  sel('鉴定类型','type',c.type||'事故车鉴定',['事故车鉴定','价值评估','水泡车鉴定','火烧车鉴定','里程真实性鉴定'])+sel('案件状态','status',c.status||'待受理',['待受理','检测中','报告编制','已完成','已归档'])+
+  f('委托方','client',c.client)+f('鉴定评估师','appraiser',c.appraiser||DB.settings.appraiser)+f('受理日期','accept',c.accept||today())+f('要求完成日期','due',c.due)+f('预估价值（元）','value',c.value||'')+
+  '<div class="form-item full"><label>委托事项备注</label><textarea name="note">'+esc(c.note||'')+'</textarea></div></div>';
+}
+function openCaseForm(id){
+  const c=id?DB.cases.find(x=>x.id===id):null;
+  showModal(c?'编辑案件':'新建鉴定案件',caseForm(c),'<button class="btn" data-act="close-modal">取消</button><button class="btn primary" data-act="save-case" data-id="'+(id||'')+'">保存案件</button>','wide');
+}
+function saveCase(id){
+  const form=document.querySelector('.modal .form-grid');if(!form)return;
+  const data={};new FormData(form).forEach((v,k)=>data[k]=String(v).trim());
+  if(!data.plate||!data.vin||!data.model){toast('车牌号、VIN 和车型为必填项','err');return}
+  data.value=Number(data.value)||0;
+  if(id){const i=DB.cases.findIndex(x=>x.id===id);DB.cases[i]={...DB.cases[i],...data}}
+  else{DB.cases.unshift({id:'JD-2026-'+String(109+DB.cases.length-8).padStart(4,'0'),...data})}
+  save();closeModal();render();toast(id?'案件信息已更新':'案件创建成功');
+}
+
+/* ==================== 车辆档案 ==================== */
+function renderVehicles(){
+  const map={};DB.cases.forEach(c=>{if(!map[c.vin])map[c.vin]=c});
+  let list=Object.values(map);
+  const scope=state.page==='vehicle-accident'?'事故车辆':state.page==='vehicle-clean'?'非事故车辆':'全部车辆';
+  if(scope==='事故车辆')list=list.filter(c=>{const i=DB.inspections[c.id];return i&&computeLevel(i).includes('事故')});
+  if(scope==='非事故车辆')list=list.filter(c=>{const i=DB.inspections[c.id];return !i||computeLevel(i)==='非事故车'});
+  return '<div class="page-head"><div><h1>'+scope+'</h1><p>按车架号 VIN 去重归档，当前分类共 '+list.length+' 辆车辆</p></div></div>'+
+  '<div class="vehicle-grid">'+(list.length?list.map(c=>{
+    const ins=DB.inspections[c.id];const lv=ins?computeLevel(ins):'待检测';
+    return '<div class="vehicle-card"><div class="veh-top"><div class="veh-icon">'+svg(ico.car)+'</div><div style="text-align:right"><div class="veh-plate">'+esc(c.plate)+'</div><div class="veh-model">'+esc(c.model)+'</div></div></div>'+
+    '<div class="veh-info"><div><span>VIN 车架号</span><b class="mono">'+esc(c.vin)+'</b></div><div><span>出厂年份</span><b>'+esc(c.year)+'</b></div><div><span>表显里程</span><b>'+esc(c.mileage)+'</b></div><div><span>车辆所有人</span><b>'+esc(c.owner)+'</b></div></div>'+
+    '<div class="veh-foot">'+levelBadge(lv)+'<button class="link" data-act="case-detail" data-id="'+c.id+'">查看档案 →</button></div></div>';
+  }).join(''):'<div class="empty" style="grid-column:1/-1">'+svg(ico.car)+'<div>该分类下暂无车辆</div></div>')+'</div>';
+}
+
+/* ==================== 检测评估 ==================== */
+const FIELDS=[
+  {title:'车身结构件（事故判定核心）',rows:[['frontRail','左/右前纵梁'],['rearRail','后纵梁'],['aPillar','A 柱'],['bPillar','B 柱'],['cPillar','C 柱'],['waterTank','水箱框架'],['firewall','防火墙'],['shockTower','前减震器座'],['trunkFloor','后备箱底板']]},
+  {title:'动力与底盘系统',rows:[['engine','发动机'],['gearbox','变速箱'],['chassis','底盘大梁']]},
+  {title:'特殊车况排查',rows:[['water','是否水泡'],['fire','是否火烧'],['odometer','里程表状态']]}
+];
+const FIELD_LABEL={};FIELDS.forEach(g=>g.rows.forEach(r=>FIELD_LABEL[r[0]]=r[1]));
+function computeLevel(v){
+  const key=['frontRail','rearRail','aPillar','bPillar','cPillar','firewall','shockTower','trunkFloor'];
+  if(key.some(k=>v[k]==='切割更换'))return '重大事故车';
+  if(v.fire==='是')return '火烧车';
+  if(v.water==='是')return '水泡车';
+  if(key.some(k=>v[k]==='钣金修复'))return '事故车（轻微）';
+  if(v.odometer==='异常')return '里程异常';
+  return '非事故车';
+}
+function renderInspection(){
+  return '<div class="page-head"><div><h1>检测评估</h1><p>对车辆结构件、动力系统及特殊车况进行标准化查勘与判定</p></div></div>'+
+  '<div class="card"><div class="card-head"><h3>待检测 / 已检测案件</h3><span class="muted small">点击录入或查看检测清单</span></div><div class="table-wrap"><table><thead><tr><th>案件编号</th><th>车辆</th><th>鉴定类型</th><th>鉴定师</th><th>检测状态</th><th>初步结论</th><th>操作</th></tr></thead><tbody>'+
+  DB.cases.map(c=>{const ins=DB.inspections[c.id];const lv=ins?computeLevel(ins):null;return '<tr><td class="mono">'+c.id+'</td><td><strong>'+esc(c.plate)+'</strong><div class="muted small">'+esc(c.model)+'</div></td><td>'+typeBadge(c.type)+'</td><td>'+esc(c.appraiser)+'</td><td>'+(ins?'<span class="badge b-green">已检测</span>':'<span class="badge b-gray">待检测</span>')+'</td><td>'+(lv?levelBadge(lv):'<span class="muted small">—</span>')+'</td><td><button class="link" data-act="open-inspect" data-id="'+c.id+'">'+(ins?'查看/修改':'录入检测')+'</button></td></tr>'}).join('')+
+  '</tbody></table></div></div>';
+}
+function openInspection(id){
+  const c=DB.cases.find(x=>x.id===id);if(!c)return;
+  const cur=DB.inspections[id]||{};
+  let body='<div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-bottom:18px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap"><div><b>'+esc(c.plate)+'</b> · '+esc(c.model)+'<div class="muted small mono">'+esc(c.vin)+' · '+esc(c.id)+'</div></div>'+statusBadge(c.status)+'</div>';
+  FIELDS.forEach(g=>{
+    body+='<div class="check-block"><div class="check-title">'+g.title+'</div><div class="check-grid">'+g.rows.map(r=>{
+      const opts=r[0]==='water'||r[0]==='fire'?['否','是']:r[0]==='odometer'?['正常','异常','无法确认']:['正常','钣金修复','切割更换','无法确认'];
+      return '<div class="check-row"><div class="check-label">'+r[1]+'</div><div class="seg">'+opts.map(o=>'<label><input type="radio" name="'+r[0]+'" value="'+o+'"'+(cur[r[0]]===o?' checked':'')+'><span>'+o+'</span></label>').join('')+'</div></div>';
+    }).join('')+'</div></div>';
+  });
+  body+='<div class="form-item"><label>检测备注 / 异常描述</label><textarea id="inspRemark" placeholder="记录检测过程中发现的痕迹、修复工艺及照片说明">'+esc(cur.remark||'')+'</textarea></div>';
+  const foot='<button class="btn" data-act="close-modal">取消</button><button class="btn primary" data-act="save-inspect" data-id="'+id+'">保存检测结论</button>';
+  showModal('车辆结构检测清单',body,foot,'wide');
+}
+function saveInspection(id){
+  const vals={};document.querySelectorAll('.modal input[type=radio]:checked').forEach(i=>vals[i.name]=i.value);
+  const remark=document.getElementById('inspRemark');if(remark)vals.remark=remark.value.trim();
+  vals.updated=today();
+  DB.inspections[id]=vals;
+  const c=DB.cases.find(x=>x.id===id);if(c&&c.status==='待受理')c.status='检测中';
+  save();closeModal();render();toast('检测结论已保存，综合判定：'+computeLevel(vals));
+}
+
+/* ==================== 鉴定报告 ==================== */
+function ensureReport(caseId){
+  let r=DB.reports.find(x=>x.caseId===caseId);
+  const c=DB.cases.find(x=>x.id===caseId);
+  if(!r){
+    const insp=DB.inspections[caseId]||{};
+    r={id:DB.settings.prefix+'-'+new Date().getFullYear()+'-'+String(87+DB.reports.length).padStart(4,'0'),caseId,date:today(),status:'已签发',conclusion:insp?computeLevel(insp):'待检测',value:c.value||0,appraiser:c.appraiser};
+    DB.reports.unshift(r);save();
+  }
+  return r;
+}
+function reportPaper(r){
+  const c=DB.cases.find(x=>x.caseId===r.caseId)||DB.cases.find(x=>x.id===r.caseId)||{};
+  const ins=DB.inspections[r.caseId]||{};
+  const findings=Object.keys(ins).filter(k=>FIELD_LABEL[k]&&ins[k]&&ins[k]!=='正常'&&ins[k]!=='否').map(k=>FIELD_LABEL[k]+'：'+ins[k]);
+  return '<div class="paper"><div class="paper-head"><div class="paper-logo">华鉴<br>鉴定</div><div><h2>机动车鉴定评估报告书</h2><p>'+esc(DB.settings.company)+'　|　报告编号：'+esc(r.id)+'</p></div></div>'+
+  '<table class="paper-table"><tr><td class="lb">委托方</td><td>'+esc(c.client)+'</td><td class="lb">委托日期</td><td>'+esc(c.accept)+'</td></tr><tr><td class="lb">车辆所有人</td><td>'+esc(c.owner)+'</td><td class="lb">鉴定事项</td><td>'+esc(c.type)+'</td></tr></table>'+
+  '<h3>一、车辆基本情况</h3><table class="paper-table"><tr><td class="lb">号牌号码</td><td>'+esc(c.plate)+'</td><td class="lb">厂牌型号</td><td>'+esc(c.model)+'</td></tr><tr><td class="lb">车辆识别代号</td><td colspan="3" class="mono">'+esc(c.vin)+'</td></tr><tr><td class="lb">出厂年份</td><td>'+esc(c.year)+'</td><td class="lb">表显里程</td><td>'+esc(c.mileage)+'</td></tr></table>'+
+  '<h3>二、查勘过程与主要发现</h3><p>受委托方委托，本机构鉴定人员依据 GB/T 30323《二手车鉴定评估技术规范》及行业通行做法，于 '+esc(c.accept)+' 对标的车辆进行了现场查勘，核查了车辆结构件、动力系统、底盘及车况痕迹，主要发现如下：</p>'+
+  '<p>'+(findings.length?findings.map((f,i)=>'（'+(i+1)+'）'+esc(f)).join('<br>'):'（1）车辆主体结构件未见明显切割、焊接及钣金修复痕迹；<br>（2）发动机、变速箱及底盘系统工作正常；<br>（3）未发现水泡、火烧及里程篡改迹象。')+'</p>'+
+  (ins.remark?'<p>备注：'+esc(ins.remark)+'</p>':'')+
+  '<h3>三、鉴定结论</h3><div class="conclusion">经综合分析，标的车况鉴定结论为：'+esc(r.conclusion)+'</div>'+
+  '<h3>四、价值评估</h3><p>以鉴定时点车辆实际车况为基础，结合市场行情、使用年限及行驶里程等因素，评估标的车辆价值为 <b>¥ '+Number(r.value).toLocaleString()+' 元</b>（人民币'+esc(toChineseNum(Number(r.value)))+'元整）。</p>'+
+  '<div class="sign-row"><div class="sign-box">鉴定评估师签字：<div class="line">'+esc(r.appraiser)+'</div></div><div class="sign-box">审核人签字：<div class="line">审核通过</div></div></div><div class="stamp">华鉴机动车<br>鉴定评估<br>专用章</div>'+
+  '<div class="paper-foot">声明：本报告仅对委托标的在鉴定时点的现状负责，不作为车辆权属证明。未经本机构书面同意，不得用于其他用途。出具日期：'+esc(r.date)+'</div></div>';
+}
+function toChineseNum(n){
+  n=Math.floor(Number(n)||0);
+  if(n===0)return '零';
+  const d='零一二三四五六七八九',units=['','十','百','千'],big=['','万','亿','万亿'];
+  const sections=[];let bi=0;
+  while(n>0){
+    const sec=n%10000;let str='',zero=false;
+    for(let i=3;i>=0;i--){
+      const g=Math.floor(sec/Math.pow(10,i))%10;
+      if(g===0){if(str)zero=true}
+      else{if(zero){str+='零';zero=false}str+=d[g]+units[i]}
+    }
+    if(str)sections.unshift(str+big[bi]);
+    n=Math.floor(n/10000);bi++;
+  }
+  return sections.join('').replace(/零+/g,'零').replace(/零$/,'');
+}
+function reportScope(){return state.page==='report-draft'?'待签发':state.page==='report-signed'?'已签发':'全部'}
+function renderReports(){
+  const scope=reportScope(),list=scope==='全部'?DB.reports:DB.reports.filter(r=>r.status===scope);
+  return '<div class="page-head"><div><h1>'+(scope==='全部'?'鉴定报告':scope+'报告')+'</h1><p>'+(scope==='全部'?'已出具 '+DB.reports.length+' 份报告':'当前分类「'+scope+'」共 '+list.length+' 份报告')+'，支持在线预览、打印与导出</p></div></div>'+
+  '<div class="card"><div class="table-wrap"><table><thead><tr><th>报告编号</th><th>关联案件</th><th>车辆</th><th>鉴定结论</th><th>评估价值</th><th>出具日期</th><th>状态</th><th>操作</th></tr></thead><tbody>'+
+  (list.length?list.map(r=>{const c=DB.cases.find(x=>x.id===r.caseId)||{};return '<tr><td class="mono">'+esc(r.id)+'</td><td class="mono">'+esc(r.caseId)+'</td><td>'+esc(c.plate||'—')+'<div class="muted small">'+esc(c.model||'')+'</div></td><td>'+levelBadge(r.conclusion)+'</td><td>¥ '+Number(r.value).toLocaleString()+'</td><td class="nowrap">'+esc(r.date)+'</td><td><span class="badge '+(r.status==='待签发'?'b-amber':'b-green')+'">'+esc(r.status)+'</span></td><td class="nowrap"><button class="link" data-act="view-report" data-id="'+r.id+'">预览</button><button class="link" data-act="print-report" data-id="'+r.id+'">打印</button><button class="link gray" data-act="export-report" data-id="'+r.id+'">导出</button></td></tr>'}).join(''):'<tr><td colspan="8"><div class="empty">'+svg(ico.doc)+'<div>暂无报告，请在案件详情中生成</div></div></td></tr>')+
+  '</tbody></table></div></div>';
+}
+function viewReport(id){
+  const r=DB.reports.find(x=>x.id===id);if(!r)return;state.currentReport=id;
+  showModal('报告预览 · '+r.id,reportPaper(r),'<button class="btn" data-act="close-modal">关闭</button><button class="btn" data-act="export-report" data-id="'+r.id+'">'+svg(ico.download)+' 导出 JSON</button><button class="btn primary" data-act="print-report" data-id="'+r.id+'">'+svg(ico.print)+' 打印报告</button>','wide');
+}
+function printReport(id){
+  const r=DB.reports.find(x=>x.id===id);if(!r)return;
+  document.getElementById('printArea').innerHTML=reportPaper(r);
+  window.print();
+}
+
+/* ==================== VIN 解析 ==================== */
+const WMI={'LSV':'上汽大众','LFV':'一汽-大众','LHG':'广汽本田','LHGJ':'广汽本田','LGB':'上汽通用别克','LSG':'上汽通用雪佛兰','LFN':'一汽丰田','LFM':'一汽丰田','LTV':'广汽丰田','LVH':'东风本田','LZW':'上汽通用五菱','LS5':'重庆长安','LSJ':'上汽荣威','LGX':'广汽丰田','WBA':'宝马（德国）','WDC':'梅赛德斯-奔驰（德国）','WAU':'奥迪（德国）','1HG':'本田（美国）','5YJ':'特斯拉（美国）','JM1':'马自达（日本）','KNA':'起亚（韩国）'};
+const YEAR={A:2010,B:2011,C:2012,D:2013,E:2014,F:2015,G:2016,H:2017,J:2018,K:2019,L:2020,M:2021,N:2022,P:2023,R:2024,S:2025,T:2026,V:2027,W:2028,X:2029,Y:2030};
+const TRANS={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9};
+const WEIGHT=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
+function parseVin(vin){
+  vin=String(vin||'').trim().toUpperCase();
+  if(vin.length!==17)return {error:'VIN 必须为 17 位字符'};
+  if(/[IOQ]/.test(vin))return {error:'VIN 中不能包含字母 I、O、Q'};
+  let sum=0,ok=true;
+  for(let i=0;i<17;i++){const ch=vin[i];const val=/[0-9]/.test(ch)?Number(ch):TRANS[ch];if(val===undefined){ok=false;break}sum+=val*WEIGHT[i]}
+  if(!ok)return {error:'VIN 包含非法字符'};
+  const mod=sum%11,expect=mod===10?'X':String(mod);
+  const region={'L':'中国','W':'德国','1':'美国','5':'美国','J':'日本','K':'韩国','S':'英国','V':'法国','3':'墨西哥','2':'加拿大'}[vin[0]]||'其他地区';
+  let maker='未收录制造商';Object.keys(WMI).sort((a,b)=>b.length-a.length).forEach(k=>{if(vin.startsWith(k))maker=WMI[k]});
+  return {vin,check:expect===vin[8],expect,region,maker,year:YEAR[vin[9]]||'未知（'+vin[9]+'）',plant:vin.slice(10,12),serial:vin.slice(12),type:['1','2','3','4','5','6','7','8'].includes(vin[0])?'乘用车':'车辆'};
+}
+function vinResultHtml(res){
+  if(res.error)return '<div style="color:var(--red);font-weight:600">'+esc(res.error)+'</div>';
+  return '<div class="vin-big">'+esc(res.vin)+'</div>'+
+  '<div style="margin-bottom:12px"><span class="badge '+(res.check?'b-green':'b-red')+'">'+(res.check?'校验位通过 · VIN 格式有效':'校验位不符 · 请核对 VIN 准确性')+'</span></div>'+
+  '<div class="vin-row"><span>生产地区</span><b>'+esc(res.region)+'</b></div><div class="vin-row"><span>制造商 / 品牌</span><b>'+esc(res.maker)+'</b></div>'+
+  '<div class="vin-row"><span>车型年份（第10位）</span><b>'+esc(res.year)+'</b></div><div class="vin-row"><span>校验位（第9位）</span><b>'+esc(res.vin[8])+'（应为 '+esc(res.expect)+'）</b></div>'+
+  '<div class="vin-row"><span>工厂代码（11-12位）</span><b class="mono">'+esc(res.plant)+'</b></div><div class="vin-row"><span>生产序列号（13-17位）</span><b class="mono">'+esc(res.serial)+'</b></div>';
+}
+function mockRecords(vin){
+  const seed=vin.charCodeAt(vin.length-1)%3;
+  const b=['2024-03-18','2023-09-06','2022-11-22','2021-05-14'],a=['更换机油机滤 · 4S 店 regular','前刹车片更换 · 4S 店','空调滤芯更换 · 4S 店','首次保养 · 4S 店'];
+  return '<div class="mock-row"><div class="t"><span>维保记录 · '+b[seed]+'</span><span class="badge b-blue">4S 店</span></div><div class="d">'+a[seed]+'　里程 '+(32000+seed*8600).toLocaleString()+' km</div></div>'+
+  '<div class="mock-row"><div class="t"><span>维保记录 · '+b[(seed+1)%4]+'</span><span class="badge b-blue">4S 店</span></div><div class="d">'+a[(seed+1)%4]+'　里程 '+(48000+seed*6200).toLocaleString()+' km</div></div>'+
+  '<div class="mock-row"><div class="t"><span>保险出险记录 · '+(2023-seed)+'-07-12</span><span class="badge '+(seed===1?'b-amber':'b-green')+'">'+(seed===1?'有出险':'无出险')+'</span></div><div class="d">'+(seed===1?'报案号 RD'+(88210+seed)+' · 理赔金额 ¥ 8,600 · 维修项目：左前翼子板钣金喷漆':'该年度未查询到理赔记录')+'</div></div>';
+}
+function renderVin(mode){
+  mode=mode||'parse';const res=state.vinText?parseVin(state.vinText):null;
+  const title=mode==='history'?'维保出险查询':'VIN 智能解析';
+  const desc=mode==='history'?'按车辆识别代号查询维保与保险理赔历史记录':'17 位车辆识别代号校验、制造商与年款信息解析';
+  const parseCard='<div class="card pad"><h3 style="margin-bottom:12px">VIN 码解析</h3><div class="form-item"><label>输入 17 位车辆识别代号（VIN）</label><input class="field" id="vinInput" placeholder="例如：LSVAA4180J2000158" value="'+esc(state.vinText)+'" style="font-family:ui-monospace,Consolas,monospace;letter-spacing:1px"></div><button class="btn primary" style="margin-top:12px" data-act="parse-vin">开始解析</button><div class="vin-result" style="margin-top:16px">'+(res?vinResultHtml(res):'<div class="muted">输入 VIN 后点击「开始解析」，将自动校验第 9 位校验码并解析生产地区、品牌与年款信息。</div>')+'</div></div>';
+  const historyCard='<div class="card pad"><h3 style="margin-bottom:12px">维保 / 出险记录查询</h3><div class="form-item"><label>按 VIN 查询历史记录</label><input class="field" id="hisVin" placeholder="输入 VIN 查询演示记录"></div><button class="btn" style="margin-top:12px" data-act="query-history">查询记录</button><div id="hisResult" style="margin-top:16px"></div><div class="notice">演示数据：当前展示的是模拟记录，正式业务需接入合规的车辆历史数据服务。</div></div>';
+  return '<div class="page-head"><div><h1>'+title+'</h1><p>'+desc+'</p></div></div>'+
+  (mode==='history'?historyCard:parseCard);
+}
+
+/* ==================== 专家 / 客户 / 设置 ==================== */
+function renderExperts(){
+  return '<div class="page-head"><div><h1>鉴定专家</h1><p>共 '+DB.experts.length+' 位鉴定人员</p></div><button class="btn primary" data-act="new-expert">'+svg(ico.plus)+' 添加鉴定师</button></div>'+
+  '<div class="grid-3">'+DB.experts.map(e=>'<div class="card pad"><div style="display:flex;gap:12px;align-items:center;margin-bottom:14px"><div class="avatar" style="width:44px;height:44px;font-size:16px">'+esc(e.name[0])+'</div><div><div style="font-weight:650;font-size:15px">'+esc(e.name)+'</div><div class="muted small">'+esc(e.title)+' · 从业 '+e.years+' 年</div></div><div style="margin-left:auto"><span class="badge '+(e.status==='在岗'?'b-green':'b-amber')+'">'+esc(e.status)+'</span></div></div>'+
+  '<div class="small muted">执业证书编号</div><div class="mono" style="margin-bottom:10px">'+esc(e.cert)+'</div><div class="small muted">擅长领域</div><div style="margin:5px 0 12px">'+esc(e.specialty).split(/[、,，]/).map(s=>'<span class="badge b-gray" style="margin-right:5px">'+esc(s)+'</span>').join('')+'</div>'+
+  '<div style="border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;align-items:center"><span class="muted small">'+esc(e.phone)+'</span><button class="link red" data-act="del-expert" data-id="'+e.id+'">移除</button></div></div>').join('')+'</div>';
+}
+function openExpertForm(){
+  showModal('添加鉴定师','<div class="form-grid"><div class="form-item"><label>姓名</label><input class="field" name="name"></div><div class="form-item"><label>职称</label><input class="field" name="title" value="鉴定评估师"></div><div class="form-item"><label>执业证书编号</label><input class="field" name="cert"></div><div class="form-item"><label>从业年限</label><input class="field" name="years" type="number" value="5"></div><div class="form-item full"><label>擅长领域（顿号分隔）</label><input class="field" name="specialty" placeholder="事故车鉴定、价值评估"></div><div class="form-item"><label>联系电话</label><input class="field" name="phone"></div><div class="form-item"><label>状态</label><select class="field" name="status"><option>在岗</option><option>外勤</option><option>休假</option></select></div></div>','<button class="btn" data-act="close-modal">取消</button><button class="btn primary" data-act="save-expert">保存</button>');
+}
+function renderClients(){
+  const scope=state.page==='client-company'?'企业':state.page==='client-person'?'个人':'全部';
+  const list=scope==='全部'?DB.clients:DB.clients.filter(k=>k.type===scope);
+  return '<div class="page-head"><div><h1>'+(scope==='全部'?'委托客户':scope+'客户')+'</h1><p>共 '+list.length+' 家'+(scope==='全部'?'':scope)+'委托客户</p></div><button class="btn primary" data-act="new-client">'+svg(ico.plus)+' 添加客户</button></div>'+
+  '<div class="card"><div class="table-wrap"><table><thead><tr><th>客户名称</th><th>客户类型</th><th>联系人</th><th>联系电话</th><th>所在城市</th><th>关联案件</th><th>操作</th></tr></thead><tbody>'+
+  (list.length?list.map(k=>'<tr><td><strong>'+esc(k.name)+'</strong></td><td><span class="badge '+(k.type==='企业'?'b-blue':'b-purple')+'">'+esc(k.type)+'</span></td><td>'+esc(k.contact)+'</td><td>'+esc(k.phone)+'</td><td>'+esc(k.city)+'</td><td>'+DB.cases.filter(c=>c.client===k.name).length+' 件</td><td><button class="link red" data-act="del-client" data-id="'+k.id+'">删除</button></td></tr>').join(''):'<tr><td colspan="7"><div class="empty">'+svg(ico.users)+'<div>该分类下暂无客户</div></div></td></tr>')+
+  '</tbody></table></div></div>';
+}
+function openClientForm(){
+  showModal('添加委托客户','<div class="form-grid"><div class="form-item full"><label>客户名称</label><input class="field" name="name"></div><div class="form-item"><label>客户类型</label><select class="field" name="type"><option>企业</option><option>个人</option></select></div><div class="form-item"><label>联系人</label><input class="field" name="contact"></div><div class="form-item"><label>联系电话</label><input class="field" name="phone"></div><div class="form-item"><label>所在城市</label><input class="field" name="city"></div></div>','<button class="btn" data-act="close-modal">取消</button><button class="btn primary" data-act="save-client">保存</button>');
+}
+function systemInfoBanner(){
+  return '<div class="info-banner"><div><h3>系统信息</h3><p>车鉴云 · 机动车鉴定评估管理系统　版本 v1.1　|　一级分类 → 二级模块 → 三级页面　|　数据存储：浏览器本地</p></div>'+
+  '<div class="info-stats"><div><b>'+NAV.length+'</b><span>一级分类</span></div><div><b>'+Object.keys(PAGE_ANCESTORS).filter(k=>PAGE_ANCESTORS[k].length===1).length+'</b><span>二级模块</span></div><div><b>'+Object.keys(PAGE_NAME).length+'</b><span>三级页面</span></div><div><b>'+DB.cases.length+'</b><span>案件数据</span></div></div></div>';
+}
+function renderSettings(){
+  const s=DB.settings;
+  return '<div class="page-head"><div><h1>机构信息与系统设置</h1><p>机构资质、报告编号规则与业务偏好配置</p></div></div>'+systemInfoBanner()+
+  '<div class="grid-2"><div class="card pad"><h3 style="margin-bottom:16px">机构基本信息</h3><div class="form-grid">'+
+  '<div class="form-item full"><label class="req">机构名称</label><input class="field" name="company" value="'+esc(s.company)+'"></div>'+
+  '<div class="form-item"><label>统一社会信用代码</label><input class="field" name="creditCode" value="'+esc(s.creditCode)+'"></div>'+
+  '<div class="form-item"><label>资质等级</label><input class="field" name="qualification" value="'+esc(s.qualification)+'"></div>'+
+  '<div class="form-item"><label>许可证编号</label><input class="field" name="licenseNo" value="'+esc(s.licenseNo)+'"></div>'+
+  '<div class="form-item"><label>许可证有效期至</label><input class="field" name="licenseUntil" value="'+esc(s.licenseUntil)+'"></div>'+
+  '<div class="form-item"><label>法定代表人</label><input class="field" name="legalPerson" value="'+esc(s.legalPerson)+'"></div>'+
+  '<div class="form-item"><label>成立日期</label><input class="field" name="founded" value="'+esc(s.founded)+'"></div>'+
+  '<div class="form-item"><label>注册资本（万元）</label><input class="field" name="capital" value="'+esc(s.capital)+'"></div>'+
+  '<div class="form-item full"><label>机构地址</label><input class="field" name="address" value="'+esc(s.address)+'"></div></div></div>'+
+  '<div class="card pad"><h3 style="margin-bottom:16px">联系与业务信息</h3><div class="form-grid">'+
+  '<div class="form-item"><label>联系电话</label><input class="field" name="phone" value="'+esc(s.phone)+'"></div>'+
+  '<div class="form-item"><label>传真</label><input class="field" name="fax" value="'+esc(s.fax)+'"></div>'+
+  '<div class="form-item"><label>电子邮箱</label><input class="field" name="email" value="'+esc(s.email)+'"></div>'+
+  '<div class="form-item"><label>官方网站</label><input class="field" name="website" value="'+esc(s.website)+'"></div>'+
+  '<div class="form-item"><label>邮政编码</label><input class="field" name="zip" value="'+esc(s.zip)+'"></div>'+
+  '<div class="form-item"><label>报告编号前缀</label><input class="field" name="prefix" value="'+esc(s.prefix)+'" maxlength="4"></div>'+
+  '<div class="form-item full"><label>默认鉴定师</label><input class="field" name="appraiser" value="'+esc(s.appraiser)+'"></div></div>'+
+  '<div class="sec-title">业务偏好</div><label style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)"><span><b>自动生成案件编号</b><br><span class="muted small">新建案件时自动分配流水号</span></span><input type="checkbox" name="autoNumber" '+(s.autoNumber?'checked':'')+'></label>'+
+  '<label style="display:flex;justify-content:space-between;align-items:center;padding:11px 0"><span><b>报告邮件提醒</b><br><span class="muted small">报告签发后发送通知邮件</span></span><input type="checkbox" name="emailNotify" '+(s.emailNotify?'checked':'')+'></label>'+
+  '<div style="margin-top:20px;background:#f8fafc;border-radius:9px;padding:14px;font-size:12px;color:#64748b">当前数据存储于浏览器本地（localStorage），刷新页面不会丢失。清除浏览器数据将重置演示数据。</div>'+
+  '<button class="btn danger sm" style="margin-top:14px" data-act="reset-data">恢复演示数据</button></div></div>'+
+  '<div style="margin-top:18px"><button class="btn primary" data-act="save-settings">保存设置</button></div>';
+}
+
+/* ==================== 三级页面：标准 / 车型库 / 配置 / 角色 / 关于 ==================== */
+function renderInspectStandard(){
+  const gname={structure:'车身结构件',power:'动力与底盘',special:'特殊车况'};
+  return '<div class="page-head"><div><h1>检测判定标准</h1><p>依据 GB/T 30323 及行业规范配置的检测项与事故等级判定规则</p></div></div>'+
+  '<div class="card"><div class="card-head"><h3>检测项清单</h3><span class="muted small">共 '+DB.checkItems.length+' 项</span></div><div class="table-wrap"><table><thead><tr><th>分组</th><th>检测项</th><th>字段标识</th><th>可选结论</th><th>状态</th></tr></thead><tbody>'+
+  DB.checkItems.map(i=>'<tr><td>'+gname[i.group]+'</td><td><b>'+esc(i.label)+'</b></td><td class="mono">'+esc(i.key)+'</td><td>'+String(i.options).split(',').map(o=>'<span class="badge b-gray" style="margin-right:4px">'+esc(o)+'</span>').join('')+'</td><td>'+(i.enabled?'<span class="badge b-green">启用</span>':'<span class="badge b-gray">停用</span>')+'</td></tr>').join('')+
+  '</tbody></table></div></div>'+
+  '<div class="card pad" style="margin-top:18px"><h3 style="margin-bottom:12px">事故等级判定规则</h3>'+
+  '<div class="rule-box"><b>重大事故车：</b>纵梁、A/B/C 柱、防火墙、减震器座、后备箱底板等结构件任一项出现「切割更换」。</div>'+
+  '<div class="rule-box"><b>事故车（轻微）：</b>上述结构件存在「钣金修复」，但未发现切割更换。</div>'+
+  '<div class="rule-box"><b>水泡车 / 火烧车：</b>特殊车况排查中水泡或火烧项判定为「是」。</div>'+
+  '<div class="rule-box"><b>里程异常：</b>里程表状态判定为「异常」，或仪表读数与维保记录明显不符。</div>'+
+  '<div class="rule-box"><b>非事故车：</b>结构件均为正常，且无其他异常项。</div></div>';
+}
+function renderCatalog(mode){
+  mode=mode||'brand';
+  const title={brand:'品牌管理',series:'车系管理',model:'车型年款'}[mode];
+  const desc={brand:'一级品牌目录',series:'二级车系目录',model:'三级车型与四级年款配置'}[mode];
+  const seriesCount=DB.catalog.reduce((s,b)=>s+b.series.length,0);
+  const modelCount=DB.catalog.reduce((s,b)=>s+b.series.reduce((n,x)=>n+x.models.length,0),0);
+  let html='<div class="page-head"><div><h1>'+title+'</h1><p>'+desc+'　|　品牌 → 车系 → 车型 → 年款，共四级分类</p></div><button class="btn primary" data-act="new-catalog">'+svg(ico.plus)+' 新增分类</button></div>'+
+  '<div class="info-banner"><div><h3>车型分类体系</h3><p>支持按品牌、车系、车型、年款逐级维护，新增时若名称已存在将自动合并。</p></div><div class="info-stats"><div><b>'+DB.catalog.length+'</b><span>一级品牌</span></div><div><b>'+seriesCount+'</b><span>二级车系</span></div><div><b>'+modelCount+'</b><span>三级车型</span></div></div></div>'+
+  '<div class="card pad"><div class="catalog-tree">';
+  DB.catalog.forEach(b=>{
+    html+='<div class="catalog-brand"><div class="catalog-brand-head"><span class="lv">一级</span>'+esc(b.brand)+'<span class="muted small" style="margin-left:auto">'+b.series.length+' 个车系</span></div>';
+    b.series.forEach(s=>{
+      html+='<div class="catalog-series"><div class="catalog-series-name"><span class="lv">二级</span>'+esc(s.name)+'<span class="muted small">'+s.models.length+' 款车型</span></div>';
+      s.models.forEach(m=>{
+        html+='<div class="model-line"><span class="mname">［三级］'+esc(m.name)+'</span><span>'+m.years.map(y=>'<span class="year-chip">四级 · '+esc(y)+'</span>').join('')+'</span></div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  return html+'</div></div>';
+}
+function openCatalogForm(){
+  showModal('新增车型分类','<div class="form-grid">'+
+    '<div class="form-item"><label>品牌（一级）</label><input class="field" name="brand" placeholder="如：大众"></div>'+
+    '<div class="form-item"><label>车系（二级）</label><input class="field" name="series" placeholder="如：帕萨特"></div>'+
+    '<div class="form-item full"><label>车型（三级）</label><input class="field" name="model" placeholder="如：330TSI 尊贵版"></div>'+
+    '<div class="form-item full"><label>年款（四级，多个用逗号分隔）</label><input class="field" name="years" placeholder="如：2018,2019,2020"></div></div>',
+    '<button class="btn" data-act="close-modal">取消</button><button class="btn primary" data-act="save-catalog">保存分类</button>');
+}
+function renderAuditors(){
+  const list=DB.users.filter(u=>u.role==='报告审核员'||u.role==='机构管理员');
+  return '<div class="page-head"><div><h1>审核人员</h1><p>负责鉴定报告复核、签发与归档的人员</p></div></div>'+
+  '<div class="card"><div class="table-wrap"><table><thead><tr><th>工号</th><th>姓名</th><th>岗位</th><th>所属部门</th><th>状态</th><th>最近登录</th></tr></thead><tbody>'+
+  list.map(u=>'<tr><td class="mono">'+esc(u.id)+'</td><td><b>'+esc(u.name)+'</b></td><td>'+esc(u.role)+'</td><td>'+esc(u.dept)+'</td><td><span class="badge '+(u.status==='启用'?'b-green':'b-gray')+'">'+esc(u.status)+'</span></td><td>'+esc(u.lastLogin)+'</td></tr>').join('')+
+  '</tbody></table></div></div>';
+}
+function renderConfig(mode){
+  const g=mode==='power'?'power':mode==='special'?'special':'structure';
+  const title={structure:'车身结构件',power:'动力底盘',special:'特殊车况'}[g];
+  const list=DB.checkItems.filter(i=>i.group===g);
+  return '<div class="page-head"><div><h1>'+title+'配置</h1><p>启用或停用检测项，配置将实时应用于检测清单</p></div></div>'+
+  '<div class="card"><div class="card-head"><h3>检测项列表</h3><span class="muted small">共 '+list.length+' 项，启用 '+list.filter(i=>i.enabled).length+' 项</span></div><div class="table-wrap"><table><thead><tr><th>检测项</th><th>字段标识</th><th>可选结论</th><th>是否启用</th></tr></thead><tbody>'+
+  list.map(i=>'<tr><td><b>'+esc(i.label)+'</b></td><td class="mono">'+esc(i.key)+'</td><td>'+String(i.options).split(',').map(o=>'<span class="badge b-gray" style="margin-right:4px">'+esc(o)+'</span>').join('')+'</td><td><label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input type="checkbox" data-config="'+i.key+'"'+(i.enabled?' checked':'')+'> '+(i.enabled?'启用':'停用')+'</label></td></tr>').join('')+
+  '</tbody></table></div></div>';
+}
+function renderRoles(){
+  return systemInfoBanner()+
+  '<div class="page-head"><div><h1>用户与角色</h1><p>共 '+DB.roles.length+' 个角色、'+DB.users.length+' 个系统账号</p></div></div>'+
+  '<div class="card"><div class="card-head"><h3>角色权限</h3></div><div class="table-wrap"><table><thead><tr><th>角色编号</th><th>角色名称</th><th>职责说明</th><th>权限范围</th><th>成员数</th></tr></thead><tbody>'+
+  DB.roles.map(r=>'<tr><td class="mono">'+esc(r.id)+'</td><td><b>'+esc(r.name)+'</b></td><td>'+esc(r.desc)+'</td><td>'+r.perms.map(p=>'<span class="badge b-blue" style="margin-right:4px">'+esc(p)+'</span>').join('')+'</td><td>'+r.members+' 人</td></tr>').join('')+'</tbody></table></div></div>'+
+  '<div class="card" style="margin-top:18px"><div class="card-head"><h3>系统账号</h3></div><div class="table-wrap"><table><thead><tr><th>工号</th><th>姓名</th><th>角色</th><th>所属部门</th><th>状态</th><th>最近登录</th></tr></thead><tbody>'+
+  DB.users.map(u=>'<tr><td class="mono">'+esc(u.id)+'</td><td><b>'+esc(u.name)+'</b></td><td>'+esc(u.role)+'</td><td>'+esc(u.dept)+'</td><td><span class="badge '+(u.status==='启用'?'b-green':'b-gray')+'">'+esc(u.status)+'</span></td><td>'+esc(u.lastLogin)+'</td></tr>').join('')+'</tbody></table></div></div>';
+}
+function renderAbout(){
+  return systemInfoBanner()+
+  '<div class="page-head"><div><h1>关于系统</h1><p>车鉴云 · 机动车鉴定评估管理系统　v1.1</p></div></div>'+
+  '<div class="grid-2"><div class="card pad"><h3 style="margin-bottom:12px">系统概述</h3><p>本系统面向机动车鉴定评估机构，覆盖案件受理、车辆查勘、结构检测、事故等级判定、报告出具与归档的全业务流程。采用三级导航结构，所有业务数据保存在本地浏览器中。</p>'+
+  '<div class="sec-title">版本信息</div><div class="info-grid"><div><span>系统版本</span><b>v1.1.0</b></div><div><span>导航层级</span><b>三级（分类 / 模块 / 页面）</b></div><div><span>数据存储</span><b>localStorage</b></div><div><span>开发架构</span><b>原生 HTML + CSS + JavaScript</b></div><div><span>适用行业</span><b>机动车鉴定评估 / 二手车检测</b></div><div><span>报告规范</span><b>GB/T 30323 参考</b></div></div></div>'+
+  '<div class="card pad"><h3 style="margin-bottom:12px">功能模块一览</h3>'+NAV.filter(n=>n.children).map(g=>'<div style="margin-bottom:12px"><b>'+g.name+'</b><div style="margin-top:5px">'+g.children.map(m=>'<span class="badge b-gray" style="margin:3px 5px 3px 0">'+m.name+'（'+m.children.length+' 页）</span>').join('')+'</div></div>').join('')+
+  '<div class="sec-title">使用提示</div><p class="muted">点击左侧二级模块可展开三级页面；工作台待办与全局搜索可快速定位案件；检测结论保存后会自动判定事故等级并写入报告。</p></div></div>';
+}
+
+/* ==================== 渲染入口 ==================== */
+const PAGES={
+  dashboard:renderDashboard,
+  'case-all':renderCases,'case-pending':renderCases,'case-doing':renderCases,'case-done':renderCases,
+  'inspect-task':renderInspection,'inspect-standard':renderInspectStandard,
+  'report-all':renderReports,'report-draft':renderReports,'report-signed':renderReports,
+  'vehicle-all':renderVehicles,'vehicle-accident':renderVehicles,'vehicle-clean':renderVehicles,
+  'vin-parse':()=>renderVin('parse'),'vin-history':()=>renderVin('history'),
+  'catalog-brand':()=>renderCatalog('brand'),'catalog-series':()=>renderCatalog('series'),'catalog-model':()=>renderCatalog('model'),
+  'staff-expert':renderExperts,'staff-auditor':renderAuditors,
+  'client-company':renderClients,'client-person':renderClients,
+  'config-structure':()=>renderConfig('structure'),'config-power':()=>renderConfig('power'),'config-special':()=>renderConfig('special'),
+  'setting-company':renderSettings,'setting-role':renderRoles,'setting-about':renderAbout
+};
+function render(){
+  document.getElementById('content').innerHTML=(PAGES[state.page]||renderDashboard)();
+  const u=document.getElementById('userName');if(u)u.textContent=DB.settings.appraiser;
+  const a=document.getElementById('avatar');if(a)a.textContent=(DB.settings.appraiser||'鉴')[0];
+}
+
+/* ==================== 交互事件 ==================== */
+document.addEventListener('click',e=>{
+  const navEl=e.target.closest('[data-nav]');
+  if(navEl){
+    const nid=navEl.dataset.nav,node=findNav(nid);
+    if(node&&node.children){
+      const i=state.navOpen.indexOf(nid);
+      if(i>=0){state.navOpen.splice(i,1);renderNav();return}
+      state.navOpen.push(nid);navigate(firstLeaf(node));
+    }else navigate(nid);
+    return;
+  }
+  const nav=e.target.closest('[data-page]');if(nav){navigate(nav.dataset.page);return}
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const act=el.dataset.act,id=el.dataset.id;
+  if(act==='overlay'){if(e.target===el)closeModal();return}
+  if(act==='close-modal'){closeModal();return}
+  if(act==='notify'){toast('您有 '+DB.cases.filter(c=>['待受理','检测中','报告编制'].includes(c.status)).length+' 项待处理案件');return}
+  if(act==='new-case'){openCaseForm();return}
+  if(act==='case-detail'){openCase(id);return}
+  if(act==='case-edit'){openCaseForm(id);return}
+  if(act==='save-case'){saveCase(id);return}
+  if(act==='case-del'){
+    if(confirm('确定删除案件 '+id+' 吗？此操作不可撤销。')){DB.cases=DB.cases.filter(c=>c.id!==id);delete DB.inspections[id];save();render();toast('案件已删除')}return;
+  }
+  if(act==='case-tab'){state.detailTab=el.dataset.tab;renderCaseModal();return}
+  if(act==='open-inspect'){openInspection(id);return}
+  if(act==='save-inspect'){saveInspection(id);return}
+  if(act==='gen-report'){const r=ensureReport(id);closeModal();render();viewReport(r.id);return}
+  if(act==='view-report'){viewReport(id);return}
+  if(act==='print-report'){printReport(id);return}
+  if(act==='export-report'){
+    const r=DB.reports.find(x=>x.id===id);if(!r)return;
+    const blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=r.id+'.json';a.click();URL.revokeObjectURL(a.href);toast('报告数据已导出');return;
+  }
+  if(act==='parse-vin'){
+    const v=document.getElementById('vinInput');state.vinText=v?v.value.trim().toUpperCase():'';render();return;
+  }
+  if(act==='query-history'){
+    const v=document.getElementById('hisVin').value.trim().toUpperCase();
+    if(v.length!==17){toast('请输入 17 位 VIN 码','err');return}
+    document.getElementById('hisResult').innerHTML=mockRecords(v);toast('查询完成（演示数据）');return;
+  }
+  if(act==='new-expert'){openExpertForm();return}
+  if(act==='save-expert'){
+    const d={};new FormData(document.querySelector('.modal .form-grid')).forEach((v,k)=>d[k]=String(v).trim());
+    if(!d.name){toast('请填写姓名','err');return}
+    d.years=Number(d.years)||1;DB.experts.push({id:uid('E'),...d,status:d.status||'在岗'});save();closeModal();render();toast('鉴定师已添加');return;
+  }
+  if(act==='del-expert'){if(confirm('确定移除该鉴定师？')){DB.experts=DB.experts.filter(x=>x.id!==id);save();render();toast('已移除')}return}
+  if(act==='new-client'){openClientForm();return}
+  if(act==='save-client'){
+    const d={};new FormData(document.querySelector('.modal .form-grid')).forEach((v,k)=>d[k]=String(v).trim());
+    if(!d.name){toast('请填写客户名称','err');return}
+    DB.clients.push({id:uid('K'),...d});save();closeModal();render();toast('客户已添加');return;
+  }
+  if(act==='del-client'){if(confirm('确定删除该客户？')){DB.clients=DB.clients.filter(x=>x.id!==id);save();render();toast('已删除')}return}
+  if(act==='save-settings'){
+    document.querySelectorAll('.card.pad input.field').forEach(i=>{if(i.name)DB.settings[i.name]=i.value.trim()});
+    document.querySelectorAll('.card.pad input[type=checkbox]').forEach(i=>DB.settings[i.name]=i.checked);
+    save();render();toast('系统设置已保存');return;
+  }
+  if(act==='new-catalog'){openCatalogForm();return}
+  if(act==='save-catalog'){
+    const d={};new FormData(document.querySelector('.modal .form-grid')).forEach((v,k)=>d[k]=String(v).trim());
+    if(!d.brand||!d.series||!d.model){toast('品牌、车系、车型为必填项','err');return}
+    let b=DB.catalog.find(x=>x.brand===d.brand);
+    if(!b){b={brand:d.brand,series:[]};DB.catalog.push(b)}
+    let s=b.series.find(x=>x.name===d.series);
+    if(!s){s={name:d.series,models:[]};b.series.push(s)}
+    let m=s.models.find(x=>x.name===d.model);
+    if(!m){m={name:d.model,years:[]};s.models.push(m)}
+    String(d.years||'').split(/[,，、\s]+/).filter(Boolean).forEach(y=>{if(!m.years.includes(y))m.years.push(y)});
+    save();closeModal();render();toast('车型分类已保存');return;
+  }
+  if(act==='reset-data'){if(confirm('确定恢复演示数据？当前所有修改将被清除。')){DB=seedDB();save();navigate('dashboard');toast('已恢复演示数据')}return}
+});
+document.addEventListener('change',e=>{
+  if(e.target.dataset.filter){state[e.target.dataset.filter]=e.target.value;render()}
+  if(e.target.dataset.config){
+    const item=DB.checkItems.find(i=>i.key===e.target.dataset.config);
+    if(item){item.enabled=e.target.checked;save();toast('检测项配置已更新');render()}
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='caseQ'){state.q=e.target.value;render();const n=document.getElementById('caseQ');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if(e.key==='Enter'&&e.target.id==='vinInput'){e.preventDefault();state.vinText=e.target.value.trim().toUpperCase();render()}
+  if(e.key==='Enter'&&e.target.id==='globalSearch'){
+    const q=e.target.value.trim();if(!q)return;state.q=q;navigate('case-all');toast('已按「'+q+'」筛选案件');
+  }
+});
+
+/* ==================== 启动 ==================== */
+renderNav();navigate('dashboard');
+</script>
+</body>
+</html>
