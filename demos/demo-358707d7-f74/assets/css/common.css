@@ -1,0 +1,197 @@
+/* ============================================================
+ * 装修公司管理系统 - 通用样式（清新装修风 · 薄荷绿 + 珊瑚橙）
+ * 设计元素：户型网格 / 色卡条 / 施工图纸纹理 / 柔和阴影
+ * ============================================================ */
+:root {
+  --primary: #0e9f8e;
+  --primary-dark: #0b7c71;
+  --primary-light: #d8f5ee;
+  --accent: #ff8a65;
+  --accent-light: #ffe6dc;
+  --sand: #f6c56b;
+  --sand-light: #fff2d6;
+  --blue: #5b9bd5;
+  --blue-light: #e3f1fb;
+  --bg: #f3f9f7;
+  --card: #ffffff;
+  --text: #203b39;
+  --text-2: #6b8582;
+  --text-3: #9bb2ae;
+  --border: #e0eee9;
+  --border-2: #cfe2dc;
+  --success: #059669;
+  --success-bg: #d1fae5;
+  --warning: #d98324;
+  --warning-bg: #fff2d6;
+  --danger: #e05a5a;
+  --danger-bg: #ffe4e4;
+  --info: #3b82c4;
+  --info-bg: #e3f1fb;
+  --purple: #8b6ad6;
+  --purple-bg: #efe9fb;
+  --shadow: 0 2px 10px rgba(23,92,82,.05), 0 1px 2px rgba(23,92,82,.04);
+  --shadow-md: 0 16px 38px rgba(23,92,82,.13);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --grid: linear-gradient(rgba(14,159,142,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(14,159,142,.055) 1px, transparent 1px);
+  --swatch: linear-gradient(90deg, #0e9f8e 0 22%, #5b9bd5 22% 44%, #f6c56b 44% 66%, #ff8a65 66% 88%, #8b6ad6 88% 100%);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font-family: inherit; font-size: inherit; }
+button { cursor: pointer; }
+h1,h2,h3,h4,p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #cfe2dc; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #a9cfc5; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 卡片：顶部一条装修色卡渐变 */
+.card, .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); position: relative; }
+.panel { overflow: hidden; }
+.panel::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--swatch); z-index: 1; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 20px 15px; border-bottom: 1px solid var(--border); }
+.panel-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.panel-title .bar { width: 4px; height: 16px; border-radius: 4px; background: linear-gradient(180deg, var(--primary), var(--accent)); display: inline-block; }
+.panel-body { padding: 20px; }
+.muted { color: var(--text-2); }
+.tiny { font-size: 12px; }
+.strong { font-weight: 700; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row { display: flex; align-items: center; gap: 10px; }
+.col { display: flex; flex-direction: column; gap: 10px; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1; min-width: 0; }
+.hide { display: none !important; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 15px; border-radius: var(--radius-sm); border: 1px solid var(--border-2);
+  background: #fff; color: var(--text); font-weight: 600; font-size: 13px; transition: .18s; white-space: nowrap;
+}
+.btn:hover { border-color: var(--primary); color: var(--primary-dark); background: #f0fbf8; }
+.btn-primary { background: linear-gradient(135deg, #12ad9b, #0b7c71); border-color: var(--primary-dark); color: #fff; box-shadow: 0 3px 10px rgba(14,159,142,.24); }
+.btn-primary:hover { background: linear-gradient(135deg, #0b9486, #08675e); border-color: #08675e; color: #fff; }
+.btn-danger { background: #fff; border-color: #f7c5c5; color: var(--danger); }
+.btn-danger:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-sm { height: 30px; padding: 0 10px; font-size: 12px; }
+.btn-lg { height: 42px; padding: 0 22px; font-size: 14px; }
+.btn-block { width: 100%; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.input, .select, .textarea {
+  width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm); background: #fff; color: var(--text); outline: none; transition: .18s;
+}
+.textarea { height: auto; min-height: 88px; padding: 10px 12px; resize: vertical; }
+.input:focus, .select:focus, .textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,159,142,.12); }
+.input::placeholder, .textarea::placeholder { color: var(--text-3); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-size: 13px; font-weight: 600; color: #52706c; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid .full { grid-column: 1 / -1; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: 12px; font-weight: 600; line-height: 1.6; white-space: nowrap; }
+.badge.success { background: var(--success-bg); color: #047857; }
+.badge.warning { background: var(--warning-bg); color: #b56a1b; }
+.badge.danger { background: var(--danger-bg); color: #c23b3b; }
+.badge.info { background: var(--info-bg); color: #2b6cb0; }
+.badge.purple { background: var(--purple-bg); color: #7451bd; }
+.badge.gray { background: #eef4f2; color: var(--text-2); }
+.badge.orange { background: var(--accent-light); color: #d46243; }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: currentColor; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; flex: none; }
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table-wrap { width: 100%; overflow-x: auto; }
+table.data-table th { text-align: left; padding: 11px 14px; background: #f4faf8; color: var(--text-2); font-weight: 700; font-size: 12px; white-space: nowrap; border-bottom: 1px solid var(--border); }
+table.data-table td { padding: 12px 14px; border-bottom: 1px solid #eef5f2; vertical-align: middle; }
+table.data-table tbody tr:hover { background: #f2fbf8; }
+table.data-table tbody tr:last-child td { border-bottom: 0; }
+.table-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.link-btn { border: 0; background: none; color: var(--primary-dark); font-weight: 600; font-size: 12px; padding: 2px 4px; }
+.link-btn:hover { text-decoration: underline; }
+.link-btn.red { color: var(--danger); }
+.empty { text-align: center; padding: 46px 20px; color: var(--text-3); }
+.empty .big { font-size: 34px; margin-bottom: 8px; opacity: .55; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(14,59,53,.38); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); }
+.modal { width: 100%; max-width: 560px; max-height: 90vh; display: flex; flex-direction: column; background: #fff; border-radius: 18px; box-shadow: 0 24px 60px rgba(14,59,53,.22); overflow: hidden; animation: pop .18s ease-out; }
+@keyframes pop { from { transform: translateY(10px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-head { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, #f4fbf8, #fff); }
+.modal-head h3 { font-size: 17px; font-weight: 700; }
+.modal-close { border: 0; background: #eef4f2; width: 30px; height: 30px; border-radius: 8px; color: var(--text-2); font-size: 18px; line-height: 1; }
+.modal-close:hover { background: var(--danger-bg); color: var(--danger); }
+.modal-body { padding: 22px; overflow-y: auto; }
+.modal-foot { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #f7fbfa; }
+
+.toast-box { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast { background: #1f4d47; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.18); animation: toastIn .2s ease-out; }
+.toast.ok { background: #0b7c71; }
+.toast.err { background: #c94545; }
+@keyframes toastIn { from { transform: translateY(-10px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.bar-chart { display: flex; align-items: flex-end; gap: 14px; height: 170px; padding: 10px 4px 0; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.bar-track { width: 100%; max-width: 38px; flex: 1; display: flex; align-items: flex-end; background: #eef5f2; border-radius: 6px 6px 0 0; overflow: hidden; }
+.bar-fill { width: 100%; background: linear-gradient(180deg, #5eead4, #0e9f8e); border-radius: 6px 6px 0 0; transition: height .5s ease; min-height: 3px; }
+.bar-label { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+.bar-value { font-size: 12px; font-weight: 700; color: var(--primary-dark); }
+
+.progress-line { height: 7px; background: #eaf3f0; border-radius: 99px; overflow: hidden; }
+.progress-line > i { display: block; height: 100%; background: linear-gradient(90deg, #5eead4, #0e9f8e 65%, #ff8a65); border-radius: 99px; transition: width .4s; }
+
+.section-title { font-size: 14px; font-weight: 800; margin: 20px 0 10px; padding-left: 10px; border-left: 3px solid var(--primary); }
+.detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 24px; }
+.detail-item { display: flex; gap: 8px; font-size: 13px; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+.detail-item .k { color: var(--text-2); min-width: 74px; flex: none; }
+.detail-item .v { font-weight: 600; word-break: break-all; }
+
+/* 时间轴：施工日志 */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(180deg, var(--primary-light), var(--border)); }
+.tl-item { position: relative; padding-bottom: 20px; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot { position: absolute; left: -22px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 3px solid var(--border-2); z-index: 1; }
+.tl-item.done .tl-dot { border-color: var(--primary); background: var(--primary); }
+.tl-item.current .tl-dot { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px var(--primary-light); }
+.tl-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tl-title { font-weight: 800; font-size: 14px; }
+.tl-date { font-size: 12px; color: var(--text-3); }
+.tl-content { margin-top: 6px; font-size: 13px; color: var(--text-2); line-height: 1.7; }
+
+/* 聊天气泡 */
+.chat-list { display: flex; flex-direction: column; gap: 14px; }
+.chat-row { display: flex; gap: 9px; align-items: flex-start; }
+.chat-row.mine { flex-direction: row-reverse; }
+.chat-row .avatar { width: 32px; height: 32px; font-size: 12px; }
+.chat-meta { max-width: 76%; }
+.chat-row.mine .chat-meta { text-align: right; }
+.chat-name { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+.chat-bubble { display: inline-block; padding: 9px 12px; background: #f0f6f4; border-radius: 4px 12px 12px 12px; font-size: 13px; line-height: 1.65; text-align: left; word-break: break-word; }
+.chat-row.mine .chat-bubble { background: var(--primary-light); color: #0b6e64; border-radius: 12px 4px 12px 12px; }
+.chat-time { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+
+/* 照片墙（CSS 模拟施工现场照片，装修色卡风格） */
+.photo-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.photo-tile { height: 82px; border-radius: 9px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: #fff; font-size: 11px; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.photo-tile svg { width: 20px; height: 20px; opacity: .9; }
+.photo-1 { background: linear-gradient(135deg, #5eead4, #0e9f8e); }
+.photo-2 { background: linear-gradient(135deg, #93c5fd, #3b82c4); }
+.photo-3 { background: linear-gradient(135deg, #fcd68a, #d98324); }
+.photo-4 { background: linear-gradient(135deg, #c4b5fd, #8b6ad6); }
+.photo-5 { background: linear-gradient(135deg, #a7f3d0, #059669); }
+.photo-6 { background: linear-gradient(135deg, #ffb59c, #f06f4e); }
+
+/* 通用装修装饰元素：色卡条 / 图纸网格 */
+.swatch-bar { height: 5px; border-radius: 99px; background: var(--swatch); }
+.blueprint-bg { background-color: #f7fcfa; background-image: var(--grid); background-size: 24px 24px; }
